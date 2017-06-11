@@ -4,6 +4,7 @@ pointing interfaces can be useful only for very simple tasks, also for some spec
 !"keyboard.png"
 comma followed by anything other than a space is for entering punctuation
 , followed by , --> .
+. followed by , --> :
 , followed by ( --> [
 , followed by add[space] --> +[space]
 , followed by add, --> +
