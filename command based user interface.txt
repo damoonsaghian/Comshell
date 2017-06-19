@@ -1,13 +1,13 @@
 command based user interfaces (keyboard, voice, gesture) are faster more convenient and more powerful than pointing based user interfaces (mouse, touch, pen)
 pointing interfaces can be useful only for very simple tasks, also for some special artistic applications pen input remains the only choice
 
-!"keyboard.png"
+\image("keyboard")
 comma followed by anything other than a space is for entering punctuation
-, followed by , --> .
-. followed by , --> :
-, followed by ( --> [
-, followed by add[space] --> +[space]
-, followed by add, --> +
+type , followed by , --> .
+type . followed by , --> :
+type , followed by ( --> [
+type , followed by add[space] --> +[space]
+type , followed by add, --> +
 double ' --> "
 
 'vim'like key'bindings
