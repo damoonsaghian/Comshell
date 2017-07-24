@@ -22,4 +22,4 @@ a headset with near range microphone can be used, to exclude far away sound sour
 also it is better to put battery and bluetooth of the headset in a separate unit, that can be put in the pocket, this makes the headset lighter and safer
 for those that neither can use all their fingers, nor can talk, gesture based interface can be implemented
 
-Comshell, command based user interface, written in Frem, using Rust ecosystem
+Comshell, command based user interface, created using Rust ecosystem
