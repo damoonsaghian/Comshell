@@ -1,0 +1,39 @@
+Comshell, command based user interface, created using Rust ecosystem.
+https://github.com/PistonDevelopers/piston/wiki/Games-Made-With-Piston
+
+text editing:
+https://github.com/jmacdonald/scribe
+https://github.com/mathall/rim
+https://github.com/gchp/iota
+https://github.com/zovt/tea
+
+web browser:
+https://github.com/kkartaltepe/rust-cef
+https://github.com/dylanede/cef-rs
+Awesomium
+Servo
+https://github.com/hyperium/hyper/
+https://github.com/servo/rust-url/
+
+media player:
+https://trac.ffmpeg.org/wiki/HWAccelIntro
+https://gist.github.com/rcolinray/7552384
+http://dranger.com/ffmpeg/
+https://github.com/pcwalton/rust-media
+https://github.com/tomaka/rodio
+https://github.com/tomaka/cpal
+https://crates.io/crates/camera_capture
+
+libs using futures:
+https://crates.io/crates/hyper
+  https://crates.io/crates/hyper-rustls
+  https://crates.io/crates/reqwest
+  https://crates.io/crates/simplist
+https://crates.io/crates/httpbin
+https://crates.io/crates/httpbis
+https://crates.io/crates/xmpp-proto
+https://crates.io/crates/cpal
+https://crates.io/crates/rodio
+https://crates.io/crates/lewton
+https://crates.io/crates/pijul (version control system)
+https://crates.io/crates/github-rs
