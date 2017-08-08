@@ -1,7 +1,7 @@
 command based user interfaces (keyboard, voice, gesture) are faster more convenient and more powerful than pointing based user interfaces (mouse, touch, pen).
 pointing interfaces can be useful only for very simple tasks. also for some special artistic applications pen input remains the only choice.
 
-\image("keyboard.png")
+".data/keyboard.png"
 , two commas --> .
 , comma followed by ' --> "
 , comma followed by ( --> [
