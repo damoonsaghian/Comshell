@@ -1,0 +1,5 @@
+Evas (which is a part of EFL) is the only g'u'i library i know, which has a high level scene'graph a'p'i, without being an extensive widget library.
+https://phab.enlightenment.org/w/efl_concept_overview/
+
+to install the dependencies of EFL, in Unix'like systems, use the system's package manager.
+for Windows install MSYS2. then add the bin directories to the paths environment variable.
