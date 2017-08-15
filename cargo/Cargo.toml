@@ -4,7 +4,6 @@ version = "0.1.0"
 authors = ["Damoon Saghian <damoonsaghian84@gmail.com>"]
 description = "command based user interface"
 license = "MIT"
-build = "build.rs"
 
 [[bin]]
 name = "comshell"
@@ -13,3 +12,4 @@ path = "../main.rs"
 [dependencies]
 futures = "*"
 futures-cpupool = "*"
+gtk = "*"
