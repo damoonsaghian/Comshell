@@ -1,10 +1,11 @@
 Comshell is command based user interface, being developed using Rust ecosystem.
 
 high'level g'u'i lib
-http://gtk-rs.org/
+"http://gtk-rs.org/"
 
 = other useful libraries
 text editing:
+"https://github.com/oakes/SolidOak"
 "https://github.com/jmacdonald/scribe"
 "https://github.com/mathall/rim"
 "https://github.com/gchp/iota"
