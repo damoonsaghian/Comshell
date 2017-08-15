@@ -4,7 +4,7 @@ boot to an existing Arch Linux (installed or live) then:
   prepare the disk (use lsblk to identify the block devices), and mount it:
     mkfs.btrfs -f /dev/sdx
     mount /dev/sdx /mnt
-  pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate
+  pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate sway gtk3
   arch-chroot /mnt
   bootloader:
     grub-install --target=i386-pc /dev/sdx
@@ -28,8 +28,12 @@ go to Comshell/cargo dir and:
   cargo build --release
   sudo cp .cache/release/comshell ~/.comshell/comshell
   cp -R ../.data ~/.comshell/
+config Sway:
+  mkdir -p /user1/.config/sway; nano /user1/.config/sway/config
+  hide_edge_borders smart
+  exec_always --no-startup-id ~/.comshell/comshell
 add this line to "~/.bash_profile":
-  exec ~/.comshell/comshell
+  exec sway
 
 projects for each user are kept in ~/.comshell/users/user1/projects
 (these users doesn't have anything to do with unix users. but Comshells with single users can be effectivily considered equivalent to the current unix user)
