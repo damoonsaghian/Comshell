@@ -1,11 +1,10 @@
 Comshell is command based user interface, being developed using Rust ecosystem.
 
-high'level g'u'i lib
-"http://gtk-rs.org/"
+3d scene graph graphics library
+Evas (from EFL)
 
 = other useful libraries
 text editing:
-"https://github.com/oakes/SolidOak"
 "https://github.com/jmacdonald/scribe"
 "https://github.com/mathall/rim"
 "https://github.com/gchp/iota"
@@ -20,6 +19,8 @@ web:
 "https://crates.io/crates/httpbin"
 "https://crates.io/crates/httpbis"
 "https://crates.io/crates/xmpp-proto"
+"https://crates.io/crates/pijul" (version control system)
+"https://crates.io/crates/github-rs"
 
 media:
 "https://github.com/tomaka/rodio"
@@ -27,5 +28,3 @@ media:
 "https://crates.io/crates/lewton"
 "https://crates.io/crates/camera_capture"
 
-"https://crates.io/crates/pijul" (version control system)
-"https://crates.io/crates/github-rs"
