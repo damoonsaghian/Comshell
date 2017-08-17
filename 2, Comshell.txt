@@ -1,7 +1,7 @@
 Comshell is command based user interface, being developed using Rust ecosystem.
 
 3d scene graph graphics library
-Evas (from EFL)
+https://github.com/sebcrozet/kiss3d
 
 = other useful libraries
 text editing:
