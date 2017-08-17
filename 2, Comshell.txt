@@ -1,30 +1,3 @@
 Comshell is command based user interface, being developed using Rust ecosystem.
 
-3d scene graph graphics library
-https://github.com/sebcrozet/kiss3d
-
-= other useful libraries
-text editing:
-"https://github.com/jmacdonald/scribe"
-"https://github.com/mathall/rim"
-"https://github.com/gchp/iota"
-"https://github.com/zovt/tea"
-
-web:
-"https://github.com/servo/rust-url/"
-"https://crates.io/crates/hyper"
-  "https://crates.io/crates/hyper-rustls"
-  "https://crates.io/crates/reqwest"
-  "https://crates.io/crates/simplist"
-"https://crates.io/crates/httpbin"
-"https://crates.io/crates/httpbis"
-"https://crates.io/crates/xmpp-proto"
-"https://crates.io/crates/pijul" (version control system)
-"https://crates.io/crates/github-rs"
-
-media:
-"https://github.com/tomaka/rodio"
-"https://github.com/tomaka/cpal"
-"https://crates.io/crates/lewton"
-"https://crates.io/crates/camera_capture"
-
+graphics library with scene'graph a'p'i
