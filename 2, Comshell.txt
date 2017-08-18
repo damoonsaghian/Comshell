@@ -5,6 +5,8 @@ retained'mode graphics library
 "https://docs.enlightenment.org/efl/current/evas_main.html"
 Qt
 "https://rust-qt.github.io/rustdoc/qt/qt_gui/"
+"http://doc.qt.io/qt-5/qt3d-index.html"
+"https://www.kdab.com/overview-qt3d-2-0-part-1/"
 
 = other useful libraries
 text editing:
