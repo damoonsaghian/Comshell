@@ -1,3 +1,43 @@
 Comshell is command based user interface, being developed using Rust ecosystem.
 
-graphics library with scene'graph a'p'i
+retained'mode graphics library
+"https://www.enlightenment.org/program_guide/evas/ui_rendering_mode"
+"https://docs.enlightenment.org/efl/current/evas_main.html"
+
+to install the dependencies of EFL, in Unix'like systems, use the system's package manager. for Windows use MSYS2.
+for MSYS2 you must also add the bin directories to the paths environment variable:
+  SET PATH=%PATH%;C:\msys64\usr\local\bin;C:\msys64\mingw64\bin
+   (for 32bit systems, just replace 64 with 32)
+  SETX PATH "%PATH%"
+now you can compile and install EFL.
+
+"https://github.com/araujol/rust-efl"
+"https://github.com/rust-lang-nursery/rust-bindgen"
+
+= other useful libraries
+text editing:
+"https://github.com/jmacdonald/scribe"
+"https://github.com/mathall/rim"
+"https://github.com/gchp/iota"
+"https://github.com/zovt/tea"
+
+web:
+"https://github.com/servo/rust-url/"
+"https://crates.io/crates/hyper"
+  "https://crates.io/crates/hyper-rustls"
+  "https://crates.io/crates/reqwest"
+  "https://crates.io/crates/simplist"
+"https://crates.io/crates/httpbin"
+"https://crates.io/crates/httpbis"
+"https://crates.io/crates/xmpp-proto"
+"https://crates.io/crates/pijul" (version control system)
+"https://crates.io/crates/github-rs"
+
+media:
+"https://trac.ffmpeg.org/wiki/HWAccelIntro"
+"https://crates.io/crates/mpv"
+"https://github.com/pcwalton/rust-media"
+"https://github.com/tomaka/rodio"
+"https://github.com/tomaka/cpal"
+"https://crates.io/crates/lewton"
+"https://crates.io/crates/camera_capture"
