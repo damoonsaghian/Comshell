@@ -13,4 +13,3 @@ path = "../main.rs"
 [dependencies]
 futures = "*"
 futures-cpupool = "*"
-gt_gui = "*"
