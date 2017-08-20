@@ -1,11 +1,20 @@
-Comshell is command based user interface, being developed using Rust ecosystem.
+Comshell is a command based user interface, being developed using Rust ecosystem.
 
-retained'mode graphics library
+retained'mode (scene'graph) graphics library
 "https://www.enlightenment.org/program_guide/evas/ui_rendering_mode"
 "https://docs.enlightenment.org/efl/current/evas_main.html"
-Qt
-"http://doc.qt.io/qt-5/qt3d-index.html"
-"https://www.kdab.com/overview-qt3d-2-0-part-1/"
+
+GTK is good for text, image, and layouts. it has good Rust bindings (even for Gstreamer and Webkit). but it doesn't provide a 3d scene'graph.
+Qt has retained 2d/3d, but Rust bindings are terrible. and it seems that creating a good binding is impossible.
+EFL has scene'graph based graphics from the ground up. but its image'based (as opposed to vector'based), maintenance is not very good, and there is no active Rust bindings.
+
+Clutter seems to be a good choice. although there isn't an active Rust bindings, it seems to be easy to create one.
+the scene'graph in Clutter is made up of actors. in an actor we can draw anything, using (immediate'mode) Cairo and Cogl a'p'i.
+
+to install Clutter in Windows use MSYS2.
+you must also add MSYS2 bin directory to the paths environment variable. e'g for 64 bit version:
+  SET PATH=%PATH%;C:\msys64\mingw64\bin
+  SETX PATH "%PATH%"
 
 = other useful libraries
 text editing:
@@ -27,6 +36,7 @@ web:
 "https://crates.io/crates/github-rs"
 
 media:
+"https://github.com/arturoc/gstreamer1.0-rs"
 "https://trac.ffmpeg.org/wiki/HWAccelIntro"
 "https://crates.io/crates/mpv"
 "https://github.com/pcwalton/rust-media"
