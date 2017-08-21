@@ -26,3 +26,5 @@ in normal mode we can:
 command based interactions are much simpler for a speech recognition engine to process, since it needs to match against a relatively small set of commands, unlike a general speech to text process.
 a headset with near range microphone can be used, to exclude far away sound sources. also it is better to put battery and bluetooth of the headset in a separate unit, that can be put in the pocket. this makes the headset lighter and safer.
 for those that neither can use all their fingers, nor can talk, gesture based interface can be implemented.
+
+Comshell is a command based user interface, being developed using Rust ecosystem.
