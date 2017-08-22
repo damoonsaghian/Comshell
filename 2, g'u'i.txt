@@ -6,9 +6,8 @@ GTK is good for text, image, and layouts. it has good Rust bindings (even for Gs
 Qt has retained 2d/3d, but Rust bindings are terrible. and it seems that creating a good binding is impossible.
 EFL has scene'graph based graphics from the ground up. but its image'based (as opposed to vector'based), maintenance is not very good, and there is no active Rust bindings.
 
-Clutter seems to be a good choice. although there is no active Rust bindings, it seems pretty easy to use it in Rust.
-"https://github.com/passcod/rust-clutter/tree/master/src"
-the scene'graph in Clutter is made up of actors. inside an actor, we can draw anything, using (immediate'mode) Cairo and Cogl a'p'i.
+Clutter seems to be a good choice. there is no actively maintained Rust bindings for Clutter. but it seems that writing bindings for Clutter is not a very difficult task, using Rust f'f'i.
+the scene'graph in Clutter is made up of actors. inside an actor, we can draw anything, using (immediate'mode) Cogl a'p'i.
 "https://developer.gnome.org/clutter-cookbook/stable/actors-non-rectangular.html"
 
 to install Clutter in Windows use MSYS2.

@@ -1,4 +1,4 @@
-Fedora Linux can be used to get a minimal operating system (without xserver).
+Fedora Linux can be used to get a minimal operating system (without a windowing system).
 use btrfs, because journaling file systems can only protect metadata at an acceptable performance, since they need to write all file system operations twice, once to the journal, and once to the file system
 copy'on'write provides consistency for both data and metadata
 also, it can offer integrity of data and metadata (using checksums), at an acceptable overhead.

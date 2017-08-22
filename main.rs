@@ -5,5 +5,7 @@ use std::path::Path;
 use futures::Future;
 use futures_cpupool::CpuPool;
 
+mod gui;
+
 fn main() {
 }
