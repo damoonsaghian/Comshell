@@ -1,0 +1,20 @@
+Fedora Linux can be used to get a minimal operating system (without a windowing system).
+use btrfs, because journaling file systems can only protect metadata at an acceptable performance, since they need to write all file system operations twice, once to the journal, and once to the file system
+copy'on'write provides consistency for both data and metadata
+also, it can offer integrity of data and metadata (using checksums), at an acceptable overhead.
+in addition, c'o'w also supports the creation of cheap snapshots and clones (because it does not overwrite data in place). users can take fast online backups without the need to use any special software technique like l'v'm.
+
+install a graphical engine (a web browser for example).
+install Rust:
+  curl https://sh.rustup.rs -sSf | sh
+go to Comshell/cargo dir and:
+  cargo build --release
+  sudo cp .cache/release/comshell ~/.comshell/comshell
+  cp -R ../.data ~/.comshell/
+add this line to "~/.bash_profile":
+  exec ~/.comshell/comshell
+
+projects for each user are kept in ~/.comshell/users/user1/projects
+(these users doesn't have anything to do with unix users. but Comshells with single users can effectivily be considered equivalent to the current unix user)
+a shared project dir (shared even between unix users) can be created like this:
+  mkdir /projects; chmod a+w /projects
