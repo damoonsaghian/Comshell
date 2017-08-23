@@ -22,7 +22,7 @@ CEF:
 "https://crates.io/crates/github-rs"
 
 media:
-"https://github.com/arturoc/gstreamer1.0-rs"
+"https://github.com/sdroege/gstreamer-rs"
 "https://trac.ffmpeg.org/wiki/HWAccelIntro"
 "https://crates.io/crates/mpv"
 "https://github.com/pcwalton/rust-media"
