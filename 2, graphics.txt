@@ -1,0 +1,23 @@
+Comshell is written uses functional reactive programming (with move semantics).
+objects created at runtime can't be represented as reactive variable themselves. they must be put in a container like a list or tree (which is a reactive variable).
+
+so the graphics system must be a scene'graph based engine.
+a graphics engine creates objects, and puts them in a container, and also manipulate the existing objects, based on textual input.
+
+this can be easily acheived using QtQuick.
+there is a small script run in QML engine, which receives textual input (which is set using QmlEngine::set_property), and then creates and manipulates graphical objects, based on the currently selected object.
+
+script in the engine:
+  current object
+  Qt.createQmlObject()
+the textual input is given to the engine using:
+  QmlEngine::set_property(name, value)
+"value" is a string containing the QML description of the data to be added, and the transformation.
+
+last object: loaded objects from file are added after the last object.
+selected object: manipulated by user.
+input message:
+  a new object or none (meaning the selected object)
+  transfomation
+
+(to install Rust and Qt on windows, use msvc versions)

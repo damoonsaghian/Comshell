@@ -5,11 +5,6 @@ text editing:
 "https://github.com/zovt/tea"
 
 web:
-CEF:
-  "https://en.wikipedia.org/wiki/Chromium_Embedded_Framework"
-  "https://github.com/cztomczak/cefcapi"
-  "https://github.com/kkartaltepe/rust-cef"
-  "https://github.com/dylanede/cef-rs"
 "https://github.com/servo/rust-url/"
 "https://crates.io/crates/hyper"
   "https://crates.io/crates/hyper-rustls"

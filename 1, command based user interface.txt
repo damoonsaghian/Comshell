@@ -28,5 +28,3 @@ a headset with near range microphone can be used, to exclude far away sound sour
 for those that neither can use all their fingers, nor can talk, gesture based interface can be implemented.
 
 Comshell is a command based user interface, being developed using Rust ecosystem.
-it uses functional reactive with move semantics.
-there is a small script run in QML engine, which receives textual input (which is set using QmlEngine::set_property), and then creates and manipulates graphical objects, based on the currently selected object.
