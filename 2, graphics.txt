@@ -1,24 +1,17 @@
-scene'graph based graphics system
-objects can be built inside or outside of the graphics system.
-outside -> graphics library
-inside -> graphics engine
-since there is no sophisticated scene'graph graphics library for Rust yat, and since writing bindings do not map well with Rust's (elegant) ownership system, and traits (instead of run'time memory management, and using classes, in existing libs written in c/c++), i thing the engine approach is better, at least for now.
+scene'graph based graphics
+objects in the scene'graph can be created directly using a library a'p'i, or created in a textual format and then sent to an engine which creates the actual objects.
+since there is no sophisticated scene'graph based graphics library for Rust yet, and since writing bindings for existing c/c++ libraries which all have run'time memory management, and class based inheritence, generally ruin Rust's (elegant) ownership system, and traits, i think the engine approach is easier, at least for now.
 
 QtQuick
+"http://doc.qt.io/qt-5/qtqml-javascript-dynamicobjectcreation.html"
+"http://doc.qt.io/qt-5/qtqml-cppintegration-contextproperties.html"
+"https://developer.ubuntu.com/api/qml/sdk-14.10/QtQml.qtqml-cppintegration-interactqmlfromcpp/"
+"https://www.wisol.ch/w/articles/2014-12-15-qt-signal-slots-qml-cpp/"
+
 "https://white-oak.github.io/qml-rust/qml/"
-https://github.com/White-Oak/qml-rust/tree/master/src
-https://white-oak.github.io/qml-rust/qml/
-http://doc.qt.io/
-http://doc.qt.io/qt-5/qtmodules.html
-http://doc.qt.io/qt-5/qtqml-index.html
+"https://github.com/White-Oak/qml-rust/tree/master/examples"
 
-http://doc.qt.io/qt-5/qtqml-javascript-dynamicobjectcreation.html
-https://developer.ubuntu.com/api/qml/sdk-14.10/QtQml.qtqml-cppintegration-interactqmlfromcpp/
-https://www.wisol.ch/w/articles/2014-12-15-qt-signal-slots-qml-cpp/
-http://doc.qt.io/qt-5/qtqml-cppintegration-contextproperties.html
-
-
-there is a small script that runs inside QML engine. it receives textual input (which is set using QmlEngine::set_property), and then creates and manipulates graphical objects, based on the currently selected object.
+a small script, inside QML engine, receives textual input (which is set using QmlEngine::set_property), and then creates and manipulates graphical objects, based on the currently selected object.
 
 script in the engine:
   current object
@@ -30,8 +23,8 @@ the textual input is given to the engine using:
 last object: loaded objects from file are added after the last object.
 selected object: manipulated by user.
 input message:
-  a new object or none (meaning the selected object)
-  transfomation
+, a new object or none (meaning the selected object)
+, transfomation
 
 to install Rust and Qt on windows, use msvc versions.
 after installing Qt on Windows:
