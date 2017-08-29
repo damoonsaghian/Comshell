@@ -12,4 +12,3 @@ path = "../main.rs"
 [dependencies]
 futures = "*"
 futures-cpupool = "*"
-qml = "*"
