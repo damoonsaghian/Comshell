@@ -17,7 +17,7 @@ web:
 "https://crates.io/crates/github-rs"
 
 media:
-"https://github.com/sdroege/gstreamer-rs"
+"http://www.qtav.org/install.html"
 "https://trac.ffmpeg.org/wiki/HWAccelIntro"
 "https://crates.io/crates/mpv"
 "https://github.com/pcwalton/rust-media"

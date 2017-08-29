@@ -4,6 +4,8 @@ copy'on'write provides consistency for both data and metadata
 also, it can offer integrity of data and metadata (using checksums), at an acceptable overhead.
 in addition, c'o'w also supports the creation of cheap snapshots and clones (because it does not overwrite data in place). users can take fast online backups without the need to use any special software technique like l'v'm.
 
+apt-get install --no-recommends qtdeclarative5-dev qml-module-qtquick2 qml-module-qtquick-layouts qml-module-qtquick-controls2 qml-module-qtquick-controls qml-module-qtquick-particles2 qml-module-qt3d
+install cmake make gcc pkgconfig.
 install Rust:
   curl https://sh.rustup.rs -sSf | sh
 go to Comshell/cargo dir and:
