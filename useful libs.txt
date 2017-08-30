@@ -25,3 +25,5 @@ media:
 "https://github.com/tomaka/cpal"
 "https://crates.io/crates/lewton"
 "https://crates.io/crates/camera_capture"
+
+"http://blog.qt.io/blog/2017/01/30/new-qtpdf-qtlabs-module/"

@@ -1,8 +1,11 @@
 scene'graph based graphics
 objects in the scene'graph can be created directly using a library a'p'i, or created in a textual format and then sent to an engine which creates the actual objects.
 since there is no sophisticated scene'graph based graphics library for Rust yet, and since writing bindings for existing c/c++ libraries which all have run'time memory management, and class based inheritence, generally ruin Rust's (elegant) ownership system, and traits, i think the engine approach is easier, at least for now.
+of course we loose etype safty, and it may be slower, but when there is a sophisticated scene'graph graphics library in Rust, we can imidiately use it using a serializer/deserializer, and gradually migrate from the textual interface, to using the direct graphics a'p'i.
 
-QtQuick
+CEF (Chromium embedded framework) is complicated (as a result of supporting all web technologies, multiple processes, ...). i think in general html+css is not designed for generic graphics use cases.
+
+QtQuick has a good modular implementation for almost all platforms. also there is a Rust binding for QML engine.
 "http://doc.qt.io/qt-5/qtqml-javascript-dynamicobjectcreation.html"
 "http://doc.qt.io/qt-5/qtqml-cppintegration-contextproperties.html"
 "https://developer.ubuntu.com/api/qml/sdk-14.10/QtQml.qtqml-cppintegration-interactqmlfromcpp/"
@@ -10,6 +13,8 @@ QtQuick
 
 "https://white-oak.github.io/qml-rust/qml/"
 "https://github.com/White-Oak/qml-rust/tree/master/examples"
+
+(don't use id property, and data bindings in QML)
 
 a small script, inside QML engine, receives textual input (which is set using QmlEngine::set_property), and then creates and manipulates graphical objects, based on the currently selected object.
 
@@ -30,3 +35,5 @@ to install Rust and Qt on windows, use msvc versions.
 after installing Qt on Windows:
   set QTDIR environment variable to point the path where Qt lib directory is installed.
   add Qt bin directory to PATH.
+
+QtWebengine can be used to view websites, pdf files (pdf.js), and even video.
