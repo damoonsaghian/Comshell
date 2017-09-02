@@ -17,10 +17,10 @@ web:
 "https://crates.io/crates/github-rs"
 
 media:
-"https://trac.ffmpeg.org/wiki/HWAccelIntro"
-"https://crates.io/crates/mpv"
 "https://github.com/pcwalton/rust-media"
 "https://github.com/tomaka/rodio"
 "https://github.com/tomaka/cpal"
 "https://crates.io/crates/lewton"
 "https://crates.io/crates/camera_capture"
+"https://crates.io/crates/mpv"
+"https://trac.ffmpeg.org/wiki/HWAccelIntro"
