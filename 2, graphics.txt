@@ -1,1 +1,6 @@
-scene'graph based graphics
+https://github.com/gfx-rs/gfx
+
+create graphical objects (pso)
+put them in a tree
+transformations on objects will be applied in groups based on the tree
+draw visible objects (based on the tree)
