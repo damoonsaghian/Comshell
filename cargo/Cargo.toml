@@ -12,6 +12,3 @@ path = "../main.rs"
 [dependencies]
 futures = "*"
 futures-cpupool = "*"
-gfx_window_glutin = "*"
-piston2d-graphics = "*"
-piston2d-gfx_graphics = "*"
