@@ -1,3 +1,32 @@
-create graphical objects
-put them in a tree
-transformations on objects will be applied in groups based on the tree
+while searching for a graphics library i realized that:
+, usual retained mode graphics libraries (like GTK), and more advanced scene'graph based libraries (like clutter, and most game engines) tend to use class hierarchies, and run'time memory managment. so by using them we loose the real benefits of programming in Rust.
+, immediate mode graphics libraries like (Conrod, Nuklear, and ImGUI) are simpler to design and thus usually don't have those complexities. but they are implemented in such a way that every time there is a change, everything must be rendered from the start. this is obviously not efficient.
+
+these sentences (written by Dale Thomas somewhere on the internet) describe it very well.
+immediate mode: constantly submit all the low'level geometry to be drawn every frame.
+  c'p'u says: "hey g'p'u buddy, here comes the next frame. ready? okay, render this triangle, now this one, now this one, ...".
+retained mode: send all the geometry to the graphics card once, then, when drawing the scene, submit high'level draw calls to render what is already there in v'r'a'm.
+  c'p'u says: "hey g'p'u buddy, remember that model i told you about ages ago, you still remember it right? can you please draw it with this position, scaling and rotation? cheers!".
+retained mode is a lot more complex to program and much more hassle to change the data. However, it is a lot faster than immediate mode and it drastically reduces bus (the data channel between c'p'u and g'p'u) usage.
+
+in immediate mode, the u'i is just a function of the current application state, thus the application is not responsible for explicitly managing the u'i state and keeping it synced with app. so it seems to be the simpler approach.
+but in fact, retained mode graphics is the right approach. the reason for the complexities usually associated with it is because of the imperative programming.
+interestingly imperative programming is also the root of complexities associated with life'times in Rust. in functional reactive programming, move semantic is actually a necessity, and there is no need to deal with life'times.
+
+NanoVG is special:
+, unlike sophisticated retained mode libs, there is no class hierarchies, and no ref counting.
+, each &vg context can be used as a retained graphical object. it can be rotated, scaled, moved, etc.
+"https://github.com/memononen/nanovg"
+
+create graphical objects (&vg contexts).
+put them in a tree.
+transformations on objects will be applied in groups based on the tree.
+current object index
+note that unlike a scene'graph, pointers to objects which are held in the tree, are not accessable by the user. they are accessed only using tree indexing. so there are no free pointer, and no need for run'time memory management.
+
+the data stream sent to the graphics function contains:
+1, the new object to be added beside the currently selected object. (can be none)
+2, the transformation which must be applied to this new object (in which case, the transformation can be none), or to the selected object (if there is no new object).
+3, the index, or the relative motion of the index of currently selected object in the tree.
+
+so here it is. we can finally implement an efficient functional reactive g'u'i.

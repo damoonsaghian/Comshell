@@ -24,3 +24,5 @@ media:
 "https://crates.io/crates/camera_capture"
 "https://crates.io/crates/mpv"
 "https://trac.ffmpeg.org/wiki/HWAccelIntro"
+
+"https://github.com/nyorain/vvg"
