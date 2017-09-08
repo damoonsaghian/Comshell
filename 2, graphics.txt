@@ -1,6 +1,6 @@
-while searching for a graphics library i realized that:
-, usual retained mode graphics libraries (like GTK), and more advanced scene'graph based libraries (like clutter, and most game engines) tend to use class hierarchies, and run'time memory managment. so by using them we loose the real benefits of programming in Rust.
-, immediate mode graphics libraries like (Conrod, Nuklear, and ImGUI) are simpler to design and thus usually don't have those complexities. but they are implemented in such a way that every time there is a change, everything must be rendered from the start. this is obviously not efficient.
+graphics libraries:
+, retained mode: sophisticated graphics libraries (like GTK), and more advanced scene'graph based libraries (like clutter, and most game engines). these tend to use class hierarchies, and run'time memory managment. so by using them we loose the real benefits of programming in Rust.
+, immediate mode: these liberaries (like Piston2d-graphics, Nuklear, raylib, ImGUI, ...) are simpler to design and thus usually don't have those complexities. but they are implemented in such a way that every time there is a change, everything must be rendered again. this is obviously inefficient.
 
 these sentences (written by Dale Thomas somewhere on the internet) describe it very well.
 immediate mode: constantly submit all the low'level geometry to be drawn every frame.
@@ -13,12 +13,21 @@ in immediate mode, the u'i is just a function of the current application state, 
 but in fact, retained mode graphics is the right approach. the reason for the complexities usually associated with it is because of the imperative programming.
 interestingly imperative programming is also the root of complexities associated with life'times in Rust. in functional reactive programming, move semantic is actually a necessity, and there is no need to deal with life'times.
 
-NanoVG is special:
+NanoVG and SFML are special:
 , unlike sophisticated retained mode libs, there is no class hierarchies, and no ref counting.
-, each &vg context can be used as a retained graphical object. it can be rotated, scaled, moved, etc.
+, we can create retained graphical object. which can be rotated, scaled, moved, etc. (in NanoVG each &vg context can be considered a retained object)
 "https://github.com/memononen/nanovg"
 
-create graphical objects (&vg contexts).
+NanoVG and SFML are 2d only.
+rewrite NanoVG in Rust, and add 3d.
+https://github.com/yui0/catgl
+https://github.com/nyorain/vvg
+
+https://crates.io/crates/spectra
+https://crates.io/crates/luminance-glfw
+https://crates.io/crates/glium_text_rusttype
+
+create graphical objects.
 put them in a tree.
 transformations on objects will be applied in groups based on the tree.
 current object index
