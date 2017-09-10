@@ -19,13 +19,14 @@ NanoVG and SFML are special:
 "https://github.com/memononen/nanovg"
 
 NanoVG and SFML are 2d only.
-rewrite NanoVG in Rust, and add 3d.
+rewrite NanoVG in Rust, and add 3d context.
+write OpenGL'ES and Vulkan backends.
 https://github.com/yui0/catgl
 https://github.com/nyorain/vvg
 
-https://crates.io/crates/spectra
-https://crates.io/crates/luminance-glfw
-https://crates.io/crates/glium_text_rusttype
+g'p'u --> shaders --> bad design
+https://stackoverflow.com/questions/9758884/concept-behind-opengls-bind-functions
+https://docs.rs/rusterize/0.3.8/rusterize/
 
 create graphical objects.
 put them in a tree.
