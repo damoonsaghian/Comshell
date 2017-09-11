@@ -31,3 +31,5 @@ https://crates.io/crates/glium_text_rusttype
 https://crates.io/crates/glium_pib
 
 https://crates.io/crates/vulkano_text
+
+https://docs.rs/rusterize/0.3.8/rusterize/
