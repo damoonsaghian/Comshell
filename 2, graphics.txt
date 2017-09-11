@@ -13,16 +13,13 @@ in immediate mode, the u'i is just a function of the current application state, 
 but in fact, retained mode graphics is the right approach. the reason for the complexities usually associated with it is because of the imperative programming.
 interestingly imperative programming is also the root of complexities associated with life'times in Rust. in functional reactive programming, move semantic is actually a necessity, and there is no need to deal with life'times.
 
-NanoVG and SFML are special:
+SFML Rust bindings is special:
 , unlike sophisticated retained mode libs, there is no class hierarchies, and no ref counting.
-, we can create retained graphical object. which can be rotated, scaled, moved, etc. (in NanoVG each &vg context can be considered a retained object)
-"https://github.com/memononen/nanovg"
+, we can create retained graphical objects, which can be rotated, scaled, moved, etc.
 
-NanoVG and SFML are 2d only.
-rewrite NanoVG in Rust, and add 3d context.
-write OpenGL'ES and Vulkan backends.
-https://github.com/yui0/catgl
-https://github.com/nyorain/vvg
+SFML is 2d only, so we can later:
+, rewrite NanoVG in Rust (maybe even add Vulkan and software rendering backends, plus Wayland and EGL/libinput)
+, add 3d
 
 g'p'u --> shaders --> bad design
 https://stackoverflow.com/questions/9758884/concept-behind-opengls-bind-functions
