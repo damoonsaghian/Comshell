@@ -9,7 +9,7 @@ interestingly imperative programming is also the root of complexities associated
 
 Rust'sfml is special:
 , we can create retained graphical objects, which can be rotated, scaled, moved, etc.
-, unlike sophisticated retained mode libs, there is no class hierarchies, and no ref counting.
+, but unlike sophisticated retained mode libs, there is no class hierarchies, and no ref counting.
 
 SFML is 2d only, so we can later:
 , rewrite it in Rust (maybe even add Vulkan and software rendering backends, plus Wayland and EGL/libinput)
