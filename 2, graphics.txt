@@ -11,15 +11,13 @@ rust-sfml is special:
 , we can create retained graphical objects, which can be rotated, scaled, moved, etc.
 , but unlike sophisticated retained mode libs, there is no class hierarchies, and no ref counting.
 
-in hardware graphics a'p'i (OpenGL, Vulkan, ...) we don't have direct access to graphical objects (they are in g'p'u memory), so we must either deal with a few fixed functions, or use isolated programs called shaders (which in my opinion is just a hack, not a good design).
 "https://www.ntu.edu.sg/home/ehchua/programming/opengl/CG_BasicsTheory.html"
-
-primitive graphical objects made of vertices.
-cached rasterized graphical objects drawn to a texture (in r'a'm), and then copied directly to the output framebuffer.
-
-softrender "https://docs.rs/softrender/"
-rusterize "https://docs.rs/rusterize/"
-font-rs "https://github.com/google/font-rs"
+shaders are like closures.
+"https://crates.io/crates/spectra"
+"https://github.com/glium/glium"
+"https://crates.io/crates/glium_text_rusttype"
+"https://crates.io/crates/glium_pib"
+"https://crates.io/crates/vulkano_text"
 
 create graphical objects.
 put them in a tree.
