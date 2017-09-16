@@ -12,19 +12,12 @@ automatic login:
     ExecStart=-/usr/bin/agetty --autologin root --noclear %I $TERM
 exit; reboot
 
-xserver-xorg
-
-curl https://sh.rustup.rs -sSf | sh
-
 go to Comshell/cargo dir and:
   cargo build --release
   sudo cp .cache/release/comshell /comshell/comshell
   cp -R ../.data /comshell/
 add this line to "~/.profile":
-  startx
-cp /etc/X11/xinit/xinitrc ~/.xinitrc
-edit "~/.xinitrc":
-  exec /comshell/comshell
+  /comshell/comshell
 
 Comshell looks for projects in "~/projects/" and "/projects/".
 a shared project directory can be created like this:

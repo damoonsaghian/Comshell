@@ -1,4 +1,4 @@
-, retained mode graphics libraries (like GTK, or more advanced scene'graph based libraries, like Clutter, and most game engines) tend to use class hierarchies, and run'time memory managment. so by using them we lose the real benefits of programming in Rust.
+, retained mode graphics libraries (like GTK, or more advanced scene'graph based libraries, like Clutter, and most game engines) tend to extensively use class hierarchies, and run'time memory managment. so by using them we lose the real benefits of programming in Rust.
 , immediate mode graphics libraries (like Piston2d-graphics, NanoVG, Nuklear, Raylib, ImGUI) are simpler to design and thus usually don't need those complexities. but they are implemented in such a way that every time there is a change, all graphical objects must be recreated, because graphical objects are not retained. this is obviously inefficient.
 
 in retained mode we send all the geometry to the graphics card once, then, submit draw calls to render what is already there in v'r'a'm.
@@ -7,13 +7,19 @@ in immediate mode, the u'i is just a function of the current application state, 
 but in fact, retained mode graphics is the right approach. the reason for the complexities usually associated with it is because of the imperative programming.
 interestingly imperative programming is also the root of complexities associated with life'times in Rust. in functional reactive programming, move semantic is actually a necessity, and there is no need to deal with life'times.
 
-Rust'sfml is special:
+rust-sfml is special:
 , we can create retained graphical objects, which can be rotated, scaled, moved, etc.
 , but unlike sophisticated retained mode libs, there is no class hierarchies, and no ref counting.
 
-SFML is 2d only, so we can later:
-, rewrite it in Rust (maybe even add Vulkan and software rendering backends, plus Wayland and EGL/libinput)
-, add 3d
+in hardware graphics a'p'i (OpenGL, Vulkan, ...) we don't have direct access to graphical objects (they are in g'p'u memory), so we must either deal with a few fixed functions, or use isolated programs called shaders (which in my opinion is just a hack, not a good design).
+"https://www.ntu.edu.sg/home/ehchua/programming/opengl/CG_BasicsTheory.html"
+
+primitive graphical objects made of vertices.
+cached rasterized graphical objects drawn to a texture (in r'a'm), and then copied directly to the output framebuffer.
+
+softrender "https://docs.rs/softrender/"
+rusterize "https://docs.rs/rusterize/"
+font-rs "https://github.com/google/font-rs"
 
 create graphical objects.
 put them in a tree.
