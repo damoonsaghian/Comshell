@@ -22,11 +22,9 @@ graphical objects:
 , points
 , connectors
 , fragments
-, pixels
 , are fragments synced with points and connectors
-, are pixels synced with fragments
 
-graphical objects drawn to a texture (in r'a'm), and then (after v'sync) copied directly to the output framebuffer.
+using the fragments, graphical objects are drawn the 2d output framebuffer (which uses double buffers and v'sync).
 
 create graphical objects.
 put them in a tree.
