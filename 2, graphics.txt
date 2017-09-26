@@ -14,17 +14,25 @@ rust-sfml is special:
 maybe Vulkan is  more flexible than OpneGL, but then again why ever bother with a hardware a'p'i.
 
 software rendering gives us a lot more flexibility, since we are not any more limited by a hardware implementation with fixed size buffers, and isolated shader programs.
-softrender "https://docs.rs/softrender/"
-rusterize "https://docs.rs/rusterize/"
 font-rs "https://github.com/google/font-rs"
+"https://docs.rs/softrender/"
+"https://docs.rs/rusterize/"
+"https://crates.io/crates/rust-3d"
+"https://crates.io/crates/mash"
+"https://crates.io/crates/line_drawing"
+"https://crates.io/crates/cgmath"
+"https://crates.io/crates/plexus"
+
+there are different types of graphical objects, defined with a set of parameters. each type has a specific algorithm for rasterization.
+rasterized objects (3d rasterizations made of 3d positioned fragments) will be cached. so tranlating and rotating objects would not need re'rasterizing. they can even be used in pixelated zooming as the middle frames, to decrease the amount of rasterization for a smooth zooming.
+more over, by caching individual rasterized objects, when there is a change in an object, there is no need to rasterize everything from the beginning.
 
 graphical objects:
-, points
-, connectors
+, parameters
 , fragments
-, are fragments synced with points and connectors
+, are fragments synced with vertices and connectors
 
-using the fragments, graphical objects are drawn the 2d texture is r'a'm. this texture will be copied directly to the output framebuffer (which uses double buffers and v'sync).
+using the fragments, graphical objects are drawn a 2d texture in r'a'm. this texture will be copied directly to the output framebuffer (which uses double buffers and v'sync).
 
 create graphical objects.
 put them in a tree.
