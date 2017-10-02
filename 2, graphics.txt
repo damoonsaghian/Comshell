@@ -1,0 +1,40 @@
+software rendering gives us a lot more flexibility, since we are not any more limited by a hardware implementation with triangle only rasterization, isolated shader programs, and fixed size buffers.
+font-rs "https://github.com/google/font-rs"
+"https://docs.rs/rusterize/"
+"https://docs.rs/softrender/"
+"https://crates.io/crates/rust-3d"
+"https://crates.io/crates/nphysics3d"
+"https://crates.io/crates/cgmath"
+"https://crates.io/crates/plexus"
+"https://crates.io/crates/mash"
+"https://crates.io/crates/line_drawing"
+"https://crates.io/crates/bvh"
+"https://crates.io/crates/beebox"
+
+graphical objects are made of primitives. primitives are defined using a set of parameters. each primitive has a specific algorithm for rasterization.
+2d primitives: point, line, curve, triangle, curved area.
+a 3d triangle are actually a projected 2d triangle plus a normal.
+also a 3d curved surface (defined by an equation) is converted to a projected curved area (also defined by an equation) plus another equation determining normals.
+
+2d objects will be rasterized to pixels. they will be drawn in layers over each other (in an overlay on top of all 3d objects).
+3d objects are rasterized to fragments which other than the pixel's location contain a depth and a normal. to draw 3d objects (fragments to pixels) we must utilize a z'buffer.
+
+graphical objects are of 2 kinds:
+, those which we know will remain unchanged the next time we want to draw to the framebuffer. these objects are first rasterized into memory, then we copy it to framebuffer.
+, those which we know will be changed (scaled, rotated, moved in z direction) the next time we want to draw to the framebuffer (which happens a lot for animations with high frame rate). these objects will be drawn directly to the framebuffer.
+(framebuffer uses double buffering and v'sync)
+note that if an object just moves in x'y plane (without rotation), the cached rasterization is still useful. for 2d objects we simply add a constant to the position of all pixels. for 3d objects we may additionally want to recompute the lighting of pixels form fragments.
+
+graphical objects:
+, primitives
+, material (texture, bump map, ...)
+, cached rasterization (can be none)
+
+graphical objects can be put in a layout tree. transformations on objects will be applied in groups, based on the tree.
+objects are moved to the tree. they can be accessed only by their index. current object index is where the selection cursor is.
+note that unlike a scene'graph, pointers to objects in the tree, are not accessable by the user. they are accessed only using tree indexing. so there are no free pointers, and no need for run'time memory management.
+
+the data stream sent to the graphics function contains:
+1, the new object to be added beside the currently selected object. (can be none)
+2, the transformation which must be applied to this new object (in which case, the transformation can be none), or to the selected object (if there is no new object).
+3, the index, or the relative motion of the index of currently selected object in the tree.
