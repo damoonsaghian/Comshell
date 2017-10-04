@@ -1,4 +1,7 @@
-= other usefull libs
+= usefull libs
+winit
+evdev (for input) and drm (to access the framebuffer)
+
 text editing:
 "https://github.com/jmacdonald/scribe"
 "https://github.com/mathall/rim"
