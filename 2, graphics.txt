@@ -18,8 +18,8 @@ graphical objects are made of primitives. primitives are defined using a set of 
 also interpolation is a good method for amorphous surfaces.
 
 2d objects will be rasterized to pixels (i'e a coordinate and a color value).
-then these rasterized objects will be drawn in the frambuffer, in layers over each other (in an overlay on top of all 3d objects).
-rasterizing 3d objects, produces an array of fragments. a fragment other than color, contains a normal and a depth. 
+then these rasterized objects will be drawn in the framebuffer, in layers over each other (in an overlay on top of all 3d objects).
+rasterizing 3d objects, produces an array of fragments. a fragment other than color, contains a normal and a depth.
 when creating the pixels of the framebuffer from the fragments, the normals are used for lighting, and the depths are used for z'buffer.
 
 "https://en.wikipedia.org/wiki/Stencil_buffer"

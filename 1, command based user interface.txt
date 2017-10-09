@@ -7,7 +7,7 @@ pointing interfaces can be useful only for very simple tasks. also for some spec
 , comma followed by ( --> [
 , comma followed by add followed by comma --> +
 , comma followed by add followed by space --> + followed by space
-, comma followed by psi followed by space --> ?
+, comma followed by psi followed by space --> ψ
 , two apostrophies followed by a --> A
 
 Vim'like key'bindings
