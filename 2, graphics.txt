@@ -23,6 +23,8 @@ rasterizing 3d objects, produces an array of fragments. a fragment other than co
 when creating the pixels of the framebuffer from the fragments, the normals are used for lighting, and the depths are used for z'buffer.
 
 "https://en.wikipedia.org/wiki/Stencil_buffer"
+"https://www.scratchapixel.com"
+"https://www.scratchapixel.com/lessons/3d-basic-rendering/phong-shader-BRDF"
 
 graphical objects are of 2 kinds:
 , those which we know will remain unchanged the next time we want to draw to the framebuffer. these objects are first rasterized into memory, then we copy it to framebuffer.

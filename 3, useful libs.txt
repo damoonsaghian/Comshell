@@ -1,3 +1,5 @@
+"https://crates.io/crates/futures"
+
 winit
 evdev (for input) and drm (to access the framebuffer)
 
