@@ -1,0 +1,24 @@
+project manager:
+, open files of a project in the current tab (even if it is open in another tab).
+, search all disks for a directory named "projects".
+
+file browser:
+, thumbnails for images an videos
+, select files by typing
+, when a file is opened, a new pane is created at right, showing the file.
+, the active file is always visible and highlighted.
+
+text editor:
+, discrete scrolling
+, do not show incomplete paragraphs.
+
+we can have different views of a project in different tabs.
+external files (websites, pdf, ...) will be opened in an adjacent tab.
+tabs bar is visible only if there are more than one tab.
+
+Comshell looks for projects in "~/projects/" and "/projects/".
+a shared project directory can be created like this:
+  mkdir /projects; chmod a+w /projects
+
+obviously implementing Comshell is a lot of work. fortunately Atom editor provides just the right a'p'i, which can be used as a temporary solution.
+"https://github.com/damoonsaghian/Orbital"

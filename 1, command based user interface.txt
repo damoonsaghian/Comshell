@@ -8,7 +8,7 @@ pointing interfaces can be useful only for very simple tasks. also for some spec
 , comma followed by add followed by comma --> +
 , comma followed by add followed by space --> + followed by space
 , comma followed by psi followed by space --> ψ
-, two apostrophies followed by a --> A
+, two apostrophes followed by a --> A
 
 Vim'like key'bindings
 modes (like normal mode and insert mode) must be visually distinctive.

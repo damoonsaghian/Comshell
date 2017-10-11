@@ -39,7 +39,7 @@ graphical objects:
 
 graphical objects can be put in a layout tree. transformations on objects will be applied in groups, based on the tree.
 objects are moved to the tree. they can be accessed only by their index. current object index is where the selection cursor is.
-note that unlike a scene'graph, pointers to objects in the tree, are not accessable by the user. they are accessed only using tree indexing. so there are no free pointers, and no need for run'time memory management.
+note that unlike a scene'graph, pointers to objects in the tree, are not accessible by the user. they are accessed only using tree indexing. so there are no free pointers, and no need for run'time memory management.
 
 the data stream sent to the graphics function contains:
 1, the new object to be added beside the currently selected object. (can be none)
