@@ -1,0 +1,59 @@
+"https://github.com/damoonsaghian/Comshell"
+MIT license
+
+Comshell is a command based user interface, being developed in Frem programing language (which is based on Rust).
+"https://github.com/damoonsaghian/Frem"
+
+command based user interfaces (using keyboard, voice, gesture) are faster more convenient and more powerful than pointing based user interfaces (using mouse, touch, pen).
+pointing interfaces can be useful only for very simple tasks. also for some special artistic applications pen input remains the only choice.
+command based interactions are much simpler for a speech recognition engine to process, since it needs to match against a relatively small set of commands, unlike a general speech to text process.
+a headset with near range microphone can be used, to exclude far away sound sources. also it is better to put battery and bluetooth of the headset in a separate unit, that can be put in the pocket. this makes the headset lighter and safer.
+for those that neither can use all their fingers, nor can talk, gesture based interface can be implemented.
+
+".data/keyboard.png"
+missing characters can be entered using snippets:
+, two commas --> .
+, comma followed by ' --> "
+, comma followed by ( --> [
+, comma followed by add followed by comma --> +
+, comma followed by add followed by space --> + followed by space
+, comma followed by psi followed by space --> ψ
+, two apostrophes followed by a --> A
+
+Vim'like key'bindings
+modes (like normal mode and insert mode) must be visually distinctive.
+pressing "esc" key always take you back to normal mode.
+in normal mode we can:
+, create a new project or file
+, show list of projects or files, move between files (previous, next), and then press space to open or raise them, or directly go to them by entering their number
+, move the cursor to the next or previous (or by entering the number directly to) words, lines (or table cells), paragraphs
+, start and end selection, then copy or cut
+, paste
+, undo, redo
+, find
+, enter insert mode
+
+project manager:
+, search all disks for a directory named "projects"
+, projects list
+
+file browser:
+, thumbnails for images and videos
+, expand directories in a tree view.
+, select files by typing their names.
+, when a file is opened, a new pane is created at right, showing the file in a tab.
+, the active file is always visible and highlighted.
+, open files in the current tab (even if it is open in another tab).
+, different views of a project can be opened in separate tabs.
+, external files (websites, pdf, ...) will be opened in an adjacent tab.
+
+focus paragraph, i'e auto scroll to reveal whole paragraph.
+auto fold/unfold for code.
+
+Comshell looks for projects in "~/projects/" and "/projects/".
+a shared project directory can be created like this:
+  mkdir /projects; chmod a+w /projects
+
+actually implementing Comshell is a lot of work. we must first implement Frem language, then a graphics library (as discussed in next chapter), then a lot of standard u'i utilities on top of that library.
+fortunately Atom editor provides just the right tools, to quickly build a demonstration of what Comshell would look like.
+"https://github.com/damoonsaghian/Orbital"
