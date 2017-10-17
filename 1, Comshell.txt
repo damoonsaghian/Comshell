@@ -1,6 +1,3 @@
-"https://github.com/damoonsaghian/Comshell"
-MIT license
-
 Comshell is a command based user interface, being developed in Frem programing language (which is based on Rust).
 "https://github.com/damoonsaghian/Frem"
 
@@ -55,5 +52,4 @@ a shared project directory can be created like this:
   mkdir /projects; chmod a+w /projects
 
 actually implementing Comshell is a lot of work. we must first implement Frem language, then a graphics library (as discussed in next chapter), then a lot of standard u'i utilities on top of that library.
-fortunately Atom editor provides just the right tools, to quickly build a demonstration of what Comshell would look like.
-"https://github.com/damoonsaghian/Orbital"
+a quick demonstration of what Comshell would look like, can be done using linux, dmenu, i3, vim, a web browser and gthumb.
