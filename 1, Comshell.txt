@@ -51,5 +51,6 @@ Comshell looks for projects in "~/projects/" and "/projects/".
 a shared project directory can be created like this:
   mkdir /projects; chmod a+w /projects
 
-actually implementing Comshell is a lot of work. we must first implement Frem language, then a graphics library (as discussed in next chapter), then a lot of standard u'i utilities on top of that library.
-a quick demonstration of what Comshell would look like, can be done using linux, dmenu, i3, vim, a web browser and gthumb.
+actually, implementing Comshell is a lot of work. we must first implement Frem language, then a graphics library (as discussed in next chapter), then a lot of standard u'i utilities on top of that library.
+fortunately Atom editor provides just the right tools, to quickly build a demonstration of what Comshell would look like.
+"https://github.com/damoonsaghian/Orbital"
