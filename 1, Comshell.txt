@@ -30,23 +30,10 @@ in normal mode we can:
 , find
 , enter insert mode
 
-project manager:
-, search all disks for a directory named "projects"
-, projects list
-
-file browser:
-, thumbnails for images and videos
-, expand directories in a tree view.
-, select files by typing their names.
-, when a file is opened, a new pane is created at right, showing the file in a tab.
-, the active file is always visible and highlighted.
-, open files in the current tab (even if it is open in another tab).
-, different views of a project can be opened in separate tabs.
-, external files (websites, pdf, ...) will be opened in an adjacent tab.
+there is a launcher which lists the projects by looking at "~/projects/" and all directories named "projects" on all disks, and opens them in a workspace (if there are already open, simply goes to that workspace).
+different views of a project can be opened in separate tabs, inside the workspace.
+external links (other projects, websites, pdf, ...) will be opened in an adjacent tab.
 
 focus paragraph, i'e auto scroll to reveal whole paragraph.
 auto fold/unfold for code.
-
-Comshell looks for projects in "~/projects/" and "/projects/".
-a shared project directory can be created like this:
-  mkdir /projects; chmod a+w /projects
+find panel, chat panel ... at the right.
