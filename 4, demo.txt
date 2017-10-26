@@ -7,7 +7,7 @@ boot to an existing Arch Linux (installed or live) then:
   prepare the disk (use lsblk to identify the block devices), and mount it:
     mkfs.btrfs -f /dev/sdx
     mount /dev/sdx /mnt
-  pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate sway termite vifm ttf-dejavu neovim uzbl zathura-pdf-poppler imv gstreamer rustup
+  pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate sway termite vifm ttf-fira-sans ttf-fira-mono neovim zathura-pdf-poppler imv rustup
   arch-chroot /mnt
   bootloader:
     grub-install --target=i386-pc /dev/sdx
@@ -33,14 +33,14 @@ Vim session
   "https://github.com/xolox/vim-session"
 "https://github.com/grigorievich/Viy"
 
-"https://www.uzbl.org/"
-Uzbl session
-"https://www.uzbl.org/wiki/session.sh"
+"http://vimperator.org/"
+"https://vimium.github.io/"
 "https://fanglingsu.github.io/vimb/"
-"https://github.com/vain/lariza"
+"https://www.uzbl.org/wiki/session.sh"
 
 "https://pwmt.org/projects/zathura/"
 
+Mplayer, gstreamer
 media projects (containing image, video, audio) are opened by opening a fixed number of the files in a grid of windows (using the appropriate program for each file).
 
 "https://wiki.archlinux.org/index.php/List_of_applications"
