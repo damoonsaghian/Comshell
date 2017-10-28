@@ -7,7 +7,7 @@ boot to an existing Arch Linux (installed or live) then:
   prepare the disk (use lsblk to identify the block devices), and mount it:
     mkfs.btrfs -f /dev/sdx
     mount /dev/sdx /mnt
-  pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate sway termite vifm ttf-fira-sans ttf-fira-mono neovim zathura-pdf-poppler imv rustup
+  pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate sway termite vifm ttf-fira-sans ttf-fira-mono neovim rustup
   arch-chroot /mnt
   bootloader:
     grub-install --target=i386-pc /dev/sdx
@@ -29,19 +29,25 @@ nano ~/.profile
 cp ./demo/sway.txt ~/.config/sway/config
 "http://jlk.fjfi.cvut.cz/arch/manpages/man/sway.5"
 
+sway + vifm
+
 Vim session
   "https://github.com/xolox/vim-session"
 "https://github.com/grigorievich/Viy"
 
-"http://vimperator.org/"
+"https://github.com/cmcaine/tridactyl"
+"https://github.com/vimperator/vimperator-labs#end-of-life-and-alternatives"
 "https://vimium.github.io/"
+"https://github.com/1995eaton/chromium-vim"
 "https://fanglingsu.github.io/vimb/"
-"https://www.uzbl.org/wiki/session.sh"
 
+zathura-pdf-poppler
 "https://pwmt.org/projects/zathura/"
+apvlv
 
-Mplayer, gstreamer
-media projects (containing image, video, audio) are opened by opening a fixed number of the files in a grid of windows (using the appropriate program for each file).
+media projects (containing directories of images, videos, audios) are opened by opening a fixed number of the files in a grid of windows (using the appropriate program for each file).
+vifm + imv, Mplayer or Gstreamer
+inside a container, vifm at the left shows the directories. files open at the right in a grid of windows.
 
 "https://wiki.archlinux.org/index.php/List_of_applications"
 "https://xaizek.github.io/2016-08-13/big-list-of-vim-like-software/"
