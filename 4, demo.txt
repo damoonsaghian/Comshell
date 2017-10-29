@@ -7,7 +7,7 @@ boot to an existing Arch Linux (installed or live) then:
   prepare the disk (use lsblk to identify the block devices), and mount it:
     mkfs.btrfs -f /dev/sdx
     mount /dev/sdx /mnt
-  pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate sway termite vifm ttf-dejavu neovim rustup
+  pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate ttf-dejavu xorg-server xinit xorg-drivers i3-wm xdotool termite vifm neovim rustup
   arch-chroot /mnt
   bootloader:
     grub-install --target=i386-pc /dev/sdx
@@ -25,29 +25,26 @@ systemctl edit getty@tty1
   ExecStart=
   ExecStart=-/usr/bin/agetty --autologin root --noclear %I $TERM
 nano ~/.profile
-  sway
-cp ./demo/sway.txt ~/.config/sway/config
-"http://jlk.fjfi.cvut.cz/arch/manpages/man/sway.5"
+  startx
+nano ~/.xinitrc
+  exec i3
+cp ./demo/i3.txt ~/.config/i3/config
 
-sway + vifm
+Sway is like i3, but for Wayland. xdotool is necessory for window manager to take cotrol of modes. thus we must choose i3, at least till a similar functionality is implemented for Sway. 
 
-Vim session
-  "https://github.com/xolox/vim-session"
+use Vifm to list projects, and open or go to them.
+
+"https://github.com/xolox/vim-session"
 "https://github.com/grigorievich/Viy"
 
-"https://github.com/cmcaine/tridactyl"
-"https://github.com/vimperator/vimperator-labs#end-of-life-and-alternatives"
-"https://vimium.github.io/"
-"https://github.com/1995eaton/chromium-vim"
+Midori
 "https://fanglingsu.github.io/vimb/"
 
 zathura-pdf-poppler
 "https://pwmt.org/projects/zathura/"
 apvlv
 
-media projects (containing directories of images, videos, audios) are opened by opening a fixed number of the files in a grid of windows (using the appropriate program for each file).
-vifm + imv, Mplayer or Gstreamer
-inside a container, vifm at the left shows the directories. files open at the right in a grid of windows.
+Gthumb
 
 "https://wiki.archlinux.org/index.php/List_of_applications"
 "https://xaizek.github.io/2016-08-13/big-list-of-vim-like-software/"
