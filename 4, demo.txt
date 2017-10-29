@@ -7,7 +7,7 @@ boot to an existing Arch Linux (installed or live) then:
   prepare the disk (use lsblk to identify the block devices), and mount it:
     mkfs.btrfs -f /dev/sdx
     mount /dev/sdx /mnt
-  pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate sway termite vifm ttf-fira-sans ttf-fira-mono neovim rustup
+  pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate sway termite vifm ttf-dejavu neovim rustup
   arch-chroot /mnt
   bootloader:
     grub-install --target=i386-pc /dev/sdx
