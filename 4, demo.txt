@@ -1,5 +1,5 @@
 actually, implementing Comshell is a lot of work. we must first implement Frem language, then a graphics library, then a lot of standard u'i utilities on top of that library.
-fortunately there are already great pieces of sofware made for Linux, which by putting them together, we can build a demonstration of what Comshell would look like.
+fortunately there are already great command based tools in Linux, which by a little tuning, we can build a demonstration of what Comshell would look like.
 
 Arch Linux
 boot to an existing Arch Linux (installed or live) then:
@@ -30,9 +30,13 @@ nano ~/.xinitrc
   exec i3
 cp ./demo/i3.txt ~/.config/i3/config
 
-Sway is like i3, but for Wayland. xdotool is necessory for window manager to take cotrol of modes. thus we must choose i3, at least till a similar functionality is implemented for Sway. 
+xdotool is necessory for window manager to take cotrol of modes. thus instead of Sway we must choose i3, at least till a similar functionality is implemented for Sway. 
 
 use Vifm to list projects, and open or go to them.
+projects open in an i3 workspace. a vertical Vifm window at the left shows the files in the project.
+text files will open in NeoVim.
+directories with ".m" extention open in music player.
+directories with ".g" extention open in Gthumb.
 
 "https://github.com/xolox/vim-session"
 "https://github.com/grigorievich/Viy"
@@ -44,9 +48,7 @@ zathura-pdf-poppler
 "https://pwmt.org/projects/zathura/"
 apvlv
 
-Gthumb
-
 "https://wiki.archlinux.org/index.php/List_of_applications"
 "https://xaizek.github.io/2016-08-13/big-list-of-vim-like-software/"
 
-in fact X applications can run on Windows (CygwinX) and MacOS too. so using "i3" (equivalent of Sway on X) we can have this demo on any platform.
+in fact X applications can run on Windows (CygwinX) and MacOS too. so we can have this demo on any platform.
