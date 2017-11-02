@@ -19,8 +19,8 @@ missing characters can be entered using snippets:
 
 Vim'like key'bindings
 modes (like normal mode and insert mode) must be visually distinctive.
-pressing "esc" key always take you back to normal mode.
-in normal mode we can:
+press "esc" to go back to normal mode.
+in normal mode:
 , create a new project or file
 , show list of projects or files, move between files (previous, next), and then press space to open or raise them, or directly go to them by entering their number
 , move the cursor to the next or previous (or by entering the number directly to) words, lines (or table cells), paragraphs
@@ -30,10 +30,7 @@ in normal mode we can:
 , find
 , enter insert mode
 
-there is a launcher which lists the projects by looking at "~/projects/" and all directories named "projects" on all disks, and opens them in a workspace (if there are already open, simply goes to that workspace).
-different views of a project can be opened in separate tabs, inside the workspace.
-external links (other projects, websites, pdf, ...) will be opened in an adjacent tab.
+list of projects are made by looking at "~/projects/" and all directories named "projects" on all disks. projects open in a workspace (and if already open, simply goes to that workspace).
+links in the main project (links to other projects, websites, pdf, ...) will be opened in tabs.
 
 focus paragraph, i'e auto scroll to reveal whole paragraph.
-auto fold/unfold for code.
-find panel, chat panel ... at the right.
