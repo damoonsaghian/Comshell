@@ -1,0 +1,24 @@
+actually, implementing Comshell is a lot of work. we must first implement Frem language, then a graphics library, then a lot of standard u'i utilities on top of that library.
+as a temporary solution Emacs can be configured to demonstrate what Comshell would look like.
+
+"https://tuhdo.github.io/emacs-tutor.html"
+"https://tuhdo.github.io/index.html"
+"http://shallowsky.com/blog/linux/editors/graphics-in-emacs.html"
+"https://github.com/larsmagne/movie.el"
+"https://emacs.stackexchange.com/questions/12153/does-some-command-exist-which-goes-to-the-next-file-of-the-current-directory"
+treeview:
+  "https://stackoverflow.com/questions/843645/a-good-project-tree-browser-for-emacs"
+  "http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
+  "tiborsimko.org/emacs-find-file-in-repository.html"
+  "https://www.reddit.com/r/emacs/comments/6f9fv4/introducing_sidebarel_a_customizable_file/"
+  "https://www.quora.com/How-do-you-use-Emacs-without-a-directory-tree-on-the-side-of-the-editor"
+  "https://www.emacswiki.org/emacs/NeoTree"
+  "https://github.com/sabof/project-explorer"
+Spacemacs
+
+list projects, and open or go to them.
+a panel at the left shows a tree view of the files in the project.
+text files open in a text editor buffer at the right.
+directories with ".m" extention open in a file manager buffer (Image-Dired, EMMS) at the right.
+in an Emacs web view buffer, we can open the same page in Firefox. Firefox windows can be dismissed and send to scrachpad. the window will be marked, so bringing it back would be easy. the marked Firefox window will be closed when the original buffer is closed.
+video player (Mplayer, ffplay) will be closed uppon pause.
