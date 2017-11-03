@@ -1,2 +1,0 @@
-font pango:DejaVu Sans 11
-focus_follows_mouse no
