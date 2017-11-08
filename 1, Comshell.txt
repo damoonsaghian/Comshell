@@ -30,7 +30,11 @@ in normal mode:
 , find
 , enter insert mode
 
-list of projects are made by looking at "~/projects/" and all directories named "projects" on all disks. projects open in a workspace (and if already open, simply goes to that workspace).
-links in the main project (links to other projects, websites, pdf, ...) will be opened in tabs.
+a list of projects are made by looking at "~/projects/" and all directories named "projects" on all disks. from this list we can open projects (or switch to them if they are already open).
+links in the main project (links to other projects, websites, pdf, ...) will be opened in a tab next to current tab. a differet view of the current project can be opened in a tabs at the end.
+
+a panel at the left shows a tree view of the files in the project.
+text files open in a text editor panel at the right.
+directories with ".m" extention open in a panel at the right, showing thumbnails of the files in it.
 
 focus paragraph, i'e auto scroll to reveal whole paragraph.
