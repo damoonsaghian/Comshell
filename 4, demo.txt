@@ -7,7 +7,7 @@ boot to an existing Arch Linux (installed or live) then:
   prepare the disk (use lsblk to identify the block devices), and mount it:
     $ mkfs.btrfs -f /dev/sdx
     $ mount /dev/sdx /mnt
-  $ pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate ttf-inconsolata ttf-anonymous-pro sway emacs firefox rustup
+  $ pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate ttf-inconsolata ttf-anonymous-pro sway emacs midori rustup
   arch-chroot /mnt
   bootloader:
     $ grub-install --target=i386-pc /dev/sdx
@@ -29,13 +29,23 @@ $ nano ~/.profile
 $ cp ./demo/sway.txt ~/.config/sway/config
 
 = Emacs
-"https://tuhdo.github.io/emacs-tutor.html"
 "https://www.emacswiki.org/"
-"https://tuhdo.github.io/index.html"
+"https://tuhdo.github.io/emacs-tutor.html"
+"https://tuhdo.github.io/emacs-tutor3.html"
 "http://randomwits.com/blog/why-i-never-close-emacs"
+"http://diobla.info/blog-archive/modules-tut.html"
 
 "https://github.com/bbatsov/projectile"
-"http://wikemacs.org/wiki/Buffer_management"
+"https://github.com/bbatsov/persp-projectile"
+"https://github.com/seudut/perspeen"
+"https://github.com/Bad-ptr/persp-mode.el"
+"http://wikemacs.org/wiki/Desktop.el"
+"https://github.com/sabof/project-explorer"
+"https://www.emacswiki.org/emacs/ProjmanMode"
+"https://www.gnu.org/software/emacs/manual/html_mono/ede.html"
+"https://www.emacswiki.org/emacs/CategoryProject"
+
+
 "https://github.com/knu/elscreen"
 "https://www.emacswiki.org/emacs/Evil#toc21"
 "https://github.com/krisajenkins/evil-tabs"
@@ -43,7 +53,6 @@ $ cp ./demo/sway.txt ~/.config/sway/config
 "http://www.splode.com/~friedman/software/emacs-lisp/src/escreen.el"
 "https://www.emacswiki.org/emacs/TabBarMode"
 
-treeview:
 "https://stackoverflow.com/questions/843645/a-good-project-tree-browser-for-emacs"
 "http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
 "tiborsimko.org/emacs-find-file-in-repository.html"
@@ -51,20 +60,34 @@ treeview:
 "https://www.quora.com/How-do-you-use-Emacs-without-a-directory-tree-on-the-side-of-the-editor"
 "https://www.emacswiki.org/emacs/NeoTree"
 "https://github.com/jaypei/emacs-neotree"
+"https://github.com/Alexander-Miller/treemacs"
 "https://emacs.stackexchange.com/questions/12153/does-some-command-exist-which-goes-to-the-next-file-of-the-current-directory"
+"https://github.com/m2ym/direx-el"
+"https://github.com/ralesi/ranger.el"
+"https://github.com/thamer/runner"
+
+"https://github.com/mrkkrp/modalka"
+"https://github.com/emacs-evil/evil"
+"https://github.com/jyp/boon"
+"http://retroj.net/modal-mode"
+"https://github.com/justbur/emacs-which-key"
 
 "https://github.com/larstvei/Focus"
 "https://www.emacswiki.org/emacs/HideShow"
 "https://jblevins.org/projects/markdown-mode/"
 
-https://www.emacswiki.org/emacs/CategoryWebBrowser
-https://en.wikipedia.org/wiki/Eww_(web_browser)
-https://www.gnu.org/software/emacs/manual/html_node/eww/Basics.html
-http://sachachua.com/blog/2008/09/emacs-w3m-open-pages-in-external-browsers/
-in a tab showing a web page, we can open the same page in Firefox. the window will be marked, so bringing it back would be easy.
-Firefox windows will be send to scratchpad, by pressing "esc". we can close Firefox window by closing the original tab in emacs.
+"https://www.emacswiki.org/emacs/CategoryWebBrowser"
+"https://en.wikipedia.org/wiki/Eww_(web_browser)"
+"https://www.gnu.org/software/emacs/manual/html_node/eww/Basics.html"
+"http://sachachua.com/blog/2008/09/emacs-w3m-open-pages-in-external-browsers/"
+in a tab showing a web page, we can open the same page in Midori.
+Midori windows will be send to scratchpad, by pressing "esc". they can be brought back from scratchpad using their customized title which contained the u'r'l.
+Midori windows will be closed when we close the original tab in emacs.
 
 "http://shallowsky.com/blog/linux/editors/graphics-in-emacs.html"
+"https://www.gnu.org/software/auctex"
+"https://github.com/aaptel/preview-latex"
+"https://github.com/josteink/wsd-mode"
 "http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html"
 "https://www.emacswiki.org/emacs/ThumbsMode"
@@ -72,13 +95,35 @@ Firefox windows will be send to scratchpad, by pressing "esc". we can close Fire
 "http://wikemacs.org/wiki/Media_player"
 "https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/"
 "https://github.com/larsmagne/movie.el"
+"https://github.com/dbrock/bongo"
 video player (Mplayer, ffplay) window will be closed by pressing "esc".
-
-"https://magit.vc/"
-"https://github.com/vermiculus/magithub"
-"http://wikemacs.org/wiki/El-get"
 
 "https://github.com/rust-lang/rust-mode"
 "https://github.com/kwrooijen/cargo.el"
 "https://github.com/racer-rust/emacs-racer"
 "https://github.com/flycheck/flycheck-rust"
+
+"https://www.emacswiki.org/emacs/CategoryPackaging"
+"https://github.com/dimitri/el-get"
+"https://github.com/cask/cask"
+  "https://github.com/rdallasgray/pallet"
+"https://github.com/jwiegley/use-package"
+"https://github.com/edvorg/req-package"
+"https://github.com/quelpa/quelpa"
+"https://github.com/rranelli/auto-package-update.el"
+
+"https://github.com/rejeep/f.el"
+"https://github.com/ilya-babanov/emacs-bpr"
+"https://github.com/jwiegley/emacs-async"
+"https://github.com/dbordak/telephone-line"
+
+"https://magit.vc/"
+  "https://github.com/vermiculus/magithub"
+  "http://wikemacs.org/wiki/El-get"
+"https://github.com/holomorph/transmission"
+"https://www.emacswiki.org/emacs/DictMode"
+  "https://www.emacswiki.org/emacs/DictEm"
+  "https://www.emacswiki.org/emacs/wordnik.el"
+  "https://github.com/gromnitsky/wordnut"
+  "https://www.emacswiki.org/emacs/ThesauriAndSynonyms"
+  "https://github.com/atykhonov/google-translate"

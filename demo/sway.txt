@@ -1,0 +1,10 @@
+default_border none
+default_floating_border pixel 2
+
+for_window [class="Mplayer"] floating enable
+bindsym [class="Mplayer"] Escape kill
+
+for_window [class="Midori"] floating enable
+bindsym [class="Midori"] Escape move scratchpad
+
+exec emacs
