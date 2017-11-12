@@ -10,9 +10,9 @@ text editing:
 web:
 "https://github.com/servo/rust-url/"
 "https://crates.io/crates/hyper"
-  "https://crates.io/crates/hyper-rustls"
-  "https://crates.io/crates/reqwest"
-  "https://crates.io/crates/simplist"
+    "https://crates.io/crates/hyper-rustls"
+    "https://crates.io/crates/reqwest"
+    "https://crates.io/crates/simplist"
 "https://crates.io/crates/httpbin"
 "https://crates.io/crates/httpbis"
 "https://crates.io/crates/xmpp-proto"
