@@ -7,4 +7,4 @@ bindsym [class="Mplayer"] Escape kill
 for_window [class="Midori"] floating enable
 bindsym [class="Midori"] Escape move scratchpad
 
-exec emacs
+exec emacs; sway exit
