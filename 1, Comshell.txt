@@ -1,7 +1,7 @@
 Comshell is a command based user interface, being developed in Frem programing language (which is based on Rust).
 "https://github.com/damoonsaghian/Frem"
 
-command based user interfaces (using keyboard, voice, gesture) are faster more convenient and more powerful than pointing based user interfaces (using mouse, touch, pen).
+command based user interfaces (using keyboard, voice, gesture) are faster, more convenient and more powerful than pointing based user interfaces (using mouse, touch, pen).
 pointing interfaces can be useful only for very simple tasks. also for some special artistic applications pen input remains the only choice.
 command based interactions are much simpler for a speech recognition engine to process, since it needs to match against a relatively small set of commands, unlike a general speech to text process.
 a headset with near range microphone can be used, to exclude far away sound sources. also it is better to put battery and bluetooth of the headset in a separate unit, that can be put in the pocket. this makes the headset lighter and safer.
@@ -30,11 +30,12 @@ in normal mode:
 , find
 , enter insert mode
 
-a list of projects are made by looking at "~/projects/" and all directories named "projects" on all disks. from this list we can open projects (or switch to them if they are already open).
-links in the main project (links to other projects, websites, pdf, ...) will be opened in a tab next to current tab. a differet view of the current project can be opened in a tabs at the end.
+projects are looked for in "~/projects/" and all directories named "projects" on all disks. from this list of projects, we can open them or switch to them if they are already open.
+different views of the current project can be opened in separate tabs.
+when projects (which can also be websites, pdf, ...) are opened from inside the current project (not from projects list) we can only get back to them from the parent project. the parent project contains a list of all its child projects.
 
 a panel at the left shows a tree view of the files in the project.
 text files open in a text editor panel at the right.
-directories with ".m" extention open in a panel at the right, showing thumbnails of the files in it.
+directories with ".m" extension open in a panel at the right, showing thumbnails of the files in it.
 
 focus paragraph, i'e auto scroll to reveal whole paragraph.

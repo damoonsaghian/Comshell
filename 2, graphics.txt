@@ -1,5 +1,7 @@
 software rendering gives us a lot more flexibility, since we are not any more limited by a hardware implementation with triangle only rasterization, isolated shader programs, and fixed size buffers.
-font-rs "https://github.com/google/font-rs"
+
+font-rs
+"https://github.com/google/font-rs"
 "https://docs.rs/rusterize/"
 "https://docs.rs/softrender/"
 "https://crates.io/crates/line_drawing"
@@ -10,7 +12,8 @@ font-rs "https://github.com/google/font-rs"
 "http://members.chello.at/~easyfilter/bresenham.html"
 "https://nothings.org/gamedev/rasterize/"
 
-graphical objects are made of primitives. primitives are defined using a set of parameters. each primitive has a specific algorithm for rasterization.
+graphical objects are made of primitives. primitives are defined using a set of
+parameters. each primitive has a specific algorithm for rasterization.
 2d primitives: point, line, curve, triangle, curved area.
 3d objects made of flat surfaces will be broken up into triangles.
 3d objects made of curved surfaces can be broken up into a number of primitive 3d surfaces which can be easily projected to 2d.
