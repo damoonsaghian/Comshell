@@ -39,8 +39,3 @@ text files open in a text editor panel at the right.
 directories with ".m" extension open in a panel at the right, showing thumbnails of the files in it.
 
 focus paragraph, i'e auto scroll to reveal whole paragraph.
-
-= prototype
-actually, implementing Comshell is a lot of work. first we must implement Frem language, then a graphics library, then a lot of standard u'i utilities on top of that library.
-as a temporary solution, we can use Atom editor, to build a prototype of Comshell.
-"https://github.com/damoonsaghian/Orbital"
