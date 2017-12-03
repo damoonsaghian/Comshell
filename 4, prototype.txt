@@ -1,2 +1,11 @@
 actually, implementing Comshell is a lot of work. first we must implement Frem language, then a graphics library, then a lot of standard u'i utilities on top of that library.
 as a temporary solution, we can use Rust futures, and GTK, to build a prototype of Comshell.
+
+as others have noticed too, using GTK call'backs in Rust is ugly. it's not the problem of Rust. this difficulty is due to imperetive programming.
+"http://relm.ml/relm-intro"
+that's exactly what i like about Rust. it doesn't sacrifice a correct design, to implement a popular mistake (imperetive programming).
+
+"http://gtk-rs.org/docs/gtk/"
+
+"https://github.com/bvinc/gxi"
+"https://github.com/gchp/iota"

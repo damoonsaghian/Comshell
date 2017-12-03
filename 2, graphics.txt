@@ -41,10 +41,13 @@ graphical objects:
 , cached rasterization (can be none)
 
 graphical objects can be put in a layout tree. transformations on objects will be applied in groups, based on the tree.
-objects are moved to the tree. they can be accessed only by their index. current object index is where the selection cursor is.
-note that unlike a scene'graph, pointers to objects in the tree, are not accessible by the user. they are accessed only using tree indexing. so there are no free pointers, and no need for run'time memory management.
+objects are moved to the tree. they can be accessed only by their index. it means that, unlike in a scene'graph, pointers to objects in the tree are not accessible by the user. they are accessed only using tree indexing. so there are no free pointers, and no need for run'time memory management.
 
-the data stream sent to the graphics function contains:
-1, the new object to be added beside the currently selected object. (can be none)
-2, the transformation which must be applied to this new object (in which case, the transformation can be none), or to the selected object (if there is no new object).
-3, the index, or the relative motion of the index of currently selected object in the tree.
+we define transformation functions which trasnform states.
+transformation :: State -> State
+                  --------
+transformation-->|        |
+                 |        |----> state
+               ->|        |  |
+              |   --------   |
+               --------------
