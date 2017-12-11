@@ -9,7 +9,7 @@ $ timedatectl set-ntp true
 prepare the disk (use lsblk to identify the block devices), and mount it:
   $ mkfs.btrfs -f /dev/sdx
   $ mount /dev/sdx /mnt
-$ pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate sway ttf-fira-mono emacs gst-plugins-base gst-plugins-good gst-plugins-ugly midori rustup
+$ pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate sway ttf-hack emacs rustup
 $ arch-chroot /mnt
 bootloader:
   $ grub-install --target=i386-pc /dev/sdx
@@ -31,16 +31,9 @@ sway
 $ nano ~/.config/sway/config
 default_border none
 default_floating_border pixel 2
-exec nvim; sway exit
+exec emacs; sway exit
 
 "http://jlk.fjfi.cvut.cz/arch/manpages/man/sway.5"
-
-zathura-pdf-poppler
-"https://pwmt.org/projects/zathura/"
-apvlv
-https://github.com/naihe2010/apvlv/blob/master/apvlvrc.example
-
-http://www.mplayerhq.hu/DOCS/tech/slave.txt
 
 = Emacs
 "https://www.emacswiki.org/"
@@ -55,6 +48,8 @@ http://www.mplayerhq.hu/DOCS/tech/slave.txt
 "https://github.com/chrismccord/dot_emacs"
 "https://github.com/bling/dotemacs"
 "https://github.com/emacs-tw/awesome-emacs"
+
+fisrt there is a Dired frame showing projects. projects will be opened in a new Emacs instance/session, inside a Sway workspace. (the Dired frame will be send to scratchpad)
 
 "https://stackoverflow.com/questions/843645/a-good-project-tree-browser-for-emacs"
 "http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
@@ -93,11 +88,13 @@ https://www.gnu.org/software/emacs/manual/html_mono/viper.html
 "https://github.com/larsmagne/movie.el"
 "https://github.com/dbrock/bongo"
 video player (Mplayer, ffplay) window will be closed by pressing "esc".
+"http://www.mplayerhq.hu/DOCS/tech/slave.txt"
 
 "https://www.emacswiki.org/emacs/CategoryWebBrowser"
 "https://en.wikipedia.org/wiki/Eww_(web_browser)"
 "https://www.gnu.org/software/emacs/manual/html_node/eww/Basics.html"
 "http://sachachua.com/blog/2008/09/emacs-w3m-open-pages-in-external-browsers/"
+the layout will be splited and the browser window is opened at the right of the EWW one.
 
 "https://github.com/rust-lang/rust-mode"
 "https://github.com/kwrooijen/cargo.el"
