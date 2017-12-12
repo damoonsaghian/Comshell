@@ -49,7 +49,15 @@ exec emacs; sway exit
 "https://github.com/bling/dotemacs"
 "https://github.com/emacs-tw/awesome-emacs"
 
-fisrt there is a Dired frame showing projects. projects will be opened in a new Emacs instance/session, inside a Sway workspace. (the Dired frame will be send to scratchpad)
+"https://github.com/Bad-ptr/persp-mode.el"
+"https://github.com/seudut/perspeen"
+
+https://github.com/knu/elscreen
+  https://www.emacswiki.org/emacs/EmacsLispScreen
+https://stackoverflow.com/questions/22445670/save-and-restore-elscreen-tabs-and-split-frames
+https://www.emacswiki.org/emacs/Evil#toc21
+https://github.com/krisajenkins/evil-tabs
+TabBarMode
 
 "https://stackoverflow.com/questions/843645/a-good-project-tree-browser-for-emacs"
 "http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
