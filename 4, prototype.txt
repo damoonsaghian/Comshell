@@ -36,6 +36,8 @@ exec emacs; sway exit
 "http://jlk.fjfi.cvut.cz/arch/manpages/man/sway.5"
 
 = Emacs
+"http://emacslife.com/"
+"https://github.com/Bad-ptr/.emacs.d"
 "https://www.emacswiki.org/"
 "https://tuhdo.github.io/emacs-tutor.html"
 "https://tuhdo.github.io/emacs-tutor3.html"
@@ -49,15 +51,7 @@ exec emacs; sway exit
 "https://github.com/bling/dotemacs"
 "https://github.com/emacs-tw/awesome-emacs"
 
-"https://github.com/Bad-ptr/persp-mode.el"
-"https://github.com/seudut/perspeen"
-
-https://github.com/knu/elscreen
-  https://www.emacswiki.org/emacs/EmacsLispScreen
-https://stackoverflow.com/questions/22445670/save-and-restore-elscreen-tabs-and-split-frames
-https://www.emacswiki.org/emacs/Evil#toc21
-https://github.com/krisajenkins/evil-tabs
-TabBarMode
+Emacs client + Sway -> workspaces and tabs
 
 "https://stackoverflow.com/questions/843645/a-good-project-tree-browser-for-emacs"
 "http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
@@ -102,7 +96,7 @@ video player (Mplayer, ffplay) window will be closed by pressing "esc".
 "https://en.wikipedia.org/wiki/Eww_(web_browser)"
 "https://www.gnu.org/software/emacs/manual/html_node/eww/Basics.html"
 "http://sachachua.com/blog/2008/09/emacs-w3m-open-pages-in-external-browsers/"
-the layout will be splited and the browser window is opened at the right of the EWW one.
+browser window will be hidden by pressing "esc".
 
 "https://github.com/rust-lang/rust-mode"
 "https://github.com/kwrooijen/cargo.el"
