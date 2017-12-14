@@ -31,6 +31,10 @@ sway
 $ nano ~/.config/sway/config
 default_border none
 default_floating_border pixel 2
+workspace_layout tabbed
+for_window [class="Mplayer"] floating enable
+for_window [class="Midori"] floating enable
+bindsym [class="Midori"] Escape move prev
 exec emacs; sway exit
 
 "http://jlk.fjfi.cvut.cz/arch/manpages/man/sway.5"
@@ -51,7 +55,21 @@ exec emacs; sway exit
 "https://github.com/bling/dotemacs"
 "https://github.com/emacs-tw/awesome-emacs"
 
-Emacs client + Sway -> workspaces and tabs
+
+"https://github.com/Bad-ptr/persp-mode.el"
+
+https://github.com/knu/elscreen
+https://github.com/robario/elscreen-persist
+https://stackoverflow.com/questions/803812/emacs-reopen-buffers-from-last-session-on-startup/13711332#13711332
+https://stackoverflow.com/questions/22445670/save-and-restore-elscreen-tabs-and-split-frames/22451791#22451791
+https://www.emacswiki.org/emacs/EmacsLispScreen
+https://stackoverflow.com/questions/22445670/save-and-restore-elscreen-tabs-and-split-frames
+https://www.emacswiki.org/emacs/Evil#toc21
+https://github.com/krisajenkins/evil-tabs
+TabBarMode
+
+"https://github.com/seudut/perspeen"
+
 
 "https://stackoverflow.com/questions/843645/a-good-project-tree-browser-for-emacs"
 "http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
@@ -89,14 +107,12 @@ https://www.gnu.org/software/emacs/manual/html_mono/viper.html
 "https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/"
 "https://github.com/larsmagne/movie.el"
 "https://github.com/dbrock/bongo"
-video player (Mplayer, ffplay) window will be closed by pressing "esc".
 "http://www.mplayerhq.hu/DOCS/tech/slave.txt"
 
 "https://www.emacswiki.org/emacs/CategoryWebBrowser"
 "https://en.wikipedia.org/wiki/Eww_(web_browser)"
 "https://www.gnu.org/software/emacs/manual/html_node/eww/Basics.html"
 "http://sachachua.com/blog/2008/09/emacs-w3m-open-pages-in-external-browsers/"
-browser window will be hidden by pressing "esc".
 
 "https://github.com/rust-lang/rust-mode"
 "https://github.com/kwrooijen/cargo.el"
