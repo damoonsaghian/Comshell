@@ -33,8 +33,7 @@ default_border none
 default_floating_border pixel 2
 workspace_layout tabbed
 for_window [class="Mplayer"] floating enable
-for_window [class="Midori"] floating enable
-bindsym [class="Midori"] Escape move prev
+bindsym [class=""] Escape move prev
 exec emacs; sway exit
 
 "http://jlk.fjfi.cvut.cz/arch/manpages/man/sway.5"
@@ -55,21 +54,9 @@ exec emacs; sway exit
 "https://github.com/bling/dotemacs"
 "https://github.com/emacs-tw/awesome-emacs"
 
-
-"https://github.com/Bad-ptr/persp-mode.el"
-
-https://github.com/knu/elscreen
-https://github.com/robario/elscreen-persist
-https://stackoverflow.com/questions/803812/emacs-reopen-buffers-from-last-session-on-startup/13711332#13711332
-https://stackoverflow.com/questions/22445670/save-and-restore-elscreen-tabs-and-split-frames/22451791#22451791
-https://www.emacswiki.org/emacs/EmacsLispScreen
-https://stackoverflow.com/questions/22445670/save-and-restore-elscreen-tabs-and-split-frames
-https://www.emacswiki.org/emacs/Evil#toc21
-https://github.com/krisajenkins/evil-tabs
-TabBarMode
-
-"https://github.com/seudut/perspeen"
-
+Emacs + Sway -> workspaces and tabs
+workspace: name, root dir path, list of tabs
+tab: name, apth/url, poit location
 
 "https://stackoverflow.com/questions/843645/a-good-project-tree-browser-for-emacs"
 "http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
