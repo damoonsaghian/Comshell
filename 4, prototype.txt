@@ -1,5 +1,6 @@
 actually, implementing Comshell is a lot of work. first we must implement Frem language, then a graphics library, then a lot of standard u'i utilities on top of that library.
 as a temporary solution, we can build a prototype, using existing tools.
 
-"https://github.com/pavouk/lgi"
-"https://github.com/howl-editor/howl"
+
+"http://eric-ide.python-projects.org/index.html"
+"https://github.com/qutebrowser/qutebrowser"
