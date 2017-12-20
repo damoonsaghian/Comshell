@@ -1,5 +1,4 @@
-Comshell is a command based user interface, to be developed in Frem programing language (which is based on Rust).
-"https://github.com/damoonsaghian/Frem"
+Comshell is a command based user interface, written in Julia using Reactive.jl.
 
 command based user interfaces (using keyboard, voice, gesture) are faster, more convenient and more powerful than pointing based user interfaces (using mouse, touch, pen).
 touch interfaces can still be useful in simple limited applications. and for some special artistic applications, pen input remains the only choice.

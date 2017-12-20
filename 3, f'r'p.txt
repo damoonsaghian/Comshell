@@ -1,0 +1,145 @@
+imperative programming is done by procedurally changing stored values, it resembles the way cpu runs the instructions stored in memory.
+imperative programming leads to unmaintainable code in large programs, and it makes writing parallel programs a cumbersome task.
+
+functional reactive programming:
+when the output channels of a function is empty and the input channels are full, the function consumes its inputs and fills its outputs with computed values.
+initially all channels have default values, so feedbacks are possible.
+
+functions just compute new data, they don't change anything outside of the function. but many computations need to mutate the data given to them, because the data is big and copying it would be inefficient.
+one method as seen in languages like Haskell and Clojure is to use persistent data structures. in this method only the mutated part of data is computed and the rest of data is accessed through a reference to the original data. this may introduce some efficiency costs, but more importantly this method needs garbage collection.
+another method is to use value semantics and copy'on'write as in Swift. this method introduces some run'time cost because of reference counting. (it's actually a run'time solution)
+another method is to use move semantics (also known as uniqueness or linear types), as used in LinearML, Mercury and Rust. (note that none of these languages need run'time garbage collection)
+but if a unique value is used more than once in the code, it means that there must be separate copies. thus to prevent the need to copy data, we can see the need for a garbage collection enters again from the back door.
+
+the real solution:
+, big immutable data (which is logically global, like functions) -> no problem, static life time, one object with multiple references
+, small immutable and mutable data -> just copy it
+, big mutable data -> keep it in a local state loop, mutate it locally
+in other words, don't trasfer mutable big data. keep it in a local state loop, change it by sending small data as well as immutable big data.
+this way there is no need for garbage collection.
+
+"http://juliagizmos.github.io/Reactive.jl/"
+
+passing data across functions:
+, copy (for small primitive data)
+, borrow (immutable, lifetime is known at compile'time)
+, counted reference (immutable, lifetime is unknown at compile'time)
+, move (for linear type data, in'place mutability is possible)
+
+"Henry G Baker, use'once variables and linear objects":
+programming languages should have use'once variables in addition to the usual multiple'use variables. use'once variables are bound to linear (unshared, unaliased, or singly'referenced) objects. linear objects are cheap to access and manage, because they require no synchronization or tracing garbage collection. linear objects can elegantly and efficiently solve otherwise difficult problems of functional systems, e'g in'place updating and the efficient initialization of functional objects.
+a use'once variable must be dynamically referenced exactly once within its scope. unreferenced use'once variables must be explicitly killed, and multiply'referenced use'once variables must be explicitly copied. use'once variables are bound only to linear objects, which may reference other linear or non'linear objects. non'linear objects can reference other non'linear objects, but can reference a linear object only in a way that ensures mutual exclusion.
+linear objects and use'once variables map elegantly into dataflow models of concurrent computation. and the graphical representations of dataflow models make an appealing visual linear programming language.
+the acceptance by a function of a linear argument object places a great responsibility on the function. the function must either pass the linear object to another function as an argument, explicitly dispose of it, or return it as a return value.
+a linear language is ideal for a dataflow architecture, which must explicitly duplicate/delete (linear) tokens.
+
+= Rust
+"http://notes.willcrichton.net/rust-the-new-llvm/"
+new programming languages with a system'level compile target should choose Rust over LLVM. targeting Rust can give new languages free package management, a type system, and memory safety, while not imposing too many opinions on the language's runtime.
+
+Rust has a good designed type system.
+the class hierarchy design like in Java is problematic.
+    "http://ptgmedia.pearsoncmg.com/images/020163371x/items/item33.html"
+also the problem of covariance for generic types, has its root in this problem.
+    "https://en.wikipedia.org/wiki/Wildcard_(Java)"
+the right way is to use structs and traits:
+, structs are like final classes in Java, we use them to make object, but we can't inherit other classes from them.
+, traits are like abstract classes in Java, we can inherit other classes from them, but we can't directly use them to make objects.
+this way, all non'leaf classes will be abstract (traits), and all leaf classes will be final (structs).
+
+shared mutability is the root of many complexities, especially in concurrent environments.
+Rust tracks and controls shared mutability. in Rust as long as a piece of data can be changed within a code segment (i'e there is a mutable reference to the data), no other code path can read or modify the same data.
+all references in Rust must either be unique or immutable.
+
+"https://doc.rust-lang.org/stable/book/second-edition/index.html"
+"https://rustbyexample.com/"
+"http://blog.skylight.io/rust-means-never-having-to-close-a-socket/"
+
+heap is necessary for:
+, growable data
+, sharing data between distinct software processes (functions and threads)
+for the compiler to know where memory should be freed at compile'time, Rust uses stack based memory, and uses only uniquely'owned heap'allocated box. (heap memory with multiple owners needs garbage collection)
+in Rust there are two kinds of refs, owner and borrower. borrowers must have a lifetime less than the owner.
+any resource have exactly one owner which takes care of its resource deallocation.
+
+owner can:
+, control resource deallocation
+, lend the resource:
+  , immutably (multiple borrows)
+  , mutably (exclusive)
+, hand over ownership (move)
+owner can't:
+, during borrow:
+  , mutate the resource
+  , mutably lend the resource
+, during mutable borrow:
+  , access the resource
+  , lend the resource
+borrower can:
+, access borrowed resource
+, share (copy) an immutable borrow
+mutable borrower can:
+, access and mutate resource
+, hand over (move) the mutable borrow (mutable ref is moved by default)
+
+scenarios that involve multiple refs or returning refs often require explicit lifetimes. so don't return refs, instead use mutable refs in inputs.
+structs and enums containing refs must have explicit lifetimes. (impl of these must use lifetimes too)
+make sure that a closure will never outlive the variables it has refs to.
+
+
+Rust have separate types for static and dynamic values. (str/String, fn/Fn)
+functions can only access static environment. closures don't have this limitation. so when using them we might be more careful.
+static data can be defined using only other static data.
+
+arrays must be mutable. thus they must be implemented on stack (not static like str). so the size must be part of the type. (changes in the array must not change its size)
+arrays coerce to slice refs. use slice refs instead of arrays.
+
+unsized types (slices):
+there is no way to know the size of a variable of these types, so they can not be copied nor moved. we can only borrow them.
+unsized (on stack or static) types --> borrow
+sized (on stack or static) types --> copy, borrow
+heap --> move, borrow, copy
+
+String[..] <--> str
+       |
+       |--> slicing
+&String[..] <--> str
+        |
+        |--> deref
+
+automatic referencing in method calls (auto'borrow for self)
+
+Rust auto'dereferences variables when:
+, making method calls on a reference
+, passing a ref as a function arg (because the type sig for functions are mandatory)
+you have to deref vars when:
+, assigning to them without type annotation
+, using overloaded operators
+
+auto'deref:
+if x doesn't implement foo() but implements Deref then x.foo() --> x.deref().foo()
+
+= Frem to Rust
+"https://github.com/nikomatsakis/lalrpop"
+"https://github.com/nikomatsakis/lalrpop/blob/master/doc/tutorial.md"
+"https://limpet.net/mbrubeck/2014/08/08/toy-layout-engine-1.html"
+"https://doc.rust-lang.org/book/macros.html"
+"https://github.com/willcrichton/lia"
+"https://github.com/gluon-lang/gluon"
+"https://github.com/gluon-lang/gluon/blob/master/TUTORIAL.md#embedding-api"
+"https://github.com/gluon-lang/gluon/blob/master/src/regex_bind.rs"
+"https://github.com/gluon-lang/gluon/tree/master/parser/src"
+"https://www.reddit.com/r/rust/comments/4bipgm/writing_a_compiler_in_rust/"
+
+= implementing functional reactive programming
+in software, there is a limited number of central processing units (unlike in hardware where there is distinct processing units). so we use an event'loop and thread pool to implement functional reactive programming.
+"https://tokio.rs/docs/going-deeper-futures/synchronization/#channels"
+"https://tokio.rs/docs/going-deeper-futures/futures-model/"
+"http://asquera.de/blog/2017-03-01/the-future-with-futures/"
+"https://docs.rs/futures/0.1.13/futures/"
+"https://docs.rs/futures/0.1.13/futures/stream/index.html"
+"https://docs.rs/futures/0.1.13/futures/stream/trait.Stream.html"
+"https://docs.rs/futures/0.1.13/futures/sync/mpsc/struct.Receiver.html"
+"https://docs.rs/futures-cpupool/0.1.5/futures_cpupool/"
+"https://docs.rs/fibers/0.1.6/fibers/"
+"https://docs.rs/bus/1.3.1/bus/"
