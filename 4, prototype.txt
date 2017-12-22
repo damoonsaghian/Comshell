@@ -1,9 +1,11 @@
 actually, implementing Comshell is a lot of work. first we must implement Frem language, then a graphics library, then a lot of standard u'i utilities on top of that library.
 as a temporary solution, we can build a prototype, using existing tools.
 
-flexibility and the existance of already written code -> PyQt5
-  text editor, qutebrowser, libinput, 3d
-"https://github.com/retext-project/retext"
-"https://github.com/spyder-ide/spyder/"
-"http://eric-ide.python-projects.org/index.html"
-"https://github.com/qutebrowser/qutebrowser"
+"http://gtk-rs.org/docs/gtk/"
+using GTK in Rust can be problematic.
+"http://relm.ml/relm-intro"
+this is not the fault of Rust, but rather the fault of the status quo in programming.
+actually this problem leads us to the right approach, using futures and streams.
+
+"https://github.com/bvinc/gxi"
+"https://github.com/gchp/iota"

@@ -1,4 +1,2 @@
 "https://github.com/damoonsaghian/Comshell"
-
-this project is licensed under Creative Commons BY-SA.
-"http://creativecommons.org/licenses/by-sa/4.0/"
+this project is public domain.
