@@ -1,11 +1,4 @@
 actually, implementing Comshell is a lot of work. first we must implement Frem language, then a graphics library, then a lot of standard u'i utilities on top of that library.
 as a temporary solution, we can build a prototype, using existing tools.
 
-"http://gtk-rs.org/docs/gtk/"
-using GTK in Rust can be problematic.
-"http://relm.ml/relm-intro"
-this is not the fault of Rust, but rather the fault of the status quo in programming.
-actually this problem leads us to the right approach, using futures and streams.
-
-"https://github.com/bvinc/gxi"
-"https://github.com/gchp/iota"
+ViFM + i3 and Xdotools (to create modal key bindings, and to know about existence of a window) + Konqueror (and Kparts for Katr, Konsole, Okular, Gwenview)
