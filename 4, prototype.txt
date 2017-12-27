@@ -2,8 +2,10 @@ actually, implementing Comshell is a lot of work. first we must implement Frem l
 as a temporary solution, we can build a prototype, using existing tools.
 
 Vifm
-i3 (to create modal key bindings)
-xdotool (to know about existence of a window or workspace)
+i3 + xdotool (to create modal key bindings, and to know about existence of a window or workspace)
+i3-save-tree, append_layout (to restore sessions)
+Emacs, Mplayer, Firefox
+applications must be capable of saving and restoring previous session, and setting window properties like window title.
 
 = Arch Linux
 Arch Linux provides a binary/shared library distribution system (Pacman and AUR) which is very close to the original build process.
