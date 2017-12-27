@@ -1,10 +1,16 @@
 actually, implementing Comshell is a lot of work. first we must implement Frem language, then a graphics library, then a lot of standard u'i utilities on top of that library.
-as a temporary solution, we can build a prototype, using existing tools.
+as a demonstration, we can build a prototype, using existing tools.
 
-Vifm
-i3 + xdotool (to create modal key bindings, and to know about existence of a window or workspace)
-i3-save-tree, append_layout (to restore sessions)
-Emacs, Mplayer, Firefox
+i3:
+  save and restore layout (i3-save-tree, append_layout)
+  modal key bindings for everything (using xdotool)  
+xdotool: query windows or workspaces
+Emacs:
+  text editor with inline images
+  image manager (Image-Dired)
+  session restore
+gst-play
+Midori
 applications must be capable of saving and restoring previous session, and setting window properties like window title.
 
 = Arch Linux
@@ -15,7 +21,7 @@ $ timedatectl set-ntp true
 prepare the disk (use lsblk to identify the block devices), and mount it:
   $ mkfs.btrfs -f /dev/sdx
   $ mount /dev/sdx /mnt
-$ pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate xorg-server xorg-xinit xf86-video-intel xf86-video-nouveau xf86-video-amdgpu i3-wm xdotool vifm ttf-roboto ttf-hack rustup
+$ pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate xorg-server xorg-xinit xf86-video-intel xf86-video-nouveau xf86-video-amdgpu i3-wm perl-anyevent-i3 xdotool ttf-roboto ttf-hack emacs gst-plugins-base gst-plugins-good gst-plugins-ugly midori rustup
 $ arch-chroot /mnt
 bootloader:
   $ grub-install --target=i386-pc /dev/sdx
