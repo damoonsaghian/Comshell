@@ -1,5 +1,16 @@
 actually, implementing Comshell is a lot of work. first we must implement Frem language, then a graphics library, then a lot of standard u'i utilities on top of that library.
 as a demonstration, we can build a prototype, using existing tools.
 
-QML
-"https://en.wikipedia.org/wiki/QML"
+"http://qmlbook.github.io/index.html"
+"https://doc.qt.io/qt-5.10/qtqml-index.html"
+"http://doc.qt.io/qt-5/qtexamplesandtutorials.html"
+
+"http://doc.qt.io/qt-5/qmlreference.html"
+"https://doc.qt.io/qt-5.10/qtquick-qmlmodule.html"
+"https://doc.qt.io/qt-5.10/qtquicklayouts-index.html"
+"https://doc.qt.io/qt-5.10/qtquick-controls2-qmlmodule.html"
+"https://doc.qt.io/qt-5.10/qml-qtquick-controls2-tabbar.html"
+"https://doc.qt.io/qt-5.10/qml-qtquick-controls2-textarea.html"
+"http://doc.qt.io/qt-5/richtext.html"
+"http://doc.qt.io/qt-5/gettingstartedqml.html"
+"https://github.com/luspi/photoqt/tree/master/qml"
