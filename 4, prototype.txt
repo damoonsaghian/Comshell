@@ -1,15 +1,17 @@
 actually, implementing Comshell is a lot of work. first we must implement Frem language, then a graphics library, then a lot of standard u'i utilities on top of that library.
 as a demonstration, we can build a prototype, using existing tools.
 
-"http://qmlbook.github.io/index.html"
-"http://doc.qt.io/qt-5/qmlreference.html"
-"http://doc.qt.io/qt-5/qtexamplesandtutorials.html"
+"http://gtk-rs.org/docs/gtk/"
+"https://github.com/gtk-rs/examples/blob/master/src/bin/basic.rs"
+"https://github.com/gtk-rs/examples/blob/master/src/bin/notebook.rs"
+"https://developer.gnome.org/gtk3/stable/TextWidget.html"
+"https://developer.gnome.org/gtk3/stable/GtkTextBuffer.html"
+"http://gtk-rs.org/docs/sourceview/"
+"https://wiki.gnome.org/Projects/GtkSourceView"
 
-"https://doc.qt.io/qt-5.10/qtquick-qmlmodule.html"
-"https://doc.qt.io/qt-5.10/qtquicklayouts-index.html"
-"https://doc.qt.io/qt-5.10/qtquick-controls2-qmlmodule.html"
-"https://doc.qt.io/qt-5.10/qml-qtquick-controls2-tabbar.html"
-"https://doc.qt.io/qt-5.10/qml-qtquick-controls2-textarea.html"
-"http://doc.qt.io/qt-5/richtext.html"
-"http://doc.qt.io/qt-5/gettingstartedqml.html"
-"https://github.com/luspi/photoqt/tree/master/qml"
+see "http://relm.ml/relm-intro".
+this problem is because of imperetive programming, and it leads us to the right approach, using futures and streams.
+"https://tokio.rs/docs/going-deeper-futures/futures-mechanics/#adapters"
+"https://docs.rs/futures/0.1.17/futures/stream/index.html"
+"https://docs.rs/futures/0.1.17/futures/"
+"https://github.com/antoyo/relm"
