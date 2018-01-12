@@ -11,6 +11,7 @@ font-rs
 "https://en.wikipedia.org/wiki/Xiaolin_Wu%27s_line_algorithm"
 "http://members.chello.at/~easyfilter/bresenham.html"
 "https://nothings.org/gamedev/rasterize/"
+"https://magcius.github.io/xplain/article/"
 
 graphical objects are made of primitives. primitives are defined using a set of
 parameters. each primitive has a specific algorithm for rasterization.
