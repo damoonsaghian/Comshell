@@ -7,16 +7,16 @@ Sway:
 , organize windows in workspaces
 , we can send commands to it
 Emacs:
-و text editor with inline images
-و image manager (Image-Dired)
-و session restore (each project in separate session, in server mode)
+, text editor with inline images
+, image manager (Image-Dired)
+, session restore (each project in separate session, in server mode)
 
 boot to an existing Arch Linux (installed or live) then:
 $ timedatectl set-ntp true
 prepare the disk (use lsblk to identify the block devices), and mount it:
   $ mkfs.btrfs -f /dev/sdx
   $ mount /dev/sdx /mnt
-$ pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate sudo ttf-droid ttf-hack mplayer sway emacs rustup
+$ pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate sudo noto-fonts ttf-hack mplayer sway emacs rustup
 $ arch-chroot /mnt
 local time:
   $ ln -sf /usr/share/zoneinfo/... /etc/localtime
@@ -37,11 +37,18 @@ auto login:
   ExecStart=-/usr/bin/agetty --autologin user1 --noclear %I $TERM
 $ exit; reboot
 $ timedatectl set-ntp true
-Sway:
-  $ nano ~/.profile
-    sway
-  $ cp prototype/sway.txt ~/.sway/config
-cp prototype/init.el ~/.emacs/init.el
+
+Sway "http://jlk.fjfi.cvut.cz/arch/manpages/man/sway.5":
+$ nano ~/.profile
+  sway
+$ nano ~/.sway/config
+  default_floating_border pixel 2
+  workspace_layout tabbed
+  # bar {}
+  # focus_follows_mouse no
+  exec emacs --no-desktop --eval='(setq-default initial-buffer-choice "~/projects")'; sway exit
+
+$ cp -r emacs/ ~/.emacs.d/
 
 btrfs is used because journaling file systems can only protect metadata, at an acceptable performance. since they need to write all file system operations twice, once to the journal, and once to the file system.
 copy'on'write provides consistency for both data and metadata.
@@ -66,14 +73,10 @@ in addition, c'o'w also supports the creation of cheap snapshots and clones (bec
 "https://github.com/bling/dotemacs"
 "https://github.com/emacs-tw/awesome-emacs"
 
-
-"https://www.reddit.com/r/emacs/comments/30vleu/word_wrapping_and_indentation_level/"
-"https://github.com/typester/emacs/blob/master/lisp/org/org-indent.el"
-"http://git.savannah.gnu.org/gitweb/?p=emacs/elpa.git;a=blob;f=packages/adaptive-wrap/adaptive-wrap.el;h=42adacd4b022a9480889988b3b2f0e6441765ca2;hb=HEAD"
+"https://github.com/joostkremers/visual-fill-column"
 
 "https://stackoverflow.com/questions/843645/a-good-project-tree-browser-for-emacs"
 "http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
-"tiborsimko.org/emacs-find-file-in-repository.html"
 dired
 "https://github.com/m2ym/direx-el"
 "https://github.com/ralesi/ranger.el"
