@@ -1,147 +1,39 @@
 actually, implementing Comshell is a lot of work. first we must implement Frem language, then a graphics library, then a lot of standard u'i utilities on top of that library.
 as a demonstration, we can build a prototype, using existing tools.
 
-Arch Linux provides a binary/shared library distribution system (Pacman and AUR) which is very close to the original build process.
-Sway:
-, simple Wayland window manager
-, organize windows in workspaces
-, we can send commands to it
-Emacs:
-, text editor with inline images
-, image manager (Image-Dired)
-, session restore (each project in separate session, in server mode)
+"https://github.com/Kesin11/atom-vim-like-tab"
 
-boot to an existing Arch Linux (installed or live) then:
-$ timedatectl set-ntp true
-prepare the disk (use lsblk to identify the block devices), and mount it:
-  $ mkfs.btrfs -f /dev/sdx
-  $ mount /dev/sdx /mnt
-$ pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate sudo noto-fonts ttf-hack mplayer sway emacs rustup
-$ arch-chroot /mnt
-local time:
-  $ ln -sf /usr/share/zoneinfo/... /etc/localtime
-  $ hwclock --systohc
-bootloader:
-  $ grub-install --target=i386-pc /dev/sdx
-  $ grub-mkconfig -o /boot/grub/grub.cfg
-$ systemctl enable dhcpcd.service
-create user:
-  $ useradd -m -G wheel user1
-  $ passwd -d user1
-  $ EDITOR=nano visudo
-    %wheel      ALL=(ALL) ALL
-auto login:
-  $ systemctl edit getty@tty1
-  [Service]
-  ExecStart=
-  ExecStart=-/usr/bin/agetty --autologin user1 --noclear %I $TERM
-$ exit; reboot
-$ timedatectl set-ntp true
+"https://atom.io/packages/atom-replace-pane"
 
-Sway "http://jlk.fjfi.cvut.cz/arch/manpages/man/sway.5":
-$ nano ~/.profile
-  sway
-$ nano ~/.sway/config
-  default_floating_border pixel 2
-  workspace_layout tabbed
-  # bar {}
-  # focus_follows_mouse no
-  exec emacs --no-desktop --eval='(setq-default initial-buffer-choice "~/projects")'; sway exit
+advanced-open-file
+modal-file-manager
+atom-commander
 
-$ cp -r emacs/ ~/.emacs.d/
+scroll-without-moving-cursor
 
-btrfs is used because journaling file systems can only protect metadata, at an acceptable performance. since they need to write all file system operations twice, once to the journal, and once to the file system.
-copy'on'write provides consistency for both data and metadata.
-also, it can offer integrity of data and metadata (using checksums), at an acceptable overhead.
-in addition, c'o'w also supports the creation of cheap snapshots and clones (because it does not overwrite data in place). users can take fast online backups without the need to use any special software technique like l'v'm.
+"https://www.npmjs.com/package/blueimp-bootstrap-image-gallery"
+"https://www.npmjs.com/package/lightgallery"
+"https://www.npmjs.com/package/angular-modal-gallery"
+"https://www.npmjs.com/package/react-responsive-carousel"
 
-= Emacs
-"http://emacslife.com/"
-"http://emacslife.com/how-to-read-emacs-lisp.html"
-"https://www.emacswiki.org/"
-"https://tuhdo.github.io/emacs-tutor.html"
-"https://tuhdo.github.io/emacs-tutor3.html"
-"http://randomwits.com/blog/why-i-never-close-emacs"
-"http://diobla.info/blog-archive/modules-tut.html"
-"https://github.com/caiorss/Emacs-Elisp-Programming"
-"https://github.com/Fuco1/dired-hacks"
-"https://github.com/technomancy/better-defaults/blob/master/better-defaults.el"
-"https://github.com/Bad-ptr/.emacs.d"
-"https://github.com/redguardtoo/emacs.d"
-"https://github.com/hlissner/doom-emacs"
-"https://github.com/chrismccord/dot_emacs"
-"https://github.com/bling/dotemacs"
-"https://github.com/emacs-tw/awesome-emacs"
+"https://atom.io/packages/inline-markdown-images"
+"https://nteract.gitbooks.io/hydrogen/docs/Installation.html"
+"https://atom.io/packages/greyatom-hydrogen"
+"https://atom.io/packages/preview-inline"
 
-"https://github.com/joostkremers/visual-fill-column"
+open-path
+navigate
+openproject-file
 
-"https://stackoverflow.com/questions/843645/a-good-project-tree-browser-for-emacs"
-"http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
-dired
-"https://github.com/m2ym/direx-el"
-"https://github.com/ralesi/ranger.el"
-"https://www.emacswiki.org/emacs/NeoTree"
-"https://github.com/jaypei/emacs-neotree"
-"https://github.com/sebastiencs/sidebar.el"
-"https://github.com/Alexander-Miller/treemacs"
-"https://emacs.stackexchange.com/questions/12153/does-some-command-exist-which-goes-to-the-next-file-of-the-current-directory"
-"https://github.com/thamer/runner"
-
-"https://github.com/mrkkrp/modalka"
-"https://github.com/emacs-evil/evil"
-"https://github.com/jyp/boon"
-"http://retroj.net/modal-mode"
-"https://github.com/justbur/emacs-which-key"
-https://www.gnu.org/software/emacs/manual/html_mono/viper.html
-
-"https://github.com/larstvei/Focus"
-"https://www.emacswiki.org/emacs/HideShow"
-"https://jblevins.org/projects/markdown-mode/"
-
-"http://shallowsky.com/blog/linux/editors/graphics-in-emacs.html"
-"https://www.gnu.org/software/auctex"
-"https://github.com/aaptel/preview-latex"
-"https://github.com/josteink/wsd-mode"
-"http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html"
-"https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html"
-"https://www.emacswiki.org/emacs/ThumbsMode"
-"https://www.gnu.org/software/emms/screenshots.html"
-"http://wikemacs.org/wiki/Media_player"
-"https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/"
-"https://github.com/larsmagne/movie.el"
-"https://github.com/dbrock/bongo"
-"http://www.mplayerhq.hu/DOCS/tech/slave.txt"
-
-"https://www.emacswiki.org/emacs/CategoryWebBrowser"
-"https://en.wikipedia.org/wiki/Eww_(web_browser)"
-"https://www.gnu.org/software/emacs/manual/html_node/eww/Basics.html"
-"http://sachachua.com/blog/2008/09/emacs-w3m-open-pages-in-external-browsers/"
-emacs eww "url-configuration-directory"
-"http://ergoemacs.org/emacs/emacs_eww_web_browser.html"
-"http://www.wilkesley.org/~ian/xah/emacs/emacs_eww_web_browser.html"
-"https://www.gnu.org/software/emacs/manual/html_node/eww/Basics.html"
-
-"https://github.com/rust-lang/rust-mode"
-"https://github.com/kwrooijen/cargo.el"
-"https://github.com/racer-rust/emacs-racer"
-"https://github.com/flycheck/flycheck-rust"
-
-"https://www.emacswiki.org/emacs/CategoryPackaging"
-"https://github.com/dimitri/el-get"
-"https://github.com/cask/cask"
-  "https://github.com/rdallasgray/pallet"
-"https://github.com/jwiegley/use-package"
-"https://github.com/edvorg/req-package"
-"https://github.com/quelpa/quelpa"
-"https://github.com/rranelli/auto-package-update.el"
-
-"https://magit.vc/"
-"https://github.com/vermiculus/magithub"
-"http://wikemacs.org/wiki/El-get"
-
-"https://www.emacswiki.org/emacs/DictMode"
-"https://www.emacswiki.org/emacs/DictEm"
-"https://www.emacswiki.org/emacs/wordnik.el"
-"https://github.com/gromnitsky/wordnut"
-"https://www.emacswiki.org/emacs/ThesauriAndSynonyms"
-"https://github.com/atykhonov/google-translate"
+"https://atom.io/packages/atom-shell-commands"
+"https://atom.io/packages/run-command"
+"https://atom.io/packages/command-executor"
+"https://atom.io/packages/execute"
+terminal-plus
+winterm
+quantum-shell
+termrk
+output-panel
+termy
+atom-xterm
+atom-terminal-tab
