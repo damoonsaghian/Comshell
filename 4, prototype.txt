@@ -1,26 +1,4 @@
 actually, implementing Comshell is a lot of work. first we must implement Frem language, then a graphics library, then a lot of standard u'i utilities on top of that library.
 as a demonstration, we can build a prototype, using existing tools.
 
-flexibility, and the existence of already written code -> PyQt5
-
-"https://github.com/goldsborough/Writer-Tutorial"
-"https://github.com/baoboa/pyqt5/tree/master/examples
-"http://doc.qt.io/qt-5/qtextedit.html
-"https://stackoverflow.com/questions/3254652/several-ways-of-placing-an-image-in-a-qtextedit"
-"https://stackoverflow.com/questions/15539075/inserting-qimage-after-string-in-qtextedit"
-"http://artibot.info/wkhtmltopdf/qt/demos/textedit/example.html"
-"https://pythonprogramminglanguage.com/pyqt5-video-widget/"
-
-"https://github.com/retext-project/retext"
-"https://github.com/DylanMeeus/InsaniText"
-"https://github.com/spyder-ide/spyder/"
-"https://github.com/spyder-ide/spyder/"
-"https://github.com/ninja-ide/ninja-ide"
-"http://eric-ide.python-projects.org/index.html"
-"https://github.com/qutebrowser/qutebrowser"
-
-"https://packaging.python.org/guides/"
-"https://packaging.python.org/tutorials/installing-packages/"
-"https://packaging.python.org/tutorials/managing-dependencies/"
-"https://packaging.python.org/tutorials/distributing-packages/"
-"https://github.com/libgit2/pygit2"
+Konqueror + i3
