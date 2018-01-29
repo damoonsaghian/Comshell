@@ -1,6 +1,11 @@
 actually, implementing Comshell is a lot of work. first we must implement Frem language, then a graphics library, then a lot of standard u'i utilities on top of that library.
 as a demonstration, we can build a prototype, using existing tools.
 
+"https://developer.gnome.org/gedit/3.20/"
+"https://github.com/jpfleury/gedit-markdown"
+"https://github.com/jefferyto/gedit-restore-tabs/tree/gedit3.8"
+  "https://github.com/raelgc/gedit-restore-tabs"
+
 "https://python-gtk-3-tutorial.readthedocs.io/en/latest/index.html"
 "https://github.com/GNOME/pygobject/tree/master/examples/"
 "https://github.com/karlch/vimiv/"
