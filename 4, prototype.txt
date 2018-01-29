@@ -1,4 +1,7 @@
 actually, implementing Comshell is a lot of work. first we must implement Frem language, then a graphics library, then a lot of standard u'i utilities on top of that library.
 as a demonstration, we can build a prototype, using existing tools.
 
-"http://www.chromium.org/user-experience/multi-profiles"
+"https://python-gtk-3-tutorial.readthedocs.io/en/latest/index.html"
+"https://github.com/GNOME/pygobject/tree/master/examples/"
+"https://github.com/karlch/vimiv/"
+"https://gitlab.gnome.org/gnumdk/eolie"
