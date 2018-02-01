@@ -1,4 +1,2 @@
 actually, implementing Comshell is a lot of work. first we must implement Frem language, then a graphics library, then a lot of standard u'i utilities on top of that library.
 as a demonstration, we can build a prototype, using existing tools.
-
-Python + a web based GUI
