@@ -5,7 +5,6 @@ text editing:
 "https://github.com/jmacdonald/scribe"
 "https://github.com/mathall/rim"
 "https://github.com/gchp/iota"
-"https://github.com/zovt/tea"
 
 web:
 "https://github.com/servo/rust-url/"
@@ -17,7 +16,6 @@ web:
 "https://crates.io/crates/httpbis"
 "https://crates.io/crates/xmpp-proto"
 "https://crates.io/crates/pijul" (version control system)
-"https://crates.io/crates/github-rs"
 
 media:
 "https://github.com/pcwalton/rust-media"
@@ -27,4 +25,3 @@ media:
 "https://github.com/tomaka/cpal"
 "https://crates.io/crates/lewton"
 "https://crates.io/crates/camera_capture"
-"https://trac.ffmpeg.org/wiki/HWAccelIntro"

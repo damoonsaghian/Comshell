@@ -21,9 +21,9 @@ parameters. each primitive has a specific algorithm for rasterization.
 "https://en.wikipedia.org/wiki/Quadric"
 also interpolation is a good method for amorphous surfaces.
 
-2d objects will be rasterized to pixels (i'e a coordinate and a color value).
+2d objects will be rasterized into pixels (a pixel is a coordinate plus a color value).
 then these rasterized objects will be drawn in the framebuffer, in layers over each other (in an overlay on top of all 3d objects).
-rasterizing 3d objects, produces an array of fragments. a fragment other than color, contains a normal and a depth.
+rasterizing 3d objects, produces an array of fragments. a fragment, besides color, contains a normal and a depth.
 when creating the pixels of the framebuffer from the fragments, the normals are used for lighting, and the depths are used for z'buffer.
 
 "https://en.wikipedia.org/wiki/Stencil_buffer"
@@ -31,10 +31,10 @@ when creating the pixels of the framebuffer from the fragments, the normals are 
 "https://www.scratchapixel.com/lessons/3d-basic-rendering/phong-shader-BRDF"
 
 graphical objects are of 2 kinds:
-, those which we know will remain unchanged the next time we want to draw to the framebuffer. these objects are first rasterized into memory, then we copy it to framebuffer.
+, those which we know will remain unchanged the next time we want to draw to the framebuffer. these objects are first rasterized into memory, then we copy it into framebuffer.
 , those which we know will be changed (scaled, rotated, moved in z direction) the next time we want to draw to the framebuffer (which happens a lot for animations with high frame rate). these objects will be drawn directly to the framebuffer.
 (framebuffer uses double buffering and v'sync)
-note that if an object just moves in x'y plane (without rotation), the cached rasterization is still useful. for 2d objects we simply add a constant to the position of all pixels. for 3d objects we may additionally want to recompute the lighting of pixels form fragments.
+note that if an object just moves in x'y plane (without rotation), the cached rasterization is still useful. for 2d objects we simply add a constant to the position of all pixels. for 3d objects we may additionally want to recompute the lighting of pixels from fragments.
 
 graphical objects:
 , primitives
@@ -42,13 +42,4 @@ graphical objects:
 , cached rasterization (can be none)
 
 graphical objects can be put in a layout tree. transformations on objects will be applied in groups, based on the tree.
-objects are moved to the tree. they can be accessed only by their index. it means that, unlike in a scene'graph, pointers to objects in the tree are not accessible by the user. they are accessed only using tree indexing. so there are no free pointers, and no need for run'time memory management.
-
-we define transformation functions which trasnform states.
-transformation :: State -> State
-                  --------
-transformation-->|        |
-                 |        |----> state
-               ->|        |  |
-              |   --------   |
-               --------------
+objects are moved to the tree. they can be accessed only internally. it means that, unlike in a scene'graph, pointers to objects in the tree are not accessible globally. so there are no free pointers, and no need for run'time memory management.
