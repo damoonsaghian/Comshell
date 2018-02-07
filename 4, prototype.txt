@@ -40,32 +40,29 @@ $ cp prototype/sway.txt ~/.config/sway/config
 
 $ cp -r emacs/ ~/.emacs.d/
 
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html"
+
 "http://ergoemacs.org/emacs/file_management.html"
 "https://github.com/Fuco1/dired-hacks"
 "https://emacs.stackexchange.com/questions/12153/does-some-command-exist-which-goes-to-the-next-file-of-the-current-directory"
-
-"https://www.gnu.org/software/emacs/manual/html_node/emacs/Hard-and-Soft-Newlines.html"
-"https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html"
-"https://www.gnu.org/software/emacs/manual/html_node/emacs/Words.html"
-"https://www.gnu.org/software/emacs/manual/html_node/emacs/Paragraphs.html"
-"https://www.gnu.org/software/emacs/manual/html_node/emacs/Pages.html"
-"https://www.gnu.org/software/emacs/manual/html_node/elisp/Choosing-Window.html"
-"https://www.gnu.org/software/emacs/manual/html_node/emacs/Change-Window.html"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Files.html"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Shell-Commands-in-Dired.html"
 
+"https://www.gnu.org/software/emacs/manual/html_node/elisp/Choosing-Window.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Change-Window.html"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Display.html"
 "https://github.com/larstvei/Focus"
 "https://www.emacswiki.org/emacs/HideShow"
-"https://jblevins.org/projects/markdown-mode/"
-
-"https://orgmode.org/manual/Tables.html"
-"https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html"
-
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Pages.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Words.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Hard-and-Soft-Newlines.html"
 "https://github.com/joostkremers/visual-fill-column"
 
+"https://jblevins.org/projects/markdown-mode/"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html"
+"https://orgmode.org/manual/Tables.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html"
 
 "http://shallowsky.com/blog/linux/editors/graphics-in-emacs.html"
 "https://www.gnu.org/software/auctex"
@@ -83,8 +80,6 @@ $ cp -r emacs/ ~/.emacs.d/
 
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Hyperlinking.html"
 "https://www.chromium.org/user-experience/multi-profiles"
-
-"https://www.gnu.org/software/emacs/manual/html_node/emacs/Document-View.html"
 
 "https://www.emacswiki.org/emacs/CategoryShell"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Shell.html"
