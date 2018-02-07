@@ -40,6 +40,8 @@ $ cp prototype/sway.txt ~/.config/sway/config
 
 $ cp -r emacs/ ~/.emacs.d/
 
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Emacs-Invocation.html"
+
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html"
 
 "http://ergoemacs.org/emacs/file_management.html"
@@ -48,9 +50,12 @@ $ cp -r emacs/ ~/.emacs.d/
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Files.html"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Shell-Commands-in-Dired.html"
+"https://github.com/thamer/runner"
 
 "https://www.gnu.org/software/emacs/manual/html_node/elisp/Choosing-Window.html"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Change-Window.html"
+split-window-horizontally
+follow-mode
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Display.html"
 "https://github.com/larstvei/Focus"
 "https://www.emacswiki.org/emacs/HideShow"
