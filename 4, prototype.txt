@@ -36,7 +36,7 @@ $ exit; reboot
 $ nano ~/.bashrc
   sway
 $ mkdir -p ~/.config/sway
-$ cp prototype/sway.txt ~/.config/sway/config
+$ cp prototype/sway ~/.config/sway/config
 
 $ cp -r emacs/ ~/.emacs.d/
 
@@ -63,6 +63,11 @@ follow-mode
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Words.html"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Hard-and-Soft-Newlines.html"
 "https://github.com/joostkremers/visual-fill-column"
+
+"https://github.com/mrkkrp/modalka"
+"https://github.com/jyp/boon"
+"http://retroj.net/modal-mode"
+"https://github.com/justbur/emacs-which-key"
 
 "https://jblevins.org/projects/markdown-mode/"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html"
