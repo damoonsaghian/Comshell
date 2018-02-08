@@ -1,6 +1,0 @@
-# "http://jlk.fjfi.cvut.cz/arch/manpages/man/sway.5"
-# focus_follows_mouse no
-# bar {}
-
-# Simulate ctrl+v upon pressing v
-# bindsym --release v exec --no-startup-id xdotool key --clearmodifiers ctrl+v
