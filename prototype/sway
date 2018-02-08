@@ -1,0 +1,18 @@
+# "http://jlk.fjfi.cvut.cz/arch/manpages/man/sway.5"
+# focus_follows_mouse no
+# bar {}
+
+bindsym p scratchpad show; exec emacsclient ~/projects/
+
+bindsym --release i exec --no-startup-id xdotool key --clearmodifiers i; mode insert
+mode insert {
+  bindsym --release escape exec --no-startup-id xdotool key --clearmodifiers escape; mode default
+}
+
+bindsym --release g exec --no-startup-id xdotool key --clearmodifiers g; mod goto
+mod goto {
+  bindsym p "raise or run chromium"; mode browser
+}
+mode browser {
+  bindsym escape focus next; mode default
+}

@@ -32,3 +32,7 @@
 (load "~/.emacs.d/org-indent.el")
 (global-org-indent-mode 1)
 ;(define-key global-map (kbd "RET") 'newline-and-indent)
+
+;(when (not (package-installed-p ...))
+;  (package-install ...))
+;(require ...)
