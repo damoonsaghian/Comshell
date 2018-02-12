@@ -1,6 +1,8 @@
 actually, implementing Comshell is a lot of work. first we must implement Frem language, then a graphics library, then a lot of standard u'i utilities on top of that library.
 but as a demonstration, we can build a prototype, using existing tools.
 
+Arch Linux, Sway, xdotool, Emacs, Mplayer, Chromium
+
 Arch Linux provides a binary/shared library distribution system, which is very close to the original build process.
 
 boot to an existing Arch Linux (installed or live) then:
@@ -12,7 +14,7 @@ prepare the disk (use lsblk to identify the block devices), and mount it:
   copy'on'write provides consistency for both data and metadata.
   also, it can offer integrity of data and metadata (using checksums), at an acceptable overhead.
   in addition, c'o'w also supports the creation of cheap snapshots and clones (because it does not overwrite data in place). users can take fast online backups without the need to use any special software technique like l'v'm.
-$ pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate sudo alsa-utils noto-fonts ttf-hack sway gtk3 gtksourceview3 vte3 gvfs gst-libav webkit2gtk python-gobject rustup
+$ pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate sudo alsa-utils noto-fonts ttf-hack sway emacs xdotool mplayer chromium rustup
 $ arch-chroot /mnt
 bootloader:
   $ grub-install --target=i386-pc /dev/sdx
@@ -37,22 +39,88 @@ $ nano ~/.bashrc
   sway
 $ mkdir -p ~/.config/sway
 $ nano ~/.config/sway/config
-  exec "python ~/projects/Comshell/prototype/comshell.py; sway exit"
+$ cp prototype/sway ~/.config/sway/config
 
-"https://python-gtk-3-tutorial.readthedocs.io/en/latest/index.html"
-"https://github.com/GNOME/pygobject/tree/master/examples/"
-"https://github.com/karlch/vimiv/"
-"https://gitlab.gnome.org/gnumdk/eolie"
+$ cp prototype/*.el ~/.emacs.d/
 
-"https://lazka.github.io/pgi-docs/Gtk-3.0/index.html"
-"https://lazka.github.io/pgi-docs/GtkSource-3.0/index.html"
-"https://lazka.github.io/pgi-docs/Vte-2.91/index.html"
-"https://lazka.github.io/pgi-docs/Gio-2.0/"
-"https://lazka.github.io/pgi-docs/GdkPixbuf-2.0/index.html"
-"https://lazka.github.io/pgi-docs/Gst-1.0/index.html"
-"https://lazka.github.io/pgi-docs/WebKit2-4.0/index.html"
-"https://lazka.github.io/pgi-docs/Poppler-0.18/index.html"
-"https://lazka.github.io/pgi-docs/EvinceView-3.0/index.html"
-"https://lazka.github.io/pgi-docs/Gepub-0.5/index.html"
-"https://lazka.github.io/pgi-docs/Farstream-0.2/index.html"
-"https://lazka.github.io/pgi-docs/TelepathyGLib-0.12/index.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Emacs-Invocation.html"
+
+"http://ergoemacs.org/emacs/file_management.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Files.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Shell-Commands-in-Dired.html"
+"https://github.com/thamer/runner"
+in dired-mode pressing "enter":
+, */projects/* -> move to workspace, and if there is no window named "nameofproject" open one using emacsclient.
+, *.m -> open image-dired/movie in a new window
+, else -> open file in a new window
+"https://github.com/Fuco1/dired-hacks"
+"https://emacs.stackexchange.com/questions/12153/does-some-command-exist-which-goes-to-the-next-file-of-the-current-directory"
+next file:
+, go to tree view
+, next file
+, open (in the window at right, go to the first line)
+
+"https://www.gnu.org/software/emacs/manual/html_node/elisp/Choosing-Window.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Change-Window.html"
+split-window-horizontally
+follow-mode
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Display.html"
+"https://github.com/larstvei/Focus"
+"https://www.emacswiki.org/emacs/HideShow"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Pages.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Words.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Hard-and-Soft-Newlines.html"
+"https://github.com/joostkremers/visual-fill-column"
+
+"https://github.com/mrkkrp/modalka"
+"https://github.com/jyp/boon"
+"http://retroj.net/modal-mode"
+"https://github.com/justbur/emacs-which-key"
+
+"https://jblevins.org/projects/markdown-mode/"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html"
+"https://orgmode.org/manual/Tables.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html"
+
+"http://shallowsky.com/blog/linux/editors/graphics-in-emacs.html"
+"https://www.gnu.org/software/auctex"
+"https://github.com/aaptel/preview-latex"
+"https://github.com/josteink/wsd-mode"
+"http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html"
+"https://www.emacswiki.org/emacs/ThumbsMode"
+"https://www.gnu.org/software/emms/screenshots.html"
+"http://wikemacs.org/wiki/Media_player"
+"https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/"
+"https://github.com/larsmagne/movie.el"
+"https://github.com/dbrock/bongo"
+"http://www.mplayerhq.hu/DOCS/tech/slave.txt"
+
+"https://www.emacswiki.org/emacs/CategoryWebBrowser"
+"https://en.wikipedia.org/wiki/Eww_(web_browser)"
+"https://www.gnu.org/software/emacs/manual/html_node/eww/index.html"
+emacs eww "url-configuration-directory"
+"http://ergoemacs.org/emacs/emacs_eww_web_browser.html"
+"http://www.wilkesley.org/~ian/xah/emacs/emacs_eww_web_browser.html"
+"https://www.gnu.org/software/emacs/manual/html_node/eww/Basics.html"
+cookies and cache location: ~/.emacs.d/url/
+the location is controlled by the following variables:
+  url-cookie-file -> default value is "~/.emacs.d/url/cookies"
+  url-configuration-directory -> default value is "~/.emacs.d/url/"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/EWW.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Hyperlinking.html"
+"https://askubuntu.com/questions/893638/terminal-command-to-open-new-chromium-tab"
+"https://www.chromium.org/user-experience/multi-profiles"
+
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Document-View.html"
+
+"https://www.emacswiki.org/emacs/CategoryShell"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Shell.html"
+"https://www.gnu.org/software/emacs/manual/html_node/eshell/index.html"
+"http://ergoemacs.org/emacs/emacs_unix.html"
+
+"https://github.com/rust-lang/rust-mode"
+"https://github.com/kwrooijen/cargo.el"
+"https://github.com/racer-rust/emacs-racer"
+"https://github.com/flycheck/flycheck-rust"
