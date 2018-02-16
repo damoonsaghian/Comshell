@@ -1,0 +1,10 @@
+# "http://jlk.fjfi.cvut.cz/arch/manpages/man/sway.5"
+focus_follows_mouse no
+workspace_layout tabbed
+
+# bindsym escape exec "query with xdotool, if chromium -> focus left. query with xdotool again, if chromium again -> kill window"
+
+bindsym --release i exec --no-startup-id xdotool key --clearmodifiers i; mode insert
+mode insert {
+  bindsym --release escape exec --no-startup-id xdotool key --clearmodifiers escape; mode default
+}
