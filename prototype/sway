@@ -8,3 +8,5 @@ bindsym --release i exec --no-startup-id xdotool key --clearmodifiers i; mode in
 mode insert {
   bindsym --release escape exec --no-startup-id xdotool key --clearmodifiers escape; mode default
 }
+
+exec "emacs --no-desktop ~/projects/; swaymsg exit"
