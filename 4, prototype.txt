@@ -12,7 +12,7 @@ prepare the disk (use lsblk to identify the block devices), and mount it:
   copy'on'write provides consistency for both data and metadata.
   also, it can offer integrity of data and metadata (using checksums), at an acceptable overhead.
   in addition, c'o'w also supports the creation of cheap snapshots and clones (because it does not overwrite data in place). users can take fast online backups without the need to use any special software technique like l'v'm.
-$ pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate sudo alsa-utils noto-fonts ttf-hack sway tk3 gtksourceview3 vte3 gvfs gst-libav webkit2gtk python-gobject rustup
+$ pacstrap /mnt grub sed intel-ucode linux systemd-sysvcompat btrfs-progs dhcpcd pacman nano man-db logrotate sudo alsa-utils noto-fonts ttf-hack xorg-server xf86-video-{intel,nouveau,amdgpu} xorg-xinit i3-wm gtk3 gtksourceview3 vte3  gst-libav webkit2gtk python-gobject rustup
 $ arch-chroot /mnt
 bootloader:
   $ grub-install --target=i386-pc /dev/sdx
@@ -35,10 +35,12 @@ $ amixer sset Master unmute
 $ exit; reboot
 
 $ nano ~/.bashrc
-  sway
-$ mkdir -p ~/.config/sway
-$ nano ~/.config/sway/config
-  exec "python ~/projects/Comshell/prototype/comshell.py; swaymsg exit"
+  startx
+$ nano ~/.xinitrc
+  exec i3
+$ mkdir -p ~/.config/i3
+$ nano ~/.config/i3/config
+  exec "python ~/projects/Comshell/prototype/comshell.py; i3-msg exit"
 
 "https://python-gtk-3-tutorial.readthedocs.io/en/latest/index.html"
 "https://github.com/GNOME/pygobject/tree/master/examples/"
