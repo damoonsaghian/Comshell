@@ -2,7 +2,7 @@ actually, implementing Comshell is a lot of work. first we must implement Frem l
 but as a demonstration, we can build a prototype, using existing tools.
 
 GTK + Lua
-https://github.com/pavouk/lgi
+"https://github.com/pavouk/lgi"
 
 Arch Linux provides a binary/shared library distribution system, which is very close to the original build process.
 
