@@ -3,12 +3,13 @@ local Gio, Gdk, Gtk, GtkSource = lgi.Gio, lgi.Gdk, lgi.Gtk, lgi.GtkSource
 
 
 local display = Gdk.Display.get_default()
---[[ todo: multi screen
+--[[ todo: multi screen support
 inside each screen create a Comshell window.
+move between them with Gtk.Window.present().
 opened tabs, text buffers (and webview buffer?), and watched directories are shared between windows.
 --]]
 
-local function new_comshell_window()
+local function new_comshell_window(monitor_n=1)
   -- the main workspace area
   local workspace = Gtk.Stack()
   
@@ -22,12 +23,14 @@ local function new_comshell_window()
   
   local window = Gtk.Window {
     on_destroy = Gtk.main_quit, -- on_delete_event = Gtk.main_quit
-    -- set windows size to fill the screen
-    geometry = display:get_monitor(1).get_geometry(),
     Gtk.Vbox()
   }
-  window:maximize() -- to have a proper window, if there is a window manager
+  -- set windows size to fill the screen
+  geometry = display:get_monitor(monitor_n).get_geometry()
   window:show_all()
+  window:move(geometry.x, geometry.y)
+  window:resize(geometry.width, geometry.height)
+  window:maximize() -- to have a proper window, if there is a window manager (with panels ...).
   
   return window
 end
