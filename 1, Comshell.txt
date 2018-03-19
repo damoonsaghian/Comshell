@@ -11,7 +11,6 @@ for those that neither can use all their fingers, nor can talk, gesture based (2
 missing characters can be entered using snippets:
 , two commas --> .
 , period followed by , --> :
-, comma followed by ( --> {
 , comma followed by ' --> "
 , comma followed by add followed by comma --> +
 , comma followed by add followed by space --> + followed by space
