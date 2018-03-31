@@ -1,4 +1,7 @@
 actually, implementing Comshell is a lot of work. first we must implement Frem language, then a graphics library, then a lot of standard u'i utilities on top of that library.
 but as a demonstration, we can build a prototype, using existing tools.
 
-Node.js FutureScript NW.js
+"http://juliagraphics.github.io/Gtk.jl/latest/"
+  "https://docs.julialang.org/en/stable/manual/calling-c-and-fortran-code/"
+  "https://github.com/JuliaGraphics/Gtk.jl/tree/master/src"
+"https://juliagizmos.github.io/GtkReactive.jl/stable/"
