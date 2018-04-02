@@ -1,6 +1,4 @@
-Comshell is a command based user interface, to be developed in Frem programing language (a functional reactive language using move semantics, based on Rust).
-"https://github.com/damoonsaghian/Frem"
-
+Comshell is a command based user interface.
 command based user interfaces (using keyboard, voice, gesture) are faster, more convenient and more powerful than pointing based user interfaces (using mouse, touch, pen).
 touch interfaces can still be useful in simple limited applications. and for some special artistic applications, pen input remains the only choice.
 command based interactions are much simpler for a speech recognition engine to process, since it needs to match against a relatively small set of commands, unlike a general speech recognition process.

@@ -1,0 +1,119 @@
+evolution of C language:
+, wrong approach:
+  classes (C++)
+  garbage collection:
+    , classes (Java, C#, ...)
+    , immutable data (Haskell)
+, right approach: traits, move semantics (Rust)
+
+Rust: the right limitations lead to the right approach.
+
+shared mutability is the root of many complexities, especially in concurrent environments.
+Rust tracks and controls shared mutability. in Rust as long as a piece of data can be changed within a code segment (i'e there is a mutable reference to the data), no other code path can read or modify the same data.
+all references in Rust must either be unique or immutable.
+
+"https://doc.rust-lang.org/stable/book/second-edition/index.html"
+"https://rustbyexample.com/"
+"http://blog.skylight.io/rust-means-never-having-to-close-a-socket/"
+
+heap is necessary for:
+, growable data
+, sharing data between distinct software processes (functions and threads)
+for the compiler to know where memory should be freed at compile'time, Rust uses stack based memory, and uses only uniquely'owned heap'allocated box. (heap memory with multiple owners needs garbage collection)
+in Rust there are two kinds of refs, owner and borrower. borrowers must have a lifetime less than the owner.
+any resource have exactly one owner which takes care of its resource deallocation.
+
+owner can:
+, control resource deallocation
+, lend the resource:
+  , immutably (multiple borrows)
+  , mutably (exclusive)
+, hand over ownership (move)
+owner can't:
+, during borrow:
+  , mutate the resource
+  , mutably lend the resource
+, during mutable borrow:
+  , access the resource
+  , lend the resource
+borrower can:
+, access borrowed resource
+, share (copy) an immutable borrow
+mutable borrower can:
+, access and mutate resource
+, hand over (move) the mutable borrow (mutable ref is moved by default)
+
+scenarios that involve multiple refs or returning refs often require explicit lifetimes. so don't return refs, instead use mutable refs in inputs.
+structs and enums containing refs must have explicit lifetimes. (impl of these must use lifetimes too)
+make sure that a closure will never outlive the variables it has refs to.
+
+
+Rust have separate types for static and dynamic values. (str/String, fn/Fn)
+functions can only access static environment. closures don't have this limitation. so when using them we might be more careful.
+static data can be defined using only other static data.
+
+arrays must be mutable. thus they must be implemented on stack (not static like str). so the size must be part of the type. (changes in the array must not change its size)
+arrays coerce to slice refs. use slice refs instead of arrays.
+
+unsized types (slices):
+there is no way to know the size of a variable of these types, so they can not be copied nor moved. we can only borrow them.
+unsized (on stack or static) types --> borrow
+sized (on stack or static) types --> copy, borrow
+heap --> move, borrow, copy
+
+String[..] <--> str
+       |
+       |--> slicing
+&String[..] <--> str
+        |
+        |--> deref
+
+automatic referencing in method calls (auto'borrow for self)
+
+Rust auto'dereferences variables when:
+, making method calls on a reference
+, passing a ref as a function arg (because the type sig for functions are mandatory)
+you have to deref vars when:
+, assigning to them without type annotation
+, using overloaded operators
+
+auto'deref:
+if x doesn't implement foo() but implements Deref then x.foo() --> x.deref().foo()
+
+"http://notes.willcrichton.net/rust-the-new-llvm/"
+new programming languages with a system'level compile target should choose Rust over LLVM. targeting Rust can give new languages free package management, a type system, and memory safety, while not imposing too many opinions on the language's runtime.
+"https://github.com/nikomatsakis/lalrpop"
+"https://github.com/nikomatsakis/lalrpop/blob/master/doc/tutorial.md"
+"https://limpet.net/mbrubeck/2014/08/08/toy-layout-engine-1.html"
+"https://doc.rust-lang.org/book/macros.html"
+"https://github.com/willcrichton/lia"
+"https://github.com/gluon-lang/gluon"
+"https://github.com/gluon-lang/gluon/blob/master/TUTORIAL.md#embedding-api"
+"https://github.com/gluon-lang/gluon/blob/master/src/regex_bind.rs"
+"https://github.com/gluon-lang/gluon/tree/master/parser/src"
+"https://www.reddit.com/r/rust/comments/4bipgm/writing_a_compiler_in_rust/"
+
+= type system
+types show us what we can do with the data (which operations are valid).
+
+the class hierarchy design like in Java is problematic.
+    "http://ptgmedia.pearsoncmg.com/images/020163371x/items/item33.html"
+also the problem of covariance for generic types, has its root in this problem.
+    "https://en.wikipedia.org/wiki/Wildcard_(Java)"
+i think this is also the reason some prefer dynamic typing (another bad design) over static typing.
+the right way is to use structs and traits (like in Rust and Go):
+, structs are like final classes in Java, we use them to make object, but we can't inherit other classes from them.
+, traits are like abstract classes in Java, we can inherit other classes from them, but we can't directly use them to make objects.
+this way, all non'leaf classes will be abstract (traits), and all leaf classes will be final (structs).
+
+tuples (heterogeneous, fixed size collection):
+x = (1, "aaa")
+named tuple: {i: 1, j: "aaa"}
+access:
+, destructuring
+, dot notation
+  tuples: x.0 (literal number only)
+  named tuples: x.i
+
+arrays: homogeneous, fixed sized collection
+vectors and hash tables: homogeneous, varying sized collection
