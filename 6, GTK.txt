@@ -47,9 +47,7 @@ $ nano ~/.config/gtk-3.0/settings.ini
   gtk-theme-name = Arc
   gtk-font-name = Noto Sans
 
-inside cargo/:
-  $ cargo build --release
 $ nano ~/.bashrc
   startx
 $ nano ~/.xinitrc
-  exec ~/projects/Comshell/cargo/.cache/release/comshell
+  exec cargo run --release --manifest-path ~/projects/Comshell/Cargo.toml
