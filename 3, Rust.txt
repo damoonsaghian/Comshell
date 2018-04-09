@@ -42,7 +42,7 @@ Rust have separate types for static and dynamic values. (str/String, fn/Fn)
 functions can only access static environment. closures don't have this limitation. so when using them we might be more careful.
 static data can be defined using only other static data.
 
-arrays must be mutable. thus they must be implemented on stack (not static like str). so the size must be part of the type. (changes in the array must not change its size)
+arrays have a fixed size, so they can be implemented on stack. but are mutable, so unlike str they can't be static.
 arrays coerce to slice refs. use slice refs instead of arrays.
 
 unsized types (slices):
@@ -69,19 +69,6 @@ you have to deref vars when:
 
 auto'deref:
 if x doesn't implement foo() but implements Deref then x.foo() --> x.deref().foo()
-
-"http://notes.willcrichton.net/rust-the-new-llvm/"
-new programming languages with a system'level compile target should choose Rust over LLVM. targeting Rust can give new languages free package management, a type system, and memory safety, while not imposing too many opinions on the language's runtime.
-"https://github.com/nikomatsakis/lalrpop"
-"https://github.com/nikomatsakis/lalrpop/blob/master/doc/tutorial.md"
-"https://limpet.net/mbrubeck/2014/08/08/toy-layout-engine-1.html"
-"https://doc.rust-lang.org/book/macros.html"
-"https://github.com/willcrichton/lia"
-"https://github.com/gluon-lang/gluon"
-"https://github.com/gluon-lang/gluon/blob/master/TUTORIAL.md#embedding-api"
-"https://github.com/gluon-lang/gluon/blob/master/src/regex_bind.rs"
-"https://github.com/gluon-lang/gluon/tree/master/parser/src"
-"https://www.reddit.com/r/rust/comments/4bipgm/writing_a_compiler_in_rust/"
 
 = type system
 types show us what we can do with the data (which operations are valid).
