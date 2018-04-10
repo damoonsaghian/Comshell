@@ -18,8 +18,8 @@ passing data across functions:
 
 , static data (like functions): no problem, share by reference
 , dynamic data
-  , small data: move it, or share by copying
-  , big data: move (no sharing)
+    , small data: move it, or share by copying
+    , big data: move (no sharing)
 functional reactive programming allow us to program without the need to share big data.
 
 keep related states in one place (to avoid copying big data).

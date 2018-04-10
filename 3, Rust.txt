@@ -16,16 +16,16 @@ any resource have exactly one owner which takes care of its resource deallocatio
 owner can:
 , control resource deallocation
 , lend the resource:
-  , immutably (multiple borrows)
-  , mutably (exclusive)
+    , immutably (multiple borrows)
+    , mutably (exclusive)
 , hand over ownership (move)
 owner can't:
 , during borrow:
-  , mutate the resource
-  , mutably lend the resource
+    , mutate the resource
+    , mutably lend the resource
 , during mutable borrow:
-  , access the resource
-  , lend the resource
+    , access the resource
+    , lend the resource
 borrower can:
 , access borrowed resource
 , share (copy) an immutable borrow
@@ -51,12 +51,10 @@ unsized (on stack or static) types --> borrow
 sized (on stack or static) types --> copy, borrow
 heap --> move, borrow, copy
 
+slicing:
 String[..] <--> str
-       |
-       |--> slicing
+deref:
 &String[..] <--> str
-        |
-        |--> deref
 
 automatic referencing in method calls (auto'borrow for self)
 
@@ -88,10 +86,10 @@ x = (1, "aaa")
 named tuple: {i: 1, j: "aaa"}
 access:
 , destructuring
-  let (a, b) = (1, "aaa")
+    let (a, b) = (1, "aaa")
 , dot notation
-  tuples: x.0 (literal number only)
-  named tuples: x.i
+    tuples: x.0 (literal number only)
+    named tuples: x.i
 
 arrays: homogeneous, fixed sized collection
 vectors and hash tables: homogeneous, varying sized collection
