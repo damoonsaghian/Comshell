@@ -8,11 +8,11 @@ for those that neither can use all their fingers, nor can talk, gesture based (2
 ".data/keyboard.png"
 missing characters can be entered like this:
 , two commas --> .
-, comma followed by ' --> "
 , comma followed by add followed by comma --> +
 , comma followed by add followed by space --> + followed by space
 , comma followed by psi followed by space --> ψ followed by space
-, two apostrophes followed by a --> A
+, __a --> A
+, ab_cd__ --> AB_CD
 "https://github.com/adereth/dactyl-keyboard"
 "https://ergodox-ez.com/pages/change-it-yourself"
 "https://shop.keyboard.io/"
@@ -20,7 +20,7 @@ Kinesis Advantage 2 keyboard
 "https://github.com/nicinabox/lets-split-guide"
 "http://www.allthingsergo.com/the-best-ergonomic-mechanical-keyboards/"
 
-Vim'like key'bindings
+Vim_like key_bindings
 modes (like normal mode and insert mode) must be visually distinctive.
 press "esc" to go back to normal mode.
 in normal mode we can:
@@ -42,4 +42,4 @@ a panel at the left shows a tree view of the files in the project.
 text files are opened in a text editor panel at the right.
 directories with ".m" extension are opened in a panel at the right, showing thumbnails of the files in it.
 
-focus paragraph, i'e auto scroll to reveal whole paragraph.
+focus paragraph, ie auto scroll to reveal whole paragraph.
