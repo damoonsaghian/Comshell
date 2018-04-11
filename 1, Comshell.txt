@@ -12,7 +12,7 @@ missing characters can be entered like this:
 , comma followed by add followed by space --> + followed by space
 , comma followed by psi followed by space --> ψ followed by space
 , __a --> A
-, ab_cd__ --> AB_CD
+, ab_cd__ followed by space --> AB_CD followed by space
 "https://github.com/adereth/dactyl-keyboard"
 "https://ergodox-ez.com/pages/change-it-yourself"
 "https://shop.keyboard.io/"

@@ -17,8 +17,8 @@ Rust is a programming language which provides zero cost abstractions (eg a well 
 
 evolution of C language:
 , wrong approach:
-    classes (C++)
-    garbage collection:
-        , classes (Java, C#, ...)
-        , immutable data (Haskell)
+  classes (C++)
+  garbage collection:
+    , classes (Java, C#, ...)
+    , immutable data (Haskell)
 , right approach: traits, move semantics (Rust)
