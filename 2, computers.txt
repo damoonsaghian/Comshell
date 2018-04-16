@@ -8,17 +8,9 @@ cpu, memory, peripherals, this seems to be the only practical architecture for t
 cpu runs a sequence of simple computations called instructions (packages of 0 and 1), one by one.
 
 programs usually do not run directly on a computer hardware, instead they run on a more sophisticated software machine (a virtual machine) called kernel.
-Linux is an example. one thing that i don't like about it (and indeed other Unix based operating systems) though is that most things appear in the file system. i think the reason is to make it possible to do a lot of things using shell scripts instead of a proper programming language, and i think it's a bad idea.
+Linux is an example. though one thing that i don't like about it (and indeed other Unix based operating systems) is that most things appear in the file system. i think the reason is to make it possible to do a lot of things using shell scripts instead of a proper programming language, and i think it's a bad idea.
 "https://github.com/thepowersgang/rust_os"
 "https://github.com/ryanra/RustOS"
 
 compilers are special programs that obtain computer instructions from a program written in a language which is human readable and structured. this way the written program will be portable to different computer architectures.
 Rust is a programming language which provides zero cost abstractions (eg a well designed type system, and functional programming techniques), and memory safety without garbage collection. thus there is absolutely no reason to write C/C++ code anymore.
-
-evolution of C language:
-, wrong approach:
-  classes (C++)
-  garbage collection:
-    , classes (Java, C#, ...)
-    , immutable data (Haskell)
-, right approach: traits, move semantics (Rust)

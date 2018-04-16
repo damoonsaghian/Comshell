@@ -1,7 +1,7 @@
 Comshell is a command based user interface.
 command based user interfaces (using keyboard, voice, gesture) are faster, more convenient and more powerful than pointing based user interfaces (using mouse, touch, pen).
 touch interfaces can still be useful in simple limited applications. and for some special artistic applications, pen input remains the only choice.
-command based interactions are much simpler for a speech recognition engine to process, since it needs to match against a relatively small set of commands, unlike a general speech recognition process.
+unlike a general speech recognition process, voice commands are much simpler for a speech recognition engine to process, since it needs to match against a relatively small set of commands.
 a headset with near range microphone can be used, to exclude far away sound sources. also it is better to put battery and bluetooth of the headset in a separate unit, that can be put in the pocket. this makes the headset lighter and safer.
 for those that neither can use all their fingers, nor can talk, gesture based (2d) input can be implemented.
 
@@ -24,16 +24,16 @@ Vim_like key_bindings
 modes (like normal mode and insert mode) must be visually distinctive.
 press "esc" to go back to normal mode.
 in normal mode we can:
-, create a new project or file
-, show list of projects or files, move between files (previous, next), and then press space to open or raise them, or directly go to them by entering their number
-, move the cursor to the next or previous (or by entering the number directly to) words, lines (or table cells), paragraphs
+, move the cursor to the next or previous charactors or words
+, move the cursor to the next or previous (or by entering the number directly to) lines (or table cells)
+, move the cursor to the next or previous paragraphs
 , start and end selection, then copy or cut
 , paste
 , undo, redo
 , find
 , enter insert mode
 
-projects are looked for in "~/projects/" and all directories named "projects" on all disks. from this list, we can open projects (or switch to them if they are already open).
+projects are looked for in "~/projects/" and all directories named "projects" on all disks. from this list, we can open projects (or switch to them if they are already open). also we can create new projects.
 
 different views of the current project can be opened in separate tabs.
 external projects (which can also be websites, pdf, etc) which are opened from inside the current project (not from projects list) will also be opened in separate tabs.
@@ -41,5 +41,6 @@ external projects (which can also be websites, pdf, etc) which are opened from i
 a panel at the left shows a tree view of the files in the project.
 text files are opened in a text editor panel at the right.
 directories with ".m" extension are opened in a panel at the right, showing thumbnails of the files in it.
+we can go to the panel, and move between files in there (by typing their name), or create new files.
 
 focus paragraph, ie auto scroll to reveal whole paragraph.

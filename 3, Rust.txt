@@ -1,23 +1,26 @@
-Rust: the right limitations lead to the right approach.
+Rust makes bad programming hard, and good programming fun.
+Rust does not hide complexity, in fact it bolds it, so we can see it and avoid it.
+
+evolution of C language:
+, wrong approach:
+  classes (C++)
+  garbage collection:
+    , classes (Java, C#, ...)
+    , immutable data (Haskell)
+, right approach: traits, move semantics (Rust)
 
 shared mutability is the root of many complexities, especially in concurrent environments.
-Rust tracks and controls shared mutability. in Rust as long as a piece of data can be changed within a code segment (ie there is a mutable reference to the data), no other code path can read or modify the same data.
 all references in Rust must either be unique or immutable.
 
-heap is necessary for:
-, growable data
-, sharing data between distinct software routines (functions and threads)
-for the compiler to know where memory should be freed at compile_time, Rust uses stack based memory, and uses only uniquely_owned heap_allocated box. (heap memory with multiple owners needs garbage collection)
-
-in Rust there are two kinds of refs: owner and borrower. borrowers must have a lifetime less than the owner.
 any resource have exactly one owner which takes care of its resource deallocation.
 "http://blog.skylight.io/rust-means-never-having-to-close-a-socket/"
+owners can share their data by lending them to references. references must have a lifetime less than the owner.
 
 owner can:
 , control resource deallocation
 , lend the resource:
-  , immutably (multiple borrows)
-  , mutably (exclusive)
+  , immutably (multiple refs)
+  , mutably (only on ref)
 , hand over ownership (move)
 owner can't:
 , during borrow:
@@ -26,35 +29,23 @@ owner can't:
 , during mutable borrow:
   , access the resource
   , lend the resource
-borrower can:
+
+reference can:
 , access borrowed resource
 , share (copy) an immutable borrow
-mutable borrower can:
+mutable reference can:
 , access and mutate resource
 , hand over (move) the mutable borrow (mutable ref is moved by default)
 
 scenarios that involve multiple refs or returning refs often require explicit lifetimes. so don't return refs, instead use mutable refs in inputs.
-structs and enums containing refs must have explicit lifetimes. (impl of these must use lifetimes too)
-make sure that a closure will never outlive the variables it has refs to.
+structs and enums containing refs must have explicit lifetimes (impl of these must use lifetimes too). so don't use them.
 
 
 Rust have separate types for static and dynamic values. (str/String, fn/Fn)
 functions can only access static environment. closures don't have this limitation. so when using them we might be more careful.
 static data can be defined using only other static data.
 
-arrays have a fixed size, so they can be implemented on stack. but are mutable, so unlike str they can't be static.
-arrays coerce to slice refs. use slice refs instead of arrays.
-
-unsized types (slices):
-there is no way to know the size of a variable of these types, so they can not be copied nor moved. we can only borrow them.
-unsized (on stack or static) types --> borrow
-sized (on stack or static) types --> copy, borrow
-heap --> move, borrow, copy
-
-slicing:
-String[..] <--> str
-deref:
-&String[..] <--> str
+arrays have a fixed size, so they can be implemented on stack. but are mutable, so unlike "str" they can't be static.
 
 automatic referencing in method calls (auto_borrow for self)
 
@@ -65,7 +56,6 @@ you have to deref vars when:
 , assigning to them without type annotation
 , using overloaded operators
 
-auto_deref:
 if x doesn't implement foo() but implements Deref then x.foo() --> x.deref().foo()
 
 = type system
@@ -91,5 +81,9 @@ access:
   tuples: x.0 (literal number only)
   named tuples: x.i
 
-arrays: homogeneous, fixed sized collection
-vectors and hash tables: homogeneous, varying sized collection
+arrays (homogeneous, fixed sized collection):
+  indexing can be done at runtime because all elements have the same type.
+vectors and hash tables (homogeneous, varying sized collection)
+
+dot notation is used where we can destucture (tuples, structures).
+double colon "::" is for namespacing.
