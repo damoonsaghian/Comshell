@@ -22,9 +22,9 @@ Kinesis Advantage 2 keyboard
 
 Vim_like key_bindings
 modes (like normal mode and insert mode) must be visually distinctive.
-press "esc" to go back to normal mode.
+press escape to go back to normal mode.
 in normal mode we can:
-, move the cursor to the next or previous charactors or words
+, move the cursor to the next or previous characters or words
 , move the cursor to the next or previous (or by entering the number directly to) lines (or table cells)
 , move the cursor to the next or previous paragraphs
 , start and end selection, then copy or cut

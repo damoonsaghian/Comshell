@@ -51,7 +51,7 @@ automatic referencing in method calls (auto_borrow for self)
 
 Rust auto_dereferences variables when:
 , making method calls on a reference
-, passing a ref as a function arg (because the type sig for functions are mandatory)
+, passing a ref as a function argument (because the type signature for functions are mandatory)
 you have to deref vars when:
 , assigning to them without type annotation
 , using overloaded operators

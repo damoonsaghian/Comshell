@@ -1,4 +1,4 @@
-imperative programming is done by procedurally changing stored values, it resembles the way cpu runs the instructions stored in memory.
+imperative programming is done by procedurally changing stored values, it resembles the way CPU runs the instructions stored in memory.
 imperative programming leads to unmaintainable code in large programs, and it makes writing parallel programs a cumbersome task.
 
 functional reactive programming:
