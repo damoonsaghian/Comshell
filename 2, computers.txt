@@ -1,16 +1,16 @@
-in conventional digital circuits when the inputs change the outputs can have temporary incorrect values until they stabilize to correct values. so gates with memory, must be synchronized with a global clock signal. the period of clock signal is made long enough for the circuit to become stable.
-this forces us to split long operations into several smaller ones which can be performed in successive clock cycles (a technique known as pipelining). otherwise the circuit would be slow and inefficient.
-in addition the widely distributed clock signal takes a lot of power, and must run whether the circuit is receiving inputs or not.
-the solution is to use rendezvous channels, in which sends and receives, block until the other side is ready.
-initially all channels have default values (this is necessary to cope with feedbacks). then gates start to fetch their inputs from channels and compute their output values. and when their following gates are ready to receive it, they send it to the output channels. now the gate itself is ready to receive new values on its inputs.
+in conventional digital circuits when the inputs change the outputs can have temporary incorrect values until they stabilize to correct values; so gates with memory, must be synchronized with a global clock signal; the period of clock signal is made long enough for the circuit to become stable;
+this forces us to split long operations into several smaller ones which can be performed in successive clock cycles (a technique known as pipelining); otherwise the circuit would be slow and inefficient;
+in addition the widely distributed clock signal takes a lot of power, and must run whether the circuit is receiving inputs or not;
+the solution is to use rendezvous channels, in which sends and receives, block until the other side is ready;
+initially all channels have default values (this is necessary to cope with feedbacks); then gates start to fetch their inputs from channels and compute their output values; and when their following gates are ready to receive it, they send it to the output channels; now the gate itself is ready to receive new values on its inputs;
 
-cpu, memory, peripherals, this seems to be the only practical architecture for the hardware of computers. though universal memory technologies (like magneto_resistive random_access memory) if possible, could make things simpler.
-cpu runs a sequence of simple computations called instructions (packages of 0 and 1), one by one.
+cpu, memory, peripherals, this seems to be the only practical architecture for the hardware of computers; though universal memory technologies (like magneto_resistive random_access memory) if possible, could make things simpler;
+cpu runs a sequence of simple computations called instructions (packages of 0 and 1), one by one;
 
-programs usually do not run directly on a computer hardware, instead they run on a more sophisticated software machine (a virtual machine) called kernel.
-Linux is an example. though one thing that i don't like about it (and indeed other Unix based operating systems) is that most things appear in the file system. i think the reason is to make it possible to do a lot of things using shell scripts instead of a proper programming language, and i think it's a bad idea.
+programs usually do not run directly on a computer hardware, instead they run on a more sophisticated software machine (a virtual machine) called kernel;
+Linux is an example; though one thing that i don't like about it (and indeed other Unix based operating systems) is that most things appear in the file system; i think the reason is to make it possible to do a lot of things using shell scripts instead of a proper programming language, and i think it's a bad idea;
 "https://github.com/thepowersgang/rust_os"
 "https://github.com/ryanra/RustOS"
 
-compilers are special programs that obtain computer instructions from a program written in a language which is human readable and structured. this way the written program will be portable to different computer architectures.
-Rust is a programming language which provides zero cost abstractions (eg a well designed type system, and functional programming techniques), and memory safety without garbage collection. thus there is absolutely no reason to write new software in C/C++.
+compilers are special programs that obtain computer instructions from a program written in a language which is human readable and structured; this way the written program will be portable to different computer architectures;
+Rust is a programming language which provides zero cost abstractions (eg a well designed type system, and functional programming techniques), and memory safety without garbage collection; thus there is absolutely no reason to write new software in C/C++;
