@@ -47,7 +47,7 @@ static data can be defined using only other static data;
 
 arrays have a fixed size, so they can be implemented on stack; but are mutable, so unlike "str" they can't be static;
 
-automatic referencing in method calls (auto_borrow for self)
+automatic referencing in method calls (auto_borrow for self);
 
 Rust auto_dereferences variables when:
 , making method calls on a reference
