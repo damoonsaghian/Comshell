@@ -1,4 +1,4 @@
-; sudo pacman -S i3-wm xdotool emacs epiphany  mpv
+; sudo pacman -S i3-wm xdotool emacs epiphany mpv
 ; nano ~/.xinitrc
   exec i3
 
@@ -11,32 +11,51 @@
 "https://www.chromium.org/user-experience/multi-profiles"
 
 ; cp init.el ~/.emacs.d/init.el
+
 "http://emacslife.com/how-to-read-emacs-lisp.html"
 "https://github.com/chrisdone/elisp-guide"
 "https://www.gnu.org/software/emacs/manual/html_node/eintr/index.html"
-"https://www.gnu.org/software/emacs/manual/html_node/elisp/index.html"
 "https://github.com/hlissner/doom-emacs"
-"https://github.com/chrismccord/dot_emacs"
 "https://github.com/bling/dotemacs"
 "https://github.com/emacs-tw/awesome-emacs"
-"http://diobla.info/blog-archive/modules-tut.html"
 
-(define-key dired-mode-map "\M-!" 'dired-smart-shell-command)
-(define-key dired-mode-map "\M-G" 'dired-goto-subdir)
-(require 'dired-x) ; provide extra commands for Dired
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Packages.html"
+"https://github.com/jwiegley/use-package"
+"https://github.com/edvorg/req-package"
+"https://github.com/quelpa/quelpa"
+"https://github.com/rranelli/auto-package-update.el"
+
+https://www.emacswiki.org/emacs/DesktopMultipleSaveFiles
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Emacs-Invocation.html
+(desktop-save-mode 1)
+(setq-default desktop-restore-eager 5)
+
+https://github.com/knu/elscreen
+https://www.emacswiki.org/emacs/EmacsLispScreen
+http://wikemacs.org/wiki/Elscreen
+https://github.com/krisajenkins/evil-tabs
+(defun kill-invisible-buffers ()
+  (dolist (buf  (buffer-list))
+    (unless (get-buffer-window buf t) (kill-buffer buf))))
+;; kill invisible buffers every 10 minutes
+(run-at-time t 600 'kill-invisible-buffers)
+
+http://ergoemacs.org/emacs/file_management.html
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Files.html
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Shell-Commands-in-Dired.html
+https://github.com/thamer/runner
+in dired-mode pressing "enter":
+, */projects/* -> i3-msg move to workspace named "nameofproject", if there is no window named "nameofproject", load the saved emacs desktop
+, *.m -> open image-dired/movie in a new emacs window
+, else -> open file in a new emacs window
+https://github.com/Fuco1/dired-hacks
 Wdired allows you to edit a Dired buffer and write changes to disk
-, switch to Wdired by C-x C-q
-, edit the Dired buffer, ie change filenames
-, Commit by C-c C-c, abort by C-c C-k
-(require 'wdired)
-
-;; Highlights matching parenthesis
-(show-paren-mode 1)
-;; Highlight current line
-(global-hl-line-mode 1)
-;; Changes all yes/no questions to y/n type
-(fset 'yes-or-no-p 'y-or-n-p)
-(scroll-bar-mode -1)
+  switch to Wdired by C-x C-q
+  edit the Dired buffer, ie change filenames
+  Commit by C-c C-c, abort by C-c C-k
+  (require 'wdired)
+  (define-key dired-mode-map (kbd "e") 'wdired-change-to-wdired-mode)
 
 "http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
 "https://github.com/m2ym/direx-el"
@@ -46,148 +65,16 @@ Wdired allows you to edit a Dired buffer and write changes to disk
 "https://github.com/sebastiencs/sidebar.el"
 "https://github.com/Alexander-Miller/treemacs"
 https://github.com/fourier/ztree
+https://emacs.stackexchange.com/questions/12153/does-some-command-exist-which-goes-to-the-next-file-of-the-current-directory
+next file:
+, go to tree view
+, next file
+, open (in the window at right, go to the first line)
 
-"https://github.com/emacs-evil/evil"
-"https://www.gnu.org/software/emacs/manual/html_mono/viper.html"
-
-https://www.emacswiki.org/emacs/DesktopMultipleSaveFiles
-
-"http://ergoemacs.org/emacs/emacs_magit-mode_tutorial.html"
-"https://magit.vc/"
-"https://github.com/vermiculus/magithub"
-
-"http://wikemacs.org/wiki/El-get"
-"https://www.gnu.org/software/emacs/manual/html_node/emacs/Packages.html"
-"https://www.emacswiki.org/emacs/CategoryPackaging"
-"https://github.com/dimitri/el-get"
-"https://github.com/cask/cask"
-  "https://github.com/rdallasgray/pallet"
-"https://github.com/jwiegley/use-package"
-"https://github.com/edvorg/req-package"
-"https://github.com/quelpa/quelpa"
-"https://github.com/rranelli/auto-package-update.el"
-
-"https://www.gnu.org/software/emacs/manual/html_node/calc/index.html"
-"https://www.gnu.org/software/emacs/manual/html_node/gnus/index.html"
-  "https://www.gnu.org/software/emacs/manual/html_node/message/index.html"
-  "https://www.gnu.org/software/emacs/manual/html_node/emacs/Gnus.html"
-  "https://www.gnu.org/software/emacs/manual/html_node/emacs/Sending-Mail.html"
-  "https://www.gnu.org/software/emacs/manual/html_node/emacs/Rmail.html"
-  "https://www.gnu.org/software/emacs/manual/html_node/mh-e/index.html"
-"https://www.gnu.org/software/emacs/manual/html_node/htmlfontify/index.html"
-"https://www.gnu.org/software/emacs/manual/html_node/emacs/Calendar_002fDiary.html"
-"https://www.emacswiki.org/emacs/DictMode"
-  "https://www.emacswiki.org/emacs/DictEm"
-  "https://www.emacswiki.org/emacs/wordnik.el"
-  "https://github.com/gromnitsky/wordnut"
-  "https://www.emacswiki.org/emacs/ThesauriAndSynonyms"
-  "https://github.com/atykhonov/google-translate"
-
-https://github.com/purcell/color-theme-sanityinc-tomorrow
-
-(add-to-list 'default-frame-alist '(font . "Hack-10"))
-
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Emacs-Invocation.html
-
-;; http://ergoemacs.org/emacs/file_management.html
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Files.html
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Shell-Commands-in-Dired.html
-;; https://github.com/thamer/runner
-;; in dired-mode pressing "enter":
-;; , */projects/* -> swaymsg move scratchpad, move to workspace named "nameofproject", if there is no window named "nameofproject", , load the saved emacs desktop, swaymsg move down
-;; , *.m -> open image-dired/movie in a new emacs window
-;; , else -> open file in a new emacs window
-;; https://github.com/Fuco1/dired-hacks
-;; https://emacs.stackexchange.com/questions/12153/does-some-command-exist-which-goes-to-the-next-file-of-the-current-directory
-;; next file:
-;; , go to tree view
-;; , next file
-;; , open (in the window at right, go to the first line)
-
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Display.html
-;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Choosing-Window.html
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Change-Window.html
-;; https://github.com/larstvei/Focus
-;; https://www.emacswiki.org/emacs/HideShow
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Pages.html
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Words.html
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Hard-and-Soft-Newlines.html
-;; https://github.com/joostkremers/visual-fill-column
-
-;; https://github.com/mrkkrp/modalka
-;; https://github.com/jyp/boon
-;; http://retroj.net/modal-mode
-;; https://github.com/justbur/emacs-which-key
-
-;; https://jblevins.org/projects/markdown-mode/
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
-;; https://orgmode.org/manual/Tables.html
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html
-
-;; http://shallowsky.com/blog/linux/editors/graphics-in-emacs.html
-;; https://www.gnu.org/software/auctex
-;; https://github.com/aaptel/preview-latex
-;; https://github.com/josteink/wsd-mode
-;; http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
-;; https://www.emacswiki.org/emacs/ThumbsMode
-;; https://www.gnu.org/software/emms/screenshots.html
-;; http://wikemacs.org/wiki/Media_player
-;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
-;; https://github.com/larsmagne/movie.el
-;; https://github.com/dbrock/bongo
-;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
-
-;; https://www.emacswiki.org/emacs/CategoryWebBrowser
-;; https://en.wikipedia.org/wiki/Eww_(web_browser)
-;; https://www.gnu.org/software/emacs/manual/html_node/eww/index.html
-;; emacs eww "url-configuration-directory
-;; http://ergoemacs.org/emacs/emacs_eww_web_browser.html
-;; http://www.wilkesley.org/~ian/xah/emacs/emacs_eww_web_browser.html
-;; https://www.gnu.org/software/emacs/manual/html_node/eww/Basics.html
-;; cookies and cache location: ~/.emacs.d/url/
-;; the location is controlled by the following variables:
-;;   url-cookie-file -> default value is "~/.emacs.d/url/cookies"
-;;   url-configuration-directory -> default value is "~/.emacs.d/url/"
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/EWW.html
-;; make emacs always use its own browser for opening URL links
-(setq browse-url-browser-function 'eww-browse-url)
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Hyperlinking.html
-;; to open a link in chromium: swaymsg splitv; chromium --new-window "link_address"
-;; to go to an already open chromium window: swaymsg focus next
-;; https://askubuntu.com/questions/893638/terminal-command-to-open-new-chromium-tab
-
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Document-View.html
-
-;; https://www.emacswiki.org/emacs/CategoryShell
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Shell.html
-;; https://www.gnu.org/software/emacs/manual/html_node/eshell/index.html
-;; http://ergoemacs.org/emacs/emacs_unix.html
-
-lsp-rust lsp-flycheck
-https://christian.kellner.me/2017/05/31/language-server-protocol-lsp-rust-and-emacs/
-;; https://github.com/rust-lang/rust-mode
-;; https://github.com/kwrooijen/cargo.el
-;; https://github.com/racer-rust/emacs-racer
-;; https://github.com/flycheck/flycheck-rust
-http://julienblanchard.com/2016/fancy-rust-development-with-emacs/
-
-(load "~/.emacs.d/org-indent.el")
-(global-org-indent-mode 1)
-;(define-key global-map (kbd "RET") 'newline-and-indent)
-
-;(when (not (package-installed-p ...))
-;  (package-install ...))
-;(require ...)
-
-;; (current-time-string nil "Iran")
-
-
-
-(setq gud-chdir-before-run nil)
-
-;; term-mode, used in M-x term
+https://www.emacswiki.org/emacs/CategoryShell
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Shell.html
+https://www.gnu.org/software/emacs/manual/html_node/eshell/index.html
+http://ergoemacs.org/emacs/emacs_unix.html
 (defun my-term-setup ()
   (interactive)
   (define-key term-raw-map (kbd "C-y") 'term-send-raw)
@@ -214,40 +101,94 @@ http://julienblanchard.com/2016/fancy-rust-development-with-emacs/
 (add-hook 'term-mode-hook 'my-term-setup t)
 (setq term-buffer-maximum-size 0)
 
-(require 'term)
+(setq create-lockfiles nil)
+(defun make-auto-save-file-name ()
+  "Return file name to use for auto-saves of current buffer.."
+  (unless (file-exists-p (concat ))
+        (make-directory dir))
+  (if buffer-file-name
+    (concat
+      (file-name-directory buffer-file-name)
+      ".cache/autosave/"
+      (file-name-nondirectory buffer-file-name))
+    (expand-file-name
+      (concat "#%" (buffer-name) "#"))))
 
-;; taken from here: http://www.enigmacurry.com/2008/12/26/emacs-ansi-term-tricks/
-(defun visit-ansi-term ()
-  "If the current buffer is:
-     1) a running ansi-term named *ansi-term*, rename it.
-     2) a stopped ansi-term, kill it and create a new one.
-     3) a non ansi-term, go to an already running ansi-term
-        or start a new one while killing a defunt one"
-  (interactive)
-  (let ((is-term (string= "term-mode" major-mode))
-        (is-running (term-check-proc (buffer-name)))
-        (term-cmd "/bin/zsh")
-        (anon-term (get-buffer "*ansi-term*")))
-    (if is-term
-        (if is-running
-            (if (string= "*ansi-term*" (buffer-name))
-                ;; (call-interactively 'rename-buffer)
-                (ansi-term term-cmd)
-              (if anon-term
-                  (switch-to-buffer "*ansi-term*")
-                (ansi-term term-cmd)))
-          (kill-buffer (buffer-name))
-          (ansi-term term-cmd))
-      (if anon-term
-          (if (term-check-proc "*ansi-term*")
-              (switch-to-buffer "*ansi-term*")
-            (kill-buffer "*ansi-term*")
-            (ansi-term term-cmd))
-        (ansi-term term-cmd)))))
+https://github.com/emacs-evil/evil
+https://www.gnu.org/software/emacs/manual/html_mono/viper.html
+https://github.com/mrkkrp/modalka
+https://github.com/jyp/boon
+http://retroj.net/modal-mode
+https://github.com/justbur/emacs-which-key
 
-(global-set-key (kbd "<f2>") 'visit-ansi-term)
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Display.html
+https://github.com/larstvei/Focus
+https://www.emacswiki.org/emacs/ThingAtPoint
 
-;; PACKAGE: shell-pop
-;; GROUP: Processes -> Shell -> Shell Pop
-(require 'shell-pop)
-(global-set-key (kbd "C-c t") 'shell-pop)
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
+
+https://www.gnu.org/software/emacs/manual/html_node/htmlfontify/index.html
+https://www.gnu.org/software/emacs/manual/html_node/eww/index.html
+  https://www.gnu.org/software/emacs/manual/html_node/emacs/EWW.html
+  http://ergoemacs.org/emacs/emacs_eww_web_browser.html
+  http://www.wilkesley.org/~ian/xah/emacs/emacs_eww_web_browser.html
+  url-cookie-file "~/.emacs.d/url/cookies"
+  url-configuration-directory "~/.emacs.d/url/"
+  make emacs always use its own browser for opening URL links
+  (setq browse-url-browser-function 'eww-browse-url)
+  https://www.gnu.org/software/emacs/manual/html_node/emacs/Hyperlinking.html
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Document-View.html
+
+http://shallowsky.com/blog/linux/editors/graphics-in-emacs.html
+https://www.gnu.org/software/auctex
+https://github.com/aaptel/preview-latex
+https://github.com/josteink/wsd-mode
+https://jblevins.org/projects/markdown-mode/
+http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
+https://www.emacswiki.org/emacs/ThumbsMode
+https://www.gnu.org/software/emms/screenshots.html
+http://wikemacs.org/wiki/Media_player
+https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
+https://github.com/larsmagne/movie.el
+https://github.com/dbrock/bongo
+http://www.mplayerhq.hu/DOCS/tech/slave.txt
+
+(current-time-string nil "Iran")
+
+https://orgmode.org/manual/Tables.html
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html
+
+lsp-rust lsp-flycheck
+https://christian.kellner.me/2017/05/31/language-server-protocol-lsp-rust-and-emacs/
+https://github.com/rust-lang/rust-mode
+https://github.com/kwrooijen/cargo.el
+https://github.com/racer-rust/emacs-racer
+https://github.com/flycheck/flycheck-rust
+http://julienblanchard.com/2016/fancy-rust-development-with-emacs/
+
+"http://ergoemacs.org/emacs/emacs_magit-mode_tutorial.html"
+  "https://magit.vc/"
+  "https://github.com/vermiculus/magithub"
+"https://www.gnu.org/software/emacs/manual/html_node/calc/index.html"
+"https://www.gnu.org/software/emacs/manual/html_node/gnus/index.html"
+  "https://www.gnu.org/software/emacs/manual/html_node/message/index.html"
+  "https://www.gnu.org/software/emacs/manual/html_node/emacs/Gnus.html"
+  "https://www.gnu.org/software/emacs/manual/html_node/emacs/Sending-Mail.html"
+  "https://www.gnu.org/software/emacs/manual/html_node/emacs/Rmail.html"
+  "https://www.gnu.org/software/emacs/manual/html_node/mh-e/index.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Calendar_002fDiary.html"
+"https://www.emacswiki.org/emacs/DictMode"
+  "https://www.emacswiki.org/emacs/DictEm"
+  "https://www.emacswiki.org/emacs/wordnik.el"
+  "https://github.com/gromnitsky/wordnut"
+  "https://www.emacswiki.org/emacs/ThesauriAndSynonyms"
+  "https://github.com/atykhonov/google-translate"
+
+Highlights matching parenthesis
+(show-paren-mode 1)
+Highlight current line
+(global-hl-line-mode 1)
+(scroll-bar-mode -1)
+(add-to-list 'default-frame-alist '(font . "Hack-10"))
+https://github.com/purcell/color-theme-sanityinc-tomorrow

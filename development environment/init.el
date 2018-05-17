@@ -3,31 +3,10 @@
 (setq inhibit-startup-screen t inhibit-startup-echo-area-message t)
 (add-hook 'prog-mode-hook 'goto-address-mode)
 (add-hook 'text-mode-hook 'goto-address-mode)
-(define-key global-map (kbd "RET") 'newline-and-indent)
 (setq-default indent-tabs-mode nil)
 (global-linum-mode t)
-(setq scroll-margin 0)
-
-(desktop-save-mode 1)
-(setq-default desktop-restore-eager 5)
-
-(defun kill-invisible-buffers ()
-  (dolist (buf  (buffer-list))
-    (unless (get-buffer-window buf t) (kill-buffer buf))))
-;; kill invisible buffers every 10 minutes
-(run-at-time t 600 kill-invisible-buffers)
 
 (setq make-backup-files nil)
-(setq create-lockfiles nil)
-(defun make-auto-save-file-name ()
-  "Return file name to use for auto-saves of current buffer.."
-  (if buffer-file-name
-    (concat
-      (file-name-directory buffer-file-name)
-      ".cache/autosave/"
-      (file-name-nondirectory buffer-file-name))
-    (expand-file-name
-      (concat "#%" (buffer-name) "#"))))
 
 ;; automatically refresh dired buffer on changes
 (add-hook 'dired-mode-hook 'auto-revert-mode)
