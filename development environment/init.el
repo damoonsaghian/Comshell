@@ -1,17 +1,15 @@
 (tool-bar-mode -1)
 (menu-bar-mode -1)
-(setq inhibit-startup-screen t inhibit-startup-echo-area-message t)
+(setq inhibit-startup-screen t
+      inhibit-startup-echo-area-message t
+      make-backup-files nil)
+;; always load newest byte code
+(setq load-prefer-newer t)
+(setq-default indent-tabs-mode nil)
 (add-hook 'prog-mode-hook 'goto-address-mode)
 (add-hook 'text-mode-hook 'goto-address-mode)
-(setq-default indent-tabs-mode nil)
-(global-linum-mode t)
-
-(setq make-backup-files nil)
-
 ;; automatically refresh dired buffer on changes
 (add-hook 'dired-mode-hook 'auto-revert-mode)
-;; Always load newest byte code
-(setq load-prefer-newer t)
 
 ;; following code is taken from adaptive-wrap package
 (defun adaptive-wrap-fill-context-prefix (beg en)
@@ -23,7 +21,6 @@
          (fill-char (if (< 0 fcp-len)
                         (string-to-char (substring fcp -1))
                       ?\ )))
-
     (concat fcp
             (make-string 2 fill-char))))
 
@@ -80,13 +77,12 @@
 (global-visual-line-mode +1)
 
 (require 'package)
-(defun require-package (package)
-  "Install given PACKAGE if it was not installed before."
-  (unless (package-installed-p package)
+(defun require-package (package-name)
+  (unless (require package-name nil 'noerror)
     (progn
-      (unless (assoc package package-archive-contents)
-	(package-refresh-contents))
-      (package-install package))))
+      (package-refresh-contents)
+      (package-install package-name)
+      (require package-name))))
 (add-to-list 'package-archives
 	     '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)

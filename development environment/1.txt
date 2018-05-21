@@ -15,15 +15,6 @@
 "http://emacslife.com/how-to-read-emacs-lisp.html"
 "https://github.com/chrisdone/elisp-guide"
 "https://www.gnu.org/software/emacs/manual/html_node/eintr/index.html"
-"https://github.com/hlissner/doom-emacs"
-"https://github.com/bling/dotemacs"
-"https://github.com/emacs-tw/awesome-emacs"
-
-"https://www.gnu.org/software/emacs/manual/html_node/emacs/Packages.html"
-"https://github.com/jwiegley/use-package"
-"https://github.com/edvorg/req-package"
-"https://github.com/quelpa/quelpa"
-"https://github.com/rranelli/auto-package-update.el"
 
 https://www.emacswiki.org/emacs/DesktopMultipleSaveFiles
 https://www.gnu.org/software/emacs/manual/html_node/emacs/Emacs-Invocation.html
@@ -50,22 +41,18 @@ in dired-mode pressing "enter":
 , *.m -> open image-dired/movie in a new emacs window
 , else -> open file in a new emacs window
 https://github.com/Fuco1/dired-hacks
-Wdired allows you to edit a Dired buffer and write changes to disk
-  switch to Wdired by C-x C-q
-  edit the Dired buffer, ie change filenames
-  Commit by C-c C-c, abort by C-c C-k
-  (require 'wdired)
-  (define-key dired-mode-map (kbd "e") 'wdired-change-to-wdired-mode)
+(require 'wdired)
+(define-key dired-mode-map (kbd "e") 'wdired-change-to-wdired-mode)
+"https://github.com/ralesi/ranger.el"
 
 "http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
-"https://github.com/m2ym/direx-el"
-"https://github.com/ralesi/ranger.el"
 "https://www.emacswiki.org/emacs/NeoTree"
 "https://github.com/jaypei/emacs-neotree"
 "https://github.com/sebastiencs/sidebar.el"
 "https://github.com/Alexander-Miller/treemacs"
-https://github.com/fourier/ztree
-https://emacs.stackexchange.com/questions/12153/does-some-command-exist-which-goes-to-the-next-file-of-the-current-directory
+"https://github.com/fourier/ztree"
+"https://github.com/m2ym/direx-el"
+"https://emacs.stackexchange.com/questions/12153/does-some-command-exist-which-goes-to-the-next-file-of-the-current-directory"
 next file:
 , go to tree view
 , next file
@@ -100,26 +87,21 @@ http://ergoemacs.org/emacs/emacs_unix.html
   (define-key term-mode-map (kbd "C-0") 'delete-window))
 (add-hook 'term-mode-hook 'my-term-setup t)
 (setq term-buffer-maximum-size 0)
-
-(setq create-lockfiles nil)
-(defun make-auto-save-file-name ()
-  "Return file name to use for auto-saves of current buffer.."
-  (unless (file-exists-p (concat ))
-        (make-directory dir))
-  (if buffer-file-name
-    (concat
-      (file-name-directory buffer-file-name)
-      ".cache/autosave/"
-      (file-name-nondirectory buffer-file-name))
-    (expand-file-name
-      (concat "#%" (buffer-name) "#"))))
+https://www.emacswiki.org/emacs/MultiTerm
 
 https://github.com/emacs-evil/evil
 https://www.gnu.org/software/emacs/manual/html_mono/viper.html
 https://github.com/mrkkrp/modalka
 https://github.com/jyp/boon
 http://retroj.net/modal-mode
+https://github.com/abo-abo/hydra
+https://github.com/chrisdone/god-mode
+https://github.com/xahlee/xah-fly-keys
+https://github.com/ergoemacs/ergoemacs-mode
 https://github.com/justbur/emacs-which-key
+
+http://www.gnu.org/software/emacs/manual/html_node/elisp/Timers.html
+https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el
 
 https://www.gnu.org/software/emacs/manual/html_node/emacs/Display.html
 https://github.com/larstvei/Focus
@@ -167,9 +149,12 @@ https://github.com/racer-rust/emacs-racer
 https://github.com/flycheck/flycheck-rust
 http://julienblanchard.com/2016/fancy-rust-development-with-emacs/
 
+https://github.com/dengste/minimap/blob/master/minimap.el
 "http://ergoemacs.org/emacs/emacs_magit-mode_tutorial.html"
   "https://magit.vc/"
   "https://github.com/vermiculus/magithub"
+https://github.com/zk-phi/symon/
+https://github.com/zk-phi/indent-guide
 "https://www.gnu.org/software/emacs/manual/html_node/calc/index.html"
 "https://www.gnu.org/software/emacs/manual/html_node/gnus/index.html"
   "https://www.gnu.org/software/emacs/manual/html_node/message/index.html"
@@ -178,17 +163,17 @@ http://julienblanchard.com/2016/fancy-rust-development-with-emacs/
   "https://www.gnu.org/software/emacs/manual/html_node/emacs/Rmail.html"
   "https://www.gnu.org/software/emacs/manual/html_node/mh-e/index.html"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Calendar_002fDiary.html"
+https://github.com/hlissner/doom-emacs/wiki/FAQ#how-is-dooms-startup-so-fast
+https://github.com/jwiegley/use-package
+  https://github.com/edvorg/req-package
 "https://www.emacswiki.org/emacs/DictMode"
   "https://www.emacswiki.org/emacs/DictEm"
   "https://www.emacswiki.org/emacs/wordnik.el"
   "https://github.com/gromnitsky/wordnut"
   "https://www.emacswiki.org/emacs/ThesauriAndSynonyms"
   "https://github.com/atykhonov/google-translate"
-
 Highlights matching parenthesis
 (show-paren-mode 1)
 Highlight current line
 (global-hl-line-mode 1)
 (scroll-bar-mode -1)
-(add-to-list 'default-frame-alist '(font . "Hack-10"))
-https://github.com/purcell/color-theme-sanityinc-tomorrow
