@@ -43,6 +43,29 @@ create user:
   gtk-theme-name = Numix
   gtk-font-name = SourceCodePro
 
+; mkdir -p ~/.config/fontconfig; nano ~/.config/fontconfig/fonts.conf
+  <?xml version='1.0'?>
+  <!DOCTYPE fontconfig SYSTEM 'fonts.dtd'>
+  <fontconfig>
+    <!-- Set preferred serif, sans serif, and monospace fonts; -->
+    <alias>
+      <family>serif</family>
+      <prefer><family>Droid Serif</family></prefer>
+    </alias>
+    <alias>
+      <family>sans-serif</family>
+      <prefer><family>Droid Sans</family></prefer>
+    </alias>
+    <alias>
+      <family>sans</family>
+      <prefer><family>Droid Sans</family></prefer>
+    </alias>
+    <alias>
+      <family>monospace</family>
+      <prefer><family>Source Code Pro</family></prefer>
+    </alias>
+  </fontconfig>
+
 ; nano ~/.bash_profile
   startx
 ; cp /etc/X11/xinit/xinitrc ~/.xinitrc; nano ~/.xinitrc
