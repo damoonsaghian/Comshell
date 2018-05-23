@@ -12,10 +12,6 @@
 
 ; cp init.el ~/.emacs.d/init.el
 
-"http://emacslife.com/how-to-read-emacs-lisp.html"
-"https://github.com/chrisdone/elisp-guide"
-"https://www.gnu.org/software/emacs/manual/html_node/eintr/index.html"
-
 https://www.emacswiki.org/emacs/DesktopMultipleSaveFiles
 https://www.gnu.org/software/emacs/manual/html_node/emacs/Emacs-Invocation.html
 (desktop-save-mode 1)
@@ -136,8 +132,6 @@ https://github.com/larsmagne/movie.el
 https://github.com/dbrock/bongo
 http://www.mplayerhq.hu/DOCS/tech/slave.txt
 
-(current-time-string nil "Iran")
-
 https://orgmode.org/manual/Tables.html
 https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html
 
@@ -172,8 +166,3 @@ https://github.com/jwiegley/use-package
   "https://github.com/gromnitsky/wordnut"
   "https://www.emacswiki.org/emacs/ThesauriAndSynonyms"
   "https://github.com/atykhonov/google-translate"
-Highlights matching parenthesis
-(show-paren-mode 1)
-Highlight current line
-(global-hl-line-mode 1)
-(scroll-bar-mode -1)

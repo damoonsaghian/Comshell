@@ -2,16 +2,40 @@
 (menu-bar-mode -1)
 (setq inhibit-startup-screen t
       inhibit-startup-echo-area-message t
-      make-backup-files nil)
-;; always load newest byte code
+      make-backup-files nil
+      scroll-conservatively 200)
+;; always load newest byte code;
 (setq load-prefer-newer t)
 (setq-default indent-tabs-mode nil)
 (add-hook 'prog-mode-hook 'goto-address-mode)
 (add-hook 'text-mode-hook 'goto-address-mode)
-;; automatically refresh dired buffer on changes
+;; automatically refresh dired buffer on changes;
 (add-hook 'dired-mode-hook 'auto-revert-mode)
 
-;; following code is taken from adaptive-wrap package
+(defun next-paragraph ()
+  (interactive)
+  (unless (bobp) (left-char))
+  (forward-paragraph)
+  (unless (eobp)
+    (progn
+      (forward-paragraph)
+      (redisplay t)
+      (backward-paragraph)
+      (right-char))))
+(global-set-key (kbd "<next>") 'next-paragraph)
+(defun previous-paragraph ()
+  (interactive)
+  (left-char)
+  (backward-paragraph)
+  (unless (bobp)
+    (progn
+      (forward-paragraph)
+      (redisplay t)
+      (backward-paragraph)
+      (right-char))))
+(global-set-key (kbd "<prior>") 'previous-paragraph)
+
+;; following code is taken from adaptive-wrap package;
 (defun adaptive-wrap-fill-context-prefix (beg en)
   "Like `fill-context-prefix', but with length 2."
   ;; Note: fill-context-prefix may return nil; See:
@@ -77,12 +101,19 @@
 (global-visual-line-mode +1)
 
 (require 'package)
-(defun require-package (package-name)
-  (unless (require package-name nil 'noerror)
+(defun require-package (package)
+  (unless (require package nil 'noerror)
     (progn
-      (package-refresh-contents)
-      (package-install package-name)
-      (require package-name))))
+      (unless (assoc package package-archive-contents)
+	(package-refresh-contents))
+      (package-install package)
+      (require package))))
+(defun install-package (package)
+  (unless (package-installed-p package nil 'noerror)
+    (progn
+      (unless (assoc package package-archive-contents)
+	(package-refresh-contents))
+      (package-install package))))
 (add-to-list 'package-archives
 	     '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
