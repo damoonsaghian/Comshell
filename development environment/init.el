@@ -3,7 +3,9 @@
 (setq inhibit-startup-screen t
       inhibit-startup-echo-area-message t
       make-backup-files nil
-      scroll-conservatively 200)
+      scroll-conservatively 200
+      paragraph-start "\n"
+      paragraph-separate "\n")
 ;; always load newest byte code;
 (setq load-prefer-newer t)
 (setq-default indent-tabs-mode nil)
@@ -11,6 +13,7 @@
 (add-hook 'text-mode-hook 'goto-address-mode)
 ;; automatically refresh dired buffer on changes;
 (add-hook 'dired-mode-hook 'auto-revert-mode)
+(set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
 
 (defun next-paragraph ()
   (interactive)
