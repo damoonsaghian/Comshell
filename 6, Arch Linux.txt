@@ -50,7 +50,7 @@ create user:
     <!-- Set preferred serif, sans serif, and monospace fonts; -->
     <alias>
       <family>serif</family>
-      <prefer><family>Droid Serif</family></prefer>
+      <prefer><family>Droid Sans</family></prefer>
     </alias>
     <alias>
       <family>sans-serif</family>
@@ -62,7 +62,7 @@ create user:
     </alias>
     <alias>
       <family>monospace</family>
-      <prefer><family>Source Code Pro</family></prefer>
+      <prefer><family>SourceCodePro</family></prefer>
     </alias>
   </fontconfig>
 
