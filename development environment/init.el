@@ -11,8 +11,6 @@
 (setq-default indent-tabs-mode nil)
 (add-hook 'prog-mode-hook 'goto-address-mode)
 (add-hook 'text-mode-hook 'goto-address-mode)
-;; automatically refresh dired buffer on changes;
-(add-hook 'dired-mode-hook 'auto-revert-mode)
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
 
 (defun next-paragraph ()
