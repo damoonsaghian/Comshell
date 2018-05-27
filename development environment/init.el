@@ -2,16 +2,21 @@
 (menu-bar-mode -1)
 (setq inhibit-startup-screen t
       inhibit-startup-echo-area-message t
-      make-backup-files nil
+      scroll-bar-adjust-thumb-portion nil
       scroll-conservatively 200
       paragraph-start "\n"
-      paragraph-separate "\n")
-;; always load newest byte code;
-(setq load-prefer-newer t)
+      paragraph-separate "\n"
+      make-backup-files nil)
+(setq-default scroll-bar-width 9)
+(add-to-list 'default-frame-alist '(left-fringe . 2))
+(add-to-list 'default-frame-alist '(right-fringe . 2))
 (setq-default indent-tabs-mode nil)
 (add-hook 'prog-mode-hook 'goto-address-mode)
 (add-hook 'text-mode-hook 'goto-address-mode)
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
+;; always load newest byte code;
+(setq load-prefer-newer t)
+(desktop-save-mode 1)
 
 (defun next-paragraph ()
   (interactive)
@@ -23,7 +28,7 @@
       (redisplay t)
       (backward-paragraph)
       (right-char))))
-(global-set-key (kbd "<next>") 'next-paragraph)
+(global-set-key (kbd "C-<down>") 'next-paragraph)
 (defun previous-paragraph ()
   (interactive)
   (left-char)
@@ -34,7 +39,7 @@
       (redisplay t)
       (backward-paragraph)
       (right-char))))
-(global-set-key (kbd "<prior>") 'previous-paragraph)
+(global-set-key (kbd "C-<up>") 'previous-paragraph)
 
 ;; following code is taken from adaptive-wrap package;
 (defun adaptive-wrap-fill-context-prefix (beg en)
@@ -117,5 +122,5 @@
       (package-install package))))
 (add-to-list 'package-archives
 	     '("melpa" . "https://melpa.org/packages/") t)
-(package-initialize)
+;(package-initialize)
 ;(require-package 'package-name)

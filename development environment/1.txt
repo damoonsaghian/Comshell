@@ -13,9 +13,10 @@
 ; cp init.el ~/.emacs.d/init.el
 
 https://www.emacswiki.org/emacs/DesktopMultipleSaveFiles
-https://www.gnu.org/software/emacs/manual/html_node/emacs/Emacs-Invocation.html
-(desktop-save-mode 1)
-(setq-default desktop-restore-eager 5)
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Title-X.html#Title-X
+https://github.com/Bad-ptr/persp-mode.el
+http://www.gnu.org/software/emacs/manual/html_node/elisp/Header-Lines.html
+https://github.com/ilohmar/wconf
 
 https://github.com/knu/elscreen
 https://www.emacswiki.org/emacs/EmacsLispScreen
