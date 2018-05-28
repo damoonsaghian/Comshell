@@ -13,20 +13,6 @@
 ; cp init.el ~/.emacs.d/init.el
 
 https://www.emacswiki.org/emacs/DesktopMultipleSaveFiles
-https://www.gnu.org/software/emacs/manual/html_node/emacs/Title-X.html#Title-X
-https://github.com/Bad-ptr/persp-mode.el
-http://www.gnu.org/software/emacs/manual/html_node/elisp/Header-Lines.html
-https://github.com/ilohmar/wconf
-
-https://github.com/knu/elscreen
-https://www.emacswiki.org/emacs/EmacsLispScreen
-http://wikemacs.org/wiki/Elscreen
-https://github.com/krisajenkins/evil-tabs
-(defun kill-invisible-buffers ()
-  (dolist (buf  (buffer-list))
-    (unless (get-buffer-window buf t) (kill-buffer buf))))
-;; kill invisible buffers every 10 minutes
-(run-at-time t 600 'kill-invisible-buffers)
 
 http://ergoemacs.org/emacs/file_management.html
 https://www.gnu.org/software/emacs/manual/html_node/emacs/Files.html
@@ -99,10 +85,6 @@ https://github.com/justbur/emacs-which-key
 
 http://www.gnu.org/software/emacs/manual/html_node/elisp/Timers.html
 https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el
-
-https://www.gnu.org/software/emacs/manual/html_node/emacs/Display.html
-https://github.com/larstvei/Focus
-https://www.emacswiki.org/emacs/ThingAtPoint
 
 https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
 

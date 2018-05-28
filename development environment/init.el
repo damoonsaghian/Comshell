@@ -1,5 +1,6 @@
 (tool-bar-mode -1)
 (menu-bar-mode -1)
+(display-time-mode 1)
 (setq inhibit-startup-screen t
       inhibit-startup-echo-area-message t
       scroll-bar-adjust-thumb-portion nil
@@ -7,13 +8,14 @@
       paragraph-start "\n"
       paragraph-separate "\n"
       make-backup-files nil)
-(setq-default scroll-bar-width 9)
+(setq-default scroll-bar-width 8)
 (add-to-list 'default-frame-alist '(left-fringe . 2))
 (add-to-list 'default-frame-alist '(right-fringe . 2))
 (setq-default indent-tabs-mode nil)
 (add-hook 'prog-mode-hook 'goto-address-mode)
 (add-hook 'text-mode-hook 'goto-address-mode)
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
+(set-face-attribute 'mode-line nil :box nil)
 ;; always load newest byte code;
 (setq load-prefer-newer t)
 (desktop-save-mode 1)
