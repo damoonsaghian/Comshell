@@ -47,6 +47,7 @@ create user:
   gtk-theme-name = Numix
   gtk-font-name = Sans
 ; nano ~/.bash_profile
+  export TZ="/usr/share/zoneinfo/<your_location>"
   startx
 ; cp /etc/X11/xinit/xinitrc ~/.xinitrc; nano ~/.xinitrc
   exec cargo run --release --manifest-path ~/projects/Comshell/Cargo.toml
