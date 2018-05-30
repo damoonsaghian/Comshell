@@ -1,6 +1,5 @@
 (tool-bar-mode -1)
 (menu-bar-mode -1)
-(display-time-mode 1)
 (setq inhibit-startup-screen t
       inhibit-startup-echo-area-message t
       scroll-bar-adjust-thumb-portion nil
@@ -15,9 +14,10 @@
 (add-hook 'prog-mode-hook 'goto-address-mode)
 (add-hook 'text-mode-hook 'goto-address-mode)
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
-(set-face-attribute 'mode-line nil :box nil)
+
 ;; always load newest byte code;
 (setq load-prefer-newer t)
+
 (desktop-save-mode 1)
 
 (defun next-paragraph ()

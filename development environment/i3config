@@ -2,11 +2,11 @@
 font pango:SourceCodePro 11
 # colors
 # class                 border  backgr. text    indicator child_border
-client.focused          #bbbbbb #bbbbbb #000000 #ffffff   #ffffff
-client.focused_inactive #dddddd #dddddd #777777 #ffffff   #ffffff
-client.unfocused        #dddddd #dddddd #777777 #ffffff   #ffffff
+client.focused          #cccccc #cccccc #000000 #ffffff   #ffffff
+client.focused_inactive #eeeeee #eeeeee #777777 #ffffff   #ffffff
+client.unfocused        #eeeeee #eeeeee #777777 #ffffff   #ffffff
 client.urgent           #900000 #900000 #ffffff #ffffff   #ffffff
-client.placeholder      #dddddd #dddddd #777777 #ffffff   #ffffff
+client.placeholder      #eeeeee #eeeeee #777777 #ffffff   #ffffff
 workspace_layout tabbed
 default_border normal 0
 default_floating_border none
