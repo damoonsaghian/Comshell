@@ -5,6 +5,8 @@
 ; mkdir -p ~/.config/i3
 ; cp i3config ~/.config/i3/config
 
+Conky
+
 "https://wiki.archlinux.org/index.php/GNOME/Web"
 "http://manpages.ubuntu.com/manpages/bionic/man1/epiphany-browser.1.html"
 "https://help.gnome.org/users/epiphany/stable/"

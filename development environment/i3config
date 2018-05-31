@@ -1,5 +1,4 @@
 # i3 config file (v4)
-font pango:SourceCodePro 11
 # colors
 # class                 border  backgr. text    indicator child_border
 client.focused          #cccccc #cccccc #000000 #ffffff   #ffffff
@@ -7,10 +6,13 @@ client.focused_inactive #eeeeee #eeeeee #777777 #ffffff   #ffffff
 client.unfocused        #eeeeee #eeeeee #777777 #ffffff   #ffffff
 client.urgent           #900000 #900000 #ffffff #ffffff   #ffffff
 client.placeholder      #eeeeee #eeeeee #777777 #ffffff   #ffffff
+
+font pango:SourceCodePro 11
 workspace_layout tabbed
 default_border normal 0
 default_floating_border none
 focus_follows_mouse no
+
 exec "emacs --no-desktop ~/projects; i3-msg exit"
 bindsym F1 [class="Epiphany"] scratchpad show; exec "if [\\"$(xdotool search --class epiphany)\\" == \\"\\"]; then epiphany & fi"
 for_window [class="Epiphany"] floating enable, move scratchpad, scratchpad show
