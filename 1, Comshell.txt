@@ -1,14 +1,16 @@
 Comshell is a command based user interface;
-csudommand based user interfaces (using keyboard, voice, gesture) are faster, more convenient and more powerful than pointing based user interfaces (using mouse, touch, pen);
-touch interfaces can still be useful in simple limited applications; and for some special artistic applications, pen input remains the only choice;
+command based user interfaces (using keyboard, voice, gesture) are faster, more convenient and more powerful than pointing based user interfaces (using mouse, touch, pen);
+although touch interfaces can still be useful in simple limited applications; and for some special artistic applications, pen input remains the only choice;
 unlike a general speech recognition process, voice commands are much simpler for a speech recognition engine to process, since it needs to match against a relatively small set of commands;
 a headset with near range microphone can be used, to exclude far away sound sources; also it is better to put battery and bluetooth of the headset in a separate unit, that can be put in the pocket; this makes the headset lighter and safer;
-for those that neither can use all their fingers, nor can talk, gesture based (2d) input can be implemented;
+for those who neither can use all their fingers, nor can talk, gesture based (2d) input can be implemented;
 
 ".data/keyboard.png"
 missing characters can be entered like this:
-, two commas --> period
-, period followed by comma --> ::
+, two commas --> ;
+, ; followed by comma --> .
+, ; followed by c --> :
+, ; folloed by n --> ::
 , comma followed by add followed by comma --> +
 , comma followed by add followed by space --> + followed by space
 , comma followed by psi followed by space --> ψ followed by space
@@ -21,7 +23,7 @@ Kinesis Advantage 2 keyboard
 "https://github.com/nicinabox/lets-split-guide"
 "http://www.allthingsergo.com/the-best-ergonomic-mechanical-keyboards/"
 
-Vim_like key_bindings;
+modal key_bindings;
 modes (like normal mode and insert mode) must be visually distinctive;
 press escape to go back to normal mode;
 in normal mode we can:

@@ -43,12 +43,3 @@ graphical objects:
 
 graphical objects can be put in a layout tree; transformations on objects will be applied in groups, based on the tree;
 objects are moved to the tree; they can be accessed only internally; it means that, unlike in a scene_graph, pointers to objects in the tree are not accessible globally; so there are no free pointers, and no need for run_time memory management;
-
-obviously implementing all these is a lot of work; till that we can use GTK;
-Rust + Streams + GTK
-"http://gtk-rs.org/docs/gtk/"
-"https://github.com/gtk-rs/examples/tree/master/src/bin"
-"http://gtk-rs.org/docs/sourceview/"
-"https://wiki.gnome.org/Projects/GtkSourceView"
-"https://github.com/gtk-rs/webkit2gtk-rs"
-"https://github.com/antoyo/relm"
