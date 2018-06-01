@@ -116,4 +116,4 @@
 (add-to-list 'package-archives
 	     '("melpa" . "https://melpa.org/packages/") t)
 ;(package-initialize)
-;(require-package 'symon)
+;(require-package 'package_name)

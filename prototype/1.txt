@@ -1,11 +1,9 @@
-; sudo pacman -S i3-wm xdotool emacs epiphany mpv
+; sudo pacman -S i3-wm xdotool dzen2 emacs epiphany mpv
 ; nano ~/.xinitrc
   exec i3
 
 ; mkdir -p ~/.config/i3
-; cp i3config ~/.config/i3/config
-
-Conky
+; cp i3.conf ~/.config/i3/config
 
 "https://wiki.archlinux.org/index.php/GNOME/Web"
 "http://manpages.ubuntu.com/manpages/bionic/man1/epiphany-browser.1.html"
