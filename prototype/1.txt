@@ -1,4 +1,4 @@
-; sudo pacman -S i3-wm xdotool dzen2 emacs epiphany mpv
+; sudo pacman -S i3-wm xdotool emacs epiphany mpv
 ; nano ~/.xinitrc
   exec i3
 

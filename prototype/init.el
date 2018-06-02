@@ -14,6 +14,38 @@
 (add-hook 'prog-mode-hook 'goto-address-mode)
 (add-hook 'text-mode-hook 'goto-address-mode)
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
+(global-eldoc-mode -1)
+
+;; following code is taken from minibuffer-line package
+(defvar minibuffer-line-format
+  '((:eval (format-time-string "%I:%M%p %a %F")) " | " mode-line-modes)
+  "specification of the contents of the minibuffer-line; uses the same format as `mode-line-format'.")
+(defface minibuffer-line
+  '((t :inherit mode-line-inactive))
+  "face to use for the minibuffer-line;")
+(defvar minibuffer-line-refresh-interval 10
+  "the frequency at which the minibuffer-line is updated, in seconds;")
+(defvar minibuffer-line--buffer " *Minibuf-0*")
+(defvar minibuffer-line--timer nil)
+(defun minibuffer-line--update ()
+  (with-current-buffer minibuffer-line--buffer
+    (erase-buffer)
+    (insert (format-mode-line minibuffer-line-format 'minibuffer-line))))
+
+(define-minor-mode minibuffer-line-mode
+  "display status info in the minibuffer window;"
+  :global t
+  (with-current-buffer minibuffer-line--buffer
+    (erase-buffer))
+  (when minibuffer-line--timer
+    (cancel-timer minibuffer-line--timer)
+    (setq minibuffer-line--timer nil))
+  (when minibuffer-line-mode
+    (setq minibuffer-line--timer
+          (run-with-timer t minibuffer-line-refresh-interval
+                          #'minibuffer-line--update))
+    (minibuffer-line--update)))
+(minibuffer-line-mode 1)
 
 ;; when tree view is ready, and the modified files are marked there, there is no need for the mode line;
 ;(setq-default mode-line-format nil)
