@@ -12,8 +12,6 @@
 
 ; cp init.el ~/.emacs.d/init.el
 
-https://www.emacswiki.org/emacs/DesktopMultipleSaveFiles
-
 http://ergoemacs.org/emacs/file_management.html
 https://www.gnu.org/software/emacs/manual/html_node/emacs/Files.html
 https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html
