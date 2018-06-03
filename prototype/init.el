@@ -18,19 +18,17 @@
 
 ;; following code is taken from minibuffer-line package
 (defvar minibuffer-line-format
-  '((:eval (format-time-string "%I:%M%p %a %F")) " | " mode-line-modes)
+  '((:eval (format-time-string "%I:%M%p %a %F")))
   "specification of the contents of the minibuffer-line; uses the same format as `mode-line-format'.")
-(defface minibuffer-line
+(defface minibuffer-line--face
   '((t :inherit mode-line-inactive))
-  "face to use for the minibuffer-line;")
-(defvar minibuffer-line-refresh-interval 10
-  "the frequency at which the minibuffer-line is updated, in seconds;")
+  "minibuffer-line face")
 (defvar minibuffer-line--buffer " *Minibuf-0*")
 (defvar minibuffer-line--timer nil)
 (defun minibuffer-line--update ()
   (with-current-buffer minibuffer-line--buffer
     (erase-buffer)
-    (insert (format-mode-line minibuffer-line-format 'minibuffer-line))))
+    (insert (format-mode-line minibuffer-line-format 'minibuffer-line--face))))
 
 (define-minor-mode minibuffer-line-mode
   "display status info in the minibuffer window;"
@@ -41,9 +39,7 @@
     (cancel-timer minibuffer-line--timer)
     (setq minibuffer-line--timer nil))
   (when minibuffer-line-mode
-    (setq minibuffer-line--timer
-          (run-with-timer t minibuffer-line-refresh-interval
-                          #'minibuffer-line--update))
+    (setq minibuffer-line--timer (run-with-timer t 10 #'minibuffer-line--update))
     (minibuffer-line--update)))
 (minibuffer-line-mode 1)
 
