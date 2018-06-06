@@ -1,7 +1,6 @@
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (setq inhibit-startup-screen t
-      inhibit-startup-echo-area-message t
       visible-bell t
       scroll-bar-adjust-thumb-portion nil
       scroll-conservatively 200
@@ -11,10 +10,12 @@
 (add-to-list 'default-frame-alist '(scroll-bar-width . 8))
 (add-to-list 'default-frame-alist '(left-fringe . 2))
 (add-to-list 'default-frame-alist '(right-fringe . 2))
+;(setq-default mode-line-format nil)
 (setq-default indent-tabs-mode nil)
 (add-hook 'prog-mode-hook 'goto-address-mode)
 (add-hook 'text-mode-hook 'goto-address-mode)
-(show-paren-mode t)
+(show-paren-mode 1)
+(blink-cursor-mode -1)
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
 (global-eldoc-mode -1)
 
@@ -45,8 +46,12 @@
     (minibuffer-line--update)))
 (minibuffer-line-mode 1)
 
-;; when tree view is ready, and the modified files are marked there, there is no need for the mode line;
-;(setq-default mode-line-format nil)
+;(require 'dired)
+;(add-hook 'dired-mode-hook 'dired-omit-mode)
+(add-hook 'dired-mode-hook 'dired-hide-details-mode)
+(setq dired-recursive-deletes t)
+
+(setq insert-default-directory nil)
 
 (defun next-paragraph ()
   (interactive)
