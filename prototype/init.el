@@ -46,10 +46,10 @@
     (minibuffer-line--update)))
 (minibuffer-line-mode 1)
 
-;(require 'dired)
-;(add-hook 'dired-mode-hook 'dired-omit-mode)
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
-(setq dired-recursive-deletes t)
+(setq dired-listing-switches "-l -I \"target\" -I \"*.lock\" -I \"#*#\"")
+(setq dired-recursive-deletes 'always)
+(setq dired-recursive-copies 'always)
 
 (setq insert-default-directory nil)
 
