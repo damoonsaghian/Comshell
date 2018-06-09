@@ -10,7 +10,8 @@
 "https://help.gnome.org/users/epiphany/stable/"
 "https://www.chromium.org/user-experience/multi-profiles"
 
-Emacs is a really good piece of software. ELisp is terible as a programming language, but it's pretty good as a command interface.
+Emacs is a really good piece of software. ELisp is terrible as a programming language, but it's pretty good as a command interface.
+
 ; cp init.el ~/.emacs.d/init.el
 
 in dired-mode pressing "enter":
@@ -19,7 +20,7 @@ in dired-mode pressing "enter":
 , else -> open file in a new emacs window
 https://github.com/Fuco1/dired-hacks
 https://www.gnu.org/software/emacs/manual/html_node/dired-x/Find-File-At-Point.html
-  https://www.gnu.org/software/emacs/manual/html_node/dired-x/Installation.html
+https://www.gnu.org/software/emacs/manual/html_node/dired-x/Installation.html
 
 "http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
 "https://www.emacswiki.org/emacs/NeoTree"
@@ -29,11 +30,6 @@ next file:
 , go to tree view
 , next file
 , open (in the window at right, go to the first line)
-
-https://www.emacswiki.org/emacs/CategoryShell
-https://www.gnu.org/software/emacs/manual/html_node/emacs/Shell.html
-https://www.gnu.org/software/emacs/manual/html_node/eshell/index.html
-http://ergoemacs.org/emacs/emacs_unix.html
 
 view-mode
 https://github.com/emacs-evil/evil
@@ -46,13 +42,8 @@ https://github.com/chrisdone/god-mode
 https://github.com/xahlee/xah-fly-keys
 https://github.com/ergoemacs/ergoemacs-mode
 https://github.com/justbur/emacs-which-key
-
-http://www.gnu.org/software/emacs/manual/html_node/elisp/Timers.html
-https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el
-
 https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
 
-https://www.gnu.org/software/emacs/manual/html_node/htmlfontify/index.html
 https://www.gnu.org/software/emacs/manual/html_node/eww/index.html
   https://www.gnu.org/software/emacs/manual/html_node/emacs/EWW.html
   http://ergoemacs.org/emacs/emacs_eww_web_browser.html
@@ -64,6 +55,8 @@ https://www.gnu.org/software/emacs/manual/html_node/eww/index.html
   https://www.gnu.org/software/emacs/manual/html_node/emacs/Hyperlinking.html
 https://www.gnu.org/software/emacs/manual/html_node/emacs/Document-View.html
 
+https://orgmode.org/manual/Tables.html
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html
 http://shallowsky.com/blog/linux/editors/graphics-in-emacs.html
 https://www.gnu.org/software/auctex
 https://github.com/aaptel/preview-latex
@@ -79,9 +72,6 @@ https://github.com/larsmagne/movie.el
 https://github.com/dbrock/bongo
 http://www.mplayerhq.hu/DOCS/tech/slave.txt
 
-https://orgmode.org/manual/Tables.html
-https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html
-
 lsp-rust lsp-flycheck
 https://christian.kellner.me/2017/05/31/language-server-protocol-lsp-rust-and-emacs/
 https://github.com/rust-lang/rust-mode
@@ -91,6 +81,7 @@ https://github.com/flycheck/flycheck-rust
 http://julienblanchard.com/2016/fancy-rust-development-with-emacs/
 
 https://github.com/dengste/minimap/blob/master/minimap.el
+https://www.gnu.org/software/emacs/manual/html_node/eshell/index.html
 "http://ergoemacs.org/emacs/emacs_magit-mode_tutorial.html"
   "https://magit.vc/"
   "https://github.com/vermiculus/magithub"
@@ -105,8 +96,8 @@ https://github.com/zk-phi/indent-guide
   "https://www.gnu.org/software/emacs/manual/html_node/mh-e/index.html"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Calendar_002fDiary.html"
 https://github.com/hlissner/doom-emacs/wiki/FAQ#how-is-dooms-startup-so-fast
-https://github.com/jwiegley/use-package
-  https://github.com/edvorg/req-package
+https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el
+http://www.gnu.org/software/emacs/manual/html_node/elisp/Timers.html
 "https://www.emacswiki.org/emacs/DictMode"
   "https://www.emacswiki.org/emacs/DictEm"
   "https://www.emacswiki.org/emacs/wordnik.el"
