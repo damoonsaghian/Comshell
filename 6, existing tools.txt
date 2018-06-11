@@ -24,7 +24,7 @@ format the partitions:
 ; pacstrap /mnt pacman
 ; arch-chroot /mnt
 install packages (to save bandwidth you can copy your already downloaded packages to "/mnt/var/cache/pacman/pkg"):
-; pacman -S grub sed intel-ucode linux systemd-sysvcompat btrfs-progs nano man-db logrotate networkmanager pulseaudio-alsa sudo udisks2 ttf-hack ttf-droid numix-gtk-theme xorg-server xf86-video-{intel,nouveau,amdgpu} xorg-xinit gtk3 gtksourceview3 vte3 gst-plugins-{base,good,bad} gst-libav webkit2gtk rust rust-docs gcc
+; pacman -S grub sed intel-ucode linux systemd-sysvcompat btrfs-progs nano man-db logrotate networkmanager pulseaudio-alsa sudo udisks2 ttf-fira-mono ttf-droid numix-gtk-theme xorg-server xf86-video-{intel,nouveau,amdgpu} xorg-xinit gtk3 gtksourceview3 vte3 gst-plugins-{base,good,bad} gst-libav webkit2gtk rust rust-docs gcc
 
 install bootloader:
 ; grub-install --target=i386-pc /dev/sdx
