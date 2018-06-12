@@ -16,7 +16,7 @@
 (add-hook 'text-mode-hook 'goto-address-mode)
 (show-paren-mode 1)
 (blink-cursor-mode -1)
-(set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
+(set-face-attribute 'fixed-pitch-serif nil :font "Serif")
 (global-eldoc-mode -1)
 
 ;; following code is taken from minibuffer-line package

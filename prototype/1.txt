@@ -10,21 +10,16 @@
 "https://help.gnome.org/users/epiphany/stable/"
 "https://www.chromium.org/user-experience/multi-profiles"
 
-Emacs is a really good piece of software. ELisp is terrible as a programming language, but it's pretty good as a command interface.
+Emacs is a really good piece of software. ELisp is terrible as a programming language, but it's pretty good as a command interface (ie as a shell like Bash).
 
 ; cp init.el ~/.emacs.d/init.el
 
+"http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
+"https://github.com/Fuco1/dired-hacks"
 in dired-mode pressing "enter":
 , */projects/* -> i3-msg move to workspace named "nameofproject", if there is no window named "nameofproject", load the saved emacs desktop
 , *.m -> open image-dired/movie in a new emacs window
 , else -> open file in a new emacs window
-https://github.com/Fuco1/dired-hacks
-https://www.gnu.org/software/emacs/manual/html_node/dired-x/Find-File-At-Point.html
-https://www.gnu.org/software/emacs/manual/html_node/dired-x/Installation.html
-
-"http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
-"https://www.emacswiki.org/emacs/NeoTree"
-"https://github.com/jaypei/emacs-neotree"
 "https://emacs.stackexchange.com/questions/12153/does-some-command-exist-which-goes-to-the-next-file-of-the-current-directory"
 next file:
 , go to tree view
@@ -76,7 +71,8 @@ lsp-rust lsp-flycheck
 https://christian.kellner.me/2017/05/31/language-server-protocol-lsp-rust-and-emacs/
 https://github.com/rust-lang/rust-mode
 https://github.com/kwrooijen/cargo.el
-https://github.com/racer-rust/emacs-racer
+https://github.com/racer-rust/emacs-
+racer
 https://github.com/flycheck/flycheck-rust
 http://julienblanchard.com/2016/fancy-rust-development-with-emacs/
 
