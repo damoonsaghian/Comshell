@@ -1,0 +1,18 @@
+[package]
+name = "comshell"
+version = "0.1.0"
+authors = ["Damoon Saghian <damoonsaghian84@gmail.com>"]
+description = "command based user interface"
+license = "public domain"
+
+[[bin]]
+path = "main.rs"
+name = "comshell"
+
+[dependencies]
+futures = "*"
+futures-cpupool = "*"
+
+[dependencies.gtk]
+version = "0.3"
+features = ["v3_22"]
