@@ -11,6 +11,9 @@
 "https://www.chromium.org/user-experience/multi-profiles"
 
 Emacs is a really good piece of software. ELisp is terrible as a programming language, but it's pretty good as a command interface (ie as a shell like Bash).
+https://writequit.org/eos/eos.html
+http://doc.rix.si/cce/cce.html
+http://doc.rix.si/cce/cce-future.html
 
 ; cp init.el ~/.emacs.d/init.el
 
