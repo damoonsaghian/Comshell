@@ -7,24 +7,35 @@
       paragraph-start "\n"
       paragraph-separate "\n"
       make-backup-files nil)
-(add-to-list 'default-frame-alist '(scroll-bar-width . 8))
-(add-to-list 'default-frame-alist '(left-fringe . 2))
-(add-to-list 'default-frame-alist '(right-fringe . 2))
+(global-set-key (kbd "C-x k") #'kill-this-buffer)
+(global-eldoc-mode -1)
 ;(setq-default mode-line-format nil)
 (setq-default indent-tabs-mode nil)
+(set-face-attribute 'region nil :background "sky blue")
+(set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
 (add-hook 'prog-mode-hook 'goto-address-mode)
 (add-hook 'text-mode-hook 'goto-address-mode)
-(show-paren-mode 1)
-(blink-cursor-mode -1)
-(set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
-(global-eldoc-mode -1)
+
+(setq default-frame-alist
+      '((scroll-bar-width . 14)
+        (left-fringe . 2)
+        (right-fringe . 0)
+        (foreground-color . "#222222")
+        ;(background-color . "#ffffff")
+        ))
+
+(setq-default cursor-type 'bar)
+(setq blink-cursor-blinks 0)
+(set-face-attribute 'cursor nil :background "red")
+(global-hl-line-mode 1)
+(set-face-attribute 'highlight nil :background "lemon chiffon")
 
 ;; following code is taken from minibuffer-line package
 (defvar minibuffer-line-format
   '((:eval (format-time-string "%I:%M%p %a %F")))
   "specification of the contents of the minibuffer-line; uses the same format as `mode-line-format'.")
 (defface minibuffer-line--face
-  '((t :inherit mode-line-inactive))
+  '((t :foreground "#777777"))
   "minibuffer-line face")
 (defvar minibuffer-line--buffer " *Minibuf-0*")
 (defvar minibuffer-line--timer nil)
@@ -46,12 +57,16 @@
     (minibuffer-line--update)))
 (minibuffer-line-mode 1)
 
+(setq insert-default-directory nil)
+
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
+(add-hook 'dired-mode-hook 'hl-line-mode)
 (setq dired-listing-switches "-l -I \"target\" -I \"*.lock\" -I \"#*#\"")
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
 
-(setq insert-default-directory nil)
+(setq-default proced-auto-update-flag t)
+(setq-default proced-auto-update-interval 2)
 
 (defun next-paragraph ()
   (interactive)
@@ -149,4 +164,4 @@
 (add-to-list 'package-archives
 	     '("melpa" . "https://melpa.org/packages/") t)
 ;(package-initialize)
-;(require-package 'package_name)
+;(require-package 'package-name)

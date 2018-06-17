@@ -3,7 +3,15 @@
   exec i3
 
 ; mkdir -p ~/.config/i3
-; cp i3.conf ~/.config/i3/config
+; nano ~/.config/i3/config
+  # i3 config file (v4)
+  default_border normal 0
+  default_floating_border none
+  focus_follows_mouse no
+  exec "emacs ~/projects; i3-msg exit"
+  bindsym F1 [class="Epiphany"] scratchpad show; exec "if [\\"$(xdotool search --class epiphany)\\" == \\"\\"]; then epiphany & fi"
+  for_window [class="Epiphany" window_type=normal] floating enable, border none, move scratchpad, scratchpad show
+  for_window [class="(?i)mpv"] floating enable, border none
 
 "https://wiki.archlinux.org/index.php/GNOME/Web"
 "http://manpages.ubuntu.com/manpages/bionic/man1/epiphany-browser.1.html"
@@ -11,11 +19,12 @@
 "https://www.chromium.org/user-experience/multi-profiles"
 
 Emacs is a really good piece of software. ELisp is terrible as a programming language, but it's pretty good as a command interface (ie as a shell like Bash).
-https://writequit.org/eos/eos.html
-http://doc.rix.si/cce/cce.html
-http://doc.rix.si/cce/cce-future.html
+"https://writequit.org/eos/eos.html"
+"http://doc.rix.si/cce/cce.html"
 
 ; cp init.el ~/.emacs.d/init.el
+
+https://github.com/racer-rust/emacs-racer
 
 "http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
 "https://github.com/Fuco1/dired-hacks"
@@ -30,62 +39,62 @@ next file:
 , open (in the window at right, go to the first line)
 
 view-mode
-https://github.com/emacs-evil/evil
-https://www.gnu.org/software/emacs/manual/html_mono/viper.html
-https://github.com/mrkkrp/modalka
-https://github.com/jyp/boon
-http://retroj.net/modal-mode
-https://github.com/abo-abo/hydra
-https://github.com/chrisdone/god-mode
-https://github.com/xahlee/xah-fly-keys
-https://github.com/ergoemacs/ergoemacs-mode
-https://github.com/justbur/emacs-which-key
-https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
+"https://github.com/emacs-evil/evil"
+"https://www.gnu.org/software/emacs/manual/html_mono/viper.html"
+"https://github.com/mrkkrp/modalka"
+"https://github.com/jyp/boon"
+"http://retroj.net/modal-mode"
+"https://github.com/abo-abo/hydra"
+"https://github.com/chrisdone/god-mode"
+"https://github.com/xahlee/xah-fly-keys"
+"https://github.com/ergoemacs/ergoemacs-mode"
+"https://github.com/justbur/emacs-which-key"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html"
 
-https://www.gnu.org/software/emacs/manual/html_node/eww/index.html
-  https://www.gnu.org/software/emacs/manual/html_node/emacs/EWW.html
-  http://ergoemacs.org/emacs/emacs_eww_web_browser.html
-  http://www.wilkesley.org/~ian/xah/emacs/emacs_eww_web_browser.html
+"https://www.gnu.org/software/emacs/manual/html_node/eww/index.html"
+  "https://www.gnu.org/software/emacs/manual/html_node/emacs/EWW.html"
+  "http://ergoemacs.org/emacs/emacs_eww_web_browser.html"
+  "http://www.wilkesley.org/~ian/xah/emacs/emacs_eww_web_browser.html"
   url-cookie-file "~/.emacs.d/url/cookies"
   url-configuration-directory "~/.emacs.d/url/"
   make emacs always use its own browser for opening URL links
   (setq browse-url-browser-function 'eww-browse-url)
-  https://www.gnu.org/software/emacs/manual/html_node/emacs/Hyperlinking.html
-https://www.gnu.org/software/emacs/manual/html_node/emacs/Document-View.html
+  "https://www.gnu.org/software/emacs/manual/html_node/emacs/Hyperlinking.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Document-View.html"
 
-https://orgmode.org/manual/Tables.html
-https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html
-http://shallowsky.com/blog/linux/editors/graphics-in-emacs.html
-https://www.gnu.org/software/auctex
-https://github.com/aaptel/preview-latex
-https://github.com/josteink/wsd-mode
-https://jblevins.org/projects/markdown-mode/
-http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
-https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
-https://www.emacswiki.org/emacs/ThumbsMode
-https://www.gnu.org/software/emms/screenshots.html
-http://wikemacs.org/wiki/Media_player
-https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
-https://github.com/larsmagne/movie.el
-https://github.com/dbrock/bongo
-http://www.mplayerhq.hu/DOCS/tech/slave.txt
+"https://orgmode.org/manual/Tables.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html"
+"http://shallowsky.com/blog/linux/editors/graphics-in-emacs.html"
+"https://www.gnu.org/software/auctex"
+"https://github.com/aaptel/preview-latex"
+"https://github.com/josteink/wsd-mode"
+"https://jblevins.org/projects/markdown-mode/"
+"http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html"
+"https://www.emacswiki.org/emacs/ThumbsMode"
+"https://www.gnu.org/software/emms/screenshots.html"
+"http://wikemacs.org/wiki/Media_player"
+"https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/"
+"https://github.com/larsmagne/movie.el"
+"https://github.com/dbrock/bongo"
+"http://www.mplayerhq.hu/DOCS/tech/slave.txt"
 
 lsp-rust lsp-flycheck
-https://christian.kellner.me/2017/05/31/language-server-protocol-lsp-rust-and-emacs/
-https://github.com/rust-lang/rust-mode
-https://github.com/kwrooijen/cargo.el
-https://github.com/racer-rust/emacs-
-racer
-https://github.com/flycheck/flycheck-rust
-http://julienblanchard.com/2016/fancy-rust-development-with-emacs/
+"https://christian.kellner.me/2017/05/31/language-server-protocol-lsp-rust-and-emacs/"
+"https://github.com/rust-lang/rust-mode"
+"https://github.com/kwrooijen/cargo.el"
+"https://github.com/racer-rust/emacs-racer"
+"https://github.com/flycheck/flycheck-rust"
+"http://julienblanchard.com/2016/fancy-rust-development-with-emacs/"
 
-https://github.com/dengste/minimap/blob/master/minimap.el
-https://www.gnu.org/software/emacs/manual/html_node/eshell/index.html
+"https://github.com/dengste/minimap/blob/master/minimap.el"
+"https://www.gnu.org/software/emacs/manual/html_node/eshell/index.html"
 "http://ergoemacs.org/emacs/emacs_magit-mode_tutorial.html"
   "https://magit.vc/"
   "https://github.com/vermiculus/magithub"
-https://github.com/zk-phi/symon/
-https://github.com/zk-phi/indent-guide
+"http://wikemacs.org/wiki/El-get"
+"https://github.com/zk-phi/symon/"
+"https://github.com/zk-phi/indent-guide"
 "https://www.gnu.org/software/emacs/manual/html_node/calc/index.html"
 "https://www.gnu.org/software/emacs/manual/html_node/gnus/index.html"
   "https://www.gnu.org/software/emacs/manual/html_node/message/index.html"
@@ -94,9 +103,9 @@ https://github.com/zk-phi/indent-guide
   "https://www.gnu.org/software/emacs/manual/html_node/emacs/Rmail.html"
   "https://www.gnu.org/software/emacs/manual/html_node/mh-e/index.html"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Calendar_002fDiary.html"
-https://github.com/hlissner/doom-emacs/wiki/FAQ#how-is-dooms-startup-so-fast
-https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el
-http://www.gnu.org/software/emacs/manual/html_node/elisp/Timers.html
+"https://github.com/hlissner/doom-emacs/wiki/FAQ#how-is-dooms-startup-so-fast"
+"https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el"
+"http://www.gnu.org/software/emacs/manual/html_node/elisp/Timers.html"
 "https://www.emacswiki.org/emacs/DictMode"
   "https://www.emacswiki.org/emacs/DictEm"
   "https://www.emacswiki.org/emacs/wordnik.el"
