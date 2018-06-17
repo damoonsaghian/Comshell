@@ -24,7 +24,7 @@ Emacs is a really good piece of software. ELisp is terrible as a programming lan
 
 ; cp init.el ~/.emacs.d/init.el
 
-https://github.com/racer-rust/emacs-racer
+"https://github.com/wasamasa/eyebrowse"
 
 "http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
 "https://github.com/Fuco1/dired-hacks"
