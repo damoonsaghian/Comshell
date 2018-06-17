@@ -17,7 +17,7 @@
 (add-hook 'text-mode-hook 'goto-address-mode)
 
 (setq default-frame-alist
-      '((scroll-bar-width . 14)
+      '((scroll-bar-width . 13)
         (left-fringe . 2)
         (right-fringe . 0)
         (foreground-color . "#222222")
