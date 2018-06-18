@@ -21,7 +21,6 @@
         (left-fringe . 2)
         (right-fringe . 0)
         (foreground-color . "#222222")
-        ;(background-color . "#ffffff")
         ))
 
 (setq-default cursor-type 'bar)
@@ -29,6 +28,7 @@
 (set-face-attribute 'cursor nil :background "red")
 (global-hl-line-mode 1)
 (set-face-attribute 'highlight nil :background "lemon chiffon")
+(show-paren-mode 1)
 
 ;; following code is taken from minibuffer-line package
 (defvar minibuffer-line-format

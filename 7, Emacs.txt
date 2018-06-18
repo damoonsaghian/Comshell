@@ -3,15 +3,7 @@
   exec i3
 
 ; mkdir -p ~/.config/i3
-; nano ~/.config/i3/config
-  # i3 config file (v4)
-  default_border none
-  default_floating_border pixel 1
-  focus_follows_mouse no
-  exec "emacs ~/projects; i3-msg exit"
-  bindsym F1 [class="Epiphany"] scratchpad show; exec "if [\\"$(xdotool search --class epiphany)\\" == \\"\\"]; then epiphany & fi"
-  for_window [class="Epiphany" window_type=normal] floating enable, border none, move scratchpad, scratchpad show
-  for_window [class="(?i)mpv"] floating enable, border none
+; cp i3.conf ~/.config/i3/config
 
 "https://wiki.archlinux.org/index.php/GNOME/Web"
 "http://manpages.ubuntu.com/manpages/bionic/man1/epiphany-browser.1.html"
@@ -19,12 +11,10 @@
 "https://www.chromium.org/user-experience/multi-profiles"
 
 Emacs is a really good piece of software. ELisp is terrible as a programming language, but it's pretty good as a command interface (ie as a shell like Bash).
-"https://writequit.org/eos/eos.html"
-"http://doc.rix.si/cce/cce.html"
-
 ; cp init.el ~/.emacs.d/init.el
 
-"https://github.com/wasamasa/eyebrowse"
+"https://writequit.org/eos/eos.html"
+"http://doc.rix.si/cce/cce.html"
 
 "http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
 "https://github.com/Fuco1/dired-hacks"
@@ -78,6 +68,8 @@ view-mode
 "https://github.com/larsmagne/movie.el"
 "https://github.com/dbrock/bongo"
 "http://www.mplayerhq.hu/DOCS/tech/slave.txt"
+
+"http://www.gnu.org/software/emacs/manual/html_node/elisp/Frame-Configurations.html"
 
 lsp-rust lsp-flycheck
 "https://christian.kellner.me/2017/05/31/language-server-protocol-lsp-rust-and-emacs/"
