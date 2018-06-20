@@ -6,7 +6,8 @@
       scroll-conservatively 200
       paragraph-start "\n"
       paragraph-separate "\n"
-      make-backup-files nil)
+      make-backup-files nil
+      insert-default-directory nil)
 (global-set-key (kbd "C-x k") #'kill-this-buffer)
 (global-eldoc-mode -1)
 ;(setq-default mode-line-format nil)
@@ -30,7 +31,8 @@
 (set-face-attribute 'highlight nil :background "lemon chiffon")
 (show-paren-mode 1)
 
-;; following code is taken from minibuffer-line package
+; show date in minibuffer when it's empty
+; this is taken from minibuffer-line package
 (defvar minibuffer-line-format
   '((:eval (format-time-string "%I:%M%p %a %F")))
   "specification of the contents of the minibuffer-line; uses the same format as `mode-line-format'.")
@@ -57,17 +59,20 @@
     (minibuffer-line--update)))
 (minibuffer-line-mode 1)
 
-(setq insert-default-directory nil)
-
+; dired
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
 (add-hook 'dired-mode-hook 'hl-line-mode)
 (setq dired-listing-switches "-l -I \"target\" -I \"*.lock\" -I \"#*#\"")
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
 
-(setq-default proced-auto-update-flag t)
-(setq-default proced-auto-update-interval 2)
+(defun dired-open-file ()
+  "open the thing under point; that can be either file or any other line of dired listing;"
+  (interactive)
+  (dired-find-file))
+(define-key dired-mode-map [remap dired-find-file] 'dired-open-file)
 
+; paragraphs
 (defun next-paragraph ()
   (interactive)
   (unless (bobp) (left-char))
@@ -91,10 +96,11 @@
       (right-char))))
 (global-set-key (kbd "C-<up>") 'previous-paragraph)
 
-;; following code is taken from adaptive-wrap package;
+; adaptive wrap
+; this is taken from adaptive-wrap package;
 (defun adaptive-wrap-fill-context-prefix (beg en)
   "like `fill-context-prefix', but with length 2;"
-  ;; note: fill-context-prefix may return nil; see: http://article.gmane.org/gmane.emacs.devel/156285
+  ; note: fill-context-prefix may return nil; see: http://article.gmane.org/gmane.emacs.devel/156285
   (let* ((fcp (or (fill-context-prefix beg en) ""))
          (fcp-len (string-width fcp))
          (fill-char (if (< 0 fcp-len)
@@ -105,9 +111,9 @@
 
 (defun adaptive-wrap-prefix-function (beg end)
   "indent the region between BEG and END with adaptive filling;"
-  ;; any change at the beginning of a line might change its wrap prefix, which affects the whole line;
-  ;; so we need to "round-up" `end' to the nearest end of line;
-  ;; we do the same with `beg' although it's probably not needed;
+  ; any change at the beginning of a line might change its wrap prefix, which affects the whole line;
+  ; so we need to "round-up" `end' to the nearest end of line;
+  ; we do the same with `beg' although it's probably not needed;
   (goto-char end)
   (unless (bolp) (forward-line 1))
   (setq end (point))
@@ -121,8 +127,8 @@
                          'wrap-prefix
                          (let ((pfx (adaptive-wrap-fill-context-prefix
                                      lbp (point))))
-                           ;; remove any `wrap-prefix' property that might have been added earlier;
-                           ;; otherwise, we end up with a string containing a `wrap-prefix' string, containing a `wrap-prefix' string ...
+                           ; remove any `wrap-prefix' property that might have been added earlier;
+                           ; otherwise, we end up with a string containing a `wrap-prefix' string, containing a `wrap-prefix' string ...
                            (remove-text-properties 0 (length pfx) '(wrap-prefix) pfx)
                            pfx))))
   `(jit-lock-bounds ,beg . ,end))
@@ -133,9 +139,9 @@
   :group 'visual-line
   (if adaptive-wrap-prefix-mode
       (progn
-        ;; HACK ATTACK! we want to run after font-lock (so our wrap-prefix includes the faces applied by font-lock),
-        ;; but  jit-lock-register doesn't accept an `append' argument,
-        ;; so we add ourselves beforehand, to make sure we're at the end of the hook (bug#15155);
+        ; HACK ATTACK! we want to run after font-lock (so our wrap-prefix includes the faces applied by font-lock),
+        ; but  jit-lock-register doesn't accept an `append' argument,
+        ; so we add ourselves beforehand, to make sure we're at the end of the hook (bug#15155);
         (add-hook 'jit-lock-functions
                   #'adaptive-wrap-prefix-function 'append t)
         (jit-lock-register #'adaptive-wrap-prefix-function))
@@ -146,6 +152,9 @@
         (remove-text-properties (point-min) (point-max) '(wrap-prefix nil))))))
 (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
 (global-visual-line-mode +1)
+
+(setq-default proced-auto-update-flag t)
+(setq-default proced-auto-update-interval 2)
 
 (require 'package)
 (defun require-package (package)

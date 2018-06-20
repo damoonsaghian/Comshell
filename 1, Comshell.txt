@@ -37,11 +37,8 @@ in normal mode we can:
 , enter insert mode
 
 projects are looked for in "~/projects/" and all directories named "projects" on all disks; from this list, we can open projects (or switch to them if they are already open); also we can create new projects;
-
-different views of the current project can be opened in separate tabs;
-external projects (which can also be websites, pdf, etc) which are opened from inside the current project (not from projects list) will also be opened in separate tabs;
-
-a panel at the left shows a tree view of the files in the project;
+the list of projects is placed in a panel at the left; files from different disks will be in separate sections; there can be a section for notifications too;
+a second panel shows a tree view of the files in the project;
 text files are opened in a text editor panel at the right;
 directories with ".m" extension are opened in a panel at the right, showing thumbnails of the files in it;
 we can go to the panel, and move between files in there (by typing their name), or create new files;

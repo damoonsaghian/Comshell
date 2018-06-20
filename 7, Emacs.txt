@@ -3,7 +3,15 @@
   exec i3
 
 ; mkdir -p ~/.config/i3
-; cp i3.conf ~/.config/i3/config
+; nano ~/.config/i3/config
+  # i3 config file (v4)
+  default_border none
+  default_floating_border pixel 1
+  focus_follows_mouse no
+  exec "emacs ~/projects; i3-msg exit"
+  bindsym F1 [class="Epiphany"] scratchpad show; exec "if [\\"$(xdotool search --class epiphany)\\" == \\"\\"]; then epiphany & fi"
+  for_window [class="Epiphany" window_type=normal] floating enable, move scratchpad, scratchpad show
+  for_window [class="(?i)mpv"] floating enable, border none
 
 "https://wiki.archlinux.org/index.php/GNOME/Web"
 "http://manpages.ubuntu.com/manpages/bionic/man1/epiphany-browser.1.html"
@@ -12,9 +20,6 @@
 
 Emacs is a really good piece of software. ELisp is terrible as a programming language, but it's pretty good as a command interface (ie as a shell like Bash).
 ; cp init.el ~/.emacs.d/init.el
-
-"https://writequit.org/eos/eos.html"
-"http://doc.rix.si/cce/cce.html"
 
 "http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
 "https://github.com/Fuco1/dired-hacks"
@@ -41,15 +46,7 @@ view-mode
 "https://github.com/justbur/emacs-which-key"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html"
 
-"https://www.gnu.org/software/emacs/manual/html_node/eww/index.html"
-  "https://www.gnu.org/software/emacs/manual/html_node/emacs/EWW.html"
-  "http://ergoemacs.org/emacs/emacs_eww_web_browser.html"
-  "http://www.wilkesley.org/~ian/xah/emacs/emacs_eww_web_browser.html"
-  url-cookie-file "~/.emacs.d/url/cookies"
-  url-configuration-directory "~/.emacs.d/url/"
-  make emacs always use its own browser for opening URL links
-  (setq browse-url-browser-function 'eww-browse-url)
-  "https://www.gnu.org/software/emacs/manual/html_node/emacs/Hyperlinking.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Hyperlinking.html"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Document-View.html"
 
 "https://orgmode.org/manual/Tables.html"
@@ -69,9 +66,7 @@ view-mode
 "https://github.com/dbrock/bongo"
 "http://www.mplayerhq.hu/DOCS/tech/slave.txt"
 
-"http://www.gnu.org/software/emacs/manual/html_node/elisp/Frame-Configurations.html"
-
-lsp-rust lsp-flycheck
+lsp-rust, lsp-flycheck
 "https://christian.kellner.me/2017/05/31/language-server-protocol-lsp-rust-and-emacs/"
 "https://github.com/rust-lang/rust-mode"
 "https://github.com/kwrooijen/cargo.el"
@@ -79,14 +74,12 @@ lsp-rust lsp-flycheck
 "https://github.com/flycheck/flycheck-rust"
 "http://julienblanchard.com/2016/fancy-rust-development-with-emacs/"
 
-"https://github.com/dengste/minimap/blob/master/minimap.el"
 "https://www.gnu.org/software/emacs/manual/html_node/eshell/index.html"
 "http://ergoemacs.org/emacs/emacs_magit-mode_tutorial.html"
   "https://magit.vc/"
   "https://github.com/vermiculus/magithub"
-"http://wikemacs.org/wiki/El-get"
-"https://github.com/zk-phi/symon/"
-"https://github.com/zk-phi/indent-guide"
+"https://github.com/DarthFennec/highlight-indent-guides"
+  "https://github.com/zk-phi/indent-guide"
 "https://www.gnu.org/software/emacs/manual/html_node/calc/index.html"
 "https://www.gnu.org/software/emacs/manual/html_node/gnus/index.html"
   "https://www.gnu.org/software/emacs/manual/html_node/message/index.html"
@@ -98,9 +91,12 @@ lsp-rust lsp-flycheck
 "https://github.com/hlissner/doom-emacs/wiki/FAQ#how-is-dooms-startup-so-fast"
 "https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el"
 "http://www.gnu.org/software/emacs/manual/html_node/elisp/Timers.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Spelling.html"
 "https://www.emacswiki.org/emacs/DictMode"
   "https://www.emacswiki.org/emacs/DictEm"
   "https://www.emacswiki.org/emacs/wordnik.el"
   "https://github.com/gromnitsky/wordnut"
   "https://www.emacswiki.org/emacs/ThesauriAndSynonyms"
   "https://github.com/atykhonov/google-translate"
+"https://github.com/dengste/minimap/blob/master/minimap.el"
+"https://stackoverflow.com/questions/21175099/how-to-automatically-add-remove-scroll-bars-as-needed-by-text-height"
