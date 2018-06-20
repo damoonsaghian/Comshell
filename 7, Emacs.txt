@@ -3,15 +3,7 @@
   exec i3
 
 ; mkdir -p ~/.config/i3
-; nano ~/.config/i3/config
-  # i3 config file (v4)
-  default_border none
-  default_floating_border pixel 1
-  focus_follows_mouse no
-  exec "emacs ~/projects; i3-msg exit"
-  bindsym F1 [class="Epiphany"] scratchpad show; exec "if [\\"$(xdotool search --class epiphany)\\" == \\"\\"]; then epiphany & fi"
-  for_window [class="Epiphany" window_type=normal] floating enable, move scratchpad, scratchpad show
-  for_window [class="(?i)mpv"] floating enable, border none
+; cp i3.conf ~/.config/i3/config
 
 "https://wiki.archlinux.org/index.php/GNOME/Web"
 "http://manpages.ubuntu.com/manpages/bionic/man1/epiphany-browser.1.html"
@@ -74,6 +66,8 @@ lsp-rust, lsp-flycheck
 "https://github.com/flycheck/flycheck-rust"
 "http://julienblanchard.com/2016/fancy-rust-development-with-emacs/"
 
+
+"http://www.gnu.org/software/emacs/manual/html_node/elisp/Frame-Configurations.html"
 "https://www.gnu.org/software/emacs/manual/html_node/eshell/index.html"
 "http://ergoemacs.org/emacs/emacs_magit-mode_tutorial.html"
   "https://magit.vc/"
