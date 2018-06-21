@@ -40,6 +40,16 @@ view-mode
 
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Hyperlinking.html"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Document-View.html"
+"https://www.gnu.org/software/emacs/manual/html_node/eww/index.html"
+  "https://www.gnu.org/software/emacs/manual/html_node/emacs/EWW.html"
+  "http://ergoemacs.org/emacs/emacs_eww_web_browser.html"
+  "http://www.wilkesley.org/~ian/xah/emacs/emacs_eww_web_browser.html"
+  url-cookie-file "~/.emacs.d/url/cookies"
+  url-configuration-directory "~/.emacs.d/url/"
+  make emacs always use its own browser for opening URL links
+  (setq browse-url-browser-function 'eww-browse-url)
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Hyperlinking.html"
+"https://www.gnu.org/software/emacs/manual/html_node/emacs/Document-View.html"
 
 "https://orgmode.org/manual/Tables.html"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html"
