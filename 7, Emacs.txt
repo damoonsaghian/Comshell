@@ -23,15 +23,12 @@ Emacs is a really good piece of software. ELisp is terrible as a programming lan
 
 "http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
 "https://github.com/Fuco1/dired-hacks"
-in dired-mode pressing "enter":
-, */projects/* -> i3-msg move to workspace named "nameofproject", if there is no window named "nameofproject", load the saved emacs desktop
-, *.m -> open image-dired/movie in a new emacs window
-, else -> open file in a new emacs window
 "https://emacs.stackexchange.com/questions/12153/does-some-command-exist-which-goes-to-the-next-file-of-the-current-directory"
 next file:
 , go to tree view
 , next file
 , open (in the window at right, go to the first line)
+"https://www.emacswiki.org/emacs/DiredView"
 
 view-mode
 "https://github.com/emacs-evil/evil"
@@ -46,8 +43,7 @@ view-mode
 "https://github.com/justbur/emacs-which-key"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html"
 
-"https://www.gnu.org/software/emacs/manual/html_node/emacs/Hyperlinking.html"
-"https://www.gnu.org/software/emacs/manual/html_node/emacs/Document-View.html"
+"https://www.emacswiki.org/emacs/BrowseUrl"
 "https://www.gnu.org/software/emacs/manual/html_node/eww/index.html"
   "https://www.gnu.org/software/emacs/manual/html_node/emacs/EWW.html"
   "http://ergoemacs.org/emacs/emacs_eww_web_browser.html"
@@ -84,7 +80,10 @@ lsp-rust, lsp-flycheck
 "https://github.com/flycheck/flycheck-rust"
 "http://julienblanchard.com/2016/fancy-rust-development-with-emacs/"
 
+"https://github.com/hlissner/doom-emacs/wiki/FAQ#how-is-dooms-startup-so-fast"
+"https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el"
 "https://www.gnu.org/software/emacs/manual/html_node/eshell/index.html"
+"https://www.emacswiki.org/emacs/DiredSync"
 "http://ergoemacs.org/emacs/emacs_magit-mode_tutorial.html"
   "https://magit.vc/"
   "https://github.com/vermiculus/magithub"
@@ -98,8 +97,6 @@ lsp-rust, lsp-flycheck
   "https://www.gnu.org/software/emacs/manual/html_node/emacs/Rmail.html"
   "https://www.gnu.org/software/emacs/manual/html_node/mh-e/index.html"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Calendar_002fDiary.html"
-"https://github.com/hlissner/doom-emacs/wiki/FAQ#how-is-dooms-startup-so-fast"
-"https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el"
 "http://www.gnu.org/software/emacs/manual/html_node/elisp/Timers.html"
 "https://www.gnu.org/software/emacs/manual/html_node/emacs/Spelling.html"
 "https://www.emacswiki.org/emacs/DictMode"

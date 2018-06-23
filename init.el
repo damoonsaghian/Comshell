@@ -69,8 +69,36 @@
 (defun dired-open-file ()
   "open the thing under point; that can be either file or any other line of dired listing;"
   (interactive)
+  (let ((file-name (dired-get-filename nil t)))
+    (cond
+     ((and (dirp file-name) (is-in-dirp "~/projects" file-name))
+      ; i3-msg move to workspace named "nameofproject", if there is no window named "nameofproject", load the saved emacs desktop
+      goto-desktop-open-emacs)
+     ((and (dirp file-name) (string-match "\\.m$" file-name))
+      ; open image-dired/movie in a new emacs window
+      open-image-dired-in-right-window)
+     ((dirp file-name)
+      expand-subtree
+      )
+     (t find-file-in-right-window))
+    )
   (dired-find-file))
 (define-key dired-mode-map [remap dired-find-file] 'dired-open-file)
+
+(defun open-file-at-cursor ()
+  "open the file path under cursor; if the path starts with “http://”, open the URL in browser; input path can be relative, full path, URL;"
+  (interactive)
+  (let (($path (ffap-file-at-point)))
+    (if (string-match-p "\\`https?://" $path)
+        (progn (browse-url $path))
+      (if (file-exists-p $path)
+            (progn
+              (let (($ext (file-name-extension $path))
+                    ($fnamecore (file-name-sans-extension $path)))
+                (if (string-equal $ext "mp4")
+                    (call-process "mpv" nil 0 nil $path)
+                  (find-file $path))))
+        (message "file doesn't exist: '%s';" $path)))))
 
 ; paragraphs
 (defun next-paragraph ()
