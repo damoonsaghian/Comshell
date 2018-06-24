@@ -1,4 +1,4 @@
-; sudo pacman -S i3-wm xdotool emacs epiphany mpv
+; sudo pacman -S i3-wm xdotool emacs firefox mpv
 ; nano ~/.xinitrc
   exec i3
 
@@ -9,20 +9,22 @@
   default_floating_border pixel 1
   focus_follows_mouse no
   exec "emacs ~/projects; i3-msg exit"
-  bindsym F1 [class="Epiphany"] scratchpad show; exec "if [\\"$(xdotool search --class epiphany)\\" == \\"\\"]; then epiphany & fi"
-  for_window [class="Epiphany" window_type=normal] floating enable, move scratchpad, scratchpad show
+  bindsym F1 [class="Firefox"] scratchpad show; exec "if [\\"$(xdotool search --class firefox)\\" == \\"\\"]; then firefox & fi"
+  for_window [class="Firefox" window_type=normal] floating enable, move scratchpad, scratchpad show
   for_window [class="(?i)mpv"] floating enable, border none
 
-"https://wiki.archlinux.org/index.php/GNOME/Web"
-"http://manpages.ubuntu.com/manpages/bionic/man1/epiphany-browser.1.html"
-"https://help.gnome.org/users/epiphany/stable/"
 "https://www.chromium.org/user-experience/multi-profiles"
 
 Emacs is a really good piece of software. ELisp is terrible as a programming language, but it's pretty good as a command interface (ie as a shell like Bash).
 ; cp init.el ~/.emacs.d/init.el
 
+"https://emacs.stackexchange.com/questions/35647/only-open-files-which-should-be-opened-via-emacs-via-ret-in-dired\"
+"https://github.com/thomp/dired-launch"
+"https://github.com/bbatsov/crux"
+"https://github.com/Fuco1/dired-hacks/blob/master/dired-open.el"
+"https://melpa.org/packages/openwith-20120531.1436.el"
 "http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
-"https://github.com/Fuco1/dired-hacks"
+"https://github.com/Fuco1/dired-hacks/blob/master/dired-subtree.el"
 "https://emacs.stackexchange.com/questions/12153/does-some-command-exist-which-goes-to-the-next-file-of-the-current-directory"
 next file:
 , go to tree view

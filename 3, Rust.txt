@@ -37,6 +37,10 @@ mutable reference can:
 , access and mutate resource
 , hand over (move) the mutable borrow (mutable ref is moved by default)
 
+life_time of argument references ends after function call; so we can have this:
+  f(&mut a);
+  g(&mut a);
+
 scenarios that involve multiple refs or returning refs often require explicit lifetimes; so don't return refs, instead use mutable refs in inputs;
 structs and enums containing refs must have explicit lifetimes (impl of these must use lifetimes too); so don't use them;
 
