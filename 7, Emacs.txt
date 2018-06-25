@@ -1,4 +1,18 @@
-; sudo pacman -S i3-wm xdotool emacs firefox mpv
+; sudo pacman -S xorg-server xf86-video-{intel,nouveau,amdgpu} xorg-xinit i3-wm xdotool ttf-fira-mono emacs ttf-droid firefox mpv
+
+monospace fonts: wide characters are forced to squeeze, narrow characters are forced to stretch, uppercase letters look skinny next to lowercase, and bold characters don’t have enough room;
+proportional font for code: generous spacing, large punctuation, and easily distinguishable characters, while allowing each character to take up the space that it needs;
+"http://input.fontbureau.com/info/"
+two spaces -> elastic blocks
+"http://nickgravgaard.com/elastic-tabstops/"
+
+; mkdir -p ~/.config/gtk-3.0; nano ~/.config/gtk-3.0/settings.ini
+  [Settings]
+  gtk-theme-name = deepin
+  gtk-font-name = Sans
+; nano ~/.bash_profile
+  export TZ="/usr/share/zoneinfo/<your_location>"
+  startx
 ; nano ~/.xinitrc
   exec i3
 
@@ -10,7 +24,7 @@
   focus_follows_mouse no
   exec "emacs ~/projects; i3-msg exit"
   bindsym F1 [class="Firefox"] scratchpad show; exec "if [\\"$(xdotool search --class firefox)\\" == \\"\\"]; then firefox & fi"
-  for_window [class="Firefox" window_type=normal] floating enable, move scratchpad, scratchpad show
+  for_window [class="Firefox" window_type=normal] floating enable, border pixel 1, move scratchpad, scratchpad show
   for_window [class="(?i)mpv"] floating enable, border none
 
 "https://www.chromium.org/user-experience/multi-profiles"
@@ -18,7 +32,6 @@
 Emacs is a really good piece of software. ELisp is terrible as a programming language, but it's pretty good as a command interface (ie as a shell like Bash).
 ; cp init.el ~/.emacs.d/init.el
 
-"https://emacs.stackexchange.com/questions/35647/only-open-files-which-should-be-opened-via-emacs-via-ret-in-dired\"
 "https://github.com/thomp/dired-launch"
 "https://github.com/bbatsov/crux"
 "https://github.com/Fuco1/dired-hacks/blob/master/dired-open.el"
