@@ -31,34 +31,6 @@
 (set-face-attribute 'highlight nil :background "lemon chiffon")
 (show-paren-mode 1)
 
-; show date in minibuffer when it's empty
-; this is taken from minibuffer-line package
-(defvar minibuffer-line-format
-  '((:eval (format-time-string "%I:%M%p %a %F")))
-  "specification of the contents of the minibuffer-line; uses the same format as `mode-line-format'.")
-(defface minibuffer-line--face
-  '((t :foreground "#777777"))
-  "minibuffer-line face")
-(defvar minibuffer-line--buffer " *Minibuf-0*")
-(defvar minibuffer-line--timer nil)
-(defun minibuffer-line--update ()
-  (with-current-buffer minibuffer-line--buffer
-    (erase-buffer)
-    (insert (format-mode-line minibuffer-line-format 'minibuffer-line--face))))
-
-(define-minor-mode minibuffer-line-mode
-  "display status info in the minibuffer window;"
-  :global t
-  (with-current-buffer minibuffer-line--buffer
-    (erase-buffer))
-  (when minibuffer-line--timer
-    (cancel-timer minibuffer-line--timer)
-    (setq minibuffer-line--timer nil))
-  (when minibuffer-line-mode
-    (setq minibuffer-line--timer (run-with-timer t 10 #'minibuffer-line--update))
-    (minibuffer-line--update)))
-(minibuffer-line-mode 1)
-
 ; dired
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
 (add-hook 'dired-mode-hook 'hl-line-mode)
@@ -83,21 +55,21 @@
      (t find-file-in-right-window))
     )
   (dired-find-file))
-(define-key dired-mode-map [remap dired-find-file] 'dired-open-file)
+(eval-after-load "dired"
+  '(define-key dired-mode-map [remap dired-find-file] 'dired-open-file))
 
-(defun open-file-at-cursor ()
+(defun go-to-link-at-point ()
   "open the file path under cursor; if the path starts with “http://”, open the URL in browser; input path can be relative, full path, URL;"
   (interactive)
   (let (($path (ffap-file-at-point)))
     (if (string-match-p "\\`https?://" $path)
-        (progn (browse-url $path))
+        (progn
+          (; if there is a Firefox window with name "$path", raise it; if not create one;
+           ))
       (if (file-exists-p $path)
-            (progn
-              (let (($ext (file-name-extension $path))
-                    ($fnamecore (file-name-sans-extension $path)))
-                (if (string-equal $ext "mp4")
-                    (call-process "mpv" nil 0 nil $path)
-                  (find-file $path))))
+          (progn
+            (; find-file and create a dired tree view of the project;
+             ))
         (message "file doesn't exist: '%s';" $path)))))
 
 ; paragraphs
