@@ -1,4 +1,4 @@
-; sudo pacman -S xorg-server xf86-video-{intel,nouveau,amdgpu} xorg-xinit i3-wm xdotool ttf-fira-mono emacs ttf-droid firefox mpv
+; sudo pacman -S xorg-server xf86-video-{intel,nouveau,amdgpu} xorg-xinit i3-wm i3status xdotool ttf-fira-mono emacs ttf-droid deepin-gtk-theme firefox mpv
 
 monospace fonts: wide characters are forced to squeeze, narrow characters are forced to stretch, uppercase letters look skinny next to lowercase, and bold characters don’t have enough room;
 proportional font for code: generous spacing, large punctuation, and easily distinguishable characters, while allowing each character to take up the space that it needs;
@@ -18,6 +18,8 @@ two spaces -> elastic blocks
 
 ; mkdir -p ~/.config/i3
 ; cp i3.conf ~/.config/i3/config
+; mkdir -p ~/.config/i3status
+; cp i3status.conf ~/.config/i3status/config
 
 "https://www.chromium.org/user-experience/multi-profiles"
 
