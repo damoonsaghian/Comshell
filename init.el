@@ -1,28 +1,24 @@
 (tool-bar-mode -1)
 (menu-bar-mode -1)
-(setq inhibit-startup-screen t
-      visible-bell t
-      scroll-bar-adjust-thumb-portion nil
-      scroll-conservatively 200
-      paragraph-start "\n"
-      paragraph-separate "\n"
-      make-backup-files nil
-      insert-default-directory nil)
-(global-set-key (kbd "C-x k") #'kill-this-buffer)
 (global-eldoc-mode -1)
-;(setq-default mode-line-format nil)
+(add-to-list 'default-frame-alist '(left-fringe . 2))
+(add-to-list 'default-frame-alist '(right-fringe . 0))
+(setq visible-bell t)
+(setq inhibit-startup-screen t)
+(setq insert-default-directory nil)
+(setq make-backup-files nil)
+; (setq-default mode-line-format nil)
+(global-set-key (kbd "C-x k") #'kill-this-buffer)
+
+(setq scroll-conservatively 200) ; never recenter point
+(setq paragraph-start "\n"
+      paragraph-separate "\n")
 (setq-default indent-tabs-mode nil)
+(add-to-list 'default-frame-alist '(foreground-color . "#222222"))
 (set-face-attribute 'region nil :background "sky blue")
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
 (add-hook 'prog-mode-hook 'goto-address-mode)
 (add-hook 'text-mode-hook 'goto-address-mode)
-
-(setq default-frame-alist
-      '((scroll-bar-width . 13)
-        (left-fringe . 2)
-        (right-fringe . 0)
-        (foreground-color . "#222222")
-        ))
 
 (setq-default cursor-type 'bar)
 (setq blink-cursor-blinks 0)
@@ -30,6 +26,11 @@
 (global-hl-line-mode 1)
 (set-face-attribute 'highlight nil :background "lemon chiffon")
 (show-paren-mode 1)
+
+; use minimap instead of scroll bar: https://github.com/dengste/minimap
+(setq scroll-bar-adjust-thumb-portion nil)
+(add-to-list 'default-frame-alist '(scroll-bar-width . 13))
+; https://stackoverflow.com/questions/21175099/how-to-automatically-add-remove-scroll-bars-as-needed-by-text-height
 
 ; dired
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)

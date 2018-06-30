@@ -114,6 +114,4 @@ lsp-rust, lsp-flycheck
   "https://github.com/gromnitsky/wordnut"
   "https://www.emacswiki.org/emacs/ThesauriAndSynonyms"
   "https://github.com/atykhonov/google-translate"
-"https://github.com/dengste/minimap/blob/master/minimap.el"
-"https://stackoverflow.com/questions/21175099/how-to-automatically-add-remove-scroll-bars-as-needed-by-text-height"
 "https://github.com/domtronn/all-the-icons.el"
