@@ -1,4 +1,4 @@
-; sudo pacman -S xorg-server xf86-video-{intel,nouveau,amdgpu} xorg-xinit i3-wm i3status xdotool ttf-fira-mono emacs ttf-droid deepin-gtk-theme firefox mpv
+; sudo pacman -S xorg-server xf86-video-{intel,nouveau,amdgpu} xorg-xinit i3-wm i3status xdotool deepin-gtk-theme ttf-hack emacs ttf-droid chromium mpv
 
 monospace fonts: wide characters are forced to squeeze, narrow characters are forced to stretch, uppercase letters look skinny next to lowercase, and bold characters don’t have enough room;
 proportional font for code: generous spacing, large punctuation, and easily distinguishable characters, while allowing each character to take up the space that it needs;
@@ -27,6 +27,7 @@ Emacs is a really good piece of software. ELisp is terrible as a programming lan
 ; cp init.el ~/.emacs.d/init.el
 
 "https://emacs.stackexchange.com/questions/35647/only-open-files-which-should-be-opened-via-emacs-via-ret-in-dired/"
+"https://github.com/thomp/dired-launch/blob/master/dired-launch.el"
 "https://github.com/bbatsov/crux"
 "https://github.com/Fuco1/dired-hacks/blob/master/dired-open.el"
 "https://melpa.org/packages/openwith-20120531.1436.el"

@@ -1,7 +1,7 @@
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (global-eldoc-mode -1)
-(add-to-list 'default-frame-alist '(left-fringe . 2))
+(add-to-list 'default-frame-alist '(left-fringe . 4))
 (add-to-list 'default-frame-alist '(right-fringe . 0))
 (setq visible-bell t)
 (setq inhibit-startup-screen t)
@@ -11,11 +11,10 @@
 (global-set-key (kbd "C-x k") #'kill-this-buffer)
 
 (setq scroll-conservatively 200) ; never recenter point
-(setq paragraph-start "\n"
-      paragraph-separate "\n")
 (setq-default indent-tabs-mode nil)
 (add-to-list 'default-frame-alist '(foreground-color . "#222222"))
 (set-face-attribute 'region nil :background "sky blue")
+(set-face-attribute 'default nil :height 105)
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
 (add-hook 'prog-mode-hook 'goto-address-mode)
 (add-hook 'text-mode-hook 'goto-address-mode)
@@ -27,74 +26,30 @@
 (set-face-attribute 'highlight nil :background "lemon chiffon")
 (show-paren-mode 1)
 
-; use minimap instead of scroll bar: https://github.com/dengste/minimap
+; to do: use minimap instead of scroll bar: https://github.com/dengste/minimap
 (setq scroll-bar-adjust-thumb-portion nil)
 (add-to-list 'default-frame-alist '(scroll-bar-width . 13))
 ; https://stackoverflow.com/questions/21175099/how-to-automatically-add-remove-scroll-bars-as-needed-by-text-height
 
-; dired
-(add-hook 'dired-mode-hook 'dired-hide-details-mode)
-(add-hook 'dired-mode-hook 'hl-line-mode)
-(setq dired-listing-switches "-l -I \"target\" -I \"*.lock\" -I \"#*#\"")
-(setq dired-recursive-deletes 'always)
-(setq dired-recursive-copies 'always)
-
-(defun dired-open-file ()
-  "open the thing under point; that can be either file or any other line of dired listing;"
-  (interactive)
-  (let ((file-name (dired-get-filename nil t)))
-    (cond
-     ((and (dirp file-name) (is-in-dirp "~/projects" file-name))
-      ; i3-msg move to workspace named "nameofproject", if there is no window named "nameofproject", load the saved emacs desktop
-      goto-desktop-open-emacs)
-     ((and (dirp file-name) (string-match "\\.m$" file-name))
-      ; open image-dired/movie in a new emacs window
-      open-image-dired-in-right-window)
-     ((dirp file-name)
-      expand-subtree
-      )
-     (t find-file-in-right-window))
-    )
-  (dired-find-file))
-(eval-after-load "dired"
-  '(define-key dired-mode-map [remap dired-find-file] 'dired-open-file))
-
-(defun go-to-link-at-point ()
-  "open the file path under cursor; if the path starts with “http://”, open the URL in browser; input path can be relative, full path, URL;"
-  (interactive)
-  (let (($path (ffap-file-at-point)))
-    (if (string-match-p "\\`https?://" $path)
-        (progn
-          (; if there is a Firefox window with name "$path", raise it; if not create one;
-           ))
-      (if (file-exists-p $path)
-          (progn
-            (; find-file and create a dired tree view of the project;
-             ))
-        (message "file doesn't exist: '%s';" $path)))))
-
 ; paragraphs
+(setq paragraph-start "\n" paragraph-separate "\n")
 (defun next-paragraph ()
   (interactive)
   (unless (bobp) (left-char))
   (forward-paragraph)
-  (unless (eobp)
-    (progn
-      (forward-paragraph)
-      (redisplay t)
-      (backward-paragraph)
-      (right-char))))
+  (unless (eobp) (progn (forward-paragraph)
+                        (redisplay t)
+                        (backward-paragraph)
+                        (right-char))))
 (global-set-key (kbd "C-<down>") 'next-paragraph)
 (defun previous-paragraph ()
   (interactive)
   (left-char)
   (backward-paragraph)
-  (unless (bobp)
-    (progn
-      (forward-paragraph)
-      (redisplay t)
-      (backward-paragraph)
-      (right-char))))
+  (unless (bobp) (progn (forward-paragraph)
+                        (redisplay t)
+                        (backward-paragraph)
+                        (right-char))))
 (global-set-key (kbd "C-<up>") 'previous-paragraph)
 
 ; adaptive wrap
@@ -156,6 +111,46 @@
 
 (setq-default proced-auto-update-flag t)
 (setq-default proced-auto-update-interval 2)
+
+; dired
+(add-hook 'dired-mode-hook 'dired-hide-details-mode)
+; (add-hook 'dired-mode-hook 'hl-line-mode)
+(setq dired-listing-switches "-l -I \"target\" -I \"*.lock\" -I \"#*#\"")
+(setq dired-recursive-deletes 'always)
+(setq dired-recursive-copies 'always)
+
+(defun dired-open-file ()
+  "open the thing under point; that can be either file or any other line of dired listing;"
+  (interactive)
+  (let ((file-name (dired-get-filename nil t)))
+    ;(cond
+    ; ((and (dirp file-name) (is-in-dirp "~/projects" file-name))
+    ;  ; i3-msg move to workspace named "nameofproject", if there is no window named "nameofproject", load the saved emacs desktop
+    ;  goto-desktop-open-emacs)
+    ; ((and (dirp file-name) (string-match "\\.m$" file-name))
+    ;  ; open image-dired/movie in a new emacs window
+    ;  open-image-dired-in-right-window)
+    ; ((dirp file-name)
+    ;  expand-subtree
+    ;  )
+    ; (t find-file-in-right-window))
+    ))
+;(eval-after-load "dired"
+;  '(define-key dired-mode-map [remap dired-find-file] 'dired-open-file))
+
+(defun go-to-link-at-point ()
+  "open the file path under cursor; if the path starts with “http://”, open the URL in browser; input path can be relative, full path, URL;"
+  (interactive)
+  (let (($path (ffap-file-at-point)))
+    (if (string-match-p "\\`https?://" $path)
+        (progn
+          (; if there is a web_browser window with name "$path", raise it; if not create one;
+           ))
+      (if (file-exists-p $path)
+          (progn
+            (; find-file and create a dired tree view of the project;
+             ))
+        (message "file doesn't exist: '%s';" $path)))))
 
 (require 'package)
 (defun require-package (package)
