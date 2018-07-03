@@ -26,7 +26,6 @@
 (set-face-attribute 'highlight nil :background "lemon chiffon")
 (show-paren-mode 1)
 
-; to do: use minimap instead of scroll bar: https://github.com/dengste/minimap
 (setq scroll-bar-adjust-thumb-portion nil)
 (add-to-list 'default-frame-alist '(scroll-bar-width . 13))
 ; https://stackoverflow.com/questions/21175099/how-to-automatically-add-remove-scroll-bars-as-needed-by-text-height
@@ -114,7 +113,7 @@
 
 ; dired
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
-; (add-hook 'dired-mode-hook 'hl-line-mode)
+(add-hook 'dired-mode-hook 'hl-line-mode)
 (setq dired-listing-switches "-l -I \"target\" -I \"*.lock\" -I \"#*#\"")
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
@@ -123,20 +122,22 @@
   "open the thing under point; that can be either file or any other line of dired listing;"
   (interactive)
   (let ((file-name (dired-get-filename nil t)))
-    ;(cond
-    ; ((and (dirp file-name) (is-in-dirp "~/projects" file-name))
-    ;  ; i3-msg move to workspace named "nameofproject", if there is no window named "nameofproject", load the saved emacs desktop
-    ;  goto-desktop-open-emacs)
-    ; ((and (dirp file-name) (string-match "\\.m$" file-name))
-    ;  ; open image-dired/movie in a new emacs window
-    ;  open-image-dired-in-right-window)
-    ; ((dirp file-name)
-    ;  expand-subtree
-    ;  )
-    ; (t find-file-in-right-window))
+    (cond
+     ((and (file-directory-p file-name) (string-match-p "/home/*/projects/*" file-name))
+      ; first move all windows in the main workspace into the hidden workspace, and rename the main workspace to "project_name"; then if there is an Emacs frame named "project_name", move it to the main workspace; otherwise load the saved Emacs desktop in the hidden workspace, then move the Emacs frame named "project_name" to the main workspace;
+      )
+     ((and (file-directory-p file-name) (string-match-p "\\.m$" file-name))
+      ; open image-dired/movie in in the right window
+      )
+     ((file-directory-p file-name)
+      ; expand subtree
+      )
+     (t
+      ; find file in the right window
+      ))
     ))
-;(eval-after-load "dired"
-;  '(define-key dired-mode-map [remap dired-find-file] 'dired-open-file))
+; (eval-after-load "dired"
+;   '(define-key dired-mode-map [remap dired-find-file] 'dired-open-file))
 
 (defun go-to-link-at-point ()
   "open the file path under cursor; if the path starts with “http://”, open the URL in browser; input path can be relative, full path, URL;"
@@ -144,11 +145,13 @@
   (let (($path (ffap-file-at-point)))
     (if (string-match-p "\\`https?://" $path)
         (progn
-          (; if there is a web_browser window with name "$path", raise it; if not create one;
+          (
+           ; if the web_browser with the profile corresponding to this project is not open, open it; then if there is a web_browser window named "project-name, $path", raise it; otherwise create it;
            ))
       (if (file-exists-p $path)
           (progn
-            (; find-file and create a dired tree view of the project;
+            (
+             ; if there is an emacs frame named "project-name, $path", raise it; otherwise create it;
              ))
         (message "file doesn't exist: '%s';" $path)))))
 

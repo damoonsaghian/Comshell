@@ -26,9 +26,6 @@ two spaces -> elastic blocks
 Emacs is a really good piece of software. ELisp is terrible as a programming language, but it's pretty good as a command interface (ie as a shell like Bash).
 ; cp init.el ~/.emacs.d/init.el
 
-"https://emacs.stackexchange.com/questions/35647/only-open-files-which-should-be-opened-via-emacs-via-ret-in-dired/"
-"https://github.com/thomp/dired-launch/blob/master/dired-launch.el"
-"https://github.com/bbatsov/crux"
 "https://github.com/Fuco1/dired-hacks/blob/master/dired-open.el"
 "https://melpa.org/packages/openwith-20120531.1436.el"
 "http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
@@ -116,3 +113,4 @@ lsp-rust, lsp-flycheck
   "https://www.emacswiki.org/emacs/ThesauriAndSynonyms"
   "https://github.com/atykhonov/google-translate"
 "https://github.com/domtronn/all-the-icons.el"
+"https://github.com/dengste/minimap"
