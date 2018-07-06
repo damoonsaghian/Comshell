@@ -26,6 +26,10 @@ two spaces -> elastic blocks
 Emacs is a really good piece of software. ELisp is terrible as a programming language, but it's pretty good as a command interface (ie as a shell like Bash).
 ; cp init.el ~/.emacs.d/init.el
 
+"https://www.emacswiki.org/emacs/Scrolling#toc4"
+
+"https://emacs.stackexchange.com/questions/14638/change-highlight-color-when-window-isnt-in-focus"
+
 "https://github.com/Fuco1/dired-hacks/blob/master/dired-open.el"
 "https://melpa.org/packages/openwith-20120531.1436.el"
 "http://mads-hartmann.com/2016/05/12/emacs-tree-view.html"
@@ -36,6 +40,15 @@ next file:
 , next file
 , open (in the window at right, go to the first line)
 "https://www.emacswiki.org/emacs/DiredView"
+"http://www.ict4g.net/adolfo/notes/2014/11/16/dirtree.html"
+"https://github.com/jojojames/dired-sidebar"
+"https://www.emacswiki.org/emacs/NeoTree"
+"https://github.com/jaypei/emacs-neotree"
+
+"https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffers-and-Frames.html"
+"https://stackoverflow.com/questions/5079466/hide-emacs-echo-area-during-inactivity"
+"https://emacs.stackexchange.com/questions/1074/how-to-display-the-content-of-minibuffer-in-the-middle-of-the-emacs-frame"
+"https://www.emacswiki.org/emacs/Dedicated_Minibuffer_Frame"
 
 view-mode
 "https://github.com/emacs-evil/evil"

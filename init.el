@@ -1,23 +1,21 @@
 (tool-bar-mode -1)
 (menu-bar-mode -1)
-(global-eldoc-mode -1)
-(add-to-list 'default-frame-alist '(left-fringe . 4))
-(add-to-list 'default-frame-alist '(right-fringe . 0))
 (setq visible-bell t)
-(setq inhibit-startup-screen t)
 (setq insert-default-directory nil)
+(setq inhibit-startup-screen t)
 (setq make-backup-files nil)
-; (setq-default mode-line-format nil)
 (global-set-key (kbd "C-x k") #'kill-this-buffer)
 
-(setq scroll-conservatively 200) ; never recenter point
-(setq-default indent-tabs-mode nil)
-(add-to-list 'default-frame-alist '(foreground-color . "#222222"))
-(set-face-attribute 'region nil :background "sky blue")
-(set-face-attribute 'default nil :height 105)
-(set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
-(add-hook 'prog-mode-hook 'goto-address-mode)
-(add-hook 'text-mode-hook 'goto-address-mode)
+(setq window-divider-default-places t
+      window-divider-default-right-width 2
+      window-divider-default-bottom-width 1)
+(window-divider-mode 1)
+(add-to-list 'default-frame-alist '(scroll-bar-width . 13))
+(setq scroll-bar-adjust-thumb-portion nil)
+(add-to-list 'default-frame-alist '(left-fringe . 5))
+(add-to-list 'default-frame-alist '(right-fringe . 0))
+
+; (setq-default mode-line-format nil)
 
 (setq-default cursor-type 'bar)
 (setq blink-cursor-blinks 0)
@@ -25,10 +23,15 @@
 (global-hl-line-mode 1)
 (set-face-attribute 'highlight nil :background "lemon chiffon")
 (show-paren-mode 1)
+(setq scroll-conservatively 200) ; never recenter point
+(global-eldoc-mode -1)
 
-(setq scroll-bar-adjust-thumb-portion nil)
-(add-to-list 'default-frame-alist '(scroll-bar-width . 13))
-; https://stackoverflow.com/questions/21175099/how-to-automatically-add-remove-scroll-bars-as-needed-by-text-height
+(add-to-list 'default-frame-alist '(foreground-color . "#222222"))
+(set-face-attribute 'region nil :background "sky blue")
+(set-face-attribute 'default nil :height 105)
+(set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
+(add-hook 'prog-mode-hook 'goto-address-mode)
+(add-hook 'text-mode-hook 'goto-address-mode)
 
 ; paragraphs
 (setq paragraph-start "\n" paragraph-separate "\n")
@@ -51,8 +54,9 @@
                         (right-char))))
 (global-set-key (kbd "C-<up>") 'previous-paragraph)
 
-; adaptive wrap
-; this is taken from adaptive-wrap package;
+(setq-default indent-tabs-mode nil)
+
+; adaptive wrap (this is taken from adaptive-wrap package);
 (defun adaptive-wrap-fill-context-prefix (beg en)
   "like `fill-context-prefix', but with length 2;"
   ; note: fill-context-prefix may return nil; see: http://article.gmane.org/gmane.emacs.devel/156285
@@ -107,9 +111,6 @@
         (remove-text-properties (point-min) (point-max) '(wrap-prefix nil))))))
 (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
 (global-visual-line-mode +1)
-
-(setq-default proced-auto-update-flag t)
-(setq-default proced-auto-update-interval 2)
 
 ; dired
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
