@@ -1,7 +1,6 @@
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (setq visible-bell t)
-(setq insert-default-directory nil)
 (setq inhibit-startup-screen t)
 (setq make-backup-files nil)
 (global-set-key (kbd "C-x k") #'kill-this-buffer)
@@ -10,24 +9,39 @@
       window-divider-default-right-width 2
       window-divider-default-bottom-width 1)
 (window-divider-mode 1)
-(add-to-list 'default-frame-alist '(scroll-bar-width . 13))
 (setq scroll-bar-adjust-thumb-portion nil)
-(add-to-list 'default-frame-alist '(left-fringe . 5))
+(add-to-list 'default-frame-alist '(scroll-bar-width . 13))
+(add-to-list 'default-frame-alist '(left-fringe . 2))
 (add-to-list 'default-frame-alist '(right-fringe . 0))
 
 ; (setq-default mode-line-format nil)
+(setq insert-default-directory nil)
+(global-eldoc-mode -1)
 
 (setq-default cursor-type 'bar)
 (setq blink-cursor-blinks 0)
 (set-face-attribute 'cursor nil :background "red")
-(global-hl-line-mode 1)
-(set-face-attribute 'highlight nil :background "lemon chiffon")
-(show-paren-mode 1)
+
 (setq scroll-conservatively 200) ; never recenter point
-(global-eldoc-mode -1)
+; move point to top/bottom of buffer before signaling a scrolling error;
+(setq scroll-error-top-bottom t)
+
+(global-hl-line-mode 1)
+(setq global-hl-line-sticky-flag t)
+(set-face-attribute 'hl-line nil :background "lemon chiffon")
+; make highlighted lines in other (not selected) windows gray;
+(defun hl-line-update-face (window)
+  "update the `hl-line' face in WINDOW to indicate whether the window is selected;"
+  (with-current-buffer (window-buffer window)
+    (when (or global-hl-line-mode hl-line-mode)
+      (if (eq (current-buffer) (window-buffer (selected-window)))
+          (face-remap-reset-base 'hl-line)
+        (face-remap-set-base 'hl-line :background "#dddddd")))))
+(add-hook 'buffer-list-update-hook
+          (lambda () (walk-windows #'hl-line-update-face nil t)))
 
 (add-to-list 'default-frame-alist '(foreground-color . "#222222"))
-(set-face-attribute 'region nil :background "sky blue")
+(set-face-attribute 'region nil :background "LightSkyBlue1")
 (set-face-attribute 'default nil :height 105)
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
 (add-hook 'prog-mode-hook 'goto-address-mode)
@@ -114,7 +128,6 @@
 
 ; dired
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
-(add-hook 'dired-mode-hook 'hl-line-mode)
 (setq dired-listing-switches "-l -I \"target\" -I \"*.lock\" -I \"#*#\"")
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
