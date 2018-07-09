@@ -14,7 +14,7 @@
 (add-to-list 'default-frame-alist '(left-fringe . 2))
 (add-to-list 'default-frame-alist '(right-fringe . 0))
 
-; (setq-default mode-line-format nil)
+;; (setq-default mode-line-format nil)
 (setq insert-default-directory nil)
 (global-eldoc-mode -1)
 
@@ -22,14 +22,14 @@
 (setq blink-cursor-blinks 0)
 (set-face-attribute 'cursor nil :background "red")
 
-(setq scroll-conservatively 200) ; never recenter point
-; move point to top/bottom of buffer before signaling a scrolling error;
+(setq scroll-conservatively 200) ;; never recenter point
+;; move point to top/bottom of buffer before signaling a scrolling error;
 (setq scroll-error-top-bottom t)
 
 (global-hl-line-mode 1)
 (setq global-hl-line-sticky-flag t)
 (set-face-attribute 'hl-line nil :background "lemon chiffon")
-; make highlighted lines in other (not selected) windows gray;
+;; make highlighted lines in other (not selected) windows gray;
 (defun hl-line-update-face (window)
   "update the `hl-line' face in WINDOW to indicate whether the window is selected;"
   (with-current-buffer (window-buffer window)
@@ -47,7 +47,7 @@
 (add-hook 'prog-mode-hook 'goto-address-mode)
 (add-hook 'text-mode-hook 'goto-address-mode)
 
-; paragraphs
+;; paragraphs
 (setq paragraph-start "\n" paragraph-separate "\n")
 (defun next-paragraph ()
   (interactive)
@@ -70,10 +70,10 @@
 
 (setq-default indent-tabs-mode nil)
 
-; adaptive wrap (this is taken from adaptive-wrap package);
+;; adaptive wrap (this is taken from adaptive-wrap package);
 (defun adaptive-wrap-fill-context-prefix (beg en)
   "like `fill-context-prefix', but with length 2;"
-  ; note: fill-context-prefix may return nil; see: http://article.gmane.org/gmane.emacs.devel/156285
+  ;; note: fill-context-prefix may return nil; see: http://article.gmane.org/gmane.emacs.devel/156285
   (let* ((fcp (or (fill-context-prefix beg en) ""))
          (fcp-len (string-width fcp))
          (fill-char (if (< 0 fcp-len)
@@ -84,9 +84,9 @@
 
 (defun adaptive-wrap-prefix-function (beg end)
   "indent the region between BEG and END with adaptive filling;"
-  ; any change at the beginning of a line might change its wrap prefix, which affects the whole line;
-  ; so we need to "round-up" `end' to the nearest end of line;
-  ; we do the same with `beg' although it's probably not needed;
+  ;; any change at the beginning of a line might change its wrap prefix, which affects the whole line;
+  ;; so we need to "round-up" `end' to the nearest end of line;
+  ;; we do the same with `beg' although it's probably not needed;
   (goto-char end)
   (unless (bolp) (forward-line 1))
   (setq end (point))
@@ -100,8 +100,8 @@
                          'wrap-prefix
                          (let ((pfx (adaptive-wrap-fill-context-prefix
                                      lbp (point))))
-                           ; remove any `wrap-prefix' property that might have been added earlier;
-                           ; otherwise, we end up with a string containing a `wrap-prefix' string, containing a `wrap-prefix' string ...
+                           ;; remove any `wrap-prefix' property that might have been added earlier;
+                           ;; otherwise, we end up with a string containing a `wrap-prefix' string, containing a `wrap-prefix' string ...
                            (remove-text-properties 0 (length pfx) '(wrap-prefix) pfx)
                            pfx))))
   `(jit-lock-bounds ,beg . ,end))
@@ -112,9 +112,9 @@
   :group 'visual-line
   (if adaptive-wrap-prefix-mode
       (progn
-        ; HACK ATTACK! we want to run after font-lock (so our wrap-prefix includes the faces applied by font-lock),
-        ; but  jit-lock-register doesn't accept an `append' argument,
-        ; so we add ourselves beforehand, to make sure we're at the end of the hook (bug#15155);
+        ;; HACK ATTACK! we want to run after font-lock (so our wrap-prefix includes the faces applied by font-lock),
+        ;; but  jit-lock-register doesn't accept an `append' argument,
+        ;; so we add ourselves beforehand, to make sure we're at the end of the hook (bug#15155);
         (add-hook 'jit-lock-functions
                   #'adaptive-wrap-prefix-function 'append t)
         (jit-lock-register #'adaptive-wrap-prefix-function))
@@ -125,49 +125,6 @@
         (remove-text-properties (point-min) (point-max) '(wrap-prefix nil))))))
 (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
 (global-visual-line-mode +1)
-
-; dired
-(add-hook 'dired-mode-hook 'dired-hide-details-mode)
-(setq dired-listing-switches "-l -I \"target\" -I \"*.lock\" -I \"#*#\"")
-(setq dired-recursive-deletes 'always)
-(setq dired-recursive-copies 'always)
-
-(defun dired-open-file ()
-  "open the thing under point; that can be either file or any other line of dired listing;"
-  (interactive)
-  (let ((file-name (dired-get-filename nil t)))
-    (cond
-     ((and (file-directory-p file-name) (string-match-p "/home/*/projects/*" file-name))
-      ; first move all windows in the main workspace into the hidden workspace, and rename the main workspace to "project_name"; then if there is an Emacs frame named "project_name", move it to the main workspace; otherwise load the saved Emacs desktop in the hidden workspace, then move the Emacs frame named "project_name" to the main workspace;
-      )
-     ((and (file-directory-p file-name) (string-match-p "\\.m$" file-name))
-      ; open image-dired/movie in in the right window
-      )
-     ((file-directory-p file-name)
-      ; expand subtree
-      )
-     (t
-      ; find file in the right window
-      ))
-    ))
-; (eval-after-load "dired"
-;   '(define-key dired-mode-map [remap dired-find-file] 'dired-open-file))
-
-(defun go-to-link-at-point ()
-  "open the file path under cursor; if the path starts with “http://”, open the URL in browser; input path can be relative, full path, URL;"
-  (interactive)
-  (let (($path (ffap-file-at-point)))
-    (if (string-match-p "\\`https?://" $path)
-        (progn
-          (
-           ; if the web_browser with the profile corresponding to this project is not open, open it; then if there is a web_browser window named "project-name, $path", raise it; otherwise create it;
-           ))
-      (if (file-exists-p $path)
-          (progn
-            (
-             ; if there is an emacs frame named "project-name, $path", raise it; otherwise create it;
-             ))
-        (message "file doesn't exist: '%s';" $path)))))
 
 (require 'package)
 (defun require-package (package)
@@ -185,5 +142,137 @@
       (package-install package))))
 (add-to-list 'package-archives
 	     '("melpa" . "https://melpa.org/packages/") t)
-;(package-initialize)
-;(require-package 'package-name)
+;; (package-initialize)
+;; (require-package 'package-name)
+
+;; dired
+;; https://github.com/Fuco1/dired-hacks/blob/master/dired-open.el
+;; https://melpa.org/packages/openwith-20120531.1436.el
+;; http://mads-hartmann.com/2016/05/12/emacs-tree-view.html
+;; https://github.com/Fuco1/dired-hacks/blob/master/dired-subtree.el
+;; https://emacs.stackexchange.com/questions/12153/does-some-command-exist-which-goes-to-the-next-file-of-the-current-directory
+;; next file:
+;; , go to tree view
+;; , next file
+;; , open (in the window at right, go to the first line)
+;; https://www.emacswiki.org/emacs/DiredView
+;; https://github.com/jojojames/dired-sidebar
+
+(add-hook 'dired-mode-hook 'dired-hide-details-mode)
+(setq dired-listing-switches "-l -I \"target\" -I \"*.lock\" -I \"#*#\"")
+(setq dired-recursive-deletes 'always)
+(setq dired-recursive-copies 'always)
+
+(defun dired-open-file ()
+  "open the thing under point; that can be either file or any other line of dired listing;"
+  (interactive)
+  (let ((file-name (dired-get-filename nil t)))
+    (cond
+     ((and (file-directory-p file-name) (string-match-p "/home/*/projects/*" file-name))
+      ;; first move all windows in the main workspace into the hidden workspace, and rename the main workspace to "project_name"; then if there is an Emacs frame named "project_name", move it to the main workspace; otherwise load the saved Emacs desktop in the hidden workspace, then move the Emacs frame named "project_name" to the main workspace;
+      )
+     ((and (file-directory-p file-name) (string-match-p "\\.m$" file-name))
+      ;; open image-dired/movie in in the right window
+      )
+     ((file-directory-p file-name)
+      ;; expand subtree
+      )
+     (t
+      ;; find file in the right window
+      ))
+    ))
+;; (eval-after-load "dired"
+;;   '(define-key dired-mode-map [remap dired-find-file] 'dired-open-file))
+
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/FFAP.html
+(defun go-to-link-at-point ()
+  "open the file path under cursor; if the path starts with “http://”, open the URL in browser; input path can be relative, full path, URL;"
+  (interactive)
+  (let (($path (ffap-file-at-point)))
+    (if (string-match-p "\\`https?://" $path)
+        (progn
+          (
+           ;; if the web_browser with the profile corresponding to this project is not open, open it; then if there is a web_browser window named "project-name, $path", raise it; otherwise create it;
+           ))
+      (if (file-exists-p $path)
+          (progn
+            (
+             ;; if there is an emacs frame named "project-name, $path", raise it; otherwise create it;
+             ))
+        (message "file doesn't exist: '%s';" $path)))))
+
+;; https://www.emacswiki.org/emacs/BrowseUrl
+;; https://www.chromium.org/user-experience/multi-profiles
+
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffers-and-Frames.html
+;; https://stackoverflow.com/questions/5079466/hide-emacs-echo-area-during-inactivity
+;; https://emacs.stackexchange.com/questions/1074/how-to-display-the-content-of-minibuffer-in-the-middle-of-the-emacs-frame
+;; https://www.emacswiki.org/emacs/Dedicated_Minibuffer_Frame
+
+;; view-mode
+;; https://github.com/emacs-evil/evil
+;; https://github.com/emacs-evil/evil-collection
+;; https://www.gnu.org/software/emacs/manual/html_mono/viper.html
+;; https://github.com/mrkkrp/modalka
+;; https://github.com/jyp/boon
+;; http://retroj.net/modal-mode
+;; https://github.com/abo-abo/hydra
+;; https://github.com/chrisdone/god-mode
+;; https://github.com/xahlee/xah-fly-keys
+;; https://github.com/ergoemacs/ergoemacs-mode
+;; https://github.com/justbur/emacs-which-key
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
+
+;; https://orgmode.org/manual/Tables.html
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html
+;; http://shallowsky.com/blog/linux/editors/graphics-in-emacs.html
+;; https://www.gnu.org/software/auctex
+;; https://github.com/aaptel/preview-latex
+;; https://github.com/josteink/wsd-mode
+;; https://jblevins.org/projects/markdown-mode/
+;; http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
+;; https://www.emacswiki.org/emacs/ThumbsMode
+;; https://www.gnu.org/software/emms/screenshots.html
+;; http://wikemacs.org/wiki/Media_player
+;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
+;; https://github.com/larsmagne/movie.el
+;; https://github.com/dbrock/bongo
+;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
+
+;; https://github.com/dengste/minimap
+
+;; lsp-rust, lsp-flycheck
+;; https://christian.kellner.me/2017/05/31/language-server-protocol-lsp-rust-and-emacs/
+;; https://github.com/rust-lang/rust-mode
+;; https://github.com/kwrooijen/cargo.el
+;; https://github.com/racer-rust/emacs-racer
+;; https://github.com/flycheck/flycheck-rust
+;; http://julienblanchard.com/2016/fancy-rust-development-with-emacs/
+
+;; https://github.com/hlissner/doom-emacs/wiki/FAQ#how-is-dooms-startup-so-fast
+;; https://www.emacswiki.org/emacs/DiredSync
+;; http://ergoemacs.org/emacs/emacs_magit-mode_tutorial.html
+;;   https://magit.vc/
+;;   https://github.com/vermiculus/magithub
+;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el
+;; https://github.com/DarthFennec/highlight-indent-guides
+;;   https://github.com/zk-phi/indent-guide
+;; https://www.gnu.org/software/emacs/manual/html_node/gnus/index.html
+;;   https://www.gnu.org/software/emacs/manual/html_node/message/index.html
+;;   https://www.gnu.org/software/emacs/manual/html_node/emacs/Gnus.html
+;;   https://www.gnu.org/software/emacs/manual/html_node/emacs/Sending-Mail.html
+;;   https://www.gnu.org/software/emacs/manual/html_node/emacs/Rmail.html
+;;   https://www.gnu.org/software/emacs/manual/html_node/mh-e/index.html
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Calendar_002fDiary.html
+;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Timers.html
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Spelling.html
+;; https://www.emacswiki.org/emacs/DictMode
+;;   https://www.emacswiki.org/emacs/DictEm
+;;   https://www.emacswiki.org/emacs/wordnik.el
+;;   https://github.com/gromnitsky/wordnut
+;;   https://www.emacswiki.org/emacs/ThesauriAndSynonyms
+;;   https://github.com/atykhonov/google-translate
+;; https://www.gnu.org/software/emacs/manual/html_node/calc/index.html
+;; https://github.com/domtronn/all-the-icons.el
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Document-View.html

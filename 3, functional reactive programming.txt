@@ -1,0 +1,49 @@
+imperative programming is done by procedurally changing stored values, it resembles the way CPU runs the instructions stored in memory;
+imperative programming leads to unmaintainable code in large programs, and it makes writing parallel programs a cumbersome task;
+
+functional reactive programming:
+when the output channels of a function is empty and the input channels are full, the function consumes its inputs and fills its outputs with computed values;
+initially all channels have default values, so feedbacks are possible;
+
+functions just compute new data, they don't change anything outside of the function; but many computations need to mutate the data given to them, because the data is big and copying it would be inefficient;
+one method as seen in languages like Haskell and Clojure is to use persistent data structures; in this method only the mutated part of data is computed and the rest of data is accessed through a reference to the original data; this may introduce some efficiency costs, but more importantly this method needs garbage collection;
+another method is to use value semantics and copy_on_write, as in Swift; this method introduces some run_time cost because of reference counting; (it's actually a run_time solution)
+the key to a real solution is move semantics (also known as uniqueness or linear types), as used in LinearML, Mercury and Rust; note that none of these languages need run_time garbage collection;
+
+passing data across functions:
+, copy (for small primitive data)
+, borrow (immutable, lifetime is known at compile_time)
+, counted reference (immutable, lifetime is unknown at compile_time)
+, move (for linear type data, in_place mutability is possible)
+
+, static data (like functions): no problem, share by reference
+, dynamic data
+  , small data: move it, or share by copying
+  , big data: move (no sharing)
+functional reactive programming allow us to program without the need to share big data;
+
+keep related states in one place (to avoid copying big data);
+a set of messages as input;
+each kind of message changes one part of the state;
+
+from "Henry G Baker, use_once variables and linear objects":
+programming languages should have use_once variables in addition to the usual multiple_use variables; use_once variables are bound to linear (unshared, unaliased, or singly_referenced) objects; linear objects are cheap to access and manage, because they require no synchronization or tracing garbage collection; linear objects can elegantly and efficiently solve otherwise difficult problems of functional systems, eg in_place updating and the efficient initialization of functional objects;
+a use_once variable must be dynamically referenced exactly once within its scope; unreferenced use_once variables must be explicitly killed, and multiply_referenced use_once variables must be explicitly copied; use_once variables are bound only to linear objects, which may reference other linear or non_linear objects; non_linear objects can reference other non_linear objects, but can reference a linear object only in a way that ensures mutual exclusion;
+linear objects and use_once variables map elegantly into data_flow models of concurrent computation; and the graphical representations of data_flow models make an appealing visual linear programming language;
+the acceptance by a function of a linear argument object places a great responsibility on the function; the function must either pass the linear object to another function as an argument, explicitly dispose of it, or return it as a return value;
+a linear language is ideal for a dataflow architecture, which must explicitly duplicate/delete (linear) tokens;
+
+move semantics + streams: the right approach to functional reactive programming
+
+in software, there is a limited number of central processing units (unlike in hardware where there is distinct processing units); so we use an event_loop and thread pool to implement functional reactive programming;
+"https://tokio.rs/docs/going-deeper-futures/futures-mechanics/#adapters"
+"https://tokio.rs/docs/going-deeper-futures/synchronization/#channels"
+"https://tokio.rs/docs/going-deeper-futures/futures-model/"
+"http://asquera.de/blog/2017-03-01/the-future-with-futures/"
+"https://docs.rs/futures/0.1.17/futures/"
+"https://docs.rs/futures/0.1.17/futures/stream/index.html"
+"https://docs.rs/futures/0.1.17/futures/stream/trait.Stream.html"
+"https://docs.rs/futures/0.1.17/futures/sync/mpsc/struct.Receiver.html"
+"https://docs.rs/futures-cpupool/0.1.5/futures_cpupool/"
+"https://docs.rs/fibers/0.1.6/fibers/"
+"https://docs.rs/bus/1.3.1/bus/"
