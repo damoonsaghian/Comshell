@@ -1,20 +1,17 @@
 software rendering gives us a lot more flexibility, since we are not any more limited by a hardware implementation with triangle only rasterization, isolated shader programs, and fixed size buffers;
 
-font-rs
 "https://github.com/google/font-rs"
 "https://docs.rs/rusterize/"
 "https://docs.rs/softrender/"
 "https://crates.io/crates/line_drawing"
 "https://www.siggraph.org/education/materials/HyperGraph/scanline/outprims/drawline.htm"
-"https://en.wikipedia.org/wiki/Bresenham's_line_algorithm"
 "https://en.wikipedia.org/wiki/Midpoint_circle_algorithm"
 "https://en.wikipedia.org/wiki/Xiaolin_Wu%27s_line_algorithm"
 "http://members.chello.at/~easyfilter/bresenham.html"
 "https://nothings.org/gamedev/rasterize/"
 "https://magcius.github.io/xplain/article/"
 
-graphical objects are made of primitives; primitives are defined using a set of
-parameters; each primitive has a specific algorithm for rasterization;
+graphical objects are made of primitives; primitives are defined using a set of parameters; each primitive has a specific algorithm for rasterization;
 2d primitives: point, line, curve, triangle, curved area;
 3d objects made of flat surfaces will be broken up into triangles;
 3d objects made of curved surfaces can be broken up into a number of primitive 3d surfaces which can be easily projected to 2d;
@@ -36,7 +33,7 @@ graphical objects are of 2 kinds:
 (framebuffer uses double buffering and v_sync)
 note that if an object just moves in x_y plane (without rotation), the cached rasterization is still useful; for 2d objects we simply add a constant to the position of all pixels; for 3d objects we may additionally want to recompute the lighting of pixels from fragments;
 
-graphical objects:
+graphical data:
 , primitives
 , material
 , cached rasterization (can be none)

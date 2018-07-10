@@ -7,7 +7,7 @@ boot to an existing Arch Linux (the live image, or an already installed Arch Lin
 
 list disks using "fdisk -l"; then use "fdisk /dev/sdx" to create 3 partitions:
   , +1M BIOS boot (code 4)
-  , +550G EFI System (code 1)
+  , +550M EFI System (code 1)
   , and the rest for Linux filesystem (code 20)
 format the partitions:
   ; mkfs.fat -F32 /dev/sdx2; mkfs.btrfs /dev/sdx3
@@ -20,6 +20,12 @@ format the partitions:
 ; arch-chroot /mnt
 install packages (to save bandwidth you can copy your already downloaded packages to "/mnt/var/cache/pacman/pkg"):
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat btrfs-progs nano man-db logrotate networkmanager pulseaudio-alsa sudo udisks2 unzip rust rust-docs gcc xorg-server xf86-video-{intel,nouveau,amdgpu} xorg-xinit i3-wm i3status xdotool deepin-gtk-theme ttf-hack emacs ttf-droid chromium mpv
+
+monospace fonts: wide characters are forced to squeeze, narrow characters are forced to stretch, uppercase letters look skinny next to lowercase, and bold characters don’t have enough room;
+proportional font for code: generous spacing, large punctuation, and easily distinguishable characters, while allowing each character to take up the space that it needs;
+"http://input.fontbureau.com/info/"
+two spaces -> elastic blocks
+"http://nickgravgaard.com/elastic-tabstops/"
 
 install bootloader:
 ; grub-install --target=i386-pc /dev/sdx
@@ -49,6 +55,7 @@ create user:
   [Settings]
   gtk-theme-name = deepin
   gtk-font-name = Sans
+
 ; nano ~/.bash_profile
   export TZ="/usr/share/zoneinfo/<your_location>"
   startx
@@ -59,12 +66,6 @@ create user:
 ; cp i3.conf ~/.config/i3/config
 ; mkdir -p ~/.config/i3status
 ; cp i3status.conf ~/.config/i3status/config
-
-monospace fonts: wide characters are forced to squeeze, narrow characters are forced to stretch, uppercase letters look skinny next to lowercase, and bold characters don’t have enough room;
-proportional font for code: generous spacing, large punctuation, and easily distinguishable characters, while allowing each character to take up the space that it needs;
-"http://input.fontbureau.com/info/"
-two spaces -> elastic blocks
-"http://nickgravgaard.com/elastic-tabstops/"
 
 ; cp init.el ~/.emacs.d/init.el
 ELisp is terrible as a programming language, but it's pretty good as a command interface (ie as a shell, like Bash).

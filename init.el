@@ -18,13 +18,13 @@
 (setq insert-default-directory nil)
 (global-eldoc-mode -1)
 
-(setq-default cursor-type 'bar)
-(setq blink-cursor-blinks 0)
-(set-face-attribute 'cursor nil :background "red")
-
 (setq scroll-conservatively 200) ;; never recenter point
 ;; move point to top/bottom of buffer before signaling a scrolling error;
 (setq scroll-error-top-bottom t)
+
+(setq-default cursor-type 'bar)
+(setq blink-cursor-blinks 0)
+(set-face-attribute 'cursor nil :background "red")
 
 (global-hl-line-mode 1)
 (setq global-hl-line-sticky-flag t)
@@ -142,8 +142,7 @@
       (package-install package))))
 (add-to-list 'package-archives
 	     '("melpa" . "https://melpa.org/packages/") t)
-;; (package-initialize)
-;; (require-package 'package-name)
+(package-initialize)
 
 ;; dired
 ;; https://github.com/Fuco1/dired-hacks/blob/master/dired-open.el
@@ -156,7 +155,16 @@
 ;; , next file
 ;; , open (in the window at right, go to the first line)
 ;; https://www.emacswiki.org/emacs/DiredView
-;; https://github.com/jojojames/dired-sidebar
+
+(require-package 'dired-sidebar)
+(setq dired-sidebar-should-follow-file t)
+(setq dired-sidebar-theme none)
+(setq dired-sidebar-mode-line-format nil)
+(defun dired-sidebar-open-sidebar (dir-to-show)
+  (let ((file-to-show (dired-sidebar-get-file-to-show)))
+    (dired-sidebar-show-sidebar (dired-sidebar-get-or-create-buffer dir-to-show))
+    (with-selected-window (selected-window)
+      (dired-sidebar-point-at-file file-to-show dir-to-show))))
 
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
 (setq dired-listing-switches "-l -I \"target\" -I \"*.lock\" -I \"#*#\"")
