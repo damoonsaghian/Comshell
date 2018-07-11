@@ -143,12 +143,12 @@
 (add-to-list 'package-archives
 	     '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
+;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el
 
 ;; dired
-;; https://github.com/Fuco1/dired-hacks/blob/master/dired-open.el
-;; https://melpa.org/packages/openwith-20120531.1436.el
 ;; http://mads-hartmann.com/2016/05/12/emacs-tree-view.html
 ;; https://github.com/Fuco1/dired-hacks/blob/master/dired-subtree.el
+;; https://github.com/jojojames/dired-sidebar/blob/master/dired-sidebar.el
 ;; https://emacs.stackexchange.com/questions/12153/does-some-command-exist-which-goes-to-the-next-file-of-the-current-directory
 ;; next file:
 ;; , go to tree view
@@ -156,37 +156,41 @@
 ;; , open (in the window at right, go to the first line)
 ;; https://www.emacswiki.org/emacs/DiredView
 
-(require-package 'dired-sidebar)
-(setq dired-sidebar-should-follow-file t)
-(setq dired-sidebar-theme none)
-(setq dired-sidebar-mode-line-format nil)
-(defun dired-sidebar-open-sidebar (dir-to-show)
-  (let ((file-to-show (dired-sidebar-get-file-to-show)))
-    (dired-sidebar-show-sidebar (dired-sidebar-get-or-create-buffer dir-to-show))
-    (with-selected-window (selected-window)
-      (dired-sidebar-point-at-file file-to-show dir-to-show))))
-
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
 (setq dired-listing-switches "-l -I \"target\" -I \"*.lock\" -I \"#*#\"")
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
 
+;; (eval-after-load "dired"
+;;   (require-package 'dired-subtree)
+;;   (setq dired-subtree-use-backgrounds nil))
+
 (defun dired-open-file ()
-  "open the thing under point; that can be either file or any other line of dired listing;"
+  "open the thing under point, that can be a file or any other line of dired listing;"
   (interactive)
   (let ((file-name (dired-get-filename nil t)))
     (cond
      ((and (file-directory-p file-name) (string-match-p "/home/*/projects/*" file-name))
-      ;; first move all windows in the main workspace into the hidden workspace, and rename the main workspace to "project_name"; then if there is an Emacs frame named "project_name", move it to the main workspace; otherwise load the saved Emacs desktop in the hidden workspace, then move the Emacs frame named "project_name" to the main workspace;
+      ;; first move all windows in the main workspace into the hidden workspace, and rename the main workspace to "project_name";
+      ;; then if there is an Emacs frame named "project_name*", if a window named "project_name" exist, move it to the main workspace, otherwise close all windows named "project_name*"; then do the next line;
+      ;; if there is no Emacs frame named "project_name*", load the saved Emacs desktop in the project directory, and open its windows in the hidden workspace; then if there is a frame named "project_name", move it to the main workspace, otherwise create it;
       )
-     ((and (file-directory-p file-name) (string-match-p "\\.m$" file-name))
-      ;; open image-dired/movie in in the right window
+     ((and (file-directory-p file-name) (string-match-p "\\.m\\'" file-name))
+      (dired-find-file)
+      ;; open image-dired/movie in the right window
+      ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
+      ;; https://github.com/larsmagne/movie.el
+      ;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
       )
      ((file-directory-p file-name)
-      ;; expand subtree
+      ;; first remove all subtrees not in the current path;
+      (dired-subtree-insert)
+      ;; open the first file of the subtree;
+      (dired-next-line 1)
+      (dired-open-file)
       )
      (t
-      ;; find file in the right window
+      (dired-find-file)
       ))
     ))
 ;; (eval-after-load "dired"
@@ -243,10 +247,7 @@
 ;; https://www.emacswiki.org/emacs/ThumbsMode
 ;; https://www.gnu.org/software/emms/screenshots.html
 ;; http://wikemacs.org/wiki/Media_player
-;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
-;; https://github.com/larsmagne/movie.el
 ;; https://github.com/dbrock/bongo
-;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
 
 ;; https://github.com/dengste/minimap
 
@@ -263,7 +264,6 @@
 ;; http://ergoemacs.org/emacs/emacs_magit-mode_tutorial.html
 ;;   https://magit.vc/
 ;;   https://github.com/vermiculus/magithub
-;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el
 ;; https://github.com/DarthFennec/highlight-indent-guides
 ;;   https://github.com/zk-phi/indent-guide
 ;; https://www.gnu.org/software/emacs/manual/html_node/gnus/index.html
