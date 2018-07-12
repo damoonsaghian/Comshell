@@ -126,29 +126,10 @@
 (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
 (global-visual-line-mode +1)
 
-(require 'package)
-(defun require-package (package)
-  (unless (require package nil 'noerror)
-    (progn
-      (unless (assoc package package-archive-contents)
-	(package-refresh-contents))
-      (package-install package)
-      (require package))))
-(defun install-package (package)
-  (unless (package-installed-p package nil 'noerror)
-    (progn
-      (unless (assoc package package-archive-contents)
-	(package-refresh-contents))
-      (package-install package))))
-(add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/") t)
-(package-initialize)
-;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el
-
 ;; dired
-;; http://mads-hartmann.com/2016/05/12/emacs-tree-view.html
-;; https://github.com/Fuco1/dired-hacks/blob/master/dired-subtree.el
-;; https://github.com/jojojames/dired-sidebar/blob/master/dired-sidebar.el
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Windows.html
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Dedicated-Windows.html
+;; https://www.gnu.org/software/emacs/draft/manual/html_node/elisp/Side-Windows.html
 ;; https://emacs.stackexchange.com/questions/12153/does-some-command-exist-which-goes-to-the-next-file-of-the-current-directory
 ;; next file:
 ;; , go to tree view
@@ -160,10 +141,6 @@
 (setq dired-listing-switches "-l -I \"target\" -I \"*.lock\" -I \"#*#\"")
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
-
-;; (eval-after-load "dired"
-;;   (require-package 'dired-subtree)
-;;   (setq dired-subtree-use-backgrounds nil))
 
 (defun dired-open-file ()
   "open the thing under point, that can be a file or any other line of dired listing;"
@@ -183,11 +160,7 @@
       ;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
       )
      ((file-directory-p file-name)
-      ;; first remove all subtrees not in the current path;
-      (dired-subtree-insert)
-      ;; open the first file of the subtree;
-      (dired-next-line 1)
-      (dired-open-file)
+      ;; open the directory in a splited and resized window above;
       )
      (t
       (dired-find-file)
@@ -234,6 +207,26 @@
 ;; https://github.com/ergoemacs/ergoemacs-mode
 ;; https://github.com/justbur/emacs-which-key
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
+
+(require 'package)
+(defun require-package (package)
+  (unless (require package nil 'noerror)
+    (progn
+      (unless (assoc package package-archive-contents)
+	(package-refresh-contents))
+      (package-install package)
+      (require package))))
+(defun install-package (package)
+  (unless (package-installed-p package nil 'noerror)
+    (progn
+      (unless (assoc package package-archive-contents)
+	(package-refresh-contents))
+      (package-install package))))
+(add-to-list 'package-archives
+	     '("melpa" . "https://melpa.org/packages/") t)
+;; (package-initialize)
+;; (require-package 'package-name)
+;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el
 
 ;; https://orgmode.org/manual/Tables.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html
