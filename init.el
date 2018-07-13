@@ -126,49 +126,6 @@
 (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
 (global-visual-line-mode +1)
 
-;; dired
-;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Windows.html
-;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Dedicated-Windows.html
-;; https://www.gnu.org/software/emacs/draft/manual/html_node/elisp/Side-Windows.html
-;; https://emacs.stackexchange.com/questions/12153/does-some-command-exist-which-goes-to-the-next-file-of-the-current-directory
-;; next file:
-;; , go to tree view
-;; , next file
-;; , open (in the window at right, go to the first line)
-;; https://www.emacswiki.org/emacs/DiredView
-
-(add-hook 'dired-mode-hook 'dired-hide-details-mode)
-(setq dired-listing-switches "-l -I \"target\" -I \"*.lock\" -I \"#*#\"")
-(setq dired-recursive-deletes 'always)
-(setq dired-recursive-copies 'always)
-
-(defun dired-open-file ()
-  "open the thing under point, that can be a file or any other line of dired listing;"
-  (interactive)
-  (let ((file-name (dired-get-filename nil t)))
-    (cond
-     ((and (file-directory-p file-name) (string-match-p "/home/*/projects/*" file-name))
-      ;; first move all windows in the main workspace into the hidden workspace, and rename the main workspace to "project_name";
-      ;; then if there is an Emacs frame named "project_name*", if a window named "project_name" exist, move it to the main workspace, otherwise close all windows named "project_name*"; then do the next line;
-      ;; if there is no Emacs frame named "project_name*", load the saved Emacs desktop in the project directory, and open its windows in the hidden workspace; then if there is a frame named "project_name", move it to the main workspace, otherwise create it;
-      )
-     ((and (file-directory-p file-name) (string-match-p "\\.m\\'" file-name))
-      (dired-find-file)
-      ;; open image-dired/movie in the right window
-      ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
-      ;; https://github.com/larsmagne/movie.el
-      ;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
-      )
-     ((file-directory-p file-name)
-      ;; open the directory in a splited and resized window above;
-      )
-     (t
-      (dired-find-file)
-      ))
-    ))
-;; (eval-after-load "dired"
-;;   '(define-key dired-mode-map [remap dired-find-file] 'dired-open-file))
-
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/FFAP.html
 (defun go-to-link-at-point ()
   "open the file path under cursor; if the path starts with “http://”, open the URL in browser; input path can be relative, full path, URL;"
@@ -224,9 +181,49 @@
       (package-install package))))
 (add-to-list 'package-archives
 	     '("melpa" . "https://melpa.org/packages/") t)
-;; (package-initialize)
-;; (require-package 'package-name)
+(package-initialize)
 ;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el
+
+;; dired
+;; http://mads-hartmann.com/2016/05/12/emacs-tree-view.html
+;; https://emacs.stackexchange.com/questions/12153/does-some-command-exist-which-goes-to-the-next-file-of-the-current-directory
+;; next file:
+;; , go to tree view
+;; , next file
+;; , open (in the window at right, go to the first line)
+;; https://www.emacswiki.org/emacs/DiredView
+
+(add-hook 'dired-mode-hook 'dired-hide-details-mode)
+(setq dired-listing-switches "-l -I \"target\" -I \"*.lock\" -I \"#*#\"")
+(setq dired-recursive-deletes 'always)
+(setq dired-recursive-copies 'always)
+
+(defun dired-open-file ()
+  "open the thing under point, that can be a file or any other line of dired listing;"
+  (interactive)
+  (let ((file-name (dired-get-filename nil t)))
+    (cond
+     ((and (file-directory-p file-name) (string-match-p "/home/*/projects/*" file-name))
+      ;; first move all windows in the main workspace into the hidden workspace, and rename the main workspace to "project_name";
+      ;; then if there is an Emacs frame named "project_name*", if a window named "project_name" exist, move it to the main workspace, otherwise close all windows named "project_name*"; then do the next line;
+      ;; if there is no Emacs frame named "project_name*", load the saved Emacs desktop in the project directory, and open its windows in the hidden workspace; then if there is a frame named "project_name", move it to the main workspace, otherwise create it;
+      )
+     ((and (file-directory-p file-name) (string-match-p "\\.m\\'" file-name))
+      (dired-find-file)
+      ;; open image-dired/movie in the right window
+      ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
+      ;; https://github.com/larsmagne/movie.el
+      ;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
+      )
+     ((file-directory-p file-name)
+      ;; dired-subtree-insert;
+      )
+     (t
+      (dired-find-file)
+      ))
+    ))
+;; (eval-after-load "dired"
+;;   '(define-key dired-mode-map [remap dired-find-file] 'dired-open-file))
 
 ;; https://orgmode.org/manual/Tables.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html
