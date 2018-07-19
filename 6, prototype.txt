@@ -11,12 +11,13 @@ list disks using "fdisk -l"; then use "fdisk /dev/sdx" to create 3 partitions (f
   , and the rest for Linux filesystem
 format the partitions:
   ; mkfs.fat -F32 /dev/sdx2; mkfs.ext4 /dev/sdx3
-; mount /dev/sdx3 /mnt
 
-to save bandwidth you can copy your already downloaded packages to "/mnt/var/cache/pacman/pkg";
+; mount /dev/sdx3 /mnt
+now to reuse previously downloaded packages on your system, and to prevent them from being downloaded again, you can copy them to "/mnt/var/cache/pacman/pkg";
+
 ; pacstrap /mnt pacman
 ; arch-chroot /mnt
-; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate networkmanager pulseaudio-alsa udisks2 sudo man-db unzip rust rust-docs gcc xorg-server xf86-video-{intel,nouveau,amdgpu} xorg-xinit i3-wm i3status xdotool deepin-gtk-theme ttf-hack emacs ttf-droid chromium mpv
+; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip rust rust-docs gcc xorg-server xf86-video-{intel,nouveau,amdgpu} xorg-xinit i3-wm i3status xdotool deepin-gtk-theme ttf-hack emacs ttf-droid chromium mpv
 
 monospace fonts: wide characters are forced to squeeze, narrow characters are forced to stretch, uppercase letters look skinny next to lowercase, and bold characters don’t have enough room;
 proportional font for code: generous spacing, large punctuation, and easily distinguishable characters, while allowing each character to take up the space that it needs;
@@ -29,17 +30,17 @@ install bootloader:
 ; mkdir /boot/efi; mount /dev/sdx2 /boot/efi
 ; grub-install --target=x86_64-efi --efi-directory=/boot/efi --removable
 ; grub-mkconfig -o /boot/grub/grub.cfg
-; emacs /boot/grub/grub.cfg
+; nano /boot/grub/grub.cfg
   set timeout = 0
-(to access the menu bar in Emacs, press F10)
 
 create user:
 ; useradd -m -G wheel user1
 ; passwd -d user1
-; EDITOR=emacs visudo
+; EDITOR=nano visudo
   %wheel ALL=(ALL) ALL
+
 ; mkdir /etc/systemd/system/getty@tty1.service.d
-; emacs /etc/systemd/system/getty@tty1.service.d/override.conf
+; nano /etc/systemd/system/getty@tty1.service.d/override.conf
   [Service]
   ExecStart=
   ExecStart=-/usr/bin/agetty --autologin user1 --noclear %I $TERM
@@ -57,10 +58,10 @@ create user:
 ; pactl set-sink-mute @DEFAULT_SINK@ 0
 ; pactl set-source-mute @DEFAULT_SOURCE@ 0
 
-; emacs ~/.bash_profile
+; nano ~/.bash_profile
   export TZ="/usr/share/zoneinfo/<your_location>"
   startx
-; emacs ~/.xinitrc
+; nano ~/.xinitrc
   exec i3
 
 ; mkdir -p ~/.config/i3
