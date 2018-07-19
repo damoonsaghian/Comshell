@@ -55,9 +55,6 @@ create user:
   gtk-theme-name = deepin
   gtk-font-name = Sans
 
-; pactl set-sink-mute @DEFAULT_SINK@ 0
-; pactl set-source-mute @DEFAULT_SOURCE@ 0
-
 ; nano ~/.bash_profile
   export TZ="/usr/share/zoneinfo/<your_location>"
   startx
