@@ -22,24 +22,7 @@
 ;; move point to top/bottom of buffer before signaling a scrolling error;
 (setq scroll-error-top-bottom t)
 
-(setq-default cursor-type 'bar)
 (setq blink-cursor-blinks 0)
-(set-face-attribute 'cursor nil :background "red")
-
-(global-hl-line-mode 1)
-(setq global-hl-line-sticky-flag t)
-(set-face-attribute 'hl-line nil :background "lemon chiffon")
-;; make highlighted lines in other (not selected) windows gray;
-(defun hl-line-update-face (window)
-  "update the `hl-line' face in WINDOW to indicate whether the window is selected;"
-  (with-current-buffer (window-buffer window)
-    (when (or global-hl-line-mode hl-line-mode)
-      (if (eq (current-buffer) (window-buffer (selected-window)))
-          (face-remap-reset-base 'hl-line)
-        (face-remap-set-base 'hl-line :background "#dddddd")))))
-(add-hook 'buffer-list-update-hook
-          (lambda () (walk-windows #'hl-line-update-face nil t)))
-
 (add-to-list 'default-frame-alist '(foreground-color . "#222222"))
 (set-face-attribute 'region nil :background "LightSkyBlue1")
 (set-face-attribute 'default nil :height 105)
@@ -186,7 +169,8 @@
 
 ;; dired
 ;; http://mads-hartmann.com/2016/05/12/emacs-tree-view.html
-;; https://emacs.stackexchange.com/questions/12153/does-some-command-exist-which-goes-to-the-next-file-of-the-current-directory
+;; https://www.gnu.org/software/emacs/draft/manual/html_node/elisp/Side-Windows.html
+;; https://www.emacswiki.org/emacs/EmacsVersor
 ;; next file:
 ;; , go to tree view
 ;; , next file
