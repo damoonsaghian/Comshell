@@ -4,26 +4,6 @@
 (setq inhibit-startup-screen t)
 (setq make-backup-files nil)
 (global-set-key (kbd "C-x k") #'kill-this-buffer)
-(set-face-attribute 'highlight nil :background "lemon chiffon")
-
-(require 'dired)
-(setq dired-recursive-deletes 'always)
-(setq dired-recursive-copies 'always)
-
-;; if this instance of Emacs is the projects viewer, do these:
-;; (global-hl-line-mode 1)
-;; (setq cursor-type nil)
-(add-hook 'dired-mode-hook 'dired-hide-details-mode)
-(add-hook 'dired-mode-hook 'hl-line-mode)
-(defun dired-find-project ()
-  (interactive)
-  (let ((file-name (dired-get-filename nil t)))
-    (if (file-directory-p file-name)
-        ;; first move all windows in the main workspace into the hidden workspace, and rename the main workspace to "project_name";
-        ;; then if there is an Emacs frame named "project_name*", if a window named "project_name" exist, move it to the main workspace, otherwise close all windows named "project_name*"; then do the next line;
-        ;; if there is no Emacs frame named "project_name*", load the saved Emacs desktop in the project directory, and open its windows in the hidden workspace; then if there is a frame named "project_name", move it to the main workspace, otherwise create it;
-        )))
-;; (define-key dired-mode-map [remap dired-find-file] 'dired-find-project))
 
 (setq window-divider-default-places t
       window-divider-default-right-width 2
@@ -44,6 +24,7 @@
 
 (setq blink-cursor-blinks 0)
 (add-to-list 'default-frame-alist '(foreground-color . "#222222"))
+(set-face-attribute 'highlight nil :background "lemon chiffon")
 (set-face-attribute 'region nil :background "LightSkyBlue1")
 (set-face-attribute 'default nil :height 105)
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
@@ -168,6 +149,37 @@
 ;; https://github.com/justbur/emacs-which-key
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
 
+(require 'dired)
+(setq dired-recursive-deletes 'always)
+(setq dired-recursive-copies 'always)
+(add-hook 'dired-mode-hook (lambda () (setq cursor-type nil)))
+(require 'hl-line)
+(setq hl-line-sticky-flag nil)
+(add-hook 'dired-mode-hook 'hl-line-mode)
+
+(add-to-list
+ 'command-switch-alist
+ (cons "projects"
+       #'(lambda (projects-path)
+           (setq dired-listing-switches "-l")
+           (add-hook 'dired-mode-hook 'dired-hide-details-mode)
+           (find-file projects-path)
+           (defun dired-find-project ()
+             (interactive)
+             (let ((file-name (dired-get-filename nil t)))
+               (if (file-directory-p file-name)
+               ;; first move all windows in the main workspace into the hidden workspace, and rename the main workspace to "project_name";
+               ;; then if there is an Emacs frame named "project_name*", if a window named "project_name" exist, move it to the main workspace, otherwise close all windows named "project_name*"; then do the next line;
+               ;; if there is no Emacs frame named "project_name*", load the saved Emacs desktop in the project directory, and open its windows in the hidden workspace; then if there is a frame named "project_name", move it to the main workspace, otherwise create it;
+               )))
+           (define-key dired-mode-map [remap dired-find-file] 'dired-find-project))))
+
+(add-to-list 'command-switch-alist
+             (cons "project"
+                   #'(lambda (project-path)
+                       (desktop-save-mode 1)
+                       (desktop-change-dir project-path))))
+
 (require 'package)
 (defun require-package (package)
   (unless (require package nil 'noerror)
@@ -196,20 +208,19 @@
 ;; , open (in the window at right, go to the first line)
 ;; https://www.emacswiki.org/emacs/DiredView
 
-(require-package 'sr-speedbar)
+;; (require-package 'sr-speedbar)
 ;; in speedbar show all files
 ;; hide "\".*\" \"target\" \"*.lock\" \"#*#\""
-
-(defun sr-speedbar-open-file ()
-  (interactive)
-  (let ((file-name (speedbar-line-file nil t)))
-    (if (and (file-directory-p file-name) (string-match-p "\\.m\\'" file-name))
-        (find-file file-name)
+;; (defun sr-speedbar-open-file ()
+;;   (interactive)
+;;   (let ((file-name (speedbar-line-file nil t)))
+;;     (if (and (file-directory-p file-name) (string-match-p "\\.m\\'" file-name))
+;;         (find-file file-name)
         ;; open image-dired/movie in the right window
         ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
         ;; https://github.com/larsmagne/movie.el
         ;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
-      (speedbar-find-file))))
+;;       (speedbar-find-file))))
 ;; (define-key speedbar-mode-map [remap speedbar-find-file] speedbar-open-file))
 
 ;; https://orgmode.org/manual/Tables.html
