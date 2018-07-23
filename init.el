@@ -1,3 +1,22 @@
+(require 'package)
+(defun require-package (package)
+  (unless (require package nil 'noerror)
+    (progn
+      (unless (assoc package package-archive-contents)
+	(package-refresh-contents))
+      (package-install package)
+      (require package))))
+(defun install-package (package)
+  (unless (package-installed-p package nil 'noerror)
+    (progn
+      (unless (assoc package package-archive-contents)
+	(package-refresh-contents))
+      (package-install package))))
+(add-to-list 'package-archives
+	     '("melpa" . "https://melpa.org/packages/") t)
+(package-initialize)
+;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el
+
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (setq visible-bell t)
@@ -30,124 +49,7 @@
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
 (add-hook 'prog-mode-hook 'goto-address-mode)
 (add-hook 'text-mode-hook 'goto-address-mode)
-
-;; paragraphs
-(setq paragraph-start "\n" paragraph-separate "\n")
-(defun next-paragraph ()
-  (interactive)
-  (unless (bobp) (left-char))
-  (forward-paragraph)
-  (unless (eobp) (progn (forward-paragraph)
-                        (redisplay t)
-                        (backward-paragraph)
-                        (right-char))))
-(global-set-key (kbd "C-<down>") 'next-paragraph)
-(defun previous-paragraph ()
-  (interactive)
-  (left-char)
-  (backward-paragraph)
-  (unless (bobp) (progn (forward-paragraph)
-                        (redisplay t)
-                        (backward-paragraph)
-                        (right-char))))
-(global-set-key (kbd "C-<up>") 'previous-paragraph)
-
 (setq-default indent-tabs-mode nil)
-
-;; adaptive wrap (this is taken from adaptive-wrap package);
-(defun adaptive-wrap-fill-context-prefix (beg en)
-  "like `fill-context-prefix', but with length 2;"
-  ;; note: fill-context-prefix may return nil; see: http://article.gmane.org/gmane.emacs.devel/156285
-  (let* ((fcp (or (fill-context-prefix beg en) ""))
-         (fcp-len (string-width fcp))
-         (fill-char (if (< 0 fcp-len)
-                        (string-to-char (substring fcp -1))
-                      ?\ )))
-    (concat fcp
-            (make-string 2 fill-char))))
-
-(defun adaptive-wrap-prefix-function (beg end)
-  "indent the region between BEG and END with adaptive filling;"
-  ;; any change at the beginning of a line might change its wrap prefix, which affects the whole line;
-  ;; so we need to "round-up" `end' to the nearest end of line;
-  ;; we do the same with `beg' although it's probably not needed;
-  (goto-char end)
-  (unless (bolp) (forward-line 1))
-  (setq end (point))
-  (goto-char beg)
-  (forward-line 0)
-  (setq beg (point))
-  (while (< (point) end)
-    (let ((lbp (point)))
-      (put-text-property (point)
-                         (progn (search-forward "\n" end 'move) (point))
-                         'wrap-prefix
-                         (let ((pfx (adaptive-wrap-fill-context-prefix
-                                     lbp (point))))
-                           ;; remove any `wrap-prefix' property that might have been added earlier;
-                           ;; otherwise, we end up with a string containing a `wrap-prefix' string, containing a `wrap-prefix' string ...
-                           (remove-text-properties 0 (length pfx) '(wrap-prefix) pfx)
-                           pfx))))
-  `(jit-lock-bounds ,beg . ,end))
-
-(define-minor-mode adaptive-wrap-prefix-mode
-  "wrap the buffer text with adaptive filling;"
-  :lighter ""
-  :group 'visual-line
-  (if adaptive-wrap-prefix-mode
-      (progn
-        ;; HACK ATTACK! we want to run after font-lock (so our wrap-prefix includes the faces applied by font-lock),
-        ;; but  jit-lock-register doesn't accept an `append' argument,
-        ;; so we add ourselves beforehand, to make sure we're at the end of the hook (bug#15155);
-        (add-hook 'jit-lock-functions
-                  #'adaptive-wrap-prefix-function 'append t)
-        (jit-lock-register #'adaptive-wrap-prefix-function))
-    (jit-lock-unregister #'adaptive-wrap-prefix-function)
-    (with-silent-modifications
-      (save-restriction
-        (widen)
-        (remove-text-properties (point-min) (point-max) '(wrap-prefix nil))))))
-(add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
-(global-visual-line-mode +1)
-
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/FFAP.html
-(defun go-to-link-at-point ()
-  "open the file path under cursor; if the path starts with “http://”, open the URL in browser; input path can be relative, full path, URL;"
-  (interactive)
-  (let (($path (ffap-file-at-point)))
-    (if (string-match-p "\\`https?://" $path)
-        (progn
-          (
-           ;; if the web_browser with the profile corresponding to this project is not open, open it; then if there is a web_browser window named "project-name, $path", raise it; otherwise create it;
-           ))
-      (if (file-exists-p $path)
-          (progn
-            (
-             ;; if there is an emacs frame named "project-name, $path", raise it; otherwise create it;
-             ))
-        (message "file doesn't exist: '%s';" $path)))))
-
-;; https://www.emacswiki.org/emacs/BrowseUrl
-;; https://www.chromium.org/user-experience/multi-profiles
-
-;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffers-and-Frames.html
-;; https://stackoverflow.com/questions/5079466/hide-emacs-echo-area-during-inactivity
-;; https://emacs.stackexchange.com/questions/1074/how-to-display-the-content-of-minibuffer-in-the-middle-of-the-emacs-frame
-;; https://www.emacswiki.org/emacs/Dedicated_Minibuffer_Frame
-
-;; view-mode
-;; https://github.com/emacs-evil/evil
-;; https://github.com/emacs-evil/evil-collection
-;; https://www.gnu.org/software/emacs/manual/html_mono/viper.html
-;; https://github.com/mrkkrp/modalka
-;; https://github.com/jyp/boon
-;; http://retroj.net/modal-mode
-;; https://github.com/abo-abo/hydra
-;; https://github.com/chrisdone/god-mode
-;; https://github.com/xahlee/xah-fly-keys
-;; https://github.com/ergoemacs/ergoemacs-mode
-;; https://github.com/justbur/emacs-which-key
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
 
 (require 'dired)
 (setq dired-recursive-deletes 'always)
@@ -180,25 +82,6 @@
                        (desktop-save-mode 1)
                        (desktop-change-dir project-path))))
 
-(require 'package)
-(defun require-package (package)
-  (unless (require package nil 'noerror)
-    (progn
-      (unless (assoc package package-archive-contents)
-	(package-refresh-contents))
-      (package-install package)
-      (require package))))
-(defun install-package (package)
-  (unless (package-installed-p package nil 'noerror)
-    (progn
-      (unless (assoc package package-archive-contents)
-	(package-refresh-contents))
-      (package-install package))))
-(add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/") t)
-(package-initialize)
-;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el
-
 ;; https://www.emacswiki.org/emacs/SrSpeedbar
 ;; https://www.gnu.org/software/emacs/draft/manual/html_node/elisp/Side-Windows.html
 ;; http://mads-hartmann.com/2016/05/12/emacs-tree-view.html
@@ -217,11 +100,82 @@
 ;;     (if (and (file-directory-p file-name) (string-match-p "\\.m\\'" file-name))
 ;;         (find-file file-name)
         ;; open image-dired/movie in the right window
+        ;; http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
+        ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
+        ;; https://www.emacswiki.org/emacs/ThumbsMode
         ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
         ;; https://github.com/larsmagne/movie.el
         ;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
+        ;; https://www.gnu.org/software/emms/screenshots.html
+        ;; http://wikemacs.org/wiki/Media_player
+        ;; https://github.com/dbrock/bongo
 ;;       (speedbar-find-file))))
 ;; (define-key speedbar-mode-map [remap speedbar-find-file] speedbar-open-file))
+
+;; view-mode
+;; https://github.com/emacs-evil/evil
+;; https://github.com/emacs-evil/evil-collection
+;; https://www.gnu.org/software/emacs/manual/html_mono/viper.html
+;; https://github.com/mrkkrp/modalka
+;; https://github.com/jyp/boon
+;; http://retroj.net/modal-mode
+;; https://github.com/abo-abo/hydra
+;; https://github.com/chrisdone/god-mode
+;; https://github.com/xahlee/xah-fly-keys
+;; https://github.com/ergoemacs/ergoemacs-mode
+;; https://github.com/justbur/emacs-which-key
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
+
+;; paragraphs
+(setq paragraph-start "\n" paragraph-separate "\n")
+(defun next-paragraph ()
+  (interactive)
+  (unless (bobp) (left-char))
+  (forward-paragraph)
+  (unless (eobp) (progn (forward-paragraph)
+                        (redisplay t)
+                        (backward-paragraph)
+                        (right-char))))
+(global-set-key (kbd "C-<down>") 'next-paragraph)
+(defun previous-paragraph ()
+  (interactive)
+  (left-char)
+  (backward-paragraph)
+  (unless (bobp) (progn (forward-paragraph)
+                        (redisplay t)
+                        (backward-paragraph)
+                        (right-char))))
+(global-set-key (kbd "C-<up>") 'previous-paragraph)
+
+(require-package 'adaptive-wrap)
+(setq adaptive-wrap-extra-indent 2)
+(add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
+(global-visual-line-mode +1)
+
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/FFAP.html
+(defun go-to-link-at-point ()
+  "open the file path under cursor; if the path starts with “http://”, open the URL in browser; input path can be relative, full path, URL;"
+  (interactive)
+  (let (($path (ffap-file-at-point)))
+    (if (string-match-p "\\`https?://" $path)
+        (progn
+          (
+           ;; if the web_browser with the profile corresponding to this project is not open, open it; then if there is a web_browser window named "project-name, $path", raise it; otherwise create it;
+           ))
+      (if (file-exists-p $path)
+          (progn
+            (
+             ;; if there is an emacs frame named "project-name, $path", raise it; otherwise create it;
+             ))
+        (message "file doesn't exist: '%s';" $path)))))
+
+;; https://www.emacswiki.org/emacs/BrowseUrl
+;; https://www.chromium.org/user-experience/multi-profiles
+
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffers-and-Frames.html
+;; https://stackoverflow.com/questions/5079466/hide-emacs-echo-area-during-inactivity
+;; https://emacs.stackexchange.com/questions/1074/how-to-display-the-content-of-minibuffer-in-the-middle-of-the-emacs-frame
+;; https://www.emacswiki.org/emacs/Dedicated_Minibuffer_Frame
 
 ;; https://orgmode.org/manual/Tables.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html
@@ -230,12 +184,6 @@
 ;; https://github.com/aaptel/preview-latex
 ;; https://github.com/josteink/wsd-mode
 ;; https://jblevins.org/projects/markdown-mode/
-;; http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
-;; https://www.emacswiki.org/emacs/ThumbsMode
-;; https://www.gnu.org/software/emms/screenshots.html
-;; http://wikemacs.org/wiki/Media_player
-;; https://github.com/dbrock/bongo
 
 ;; https://github.com/dengste/minimap
 
@@ -271,4 +219,3 @@
 ;;   https://github.com/atykhonov/google-translate
 ;; https://www.gnu.org/software/emacs/manual/html_node/calc/index.html
 ;; https://github.com/domtronn/all-the-icons.el
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Document-View.html
