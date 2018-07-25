@@ -42,6 +42,10 @@
 (setq scroll-error-top-bottom t)
 
 (setq blink-cursor-blinks 0)
+(setq-default cursor-type 'bar)
+(set-face-attribute 'cursor nil :background "red")
+(global-hl-line-mode 1)
+
 (add-to-list 'default-frame-alist '(foreground-color . "#222222"))
 (set-face-attribute 'highlight nil :background "lemon chiffon")
 (set-face-attribute 'region nil :background "LightSkyBlue1")
@@ -55,10 +59,13 @@
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
 (add-hook 'dired-mode-hook (lambda () (setq cursor-type nil)))
-(require 'hl-line)
-(setq hl-line-sticky-flag nil)
-(add-hook 'dired-mode-hook 'hl-line-mode)
+;; https://www.emacswiki.org/emacs/DiredView
 
+;; what follows is not determined; maybe it's better to use dired + dired-subtree and mark the selected file.
+;; https://www.gnu.org/software/emacs/draft/manual/html_node/elisp/Side-Windows.html
+;; http://mads-hartmann.com/2016/05/12/emacs-tree-view.html
+
+;; when Emacs is called with -projects argument, show the list of projects:
 (add-to-list
  'command-switch-alist
  (cons "projects"
@@ -76,41 +83,68 @@
                )))
            (define-key dired-mode-map [remap dired-find-file] 'dired-find-project))))
 
-(add-to-list 'command-switch-alist
-             (cons "project"
-                   #'(lambda (project-path)
-                       (desktop-save-mode 1)
-                       (desktop-change-dir project-path))))
+;; when Emacs is called with -project argument, restore previous session (if any):
+(add-to-list
+ 'command-switch-alist
+ (cons
+  "project"
+  #'(lambda (project-path)
+      (desktop-save-mode 1)
+      (desktop-change-dir project-path)
 
-;; https://www.emacswiki.org/emacs/SrSpeedbar
-;; https://www.gnu.org/software/emacs/draft/manual/html_node/elisp/Side-Windows.html
-;; http://mads-hartmann.com/2016/05/12/emacs-tree-view.html
-;; next file:
-;; , go to tree view
-;; , next file
-;; , open (in the window at right, go to the first line)
-;; https://www.emacswiki.org/emacs/DiredView
+      ;; https://www.emacswiki.org/emacs/SrSpeedbar
+      ;; next file:
+      ;; , go to tree view
+      ;; , next file
+      ;; , open (in the window at right, go to the first line)
 
-;; (require-package 'sr-speedbar)
-;; in speedbar show all files
-;; hide "\".*\" \"target\" \"*.lock\" \"#*#\""
-;; (defun sr-speedbar-open-file ()
-;;   (interactive)
-;;   (let ((file-name (speedbar-line-file nil t)))
-;;     (if (and (file-directory-p file-name) (string-match-p "\\.m\\'" file-name))
-;;         (find-file file-name)
-        ;; open image-dired/movie in the right window
-        ;; http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
-        ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
-        ;; https://www.emacswiki.org/emacs/ThumbsMode
-        ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
-        ;; https://github.com/larsmagne/movie.el
-        ;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
-        ;; https://www.gnu.org/software/emms/screenshots.html
-        ;; http://wikemacs.org/wiki/Media_player
-        ;; https://github.com/dbrock/bongo
-;;       (speedbar-find-file))))
-;; (define-key speedbar-mode-map [remap speedbar-find-file] speedbar-open-file))
+      (require-package 'sr-speedbar)
+      (setq sr-speedbar-right-side nil)
+      (setq sr-speedbar-skip-other-window-p t)
+      (setq speedbar-directory-unshown-regexp "^\\(\\.*\\)\\'\\|^target\\'")
+      (setq speedbar-file-unshown-regexp "^\\(\\.*\\)\\'\\|\\.lock\\'\\|^\\(\\#*\\)\\#\\'")
+      (setq speedbar-show-unknown-files t)
+      (setq speedbar-use-images nil)
+      ;; (setq speedbar-indentation-width 2)
+      (add-hook 'speedbar-mode-hook (lambda () (setq cursor-type nil)))
+      ;; show all files in speedbar
+      (defun sr-speedbar-open-file ()
+        (interactive)
+        (let ((file-name (speedbar-line-file nil t)))
+          (if (and (file-directory-p file-name) (string-match-p "\\.m\\'" file-name))
+              (find-file file-name)
+              ;; open image-dired/movie in the right window
+              ;; http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
+              ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
+              ;; https://www.emacswiki.org/emacs/ThumbsMode
+              ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
+              ;; https://github.com/larsmagne/movie.el
+              ;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
+              ;; https://www.gnu.org/software/emms/screenshots.html
+              ;; http://wikemacs.org/wiki/Media_player
+              ;; https://github.com/dbrock/bongo
+            (speedbar-find-file))))
+      (define-key speedbar-mode-map [remap speedbar-find-file] speedbar-open-file))))
+
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/FFAP.html
+(defun go-to-link-at-point ()
+  "open the file path under cursor; if the path starts with “http://”, open the URL in browser; input path can be relative, full path, URL;"
+  (interactive)
+  (let (($path (ffap-file-at-point)))
+    (if (string-match-p "\\`https?://" $path)
+        (progn
+          (
+           ;; if the web_browser with the profile corresponding to this project is not open, open it; then if there is a web_browser window named "project-name, $path", raise it; otherwise create it;
+           ))
+      (if (file-exists-p $path)
+          (progn
+            (
+             ;; if there is an emacs frame named "project-name, $path", raise it; otherwise create it;
+             ))
+        (message "file doesn't exist: '%s';" $path)))))
+
+;; https://www.emacswiki.org/emacs/BrowseUrl
+;; https://www.chromium.org/user-experience/multi-profiles
 
 ;; view-mode
 ;; https://github.com/emacs-evil/evil
@@ -151,26 +185,6 @@
 (setq adaptive-wrap-extra-indent 2)
 (add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
 (global-visual-line-mode +1)
-
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/FFAP.html
-(defun go-to-link-at-point ()
-  "open the file path under cursor; if the path starts with “http://”, open the URL in browser; input path can be relative, full path, URL;"
-  (interactive)
-  (let (($path (ffap-file-at-point)))
-    (if (string-match-p "\\`https?://" $path)
-        (progn
-          (
-           ;; if the web_browser with the profile corresponding to this project is not open, open it; then if there is a web_browser window named "project-name, $path", raise it; otherwise create it;
-           ))
-      (if (file-exists-p $path)
-          (progn
-            (
-             ;; if there is an emacs frame named "project-name, $path", raise it; otherwise create it;
-             ))
-        (message "file doesn't exist: '%s';" $path)))))
-
-;; https://www.emacswiki.org/emacs/BrowseUrl
-;; https://www.chromium.org/user-experience/multi-profiles
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffers-and-Frames.html
 ;; https://stackoverflow.com/questions/5079466/hide-emacs-echo-area-during-inactivity
