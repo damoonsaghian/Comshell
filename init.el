@@ -19,9 +19,12 @@
 
 (tool-bar-mode -1)
 (menu-bar-mode -1)
-(setq visible-bell t)
 (setq inhibit-startup-screen t)
+(setq visible-bell t)
 (setq make-backup-files nil)
+;; (setq-default mode-line-format nil)
+(setq insert-default-directory nil)
+(global-eldoc-mode -1)
 (global-set-key (kbd "C-x k") #'kill-this-buffer)
 
 (setq window-divider-default-places t
@@ -33,18 +36,12 @@
 (add-to-list 'default-frame-alist '(left-fringe . 2))
 (add-to-list 'default-frame-alist '(right-fringe . 0))
 
-;; (setq-default mode-line-format nil)
-(setq insert-default-directory nil)
-(global-eldoc-mode -1)
-
 (setq scroll-conservatively 200) ;; never recenter point
 ;; move point to top/bottom of buffer before signaling a scrolling error;
 (setq scroll-error-top-bottom t)
 
 (setq blink-cursor-blinks 0)
-(setq-default cursor-type 'bar)
-(set-face-attribute 'cursor nil :background "red")
-(global-hl-line-mode 1)
+(setq-default cursor-in-non-selected-windows nil)
 
 (add-to-list 'default-frame-alist '(foreground-color . "#222222"))
 (set-face-attribute 'highlight nil :background "lemon chiffon")
@@ -58,30 +55,28 @@
 (require 'dired)
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
-(add-hook 'dired-mode-hook (lambda () (setq cursor-type nil)))
 ;; https://www.emacswiki.org/emacs/DiredView
-
-;; what follows is not determined; maybe it's better to use dired + dired-subtree and mark the selected file.
-;; https://www.gnu.org/software/emacs/draft/manual/html_node/elisp/Side-Windows.html
-;; http://mads-hartmann.com/2016/05/12/emacs-tree-view.html
 
 ;; when Emacs is called with -projects argument, show the list of projects:
 (add-to-list
  'command-switch-alist
- (cons "projects"
-       #'(lambda (projects-path)
-           (setq dired-listing-switches "-l")
-           (add-hook 'dired-mode-hook 'dired-hide-details-mode)
-           (find-file projects-path)
-           (defun dired-find-project ()
-             (interactive)
-             (let ((file-name (dired-get-filename nil t)))
-               (if (file-directory-p file-name)
+ (cons
+  "projects"
+  #'(lambda (projects-path)
+      (setq dired-listing-switches "-l -I \".*\" -I \"#*#\" -I \"*.lock\" -I \"target\"")
+      (add-hook 'dired-mode-hook 'dired-hide-details-mode)
+      (dired projects-path)
+      ;; todo: automatically mount disks when available, and show their "projects" directories in seperate panes (Emacs windows);
+      (defun dired-find-project ()
+        (interactive)
+        (let ((file-name (dired-get-filename nil t)))
+          (if (file-directory-p file-name)
                ;; first move all windows in the main workspace into the hidden workspace, and rename the main workspace to "project_name";
                ;; then if there is an Emacs frame named "project_name*", if a window named "project_name" exist, move it to the main workspace, otherwise close all windows named "project_name*"; then do the next line;
                ;; if there is no Emacs frame named "project_name*", load the saved Emacs desktop in the project directory, and open its windows in the hidden workspace; then if there is a frame named "project_name", move it to the main workspace, otherwise create it;
-               )))
-           (define-key dired-mode-map [remap dired-find-file] 'dired-find-project))))
+              )))
+      (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)
+      (install-package 'sr-speedbar))))
 
 ;; when Emacs is called with -project argument, restore previous session (if any):
 (add-to-list
@@ -92,11 +87,21 @@
       (desktop-save-mode 1)
       (desktop-change-dir project-path)
 
-      ;; https://www.emacswiki.org/emacs/SrSpeedbar
+      ;; https://www.emacswiki.org/emacs/sr-speedbar.el
+      ;; sr-speedbar-open, sr-speedbar-select-window
+      ;; sr-speedbar-auto-refresh
+      ;; copy, rename, delete, speedbar-creat-directory works just like in dired;
+      ;; speedbar-line-{file,directory,path}
+      ;; speedbar-{edit,expand,contract}-line
+      ;; button-face, file-face, directory-face, selected-face
+      ;; speedbar-path-line
+      ;; speedbar-ignored-directory-expressions, speedbar-ignored-path-expressions
       ;; next file:
       ;; , go to tree view
       ;; , next file
       ;; , open (in the window at right, go to the first line)
+      ;; https://www.gnu.org/software/emacs/draft/manual/html_node/elisp/Side-Windows.html
+      ;; http://mads-hartmann.com/2016/05/12/emacs-tree-view.html
 
       (require-package 'sr-speedbar)
       (setq sr-speedbar-right-side nil)
@@ -106,8 +111,6 @@
       (setq speedbar-show-unknown-files t)
       (setq speedbar-use-images nil)
       ;; (setq speedbar-indentation-width 2)
-      (add-hook 'speedbar-mode-hook (lambda () (setq cursor-type nil)))
-      ;; show all files in speedbar
       (defun sr-speedbar-open-file ()
         (interactive)
         (let ((file-name (speedbar-line-file nil t)))
