@@ -100,10 +100,12 @@
         (interactive)
         (let ((file-name (dired-get-filename nil t)))
           (when (file-directory-p file-name)
-            ;; first move all windows in the main workspace into the hidden workspace, and rename the main workspace to "project_name";
-            ;; if there is an Emacs frame named "project_name", clear the main workspace and bring that window in;
-            ;; otherwise close all windows named  "project_name*", then:
-            ;;   (start-process-shell-command (concat "emacs -project" file-name))
+            ;; if there is an Emacs frame named "project_name":
+            ;;   , clear the main workspace (move all windows to hidden workspace);
+            ;;   , bring the window named "project_name" to the main workspace;
+            ;;   , rename the main workspace to "project_name";
+            ;; otherwise close all windows named "project_name*", then:
+            ;;   ; emacs -project file-name
             )))
       (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)
 
