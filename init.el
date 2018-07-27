@@ -52,6 +52,32 @@
 (add-hook 'text-mode-hook 'goto-address-mode)
 (setq-default indent-tabs-mode nil)
 
+(require-package 'adaptive-wrap)
+(setq-default adaptive-wrap-extra-indent 2)
+(add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
+(global-visual-line-mode +1)
+
+;; paragraphs
+(setq paragraph-start "\n" paragraph-separate "\n")
+(defun next-paragraph ()
+  (interactive)
+  (unless (bobp) (left-char))
+  (forward-paragraph)
+  (unless (eobp) (progn (forward-paragraph)
+                        (redisplay t)
+                        (backward-paragraph)
+                        (right-char))))
+(global-set-key (kbd "C-<down>") 'next-paragraph)
+(defun previous-paragraph ()
+  (interactive)
+  (left-char)
+  (backward-paragraph)
+  (unless (bobp) (progn (forward-paragraph)
+                        (redisplay t)
+                        (backward-paragraph)
+                        (right-char))))
+(global-set-key (kbd "C-<up>") 'previous-paragraph)
+
 (require 'dired)
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
@@ -63,22 +89,28 @@
  (cons
   "projects"
   #'(lambda (projects-path)
+      (set-frame-name "projects")
       (setq dired-listing-switches "-l -I \".*\" -I \"#*#\" -I \"*.lock\" -I \"target\"")
       (add-hook 'dired-mode-hook 'dired-hide-details-mode)
       (dired projects-path)
-      ;; todo: automatically mount disks when available, and show their "projects" directories in seperate panes (Emacs windows);
+      ;; todo: automatically mount storage devices when available, and show their "projects" directories in seperate panes (Emacs windows);
+      ;; the name of projects in other panes other will be prefixed with a number indicating the pane number, like this: "[1] project_name";
+
       (defun dired-find-project ()
         (interactive)
         (let ((file-name (dired-get-filename nil t)))
-          (if (file-directory-p file-name)
-               ;; first move all windows in the main workspace into the hidden workspace, and rename the main workspace to "project_name";
-               ;; then if there is an Emacs frame named "project_name*", if a window named "project_name" exist, move it to the main workspace, otherwise close all windows named "project_name*"; then do the next line;
-               ;; if there is no Emacs frame named "project_name*", load the saved Emacs desktop in the project directory, and open its windows in the hidden workspace; then if there is a frame named "project_name", move it to the main workspace, otherwise create it;
-              )))
+          (when (file-directory-p file-name)
+            ;; first move all windows in the main workspace into the hidden workspace, and rename the main workspace to "project_name";
+            ;; if there is an Emacs frame named "project_name", clear the main workspace and bring that window in;
+            ;; otherwise close all windows named  "project_name*", then:
+            ;;   (start-process-shell-command (concat "emacs -project" file-name))
+            )))
       (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)
+
+      ;; packages which need to be installed, but are not needed to be "required" in projects view instance:
       (install-package 'sr-speedbar))))
 
-;; when Emacs is called with -project argument, restore previous session (if any):
+;; when Emacs is called with -project argument:
 (add-to-list
  'command-switch-alist
  (cons
@@ -87,6 +119,9 @@
       (desktop-save-mode 1)
       (desktop-change-dir project-path)
 
+      ;; note that all the project's windows will be opened in the hidden workspace;
+      ;; after opening the poject, if there is a frame named "project_name", move it to the main workspace, otherwise create it;
+      
       ;; https://www.emacswiki.org/emacs/sr-speedbar.el
       ;; sr-speedbar-open, sr-speedbar-select-window
       ;; sr-speedbar-auto-refresh
@@ -163,31 +198,7 @@
 ;; https://github.com/justbur/emacs-which-key
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
 
-;; paragraphs
-(setq paragraph-start "\n" paragraph-separate "\n")
-(defun next-paragraph ()
-  (interactive)
-  (unless (bobp) (left-char))
-  (forward-paragraph)
-  (unless (eobp) (progn (forward-paragraph)
-                        (redisplay t)
-                        (backward-paragraph)
-                        (right-char))))
-(global-set-key (kbd "C-<down>") 'next-paragraph)
-(defun previous-paragraph ()
-  (interactive)
-  (left-char)
-  (backward-paragraph)
-  (unless (bobp) (progn (forward-paragraph)
-                        (redisplay t)
-                        (backward-paragraph)
-                        (right-char))))
-(global-set-key (kbd "C-<up>") 'previous-paragraph)
 
-(require-package 'adaptive-wrap)
-(setq adaptive-wrap-extra-indent 2)
-(add-hook 'visual-line-mode-hook #'adaptive-wrap-prefix-mode)
-(global-visual-line-mode +1)
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffers-and-Frames.html
 ;; https://stackoverflow.com/questions/5079466/hide-emacs-echo-area-during-inactivity
