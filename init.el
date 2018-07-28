@@ -94,18 +94,15 @@
       (add-hook 'dired-mode-hook 'dired-hide-details-mode)
       (dired projects-path)
       ;; todo: automatically mount storage devices when available, and show their "projects" directories in seperate panes (Emacs windows);
-      ;; the name of projects in other panes other will be prefixed with a number indicating the pane number, like this: "[1] project_name";
+      ;; the name of projects in other panes will be prefixed with a number indicating the pane number, like this: "[1] project_name";
+      ;; after unmounting pane 1 for example, we must force close all windows in workspace named "[1]*";
 
       (defun dired-find-project ()
         (interactive)
         (let ((file-name (dired-get-filename nil t)))
           (when (file-directory-p file-name)
-            ;; if there is an Emacs frame named "project_name":
-            ;;   , clear the main workspace (move all windows to hidden workspace);
-            ;;   , bring the window named "project_name" to the main workspace;
-            ;;   , rename the main workspace to "project_name";
-            ;; otherwise close all windows named "project_name*", then:
-            ;;   ; emacs -project file-name
+            ;; move to workspace "1:project_name"; rename it to "1:project_name" (this apparently mundane command is for moving workspace button to the first position in i3-bar); if there is Emacs frame in the workspace:
+            ;; emacs -project file-name
             )))
       (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)
 
@@ -121,9 +118,6 @@
       (desktop-save-mode 1)
       (desktop-change-dir project-path)
 
-      ;; note that all the project's windows will be opened in the hidden workspace;
-      ;; after opening the poject, if there is a frame named "project_name", move it to the main workspace, otherwise create it;
-      
       ;; https://www.emacswiki.org/emacs/sr-speedbar.el
       ;; sr-speedbar-open, sr-speedbar-select-window
       ;; sr-speedbar-auto-refresh
