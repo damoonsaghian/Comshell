@@ -101,7 +101,7 @@
         (interactive)
         (let ((file-name (dired-get-filename nil t)))
           (when (file-directory-p file-name)
-            ;; move to workspace "1:project_name"; rename it to "1:project_name" (this apparently mundane command is for moving workspace button to the first position in i3-bar); if there is Emacs frame in the workspace:
+            ;; move to workspace "1:project_name"; rename it to "1:project_name" (this apparently mundane command is for moving workspace button to the first position in i3-bar); if there is no frame in the workspace:
             ;; emacs -project file-name
             )))
       (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)

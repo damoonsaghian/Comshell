@@ -38,6 +38,7 @@ create user:
 ; passwd -d user1
 ; EDITOR=nano visudo
   %wheel ALL=(ALL) ALL
+I know that having sudo without password has no security advantage over just using root; but the problem is that some programs (like PulseAudio and Chromium) wouldn't work normally when run as root;
 
 ; mkdir /etc/systemd/system/getty@tty1.service.d
 ; nano /etc/systemd/system/getty@tty1.service.d/override.conf
@@ -54,6 +55,10 @@ create user:
   [Settings]
   gtk-theme-name = deepin
   gtk-font-name = Sans
+
+for devices with hardware mute and volume control, PulseAudio mutes and silences them by default; so if you like you can do this:
+; pactl set-sink-mute @DEFAULT_SINK@ 0
+; pactl set-sink-volume @DEFAULT_SINK@ 100%
 
 ; nano ~/.bash_profile
   export TZ="/usr/share/zoneinfo/<your_location>"
