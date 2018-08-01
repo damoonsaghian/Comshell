@@ -101,8 +101,9 @@
         (interactive)
         (let ((file-name (dired-get-filename nil t)))
           (when (file-directory-p file-name)
-            ;; move to workspace "1:project_name"; rename it to "1:project_name" (this apparently mundane command is for moving workspace button to the first position in i3-bar); if there is no frame in the workspace:
-            ;; emacs -project file-name
+            ;; if workspace "1:project_name" is not empty, go to that workspace, and rename it to "1:project_name" (this apparently mundane command is for moving workspace button to the first position in i3-bar); but if it's empty:
+            ;; , go to "/hidden/" workspace;
+            ;; , execute: emacs -project file-name;
             )))
       (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)
 
@@ -118,6 +119,9 @@
       (desktop-save-mode 1)
       (desktop-change-dir project-path)
 
+      ;; go to workspace "1:project_name", and rename it to "1:project_name";
+      ;; move the window named "project_name" from the "/hidden/" workspace to "1:project_name" workspace;
+      
       ;; https://www.emacswiki.org/emacs/sr-speedbar.el
       ;; sr-speedbar-open, sr-speedbar-select-window
       ;; sr-speedbar-auto-refresh
