@@ -89,21 +89,21 @@
  (cons
   "projects"
   #'(lambda (projects-path)
-      (set-frame-name "projects")
+      (set-frame-name "/projects/")
       (setq dired-listing-switches "-l -I \".*\" -I \"#*#\" -I \"*.lock\" -I \"target\"")
       (add-hook 'dired-mode-hook 'dired-hide-details-mode)
       (dired projects-path)
       ;; todo: automatically mount storage devices when available, and show their "projects" directories in seperate panes (Emacs windows);
-      ;; the name of projects in other panes will be prefixed with a number indicating the pane number, like this: "[1] project_name";
-      ;; after unmounting pane 1 for example, we must force close all windows in workspace named "[1]*";
+      ;; the name of projects in other panes will be named like this: "project_name/partition_name/";
+      ;; after unmounting a pane, we must force close all windows in workspaces named "*/partition_name/";
 
       (defun dired-find-project ()
         (interactive)
         (let ((file-name (dired-get-filename nil t)))
           (when (file-directory-p file-name)
-            ;; if workspace "1:project_name" is not empty, go to that workspace, and rename it to "1:project_name" (this apparently mundane command is for moving workspace button to the first position in i3-bar); but if it's empty:
-            ;; , go to "/hidden/" workspace;
-            ;; , execute: emacs -project file-name;
+            ;; go to the workspace named "1:project_name", and rename it to "1:project_name" (this apparently mundane command is for moving workspace button to the first position in i3-bar);
+            ;; then if there is no window named "project_name", open one:
+            ;; ; if [-z \\"$(xdotool search --all --class emacs --name project_name)\\"]; then emacs -project project_name & fi
             )))
       (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)
 
@@ -115,13 +115,13 @@
  'command-switch-alist
  (cons
   "project"
-  #'(lambda (project-path)
+  #'(lambda (project-name)
       (desktop-save-mode 1)
-      (desktop-change-dir project-path)
+      ;; (desktop-change-dir project-path)
+      ;; don't restore frames;
 
-      ;; go to workspace "1:project_name", and rename it to "1:project_name";
-      ;; move the window named "project_name" from the "/hidden/" workspace to "1:project_name" workspace;
-      
+      (set-frame-name project_name)
+
       ;; https://www.emacswiki.org/emacs/sr-speedbar.el
       ;; sr-speedbar-open, sr-speedbar-select-window
       ;; sr-speedbar-auto-refresh
