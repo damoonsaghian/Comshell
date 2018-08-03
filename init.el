@@ -89,7 +89,6 @@
  (cons
   "projects"
   #'(lambda (projects-path)
-      (set-frame-name "/projects/")
       (setq dired-listing-switches "-l -I \".*\" -I \"#*#\" -I \"*.lock\" -I \"target\"")
       (add-hook 'dired-mode-hook 'dired-hide-details-mode)
       (dired projects-path)
@@ -99,12 +98,20 @@
 
       (defun dired-find-project ()
         (interactive)
-        (let ((file-name (dired-get-filename nil t)))
-          (when (file-directory-p file-name)
-            ;; go to the workspace named "1:project_name", and rename it to "1:project_name" (this apparently mundane command is for moving workspace button to the first position in i3-bar);
-            ;; then if there is no window named "project_name", open one:
-            ;; ; if [-z \\"$(xdotool search --all --class emacs --name project_name)\\"]; then emacs -project project_name & fi
-            )))
+        (let ((project-path (dired-get-filename)))
+          (if (file-directory-p project-path)
+              (let ((project-name (file-name-nondirectory project-path))
+                    (workspace-name (concat "\"1:" project-name "\"")))
+                ;; go to the workspace named "1:project_name", and rename it to "1:project_name" (this apparently mundane command is for moving workspace button to the first position in i3-bar);
+                ;; then if there is no window in the workspace:
+                ;; , first close all windows in workspaces named "project_name /*";
+                ;; , then run a new instance of Emacs for this project;
+                (call-process "i3-msg" nil nil nil
+                 (concat "workspace " workspace-name "; "
+                         "rename workspace " workspace-name " to " workspace-name "; "
+                         "exec \"if [[ \\\\\"$(i3-msg [workspace=__focused__] mark a)\\\\\" =~ \\\\\"false\\\\\" ]]; then i3-msg [workspace=\\\\\"^1:" project-name " /\\\\\"]; emacs -project \\\\\"" project-path "\\\\\"& fi\""
+                         ))
+                ))))
       (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)
 
       ;; packages which need to be installed, but are not needed to be "required" in projects view instance:
@@ -115,12 +122,11 @@
  'command-switch-alist
  (cons
   "project"
-  #'(lambda (project-name)
+  #'(lambda (project-path)
       (desktop-save-mode 1)
-      ;; (desktop-change-dir project-path)
-      ;; don't restore frames;
-
-      (set-frame-name project_name)
+      (desktop-change-dir project-path)
+      (setq desktop-restore-frames nil)
+      ;; restore the last visited buffer
 
       ;; https://www.emacswiki.org/emacs/sr-speedbar.el
       ;; sr-speedbar-open, sr-speedbar-select-window
@@ -182,7 +188,9 @@
         (message "file doesn't exist: '%s';" $path)))))
 
 ;; https://www.emacswiki.org/emacs/BrowseUrl
-;; https://www.chromium.org/user-experience/multi-profiles
+;; chromium --user-data-dir=project_path/.cache/chromium
+;; if you don't want to start a new Chromium instance, create a profile directory symlinked to "project_path/.cache/chromium" then:
+;;   chromium --profile-directory=project_name
 
 ;; view-mode
 ;; https://github.com/emacs-evil/evil

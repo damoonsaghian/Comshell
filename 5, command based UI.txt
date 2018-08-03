@@ -35,13 +35,13 @@ in normal mode we can:
 , find
 , enter insert mode
 
-projects are looked for in "~/projects/" and all directories named "projects" on all disks; from this list, we can open projects (or switch to them if they are already open), create new projects, etc;
-files from different disks will be in separate sections;
+projects are looked for in "~/projects/" and all directories named "projects" on all disks, and shown in lists side by side (files from different disks will be in separate lists);
+from these lists, we can open projects (or switch to them if they are already open), create new projects, etc;
 
 a panel at the left shows a tree view of the files in the project;
 text files are opened in a text editor panel at the right;
 directories with ".m" extension are opened in a panel at the right, showing thumbnails of the files in it;
-we can go to the panel, and move between files in there (by typing their name), or create new files;
+in the panel, we can move between files (by typing their name), or create new files;
 
 external projects (which can also be websites, pdf, etc) will be opened and accessed from links inside the main project (not from projects list); we can always go back to the main project easily;
 
