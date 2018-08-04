@@ -124,9 +124,15 @@
   "project"
   #'(lambda (project-path)
       (desktop-save-mode 1)
-      (desktop-change-dir project-path)
       (setq desktop-restore-frames nil)
+      (desktop-change-dir project-path)
       ;; restore the last visited buffer
+
+      ;; when we want to view a file of a project, in a new workspace:
+      ;; , first rename the current workspace which is "project_name", to "project_name /current_file_name/";
+      ;; , then go to the workspace "project_name /file_name/", and if there is no window in there, open a new Emacs frame for the file;
+      ;; , then rename the workspace to "project_name";
+      ;; note that there would never be two workspace of a project, showing the same file; because when we want to open a file in a project, we check that if it's already open in a buffer, we first close all frames in the workspace "project_name /file_name/"; and only then we close and reopen the buffer;
 
       ;; https://www.emacswiki.org/emacs/sr-speedbar.el
       ;; sr-speedbar-open, sr-speedbar-select-window
@@ -205,8 +211,6 @@
 ;; https://github.com/ergoemacs/ergoemacs-mode
 ;; https://github.com/justbur/emacs-which-key
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
-
-
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffers-and-Frames.html
 ;; https://stackoverflow.com/questions/5079466/hide-emacs-echo-area-during-inactivity

@@ -25,6 +25,8 @@ proportional font for code: generous spacing, large punctuation, and easily dist
 two spaces -> elastic blocks
 "http://nickgravgaard.com/elastic-tabstops/"
 
+i chose chromium because the memory needed for new instances of Chromium is much less than Firefox; besides in Chromium it's possible to have multiple profiles in the same instance, which is not yet possible in Firefox;
+
 install bootloader:
 ; grub-install --target=i386-pc /dev/sdx
 ; mkdir /boot/efi; mount /dev/sdx2 /boot/efi
