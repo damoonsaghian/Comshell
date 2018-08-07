@@ -17,7 +17,7 @@ now to reuse previously downloaded packages on your system, and to prevent them 
 
 ; pacstrap /mnt pacman
 ; arch-chroot /mnt
-; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip rust rust-docs gcc xorg-server xf86-video-{intel,nouveau,amdgpu} xorg-xinit i3-wm i3status xdotool deepin-gtk-theme ttf-hack emacs ttf-droid chromium mpv
+; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip rust rust-docs gcc xorg-server xf86-video-{intel,nouveau,amdgpu} compton xorg-xinit i3-wm i3status deepin-gtk-theme ttf-hack emacs ttf-droid firefox mpv
 
 monospace fonts: wide characters are forced to squeeze, narrow characters are forced to stretch, uppercase letters look skinny next to lowercase, and bold characters don’t have enough room;
 proportional font for code: generous spacing, large punctuation, and easily distinguishable characters, while allowing each character to take up the space that it needs;

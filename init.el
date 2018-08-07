@@ -92,7 +92,7 @@
       (setq dired-listing-switches "-l -I \".*\" -I \"#*#\" -I \"*.lock\" -I \"target\"")
       (add-hook 'dired-mode-hook 'dired-hide-details-mode)
       (dired projects-path)
-      ;; todo: automatically mount storage devices when available, and show their "projects" directories in seperate panes (Emacs windows);
+      ;; to do: automatically mount storage devices when available, and show their "projects" directories in seperate panes (Emacs windows);
       ;; the name of projects in other panes will be named like this: "project_name/partition_name/";
       ;; after unmounting a pane, we must force close all windows in workspaces named "*/partition_name/";
 
@@ -109,7 +109,7 @@
                 (call-process "i3-msg" nil nil nil
                  (concat "workspace " workspace-name "; "
                          "rename workspace " workspace-name " to " workspace-name "; "
-                         "exec \"if [[ \\\\\"$(i3-msg [workspace=__focused__] mark a)\\\\\" =~ \\\\\"false\\\\\" ]]; then i3-msg [workspace=\\\\\"^1:" project-name " /\\\\\"]; emacs -project \\\\\"" project-path "\\\\\"& fi\""
+                         "exec \"if [[ \\\\\"$(i3-msg [workspace=__focused__] mark a)\\\\\" =~ \\\\\"false\\\\\" ]]; then i3-msg [workspace=\\\\\"^1:" project-name " /\\\\\"] kill; emacs -project \\\\\"" project-path "\\\\\"& fi\""
                          ))
                 ))))
       (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)
@@ -128,36 +128,34 @@
       (desktop-change-dir project-path)
       ;; restore the last visited buffer
 
-      ;; when we want to view a file of a project, in a new workspace:
-      ;; , first rename the current workspace which is "project_name", to "project_name /current_file_name/";
-      ;; , then go to the workspace "project_name /file_name/", and if there is no window in there, open a new Emacs frame for the file;
-      ;; , then rename the workspace to "project_name";
-      ;; note that there would never be two workspace of a project, showing the same file; because when we want to open a file in a project, we check that if it's already open in a buffer, we first close all frames in the workspace "project_name /file_name/"; and only then we close and reopen the buffer;
+      (require-package 'sr-speedbar)
+      (setq sr-speedbar-right-side nil)
+      (setq sr-speedbar-default-width 50)
+      ;; (setq sr-speedbar-delete-windows t)
+      (setq sr-speedbar-skip-other-window-p t)
+      (setq sr-speedbar-auto-refresh t)
+      (setq speedbar-use-images nil)
+      (setq speedbar-indentation-width 2)
+      (setq speedbar-show-unknown-files t)
+      (setq speedbar-directory-unshown-regexp "^\\(\\.*\\)\\'\\|^target\\'")
+      (setq speedbar-file-unshown-regexp "^\\(\\.*\\)\\'\\|\\.lock\\'\\|^\\(\\#*\\)\\#\\'")
+      (sr-speedbar-open)
 
-      ;; https://www.emacswiki.org/emacs/sr-speedbar.el
-      ;; sr-speedbar-open, sr-speedbar-select-window
-      ;; sr-speedbar-auto-refresh
       ;; copy, rename, delete, speedbar-creat-directory works just like in dired;
       ;; speedbar-line-{file,directory,path}
       ;; speedbar-{edit,expand,contract}-line
       ;; button-face, file-face, directory-face, selected-face
       ;; speedbar-path-line
       ;; speedbar-ignored-directory-expressions, speedbar-ignored-path-expressions
-      ;; next file:
-      ;; , go to tree view
-      ;; , next file
-      ;; , open (in the window at right, go to the first line)
-      ;; https://www.gnu.org/software/emacs/draft/manual/html_node/elisp/Side-Windows.html
-      ;; http://mads-hartmann.com/2016/05/12/emacs-tree-view.html
 
-      (require-package 'sr-speedbar)
-      (setq sr-speedbar-right-side nil)
-      (setq sr-speedbar-skip-other-window-p t)
-      (setq speedbar-directory-unshown-regexp "^\\(\\.*\\)\\'\\|^target\\'")
-      (setq speedbar-file-unshown-regexp "^\\(\\.*\\)\\'\\|\\.lock\\'\\|^\\(\\#*\\)\\#\\'")
-      (setq speedbar-show-unknown-files t)
-      (setq speedbar-use-images nil)
-      ;; (setq speedbar-indentation-width 2)
+      (defun go-to-sr-speedbar ()
+        (interactive)
+        (if (sr-speedbar-exist-p)
+            (select-window sr-speedbar-window)
+          (sr-speedbar-open)
+          (select-window sr-speedbar-window)))
+      (global-set-key (kbd "C-c s") 'go-to-sr-speedbar)
+
       (defun sr-speedbar-open-file ()
         (interactive)
         (let ((file-name (speedbar-line-file nil t)))
@@ -174,7 +172,14 @@
               ;; http://wikemacs.org/wiki/Media_player
               ;; https://github.com/dbrock/bongo
             (speedbar-find-file))))
-      (define-key speedbar-mode-map [remap speedbar-find-file] speedbar-open-file))))
+      (define-key speedbar-mode-map [remap speedbar-find-file] speedbar-open-file)
+
+      ;; when we want to view a file of a project, in a new workspace:
+      ;; , first rename the current workspace which is "project_name", to "project_name /current_file_name/";
+      ;; , then go to the workspace "project_name /file_name/", and if there is no window in there, open a new Emacs frame for the file;
+      ;; , then rename the workspace to "project_name";
+      ;; note that there would never be two workspace of a project, showing the same file; because when we want to open a file in a project, we check that if it's already open in a buffer, we first close all frames in the workspace "project_name /file_name/"; and only then we close and reopen the buffer;
+      )))
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/FFAP.html
 (defun go-to-link-at-point ()
@@ -194,6 +199,7 @@
         (message "file doesn't exist: '%s';" $path)))))
 
 ;; https://www.emacswiki.org/emacs/BrowseUrl
+;; browse-url-browser-function
 ;; chromium --user-data-dir=project_path/.cache/chromium
 ;; if you don't want to start a new Chromium instance, create a profile directory symlinked to "project_path/.cache/chromium" then:
 ;;   chromium --profile-directory=project_name
@@ -225,8 +231,6 @@
 ;; https://github.com/josteink/wsd-mode
 ;; https://jblevins.org/projects/markdown-mode/
 
-;; https://github.com/dengste/minimap
-
 ;; lsp-rust, lsp-flycheck
 ;; https://christian.kellner.me/2017/05/31/language-server-protocol-lsp-rust-and-emacs/
 ;; https://github.com/rust-lang/rust-mode
@@ -235,6 +239,8 @@
 ;; https://github.com/flycheck/flycheck-rust
 ;; http://julienblanchard.com/2016/fancy-rust-development-with-emacs/
 
+;; https://github.com/dengste/minimap
+;; https://www.gnu.org/software/emacs/draft/manual/html_node/elisp/Side-Windows.html
 ;; https://github.com/hlissner/doom-emacs/wiki/FAQ#how-is-dooms-startup-so-fast
 ;; https://www.emacswiki.org/emacs/DiredSync
 ;; http://ergoemacs.org/emacs/emacs_magit-mode_tutorial.html
@@ -252,8 +258,6 @@
 ;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Timers.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Spelling.html
 ;; https://www.emacswiki.org/emacs/DictMode
-;;   https://www.emacswiki.org/emacs/DictEm
-;;   https://www.emacswiki.org/emacs/wordnik.el
 ;;   https://github.com/gromnitsky/wordnut
 ;;   https://www.emacswiki.org/emacs/ThesauriAndSynonyms
 ;;   https://github.com/atykhonov/google-translate
