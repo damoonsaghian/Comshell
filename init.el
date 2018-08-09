@@ -109,7 +109,7 @@
                 (call-process "i3-msg" nil nil nil
                  (concat "workspace " workspace-name "; "
                          "rename workspace " workspace-name " to " workspace-name "; "
-                         "exec \"if [[ \\\\\"$(i3-msg [workspace=__focused__] mark a)\\\\\" =~ \\\\\"false\\\\\" ]]; then i3-msg [workspace=\\\\\"^1:" project-name " /\\\\\"] kill; emacs -project \\\\\"" project-path "\\\\\"& fi\""
+                         "exec \"if [[ \\\"$(i3-msg [workspace=__focused__ class=Emacs window_type=normal tiling] mark a)\\\" =~ \\\"false\\\" ]]; then i3-msg [workspace=\\\"^1:" project-name " /\\\"] kill; emacs -project \\\"" project-path "\\\" & fi\""
                          ))
                 ))))
       (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)
@@ -139,6 +139,7 @@
       (setq speedbar-show-unknown-files t)
       (setq speedbar-directory-unshown-regexp "^\\(\\.*\\)\\'\\|^target\\'")
       (setq speedbar-file-unshown-regexp "^\\(\\.*\\)\\'\\|\\.lock\\'\\|^\\(\\#*\\)\\#\\'")
+      ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Regexps.html
       (sr-speedbar-open)
 
       ;; copy, rename, delete, speedbar-creat-directory works just like in dired;
@@ -203,6 +204,9 @@
 ;; chromium --user-data-dir=project_path/.cache/chromium
 ;; if you don't want to start a new Chromium instance, create a profile directory symlinked to "project_path/.cache/chromium" then:
 ;;   chromium --profile-directory=project_name
+;; https://peter.sh/experiments/chromium-command-line-switches/#repl
+;;   chromium tab groups
+;; chromium startup id
 
 ;; view-mode
 ;; https://github.com/emacs-evil/evil
