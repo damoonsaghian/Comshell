@@ -201,12 +201,9 @@
 
 ;; https://www.emacswiki.org/emacs/BrowseUrl
 ;; browse-url-browser-function
-;; chromium --user-data-dir=project_path/.cache/chromium
-;; if you don't want to start a new Chromium instance, create a profile directory symlinked to "project_path/.cache/chromium" then:
-;;   chromium --profile-directory=project_name
-;; https://peter.sh/experiments/chromium-command-line-switches/#repl
-;;   chromium tab groups
-;; chromium startup id
+;; epiphany --profile=project_path/.cache/epiphany/config/link-name
+;; XDG_DATA_HOME = project_path/.cache/epiphany/data
+;; XDG_CACHE_HOME = project_path/.cache/epiphany/cache
 
 ;; view-mode
 ;; https://github.com/emacs-evil/evil
