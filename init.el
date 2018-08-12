@@ -200,10 +200,11 @@
         (message "file doesn't exist: '%s';" $path)))))
 
 ;; https://www.emacswiki.org/emacs/BrowseUrl
-;; browse-url-browser-function
-;; epiphany --profile=project_path/.cache/epiphany/config/link-name
-;; XDG_DATA_HOME = project_path/.cache/epiphany/data
-;; XDG_CACHE_HOME = project_path/.cache/epiphany/cache
+;; create a profile directory symlinked to "project_path/.cache/chromium" then:
+;; ; chromium --profile-directory=project_name
+;; can profiles share data (like local storage) using symlinks;
+;; https://peter.sh/experiments/chromium-command-line-switches
+;; Chromium startup notification is broken;
 
 ;; view-mode
 ;; https://github.com/emacs-evil/evil
