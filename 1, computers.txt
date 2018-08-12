@@ -12,6 +12,7 @@ Linux is a highly developted, constantly evolving, open_source kernel;
 in Linux (and other Unix based operating systems) most things appear in the file system; i think the reason is to make it possible to do a lot of things using shell scripts instead of a proper programming language; while i can understand the convenience it provides, i think it's bad design;
 "https://github.com/thepowersgang/rust_os"
 "https://github.com/ryanra/RustOS"
+"https://dominuscarnufex.github.io/cours/rs-kernel/en.html"
 
 compilers are special programs that obtain computer instructions from a program written in a language which is human readable and structured; this way the written program will be portable to different computer architectures;
 Rust is a programming language which provides zero cost abstractions (eg a well designed type system, and functional programming techniques), and memory safety without garbage collection; thus there is absolutely no reason to write new software in C/C++;

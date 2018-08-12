@@ -202,9 +202,7 @@
 ;; https://www.emacswiki.org/emacs/BrowseUrl
 ;; create a profile directory symlinked to "project_path/.cache/chromium" then:
 ;; ; chromium --profile-directory=project_name
-;; can profiles share data (like local storage) using symlinks;
 ;; https://peter.sh/experiments/chromium-command-line-switches
-;; Chromium startup notification is broken;
 
 ;; view-mode
 ;; https://github.com/emacs-evil/evil

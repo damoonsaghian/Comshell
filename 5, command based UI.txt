@@ -43,6 +43,10 @@ text files are opened in a text editor panel at the right;
 directories with ".m" extension are opened in a panel at the right, showing thumbnails of the files in it;
 in the panel, we can move between files (by typing their name), or create new files;
 
-external projects (which can also be websites, pdf, etc) will be opened and accessed from links inside the main project (not from projects list); we can always go back to the main project easily;
+in any project we can open a file in a new workspace;
+
+other's projects can be opened and accessed from links inside the main project;
+
+in any project a floating web_browser window can be opened;
 
 focus paragraph, ie auto scroll to reveal whole paragraph;
