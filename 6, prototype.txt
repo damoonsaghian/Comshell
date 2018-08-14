@@ -1,4 +1,8 @@
-we can use existing tools, to create a prototype of the command based UI discussed in the previous chapter.
+writing all of these, from scratch, in Rust will be a huge project; as a cheaper solution we can use existing tools to create a prototype;
+we need a framework which provides everything we need, and we need a simple way to script them; the best choice i've found is GTK and Lua;
+"https://github.com/pavouk/lgi/tree/master/docs"
+"https://github.com/pavouk/lgi/tree/master/samples"
+"https://wiki.gnome.org/Projects/GtkSourceView"
 
 Arch Linux provides a shared_library distribution system, which is simple and effective, and is very close to the original build process;
 
@@ -17,7 +21,7 @@ now to reuse previously downloaded packages on your system, and to prevent them 
 
 ; pacstrap /mnt pacman
 ; arch-chroot /mnt
-; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip rust rust-docs gcc xorg-server xf86-video-{intel,nouveau,amdgpu} xorg-xinit i3-wm i3status deepin-gtk-theme ttf-droid ttf-hack emacs chromium mpv
+; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip sway ttf-hack ttf-droid deepin-gtk-theme gtk3 gtksourceview3 vte3 gst-plugins-{base,good,bad} gst-libav webkit2gtk lua-lgi
 
 monospace fonts: wide characters are forced to squeeze, narrow characters are forced to stretch, uppercase letters look skinny next to lowercase, and bold characters don’t have enough room;
 proportional font for code: generous spacing, large punctuation, and easily distinguishable characters, while allowing each character to take up the space that it needs;
@@ -62,14 +66,9 @@ for devices with hardware mute and volume control, PulseAudio mutes and silences
 
 ; nano ~/.bash_profile
   export TZ="/usr/share/zoneinfo/<your_location>"
-  startx
-; nano ~/.xinitrc
-  exec i3
+  sway
 
-; mkdir -p ~/.config/i3
-; cp i3.conf ~/.config/i3/config
-; mkdir -p ~/.config/i3status
-; cp i3status.conf ~/.config/i3status/config
-
-; cp init.el ~/.emacs.d/init.el
-ELisp is terrible as a programming language, but it's pretty good as a command interface (ie as a shell, like Bash).
+; mkdir -p ~/.config/sway
+; nano ~/.config/sway/config
+  default_border none
+  exec "lua comshell.lua; sway-msg exit"
