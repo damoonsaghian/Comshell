@@ -1,8 +1,17 @@
-command based user interfaces (using keyboard, voice, gesture) are faster, more convenient and more powerful than pointing based user interfaces (using mouse, touch, pen);
-although touch interfaces can still be useful in simple limited applications; and for some special artistic applications, pen input remains the only choice;
-unlike a general speech recognition process, voice commands are much simpler for a speech recognition engine to process, since it needs to match against a relatively small set of commands;
-a headset with near range microphone can be used, to exclude far away sound sources; also it is better to put battery and bluetooth of the headset in a separate unit, that can be put in the pocket; this makes the headset lighter and safer;
-for those who neither can use all their fingers, nor can talk, gesture based (2d) input can be implemented;
+command based user interfaces (using keyboard, voice, gesture) are
+  faster, more convenient and more powerful
+  than pointing based user interfaces (using mouse, touch, pen);
+although touch interfaces can still be useful in simple limited applications;
+  and for some special artistic applications, pen input remains the only choice;
+unlike a general speech recognition process,
+  voice commands are much simpler for a speech recognition engine to process,
+  since it needs to match against a relatively small set of commands;
+a headset with near range microphone can be used, to exclude far away sound sources;
+  also it is better to put battery and bluetooth of the headset in a separate unit,
+    that can be put in the pocket;
+  this makes the headset lighter and safer;
+for those who neither can use all their fingers, nor can talk,
+  gesture based (2d) input can be implemented;
 
 ".data/keyboard.png"
 missing characters can be entered like this:
@@ -27,7 +36,8 @@ modes (like normal mode and insert mode) must be visually distinctive;
 press escape to go back to normal mode;
 in normal mode we can:
 , move the cursor to the next or previous characters or words
-, move the cursor to the next or previous (or by entering the number directly to) lines (or table cells)
+, move the cursor to the next or previous
+  (or by entering the number directly to) lines (or table cells)
 , move the cursor to the next or previous paragraphs
 , start and end selection, then copy or cut
 , paste
@@ -35,22 +45,31 @@ in normal mode we can:
 , find
 , enter insert mode
 
-projects are looked for in "~/projects/" and all directories named "projects" on all disks, and shown in lists side by side (files from different disks will be in separate lists);
-from these lists, we can open projects (or switch to them if they are already open), create new projects, etc;
+projects are looked for in "~/projects/" and all directories named "projects" on all disks,
+  and shown in lists side by side (files from different disks will be in separate lists);
+from these lists, we can open projects (or switch to them if they are already open),
+  create new projects, etc;
 
-automatically mount storage devices when available, and show their "projects" directories in seperate panes;
-the name of projects in other panes will be named like this: "project_name/partition_name/";
+automatically mount storage devices when available,
+  and show their "projects" directories in seperate panes;
+the name of projects in other panes will be named like this:
+  "project_name/partition_name/";
 after unmounting a pane, we must close it'e views
 
-a bar at the top shows project name, the project views numbers, and at the right end, date and various status informations;
+a bar at the top shows project name, the project views numbers,
+  and at the right end, date and various status informations;
 
-go to the view named "project_name", and put it's name at the bar; if there is no view named "project_name", open one;
+go to the view named "project_name", and put it's name at the bar;
+  if there is no view named "project_name", open one;
 
 a panel at the left shows a tree view of the files in the project;
 text files are opened in a text editor panel at the right;
-directories with ".m" extension are opened in a panel at the right, showing thumbnails of the files in it;
-in the left panel, we can move between files, by typing their name; and we can copy, rename, delete, or create files in it;
+directories with ".m" extension are opened in a panel at the right,
+  showing thumbnails of the files in it;
+in the left panel, we can move between files, by typing their name;
+  and we can copy, rename, delete, or create files in it;
 
-other projects, web pages, pdf documents, etc can be opened and accessed from links inside the main project;
+other projects, web pages, pdf documents, etc,
+  can be opened and accessed from links inside the main project;
 
 focus paragraph, ie auto scroll to reveal whole paragraph;

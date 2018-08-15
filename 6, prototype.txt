@@ -1,30 +1,54 @@
-writing all of these, from scratch, in Rust will be a huge project; as a cheaper solution we can use existing tools to create a prototype;
-we need a framework which provides everything we need, and we need a simple way to script them; the best choice i've found is GTK and Lua;
+writing all of these, from scratch, in Rust will be a huge project;
+  as a cheaper solution we can use existing tools to create a prototype;
+we need a framework which provides everything we need,
+  and we need a simple way to script them;
+  the best choice i've found is GTK and Lua;
 "https://github.com/pavouk/lgi/tree/master/docs"
 "https://github.com/pavouk/lgi/tree/master/samples"
 "https://wiki.gnome.org/Projects/GtkSourceView"
 
-Arch Linux provides a shared_library distribution system, which is simple and effective, and is very close to the original build process;
+Arch Linux provides a shared_library distribution system,
+  which is simple and effective,
+  and is very close to the original build process;
 
-boot to an existing Arch Linux (the live image, or an already installed Arch Linux with arch-install-scripts package installed) then:
+boot to an existing Arch Linux
+  (the live image,
+    or an already installed Arch Linux with arch-install-scripts package installed)
+  then:
 ; timedatectl set-ntp true
 
-list disks using "fdisk -l"; then use "fdisk /dev/sdx" to create 3 partitions (first enter "g" command to create a GPT partition table, then enter "n" to add a new partition, and change its type using "t" command; at the end enter "w" to write and exit):
+list disks using "fdisk -l"; then use "fdisk /dev/sdx" to create 3 partitions:
   , +1M BIOS boot (partition type code: 4)
   , +550M EFI System (partition tye code: 1)
   , and the rest for Linux filesystem
+  (first enter "g" command to create a GPT partition table,
+    then enter "n" to add a new partition, and change its type using "t" command;
+    at the end enter "w" to write and exit;)
 format the partitions:
   ; mkfs.fat -F32 /dev/sdx2; mkfs.ext4 /dev/sdx3
 
 ; mount /dev/sdx3 /mnt
-now to reuse previously downloaded packages on your system, and to prevent them from being downloaded again, you can copy them to "/mnt/var/cache/pacman/pkg";
+now to reuse previously downloaded packages on your system,
+  and to prevent them from being downloaded again,
+  you can copy them to "/mnt/var/cache/pacman/pkg";
 
 ; pacstrap /mnt pacman
 ; arch-chroot /mnt
-; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip sway ttf-hack ttf-droid deepin-gtk-theme gtk3 gtksourceview3 vte3 gst-plugins-{base,good,bad} gst-libav webkit2gtk lua-lgi
+; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
+  networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip \
+  sway ttf-hack ttf-droid deepin-gtk-theme \
+  gtk3 gtksourceview3 vte3 gst-plugins-{base,good,bad} gst-libav webkit2gtk lua-lgi
 
-monospace fonts: wide characters are forced to squeeze, narrow characters are forced to stretch, uppercase letters look skinny next to lowercase, and bold characters don’t have enough room;
-proportional font for code: generous spacing, large punctuation, and easily distinguishable characters, while allowing each character to take up the space that it needs;
+monospace fonts:
+, wide characters are forced to squeeze
+, narrow characters are forced to stretch
+, uppercase letters look skinny next to lowercase
+, and bold characters don’t have enough room;
+proportional font for code:
+, generous spacing
+, large punctuation
+, and easily distinguishable characters
+, while allowing each character to take up the space that it needs
 "http://input.fontbureau.com/info/"
 two spaces -> elastic blocks
 "http://nickgravgaard.com/elastic-tabstops/"
@@ -42,7 +66,9 @@ create user:
 ; passwd -d user1
 ; EDITOR=nano visudo
   %wheel ALL=(ALL) ALL
-i know that having sudo without password has no security advantage over just using root; but the problem is that some programs (like PulseAudio and Chromium) wouldn't work normally when run as root;
+i know that having sudo without password has no security advantage over just using root;
+  but the problem is that some programs (like PulseAudio)
+    wouldn't work normally when run as root;
 
 ; mkdir /etc/systemd/system/getty@tty1.service.d
 ; nano /etc/systemd/system/getty@tty1.service.d/override.conf
@@ -60,7 +86,9 @@ i know that having sudo without password has no security advantage over just usi
   gtk-theme-name = deepin
   gtk-font-name = Sans
 
-for devices with hardware mute and volume control, PulseAudio mutes and silences them by default; so if you like you can do this:
+for devices with hardware mute and volume control,
+  PulseAudio mutes and silences them by default;
+  so if you like you can do this:
 ; pactl set-sink-mute @DEFAULT_SINK@ 0
 ; pactl set-sink-volume @DEFAULT_SINK@ 100%
 
@@ -71,4 +99,4 @@ for devices with hardware mute and volume control, PulseAudio mutes and silences
 ; mkdir -p ~/.config/sway
 ; nano ~/.config/sway/config
   default_border none
-  exec "lua comshell.lua; sway-msg exit"
+  exec "lua comshell.lua; swaymsg exit"
