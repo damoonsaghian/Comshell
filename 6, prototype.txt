@@ -1,8 +1,9 @@
-writing all of these, from scratch, in Rust will be a huge project;
-  as a cheaper solution we can use existing tools to create a prototype;
+since the needed platform is still not ready,
+  for now we use existing tools to create a prototype of Comshell;
 we need a framework which provides everything we need,
   and we need a simple way to script them;
-  the best choice i've found is GTK and Lua;
+  the best choice i've found is GTK plus Lua;
+"https://www.lua.org/spe.html"
 "https://github.com/pavouk/lgi/tree/master/docs"
 "https://github.com/pavouk/lgi/tree/master/samples"
 "https://wiki.gnome.org/Projects/GtkSourceView"
@@ -100,3 +101,20 @@ for devices with hardware mute and volume control,
 ; nano ~/.config/sway/config
   default_border none
   exec "lua comshell.lua; swaymsg exit"
+
+the above is for the time when Sway with "wlroot" is ready;
+  before that we can use "i3-wm";
+; pacman -S xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-wm
+; nano ~/.bash_profile
+  export TZ="/usr/share/zoneinfo/<your_location>"
+  startx
+; nano ~/.xinitrc
+  exec i3
+; mkdir -p ~/.config/i3
+; nano ~/.config/i3/config
+  default_border none
+  exec compton --shadow-exclude "class_g %= '*'" --unredir-if-possible-exclude "class_g %= '*'"
+  exec "lua comshell.lua; swaymsg exit"
+  
+
+"https://wiki.archlinux.org/index.php/Udisks#udevadm_monitor"
