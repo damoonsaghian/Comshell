@@ -1,12 +1,11 @@
 since the needed platform is still not ready,
   for now we use existing tools to create a prototype of Comshell;
 we need a framework which provides everything we need,
-  and we need a simple way to script them;
-  the best choice i've found is GTK plus Lua;
-"https://www.lua.org/spe.html"
-"https://github.com/pavouk/lgi/tree/master/docs"
-"https://github.com/pavouk/lgi/tree/master/samples"
-"https://wiki.gnome.org/Projects/GtkSourceView"
+  and we need a simple way to script it;
+  the best choice i've found is GTK plus Javascript;
+"https://gitlab.gnome.org/GNOME/gjs"
+"http://devdocs.baznga.org"
+"https://www.liip.ch/en/blog/why-i-dont-use-the-javascript-new-keyword"
 
 Arch Linux provides a shared_library distribution system,
   which is simple and effective,
@@ -38,21 +37,7 @@ now to reuse previously downloaded packages on your system,
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
   networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip \
   sway ttf-hack ttf-droid deepin-gtk-theme \
-  gtk3 gtksourceview3 vte3 gst-plugins-{base,good,bad} gst-libav webkit2gtk lua-lgi
-
-monospace fonts:
-, wide characters are forced to squeeze
-, narrow characters are forced to stretch
-, uppercase letters look skinny next to lowercase
-, and bold characters don’t have enough room;
-proportional font for code:
-, generous spacing
-, large punctuation
-, and easily distinguishable characters
-, while allowing each character to take up the space that it needs
-"http://input.fontbureau.com/info/"
-two spaces -> elastic blocks
-"http://nickgravgaard.com/elastic-tabstops/"
+  gtk3 gtksourceview3 vte3 gst-plugins-{base,good,bad} gst-libav webkit2gtk gjs
 
 install bootloader:
 ; grub-install --target=i386-pc /dev/sdx
@@ -68,9 +53,10 @@ create user:
 ; EDITOR=nano visudo
   %wheel ALL=(ALL) ALL
 i know that having sudo without password has no security advantage over just using root;
-  but the problem is that some programs (like PulseAudio)
-    wouldn't work normally when run as root;
+but a regular user is necessary, because
+  some programs (like PulseAudio) wouldn't work normally when run as root;
 
+automatic login:
 ; mkdir /etc/systemd/system/getty@tty1.service.d
 ; nano /etc/systemd/system/getty@tty1.service.d/override.conf
   [Service]
@@ -89,7 +75,7 @@ i know that having sudo without password has no security advantage over just usi
 
 for devices with hardware mute and volume control,
   PulseAudio mutes and silences them by default;
-  so if you like you can do this:
+so if you like you can do this:
 ; pactl set-sink-mute @DEFAULT_SINK@ 0
 ; pactl set-sink-volume @DEFAULT_SINK@ 100%
 
@@ -100,10 +86,10 @@ for devices with hardware mute and volume control,
 ; mkdir -p ~/.config/sway
 ; nano ~/.config/sway/config
   default_border none
-  exec "lua comshell.lua; swaymsg exit"
+  exec "gjs comshell.js; swaymsg exit"
 
-the above is for the time when Sway with "wlroot" is ready;
-  before that we can use "i3-wm";
+actually Sway (with "wlroot") is not ready yet;
+  so til then, we can use "i3-wm";
 ; pacman -S xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-wm
 ; nano ~/.bash_profile
   export TZ="/usr/share/zoneinfo/<your_location>"
@@ -114,7 +100,6 @@ the above is for the time when Sway with "wlroot" is ready;
 ; nano ~/.config/i3/config
   default_border none
   exec compton --shadow-exclude "class_g %= '*'" --unredir-if-possible-exclude "class_g %= '*'"
-  exec "lua comshell.lua; swaymsg exit"
-  
+  exec "gjs comshell.js; i3-msg exit"
 
 "https://wiki.archlinux.org/index.php/Udisks#udevadm_monitor"

@@ -60,3 +60,17 @@ objects are moved to the tree; they can be accessed only internally;
   it means that, unlike in a scene_graph,
     pointers to objects in the tree are not accessible globally;
   so there are no free pointers, and no need for run_time memory management;
+
+monospace fonts:
+  wide characters are forced to squeeze;
+  narrow characters are forced to stretch;
+  uppercase letters look skinny next to lowercase;
+  bold characters don’t have enough room;
+proportional font for code:
+  generous spacing
+  large punctuation
+  and easily distinguishable characters
+  while allowing each character to take up the space that it needs
+"http://input.fontbureau.com/info/"
+two spaces -> elastic blocks
+"http://nickgravgaard.com/elastic-tabstops/"
