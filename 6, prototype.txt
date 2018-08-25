@@ -4,8 +4,18 @@ we need a framework which provides everything we need,
   and we need a simple way to script it;
   the best choice i've found is GTK plus Javascript;
 "https://gitlab.gnome.org/GNOME/gjs"
+"https://gjs-tutorial.readthedocs.io/en/latest/introduction.html"
+"https://github.com/optimisme/gjs-examples"
+"https://github.com/gcampax/gtk-js-app"
 "http://devdocs.baznga.org"
+
 "https://www.liip.ch/en/blog/why-i-dont-use-the-javascript-new-keyword"
+so just use the "Class.new()" instead of "new Class()";
+it's also possible to change the constructor in a way to avoid "new" keyword;
+  "https://muffinresearch.co.uk/js-create-instances-without-new/"
+  "https://jfire.io/blog/2013/03/20/newless-javascript/"
+  "https://stackoverflow.com/questions/1889014/can-i-construct-a-javascript-object-without-using-the-new-keyword"
+i prefer the first approach; it's more elegant and doesn't  need extra work;
 
 Arch Linux provides a shared_library distribution system,
   which is simple and effective,
@@ -62,6 +72,12 @@ automatic login:
   [Service]
   ExecStart=
   ExecStart=-/usr/bin/agetty --autologin user1 --noclear %I $TERM
+
+; nano /etc/locale.gen
+  en_US.UTF-8 UTF-8
+; locale-gen
+; nano /etc/locale.conf
+  LANG=en_US.UTF-8
 
 ; systemctl enable NetworkManager.service
 ; systemctl enable systemd-timesyncd.service
