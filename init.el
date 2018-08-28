@@ -23,7 +23,7 @@
 (setq visible-bell t)
 (setq make-backup-files nil)
 ;; (setq-default mode-line-format nil)
-(setq insert-default-directory nil)
+(setq insert-default-directory nil) ;; or use double slash mechanism;
 (global-eldoc-mode -1)
 (global-set-key (kbd "C-x k") #'kill-this-buffer)
 
@@ -35,6 +35,7 @@
 (add-to-list 'default-frame-alist '(scroll-bar-width . 13))
 (add-to-list 'default-frame-alist '(left-fringe . 2))
 (add-to-list 'default-frame-alist '(right-fringe . 0))
+(setq window-sides-vertical t)
 
 (setq scroll-conservatively 200) ;; never recenter point
 ;; move point to top/bottom of buffer before signaling a scrolling error;
@@ -79,6 +80,8 @@
 (setq dired-recursive-copies 'always)
 (setq dired-listing-switches "-lA")
 ;; https://www.emacswiki.org/emacs/DiredView
+;; async file operations in dired
+https://wiki.archlinux.org/index.php/Udisks#udevadm_monitor
 
 ;; when Emacs is called with -projects argument, show the list of projects:
 (add-to-list
@@ -154,6 +157,11 @@
       ;; button-face, file-face, directory-face, selected-face
       ;; speedbar-path-line
       ;; speedbar-ignored-directory-expressions, speedbar-ignored-path-expressions
+      ;; speedbar-{next,prev,item-{copy,rename,delet},create-directoy,update-current-file,
+      ;;   line-file -> file or directory name
+      ;;   line-directoy,do-function-pointer,expand-line,contract-line}
+      ;;speedbar-selected-face :foreground "..." :underline nil :background "..."
+
 
       (defun go-to-sr-speedbar ()
         (interactive)

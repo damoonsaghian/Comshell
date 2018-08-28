@@ -1,4 +1,4 @@
-for now we use existing tools to create a prototype of command based user interface;
+we can use existing tools to create a prototype of command based user interface;
 
 Arch Linux provides a shared_library distribution system,
   which is simple and effective,
