@@ -56,11 +56,8 @@ the name of projects in other panes will be named like this:
   "project_name/partition_name/";
 after unmounting a pane, we must close it'e views
 
-a bar at the top shows project name, the project views numbers,
+a bar at the top shows project name,
   and at the right end, date and various status informations;
-
-go to the view named "project_name", and put it's name at the bar;
-  if there is no view named "project_name", open one;
 
 a panel at the left shows a tree view of the files in the project;
 text files are opened in a text editor panel at the right;

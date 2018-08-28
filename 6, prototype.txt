@@ -1,29 +1,12 @@
-since the needed platform is still not ready,
-  for now we use existing tools to create a prototype of Comshell;
-we need a framework which provides everything we need,
-  and we need a simple way to script it;
-  the best choice i've found is GTK plus Javascript;
-"https://gitlab.gnome.org/GNOME/gjs"
-"https://gjs-tutorial.readthedocs.io/en/latest/introduction.html"
-"https://github.com/optimisme/gjs-examples"
-"https://github.com/gcampax/gtk-js-app"
-"http://devdocs.baznga.org"
-
-"https://www.liip.ch/en/blog/why-i-dont-use-the-javascript-new-keyword"
-so just use the "Class.new()" instead of "new Class()";
-it's also possible to change the constructor in a way to avoid "new" keyword;
-  "https://muffinresearch.co.uk/js-create-instances-without-new/"
-  "https://jfire.io/blog/2013/03/20/newless-javascript/"
-  "https://stackoverflow.com/questions/1889014/can-i-construct-a-javascript-object-without-using-the-new-keyword"
-i prefer the first approach; it's more elegant and doesn't  need extra work;
+for now we use existing tools to create a prototype of command based user interface;
 
 Arch Linux provides a shared_library distribution system,
   which is simple and effective,
   and is very close to the original build process;
 
 boot to an existing Arch Linux
-  (the live image,
-    or an already installed Arch Linux with arch-install-scripts package installed)
+  (the live image, or an already installed Arch Linux
+    with arch-install-scripts package installed)
   then:
 ; timedatectl set-ntp true
 
@@ -46,8 +29,8 @@ now to reuse previously downloaded packages on your system,
 ; arch-chroot /mnt
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
   networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip \
-  sway ttf-hack ttf-droid deepin-gtk-theme \
-  gtk3 gtksourceview3 vte3 gst-plugins-{base,good,bad} gst-libav webkit2gtk gjs
+  xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-wm i3status xdotool\
+  ttf-hack emacs deepin-gtk-theme ttf-droid firefox mpv
 
 install bootloader:
 ; grub-install --target=i386-pc /dev/sdx
@@ -97,25 +80,15 @@ so if you like you can do this:
 
 ; nano ~/.bash_profile
   export TZ="/usr/share/zoneinfo/<your_location>"
-  sway
-
-; mkdir -p ~/.config/sway
-; nano ~/.config/sway/config
-  default_border none
-  exec "gjs comshell.js; swaymsg exit"
-
-actually Sway (with "wlroot") is not ready yet;
-  so til then, we can use "i3-wm";
-; pacman -S xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-wm
-; nano ~/.bash_profile
-  export TZ="/usr/share/zoneinfo/<your_location>"
   startx
 ; nano ~/.xinitrc
   exec i3
-; mkdir -p ~/.config/i3
-; nano ~/.config/i3/config
-  default_border none
-  exec compton --shadow-exclude "class_g %= '*'" --unredir-if-possible-exclude "class_g %= '*'"
-  exec "gjs comshell.js; i3-msg exit"
 
-"https://wiki.archlinux.org/index.php/Udisks#udevadm_monitor"
+; mkdir -p ~/.config/i3
+; cp i3.conf ~/.config/i3/config
+; mkdir -p ~/.config/i3status
+; cp i3status.conf ~/.config/i3status/config
+
+; cp init.el ~/.emacs.d/init.el
+ELisp is terrible as a programming language,
+  but it's pretty good as a command interface (ie as a shell, like Bash).
