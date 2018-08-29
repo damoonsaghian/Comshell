@@ -45,7 +45,7 @@
 (setq-default cursor-in-non-selected-windows nil)
 
 (add-to-list 'default-frame-alist '(foreground-color . "#222222"))
-(set-face-attribute 'highlight nil :background "lemon chiffon")
+(set-face-attribute 'highlight nil :background "LightSkyBlue1")
 (set-face-attribute 'region nil :background "LightSkyBlue1")
 (set-face-attribute 'default nil :height 105)
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
@@ -79,8 +79,22 @@
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
 (setq dired-listing-switches "-lA")
+(add-hook 'dired-mode-hook (lambda () (progn (dired-hide-details-mode 1)
+                                             (setq cursor-type nil)
+                                             (hl-line-mode 1))))
 ;; https://www.emacswiki.org/emacs/DiredView
 ;; async file operations in dired
+
+;; make highlighted lines in other (not selected) windows gray;
+(defun hl-line-update-face (window)
+  "update the `hl-line' face in WINDOW to indicate whether the window is selected;"
+  (with-current-buffer (window-buffer window)
+    (when (or global-hl-line-mode hl-line-mode)
+      (if (eq (current-buffer) (window-buffer (selected-window)))
+          (face-remap-reset-base 'hl-line)
+        (face-remap-set-base 'hl-line :background "#dddddd")))))
+(add-hook 'buffer-list-update-hook
+          (lambda () (walk-windows #'hl-line-update-face nil t)))
 
 ;; when Emacs is called with -projects argument, show the list of projects:
 (add-to-list
@@ -122,9 +136,7 @@
                          ))
                 ))))
       (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)
-
-      ;; packages which need to be installed, but are not needed to be "required" in projects view instance:
-      (install-package 'sr-speedbar))))
+      )))
 
 ;; when Emacs is called with -project argument:
 (add-to-list
@@ -132,50 +144,40 @@
  (cons
   "project"
   #'(lambda (project-path)
-      (desktop-save-mode 1)
+
+      (require 'desktop)
+      (let ((desktop-file-dir-path (expand-file-name ".cache/" project-path))
+            (desktop-file-path (expand-file-name ".cache/.emacs.desktop" project-path)))
+        (unless (file-exists-p desktop-file-dir-path)
+          (make-directory desktop-file-dir-path t))
+        (unless (file-exists-p desktop-file-path)
+          (write-region "" nil desktop-file-path))
+        (add-to-list 'desktop-path desktop-file-dir-path))
       (setq desktop-restore-frames nil)
-      (desktop-change-dir project-path)
-      ;; restore the last visited buffer
+      (setq desktop-load-locked-desktop t)
+      (desktop-save-mode 1)
+      ;; restore the last visited buffer belonging to current project;
 
-      (require-package 'sr-speedbar)
-      (setq sr-speedbar-right-side nil)
-      (setq sr-speedbar-default-width 50)
-      ;; (setq sr-speedbar-delete-windows t)
-      (setq sr-speedbar-skip-other-window-p t)
-      (setq sr-speedbar-auto-refresh t)
-      (setq speedbar-use-images nil)
-      (setq speedbar-indentation-width 2)
-      (setq speedbar-show-unknown-files t)
-      (setq speedbar-directory-unshown-regexp "^\\(\\.*\\)\\'\\|^target\\'")
-      (setq speedbar-file-unshown-regexp "^\\(\\.*\\)\\'\\|\\.lock\\'\\|^\\(\\#*\\)\\#\\'")
+      ;; https://www.gnu.org/software/emacs/draft/manual/html_node/elisp/Side-Windows.html
+      ;; http://mads-hartmann.com/2016/05/12/emacs-tree-view.html
+
+      ;; (setq directory-unshown-regexp "^\\(\\.*\\)\\'\\|^target\\'")
+      ;; (setq file-unshown-regexp "^\\(\\.*\\)\\'\\|\\.lock\\'\\|^\\(\\#*\\)\\#\\'")
       ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Regexps.html
-      (sr-speedbar-open)
 
-      ;; copy, rename, delete, speedbar-creat-directory works just like in dired;
-      ;; speedbar-line-{file,directory,path}
-      ;; speedbar-{edit,expand,contract}-line
-      ;; button-face, file-face, directory-face, selected-face
-      ;; speedbar-path-line
-      ;; speedbar-ignored-directory-expressions, speedbar-ignored-path-expressions
-      ;; speedbar-{next,prev,item-{copy,rename,delet},create-directoy,update-current-file,
-      ;;   line-file -> file or directory name
-      ;;   line-directoy,do-function-pointer,expand-line,contract-line}
-      ;;speedbar-selected-face :foreground "..." :underline nil :background "..."
+      ;;(defun go-to-tree-view-window ()
+      ;;  (interactive)
+      ;;  (if (sr-speedbar-exist-p)
+      ;;      (select-window tree-view-window)
+      ;;    (tree-view-open)
+      ;;    (select-window tree-view-window)))
+      ;;(global-set-key (kbd "C-c s") 'go-to-tree-view-window)
 
-
-      (defun go-to-sr-speedbar ()
-        (interactive)
-        (if (sr-speedbar-exist-p)
-            (select-window sr-speedbar-window)
-          (sr-speedbar-open)
-          (select-window sr-speedbar-window)))
-      (global-set-key (kbd "C-c s") 'go-to-sr-speedbar)
-
-      (defun sr-speedbar-open-file ()
-        (interactive)
-        (let ((file-name (speedbar-line-file nil t)))
-          (if (and (file-directory-p file-name) (string-match-p "\\.m\\'" file-name))
-              (find-file file-name)
+      ;;(defun tree-view-open-file ()
+      ;;  (interactive)
+      ;;  (let ((file-name (dired-line-file nil t)))
+      ;;    (if (and (file-directory-p file-name) (string-match-p "\\.m\\'" file-name))
+      ;;        (find-file file-name)
               ;; open image-dired/movie in the right window
               ;; http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
               ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
@@ -183,11 +185,11 @@
               ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
               ;; https://github.com/larsmagne/movie.el
               ;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
-              ;; https://www.gnu.org/software/emms/screenshots.html
+              ;; https://www.gnu.org/software/emms/
               ;; http://wikemacs.org/wiki/Media_player
               ;; https://github.com/dbrock/bongo
-            (speedbar-find-file))))
-      (define-key speedbar-mode-map [remap speedbar-find-file] speedbar-open-file)
+      ;;      (dired-find-file))))
+      ;;(define-key dired-mode-map [remap dired-find-file] dired-open-file)
       )))
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/FFAP.html
@@ -266,3 +268,6 @@
 ;;   https://github.com/atykhonov/google-translate
 ;; https://www.gnu.org/software/emacs/manual/html_node/calc/index.html
 ;; https://github.com/domtronn/all-the-icons.el
+;; https://www.gnu.org/software/emacs-muse/manual/html_node/Extending-Muse.html#Extending-Muse
+;; https://github.com/Fuco1/smartparens
+;; http://company-mode.github.io/
