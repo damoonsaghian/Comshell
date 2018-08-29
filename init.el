@@ -81,7 +81,6 @@
 (setq dired-listing-switches "-lA")
 ;; https://www.emacswiki.org/emacs/DiredView
 ;; async file operations in dired
-https://wiki.archlinux.org/index.php/Udisks#udevadm_monitor
 
 ;; when Emacs is called with -projects argument, show the list of projects:
 (add-to-list
@@ -98,6 +97,7 @@ https://wiki.archlinux.org/index.php/Udisks#udevadm_monitor
       ;;   "project_name/partition_name/";
       ;; after unmounting a pane, we must force close all windows
       ;;   in workspaces named "*/partition_name/";
+      ;; https://wiki.archlinux.org/index.php/Udisks#udevadm_monitor
 
       (defun dired-find-project ()
         (interactive)
@@ -188,12 +188,6 @@ https://wiki.archlinux.org/index.php/Udisks#udevadm_monitor
               ;; https://github.com/dbrock/bongo
             (speedbar-find-file))))
       (define-key speedbar-mode-map [remap speedbar-find-file] speedbar-open-file)
-
-      ;; when we want to view a file of a project, in a new workspace:
-      ;; , first rename the current workspace which is "project_name", to "project_name /current_file_name/";
-      ;; , then go to the workspace "project_name /file_name/", and if there is no window in there, open a new Emacs frame for the file;
-      ;; , then rename the workspace to "project_name";
-      ;; note that there would never be two workspace of a project, showing the same file; because when we want to open a file in a project, we check that if it's already open in a buffer, we first close all frames in the workspace "project_name /file_name/"; and only then we close and reopen the buffer;
       )))
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/FFAP.html
