@@ -17,14 +17,14 @@
 (package-initialize)
 ;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el
 
-(tool-bar-mode -1)
 (menu-bar-mode -1)
+(tool-bar-mode -1)
 (setq inhibit-startup-screen t)
 (setq visible-bell t)
-(setq make-backup-files nil)
 ;; (setq-default mode-line-format nil)
 (setq insert-default-directory nil) ;; or use double slash mechanism;
 (global-eldoc-mode -1)
+(setq make-backup-files nil)
 (global-set-key (kbd "C-x k") #'kill-this-buffer)
 
 (setq window-divider-default-places t
@@ -78,13 +78,14 @@
 (require 'dired)
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
-(setq dired-listing-switches "-lA")
+(setq dired-listing-switches "-l -I \".*\" -I \"#*#\" -I \"*.lock\" -I \"target\"")
 (add-hook 'dired-mode-hook (lambda () (progn (dired-hide-details-mode 1)
                                              (setq cursor-type nil)
                                              (hl-line-mode 1))))
 ;; https://www.emacswiki.org/emacs/DiredView
 ;; async file operations in dired
 
+(require 'hl-line)
 ;; make highlighted lines in other (not selected) windows gray;
 (defun hl-line-update-face (window)
   "update the `hl-line' face in WINDOW to indicate whether the window is selected;"
@@ -102,9 +103,8 @@
  (cons
   "projects"
   #'(lambda (projects-path)
-      (setq dired-listing-switches "-l -I \".*\" -I \"#*#\" -I \"*.lock\" -I \"target\"")
-      (add-hook 'dired-mode-hook 'dired-hide-details-mode)
       (dired projects-path)
+      
       ;; to do: automatically mount storage devices when available,
       ;;   and show their "projects" directories in seperate panes (Emacs windows);
       ;; the name of projects in other panes will be named like this:
@@ -119,21 +119,22 @@
           (if (file-directory-p project-path)
               (let ((project-name (file-name-nondirectory project-path))
                     (workspace-name (concat "\"1:" project-name "\"")))
-                ;; go to the workspace named "1:project_name", and rename it to "1:project_name"
-                ;;   (this apparently mundane command is for
+                ;; go to the workspace named "1:project_name";
+                ;; rename it to "1:project_name"; (this apparently mundane command is for
                 ;;     moving workspace button to the first position in i3-bar);
-                ;; then if there is no window in the workspace:
-                ;; , first close all windows in workspaces named "project_name /*";
+                ;; then if there is no Emacs frame with title "project_name" in the workspace:
+                ;; , first close all windows in current workspace;
                 ;; , then run a new instance of Emacs for this project;
-                (call-process "i3-msg" nil nil nil
-                 (concat "workspace " workspace-name "; "
-                         "rename workspace " workspace-name " to " workspace-name "; "
-                         "exec \"if 
-                           [[ \\\"$(i3-msg [workspace=__focused__ class=Emacs window_type=normal tiling] mark a)\\\" 
-                           =~ \\\"false\\\" ]]; 
-                         then i3-msg [workspace=\\\"^1:" project-name " /\\\"] kill; 
-                         emacs -project \\\"" project-path "\\\" & fi\""
-                         ))
+                (call-process
+                 "i3-msg" nil nil nil
+                 (concat
+                  "workspace " workspace-name "; "
+                  "rename workspace " workspace-name " to " workspace-name "; "
+                  "exec \"
+                    if [[ \\\"$(i3-msg [workspace=__focused__ class=Emacs tiling] focus)\\\"
+                      =~ \\\"false\\\" ]]; 
+                    then i3-msg [workspace=__focused__] kill; 
+                      emacs -project \\\"" project-path "\\\" & fi\""))
                 ))))
       (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)
       )))
@@ -189,7 +190,7 @@
               ;; http://wikemacs.org/wiki/Media_player
               ;; https://github.com/dbrock/bongo
       ;;      (dired-find-file))))
-      ;;(define-key dired-mode-map [remap dired-find-file] dired-open-file)
+      ;;(define-key dired-mode-map [remap dired-find-file] tree-view-open-file)
       )))
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/FFAP.html
