@@ -104,7 +104,7 @@
   "projects"
   #'(lambda (projects-path)
       (dired projects-path)
-      
+
       ;; to do: automatically mount storage devices when available,
       ;;   and show their "projects" directories in seperate panes (Emacs windows);
       ;; the name of projects in other panes will be named like this:
@@ -123,7 +123,7 @@
                 ;; rename it to "1:project_name"; (this apparently mundane command is for
                 ;;     moving workspace button to the first position in i3-bar);
                 ;; then if there is no Emacs frame with title "project_name" in the workspace:
-                ;; , first close all windows in current workspace;
+                ;; , first close all windows in workspaces named like this: "1:project_name*";
                 ;; , then run a new instance of Emacs for this project;
                 (call-process
                  "i3-msg" nil nil nil
@@ -133,7 +133,7 @@
                   "exec \"
                     if [[ \\\"$(i3-msg [workspace=__focused__ class=Emacs tiling] focus)\\\"
                       =~ \\\"false\\\" ]]; 
-                    then i3-msg [workspace=__focused__] kill; 
+                    then i3-msg [workspace=\\\"^" workspace-name "\\\"] kill; 
                       emacs -project \\\"" project-path "\\\" & fi\""))
                 ))))
       (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)
@@ -157,40 +157,37 @@
       (setq desktop-restore-frames nil)
       (setq desktop-load-locked-desktop t)
       (desktop-save-mode 1)
-      ;; restore the last visited buffer belonging to current project;
+
+      (find-file project-path)
 
       ;; https://www.gnu.org/software/emacs/draft/manual/html_node/elisp/Side-Windows.html
-      ;; http://mads-hartmann.com/2016/05/12/emacs-tree-view.html
 
-      ;; (setq directory-unshown-regexp "^\\(\\.*\\)\\'\\|^target\\'")
-      ;; (setq file-unshown-regexp "^\\(\\.*\\)\\'\\|\\.lock\\'\\|^\\(\\#*\\)\\#\\'")
-      ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Regexps.html
+      ;;(global-set-key (kbd "C-c s") 'go-to-side-window)
 
-      ;;(defun go-to-tree-view-window ()
-      ;;  (interactive)
-      ;;  (if (sr-speedbar-exist-p)
-      ;;      (select-window tree-view-window)
-      ;;    (tree-view-open)
-      ;;    (select-window tree-view-window)))
-      ;;(global-set-key (kbd "C-c s") 'go-to-tree-view-window)
-
-      ;;(defun tree-view-open-file ()
+      ;;(defun side-window-find-file ()
       ;;  (interactive)
       ;;  (let ((file-name (dired-line-file nil t)))
-      ;;    (if (and (file-directory-p file-name) (string-match-p "\\.m\\'" file-name))
-      ;;        (find-file file-name)
-              ;; open image-dired/movie in the right window
-              ;; http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
-              ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
-              ;; https://www.emacswiki.org/emacs/ThumbsMode
-              ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
-              ;; https://github.com/larsmagne/movie.el
-              ;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
-              ;; https://www.gnu.org/software/emms/
-              ;; http://wikemacs.org/wiki/Media_player
-              ;; https://github.com/dbrock/bongo
-      ;;      (dired-find-file))))
-      ;;(define-key dired-mode-map [remap dired-find-file] tree-view-open-file)
+      ;;    (if (file-directory-p file-name)
+      ;;      (if (string-match-p "\\.m\\'" file-name)
+                ;; "^\\(\\.*\\)\\'\\|^target\\'|\\.lock\\'\\|^\\(\\#*\\)\\#\\'"
+                ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Regexps.html
+      ;;          (progn
+                    ;; open image-dired/movie in the right window
+                    ;; http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
+                    ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
+                    ;; https://www.emacswiki.org/emacs/ThumbsMode
+                    ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
+                    ;; https://github.com/larsmagne/movie.el
+                    ;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
+                    ;; https://www.gnu.org/software/emms/
+                    ;; http://wikemacs.org/wiki/Media_player
+                    ;; https://github.com/dbrock/bongo
+      ;;            )
+                 ;; find directory in a side window below this one;
+      ;;         ())
+             ;; find file in the window at right;
+      ;;     )
+      ;;(define-key dired-mode-map [remap dired-find-file] side-window-find-file)
       )))
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/FFAP.html
