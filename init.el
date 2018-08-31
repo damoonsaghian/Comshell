@@ -76,9 +76,12 @@
 (global-set-key (kbd "C-<up>") 'previous-paragraph)
 
 (require 'dired)
+(require 'dired-subtree)
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
 (setq dired-listing-switches "-l -I \".*\" -I \"#*#\" -I \"*.lock\" -I \"target\"")
+;; "^\\(\\.*\\)\\'\\|^target\\'|\\.lock\\'\\|^\\(\\#*\\)\\#\\'"
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Regexps.html
 (add-hook 'dired-mode-hook (lambda () (progn (dired-hide-details-mode 1)
                                              (setq cursor-type nil)
                                              (hl-line-mode 1))))
@@ -123,17 +126,19 @@
                 ;; rename it to "1:project_name"; (this apparently mundane command is for
                 ;;     moving workspace button to the first position in i3-bar);
                 ;; then if there is no Emacs frame with title "project_name" in the workspace:
-                ;; , first close all windows in workspaces named like this: "1:project_name*";
+                ;; , first close all windows in current workspace,
+                ;;   and all workspaces named like this: "1:project_name /*";
                 ;; , then run a new instance of Emacs for this project;
                 (call-process
                  "i3-msg" nil nil nil
                  (concat
-                  "workspace " workspace-name "; "
-                  "rename workspace " workspace-name " to " workspace-name "; "
+                  "workspace \"" workspace-name "\"; "
+                  "rename workspace \"" workspace-name "\" to \"" workspace-name "\"; "
                   "exec \"
                     if [[ \\\"$(i3-msg [workspace=__focused__ class=Emacs tiling] focus)\\\"
                       =~ \\\"false\\\" ]]; 
-                    then i3-msg [workspace=\\\"^" workspace-name "\\\"] kill; 
+                    then i3-msg [workspace=\\\"^" workspace-name " /\\\"] kill;
+                      i3-msg [workspace=__focused__] kill;
                       emacs -project \\\"" project-path "\\\" & fi\""))
                 ))))
       (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)
@@ -160,18 +165,17 @@
 
       (find-file project-path)
 
+      ;; http://mads-hartmann.com/2016/05/12/emacs-tree-view.html
       ;; https://www.gnu.org/software/emacs/draft/manual/html_node/elisp/Side-Windows.html
 
-      ;;(global-set-key (kbd "C-c s") 'go-to-side-window)
+      ;;(global-set-key (kbd "C-c s") 'go-to-tree-view)
 
-      ;;(defun side-window-find-file ()
-      ;;  (interactive)
-      ;;  (let ((file-name (dired-line-file nil t)))
-      ;;    (if (file-directory-p file-name)
-      ;;      (if (string-match-p "\\.m\\'" file-name)
-                ;; "^\\(\\.*\\)\\'\\|^target\\'|\\.lock\\'\\|^\\(\\#*\\)\\#\\'"
-                ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Regexps.html
-      ;;          (progn
+      (defun tree-view-find-or-expand ()
+        (interactive)
+        (let ((file-name (dired-line-file nil t)))
+          (if (file-directory-p file-name)
+              (if (string-match-p "\\.m\\'" file-name)
+                  (progn
                     ;; open image-dired/movie in the right window
                     ;; http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
                     ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
@@ -182,13 +186,11 @@
                     ;; https://www.gnu.org/software/emms/
                     ;; http://wikemacs.org/wiki/Media_player
                     ;; https://github.com/dbrock/bongo
-      ;;            )
-                 ;; find directory in a side window below this one;
-      ;;         ())
-             ;; find file in the window at right;
-      ;;     )
-      ;;(define-key dired-mode-map [remap dired-find-file] side-window-find-file)
-      )))
+                    )
+                (dired-subtree-insert)
+                (revert-buffer))
+            (dired-find-file))))
+      (define-key dired-mode-map [remap dired-find-file] 'tree-view-find-or-expand))
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/FFAP.html
 (defun go-to-link-at-point ()
