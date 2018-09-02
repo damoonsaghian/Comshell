@@ -147,18 +147,20 @@
     (unless (file-exists-p desktop-file-dir-path)
       (make-directory desktop-file-dir-path t))
     (unless (file-exists-p desktop-file-path)
-      (write-region "" nil desktop-file-path))
-    (add-to-list 'desktop-path desktop-file-dir-path))
-  (setq desktop-restore-frames nil)
-  (setq desktop-load-locked-desktop t)
-  (desktop-save-mode 1)
+      ;;(write-region "" nil desktop-file-path)
+      (desktop-save desktop-file-dir-path))
+    (setq desktop-path (list desktop-file-dir-path)
+          desktop-restore-frames nil
+          desktop-load-locked-desktop t)
+    (desktop-save-mode 1)
+    (desktop-read desktop-file-dir-path))
 
   (defun project-explorer ()
     (interactive)
     (let ((buffer (dired-noselect project-path)))
-      (display-buffer-in-side-window buffer '((side . left) (window-width . 0.25)))
-      (set-window-dedicated-p (get-buffer-window buffer) t)
-      (select-window (get-buffer-window buffer))))
+      (select-window
+       (display-buffer-in-side-window buffer '((side . left) (window-width . 0.25))))
+      (set-window-dedicated-p (get-buffer-window buffer) t)))
   (global-set-key (kbd "C-c p") 'project-explorer)
   (setq window-sides-vertical t)
   (project-explorer)
@@ -179,10 +181,12 @@
                 ;; https://www.gnu.org/software/emms/
                 ;; http://wikemacs.org/wiki/Media_player
                 ;; https://github.com/dbrock/bongo
-                (dired-find-file-other-window))
+                (select-window
+                 (display-buffer-use-some-window (find-file-noselect file-name) nil)))
             (dired-subtree-insert)
             (revert-buffer))
-        (dired-find-file-other-window))))
+        (select-window
+         (display-buffer-use-some-window (find-file-noselect file-name) nil)))))
   (define-key dired-mode-map [remap dired-find-file] 'project-explorer-find-or-expand))
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/FFAP.html
