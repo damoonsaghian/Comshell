@@ -35,7 +35,6 @@
 (add-to-list 'default-frame-alist '(scroll-bar-width . 13))
 (add-to-list 'default-frame-alist '(left-fringe . 2))
 (add-to-list 'default-frame-alist '(right-fringe . 0))
-(setq window-sides-vertical t)
 
 (setq scroll-conservatively 200) ;; never recenter point
 ;; move point to top/bottom of buffer before signaling a scrolling error;
@@ -76,7 +75,6 @@
 (global-set-key (kbd "C-<up>") 'previous-paragraph)
 
 (require 'dired)
-(require 'dired-subtree)
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
 (setq dired-listing-switches "-l -I \".*\" -I \"#*#\" -I \"*.lock\" -I \"target\"")
@@ -87,6 +85,9 @@
                                              (hl-line-mode 1))))
 ;; https://www.emacswiki.org/emacs/DiredView
 ;; async file operations in dired
+
+(require-package 'dired-subtree)
+(setq dired-subtree-use-backgrounds nil)
 
 (require 'hl-line)
 ;; make highlighted lines in other (not selected) windows gray;
@@ -100,97 +101,89 @@
 (add-hook 'buffer-list-update-hook
           (lambda () (walk-windows #'hl-line-update-face nil t)))
 
-;; when Emacs is called with -projects argument, show the list of projects:
-(add-to-list
- 'command-switch-alist
- (cons
-  "projects"
-  #'(lambda (projects-path)
-      (dired projects-path)
+(defun show-projects (projects-path)
+  (dired projects-path)
 
-      ;; to do: automatically mount storage devices when available,
-      ;;   and show their "projects" directories in seperate panes (Emacs windows);
-      ;; the name of projects in other panes will be named like this:
-      ;;   "project_name/partition_name/";
-      ;; after unmounting a pane, we must force close all windows
-      ;;   in workspaces named "*/partition_name/";
-      ;; https://wiki.archlinux.org/index.php/Udisks#udevadm_monitor
+  ;; to do: automatically mount storage devices when available,
+  ;;   and show their "projects" directories in seperate panes (Emacs windows);
+  ;; the name of projects in other panes will be named like this:
+  ;;   "project_name/partition_name/";
+  ;; after unmounting a pane, we must force close all windows
+  ;;   in workspaces named "*/partition_name/";
+  ;; https://wiki.archlinux.org/index.php/Udisks#udevadm_monitor
 
-      (defun dired-find-project ()
-        (interactive)
-        (let ((project-path (dired-get-filename)))
-          (if (file-directory-p project-path)
-              (let ((project-name (file-name-nondirectory project-path))
-                    (workspace-name (concat "\"1:" project-name "\"")))
-                ;; go to the workspace named "1:project_name";
-                ;; rename it to "1:project_name"; (this apparently mundane command is for
-                ;;     moving workspace button to the first position in i3-bar);
-                ;; then if there is no Emacs frame with title "project_name" in the workspace:
-                ;; , first close all windows in current workspace,
-                ;;   and all workspaces named like this: "1:project_name /*";
-                ;; , then run a new instance of Emacs for this project;
-                (call-process
-                 "i3-msg" nil nil nil
-                 (concat
-                  "workspace \"" workspace-name "\"; "
-                  "rename workspace \"" workspace-name "\" to \"" workspace-name "\"; "
-                  "exec \"
-                    if [[ \\\"$(i3-msg [workspace=__focused__ class=Emacs tiling] focus)\\\"
-                      =~ \\\"false\\\" ]]; 
-                    then i3-msg [workspace=\\\"^" workspace-name " /\\\"] kill;
-                      i3-msg [workspace=__focused__] kill;
-                      emacs -project \\\"" project-path "\\\" & fi\""))
-                ))))
-      (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)
-      )))
+  (defun dired-find-project ()
+    (interactive)
+    (let ((project-path (dired-get-filename)))
+      (if (file-directory-p project-path)
+          (let* ((project-name (file-name-nondirectory project-path))
+                 (workspace-name (concat "1:" project-name)))
+            ;; go to the workspace named "1:project_name";
+            ;; rename it to "1:project_name"; (this apparently mundane command is for
+            ;;     moving workspace button to the first position in i3-bar);
+            ;; then if there is no Emacs frame with title "project_name" in the workspace:
+            ;; , first close all windows in current workspace,
+            ;;   and all workspaces named like this: "1:project_name /*";
+            ;; , then run a new instance of Emacs for this project;
+            (call-process-shell-command
+             (concat
+              "i3-msg workspace '\"" workspace-name "\"'; "
+              "i3-msg rename workspace '\"" workspace-name "\"'"
+              "  to '\"" workspace-name "\"'; "
+              "if [[ \"$(i3-msg [workspace=__focused__ class=Emacs tiling] focus)\""
+              "  =~ \"false\" ]]; "
+              "then "
+              "  i3-msg [workspace=\"^" workspace-name " /\"] kill; "
+              "  i3-msg [workspace=__focused__] kill; "
+              "  emacs --eval '(goto-project \"" project-path "\")' & fi"))
+            ))))
+  (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)
+)
 
-;; when Emacs is called with -project argument:
-(add-to-list
- 'command-switch-alist
- (cons
-  "project"
-  #'(lambda (project-path)
+(defun goto-project (project-path)
+  (require 'desktop)
+  (let ((desktop-file-dir-path (expand-file-name ".cache/" project-path))
+        (desktop-file-path (expand-file-name ".cache/.emacs.desktop" project-path)))
+    (unless (file-exists-p desktop-file-dir-path)
+      (make-directory desktop-file-dir-path t))
+    (unless (file-exists-p desktop-file-path)
+      (write-region "" nil desktop-file-path))
+    (add-to-list 'desktop-path desktop-file-dir-path))
+  (setq desktop-restore-frames nil)
+  (setq desktop-load-locked-desktop t)
+  (desktop-save-mode 1)
 
-      (require 'desktop)
-      (let ((desktop-file-dir-path (expand-file-name ".cache/" project-path))
-            (desktop-file-path (expand-file-name ".cache/.emacs.desktop" project-path)))
-        (unless (file-exists-p desktop-file-dir-path)
-          (make-directory desktop-file-dir-path t))
-        (unless (file-exists-p desktop-file-path)
-          (write-region "" nil desktop-file-path))
-        (add-to-list 'desktop-path desktop-file-dir-path))
-      (setq desktop-restore-frames nil)
-      (setq desktop-load-locked-desktop t)
-      (desktop-save-mode 1)
+  (defun project-explorer ()
+    (interactive)
+    (let ((buffer (dired-noselect project-path)))
+      (display-buffer-in-side-window buffer '((side . left) (window-width . 0.25)))
+      (set-window-dedicated-p (get-buffer-window buffer) t)
+      (select-window (get-buffer-window buffer))))
+  (global-set-key (kbd "C-c p") 'project-explorer)
+  (setq window-sides-vertical t)
+  (project-explorer)
 
-      (find-file project-path)
-
-      ;; http://mads-hartmann.com/2016/05/12/emacs-tree-view.html
-      ;; https://www.gnu.org/software/emacs/draft/manual/html_node/elisp/Side-Windows.html
-
-      ;;(global-set-key (kbd "C-c s") 'go-to-tree-view)
-
-      (defun tree-view-find-or-expand ()
-        (interactive)
-        (let ((file-name (dired-line-file nil t)))
-          (if (file-directory-p file-name)
-              (if (string-match-p "\\.m\\'" file-name)
-                  (progn
-                    ;; open image-dired/movie in the right window
-                    ;; http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
-                    ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
-                    ;; https://www.emacswiki.org/emacs/ThumbsMode
-                    ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
-                    ;; https://github.com/larsmagne/movie.el
-                    ;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
-                    ;; https://www.gnu.org/software/emms/
-                    ;; http://wikemacs.org/wiki/Media_player
-                    ;; https://github.com/dbrock/bongo
-                    )
-                (dired-subtree-insert)
-                (revert-buffer))
-            (dired-find-file))))
-      (define-key dired-mode-map [remap dired-find-file] 'tree-view-find-or-expand))
+  (defun project-explorer-find-or-expand ()
+    (interactive)
+    (let ((file-name (dired-get-filename)))
+      (if (file-directory-p file-name)
+          (if (string-match-p "\\.m\\'" file-name)
+              (progn
+                ;; open image-dired/movie in the right window
+                ;; http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
+                ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
+                ;; https://www.emacswiki.org/emacs/ThumbsMode
+                ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
+                ;; https://github.com/larsmagne/movie.el
+                ;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
+                ;; https://www.gnu.org/software/emms/
+                ;; http://wikemacs.org/wiki/Media_player
+                ;; https://github.com/dbrock/bongo
+                (dired-find-file-other-window))
+            (dired-subtree-insert)
+            (revert-buffer))
+        (dired-find-file-other-window))))
+  (define-key dired-mode-map [remap dired-find-file] 'project-explorer-find-or-expand))
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/FFAP.html
 (defun go-to-link-at-point ()
