@@ -86,9 +86,6 @@
 ;; https://www.emacswiki.org/emacs/DiredView
 ;; async file operations in dired
 
-(require-package 'dired-subtree)
-(setq dired-subtree-use-backgrounds nil)
-
 (require 'hl-line)
 ;; make highlighted lines in other (not selected) windows gray;
 (defun hl-line-update-face (window)
@@ -101,8 +98,8 @@
 (add-hook 'buffer-list-update-hook
           (lambda () (walk-windows #'hl-line-update-face nil t)))
 
-(defun show-projects (projects-path)
-  (dired projects-path)
+(defun show-projects ()
+  (dired "~/projects")
 
   ;; to do: automatically mount storage devices when available,
   ;;   and show their "projects" directories in seperate panes (Emacs windows);
@@ -121,20 +118,26 @@
             ;; go to the workspace named "1:project_name";
             ;; rename it to "1:project_name"; (this apparently mundane command is for
             ;;     moving workspace button to the first position in i3-bar);
-            ;; then if there is no Emacs frame with title "project_name" in the workspace:
-            ;; , first close all windows in current workspace,
-            ;;   and all workspaces named like this: "1:project_name /*";
-            ;; , then run a new instance of Emacs for this project;
             (call-process-shell-command
              (concat
               "i3-msg workspace '\"" workspace-name "\"'; "
               "i3-msg rename workspace '\"" workspace-name "\"'"
-              "  to '\"" workspace-name "\"'; "
-              "if [[ \"$(i3-msg [workspace=__focused__ class=Emacs tiling] focus)\""
+              "  to '\"" workspace-name "\"'"))
+
+            ;; then if there is no Emacs frame with title "project_name" in the workspace:
+            ;; , first close all windows in current workspace,
+            ;;   and all workspaces named like this: "1:project_name /*";
+            ;; , then run a new instance of Emacs for this project;
+            ;; (i think i had to seperate this from above
+            ;;   to place the startup notification of the process, in the new workspace)
+            (call-process-shell-command
+             (concat
+              "if [[ \"$(i3-msg [workspace=__focused__ class=Emacs tiling] mark a)\""
               "  =~ \"false\" ]]; "
               "then "
               "  i3-msg [workspace=\"^" workspace-name " /\"] kill; "
               "  i3-msg [workspace=__focused__] kill; "
+              "  i3-msg workspace '\"" workspace-name "\"'; "
               "  emacs --eval '(goto-project \"" project-path "\")' & fi"))
             ))))
   (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)
@@ -147,7 +150,6 @@
     (unless (file-exists-p desktop-file-dir-path)
       (make-directory desktop-file-dir-path t))
     (unless (file-exists-p desktop-file-path)
-      ;;(write-region "" nil desktop-file-path)
       (desktop-save desktop-file-dir-path))
     (setq desktop-path (list desktop-file-dir-path)
           desktop-restore-frames nil
@@ -155,42 +157,39 @@
     (desktop-save-mode 1)
     (desktop-read desktop-file-dir-path))
 
-  (defun project-explorer ()
-    (interactive)
-    (let ((buffer (dired-noselect project-path)))
-      (select-window
-       (display-buffer-in-side-window buffer '((side . left) (window-width . 0.25))))
-      (set-window-dedicated-p (get-buffer-window buffer) t)))
-  (global-set-key (kbd "C-c p") 'project-explorer)
-  (setq window-sides-vertical t)
-  (project-explorer)
-
-  (defun project-explorer-find-or-expand ()
+  (defun project-explorer-find-file ()
     (interactive)
     (let ((file-name (dired-get-filename)))
-      (if (file-directory-p file-name)
-          (if (string-match-p "\\.m\\'" file-name)
-              (progn
-                ;; open image-dired/movie in the right window
-                ;; http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
-                ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
-                ;; https://www.emacswiki.org/emacs/ThumbsMode
-                ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
-                ;; https://github.com/larsmagne/movie.el
-                ;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
-                ;; https://www.gnu.org/software/emms/
-                ;; http://wikemacs.org/wiki/Media_player
-                ;; https://github.com/dbrock/bongo
-                (select-window
-                 (display-buffer-use-some-window (find-file-noselect file-name) nil)))
-            (dired-subtree-insert)
-            (revert-buffer))
+      (if (and (file-directory-p file-name) (string-match-p "\\.m\\'" file-name))
+          (progn
+            ;; open image-dired/movie in the right window
+            ;; http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
+            ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
+            ;; https://www.emacswiki.org/emacs/ThumbsMode
+            ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
+            ;; https://github.com/larsmagne/movie.el
+            ;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
+            ;; https://www.gnu.org/software/emms/
+            ;; http://wikemacs.org/wiki/Media_player
+            ;; https://github.com/dbrock/bongo
+            (select-window
+             (display-buffer-use-some-window (find-file-noselect file-name) nil)))
         (select-window
          (display-buffer-use-some-window (find-file-noselect file-name) nil)))))
-  (define-key dired-mode-map [remap dired-find-file] 'project-explorer-find-or-expand))
+  (define-key dired-mode-map [remap dired-find-file] 'project-explorer-find-file)
+
+  (let* ((buffer (dired-noselect project-path))
+         (window (display-buffer-in-side-window
+                  buffer
+                  '((side . left) (window-width . 0.2)))))
+    (set-window-dedicated-p window t)
+    (select-window window)
+    (hl-line-update-face window)
+    (project-explorer-find-file))
+  (setq window-sides-vertical t))
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/FFAP.html
-(defun go-to-link-at-point ()
+(defun goto-link-at-point ()
   "open the project with the URL under cursor; 
   if the path starts with “http://”, copy it and go to Firefox workspace;"
   (interactive)
