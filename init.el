@@ -1,22 +1,3 @@
-(require 'package)
-(defun require-package (package)
-  (unless (require package nil 'noerror)
-    (progn
-      (unless (assoc package package-archive-contents)
-	(package-refresh-contents))
-      (package-install package)
-      (require package))))
-(defun install-package (package)
-  (unless (package-installed-p package nil 'noerror)
-    (progn
-      (unless (assoc package package-archive-contents)
-	(package-refresh-contents))
-      (package-install package))))
-(add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/") t)
-(package-initialize)
-;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el
-
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (setq inhibit-startup-screen t)
@@ -118,26 +99,24 @@
             ;; go to the workspace named "1:project_name";
             ;; rename it to "1:project_name"; (this apparently mundane command is for
             ;;     moving workspace button to the first position in i3-bar);
-            (call-process-shell-command
-             (concat
-              "i3-msg workspace '\"" workspace-name "\"'; "
-              "i3-msg rename workspace '\"" workspace-name "\"'"
-              "  to '\"" workspace-name "\"'"))
-
             ;; then if there is no Emacs frame with title "project_name" in the workspace:
             ;; , first close all windows in current workspace,
             ;;   and all workspaces named like this: "1:project_name /*";
             ;; , then run a new instance of Emacs for this project;
-            ;; (i think i had to seperate this from above
-            ;;   to place the startup notification of the process, in the new workspace)
             (call-process-shell-command
              (concat
-              "if [[ \"$(i3-msg [workspace=__focused__ class=Emacs tiling] mark a)\""
+              "i3-msg workspace '\"" workspace-name "\"'; "
+              "i3-msg rename workspace '\"" workspace-name "\"' "
+              "  to '\"" workspace-name "\"'; "
+              "if [[ \"$(i3-msg [workspace=__focused__ class=Emacs tiling] mark a)\" "
               "  =~ \"false\" ]]; "
               "then "
               "  i3-msg [workspace=\"^" workspace-name " /\"] kill; "
               "  i3-msg [workspace=__focused__] kill; "
               "  i3-msg workspace '\"" workspace-name "\"'; "
+              ;;"  i3-msg exec 'emacs --eval " (shell-quote-argument "(goto-project ")
+              ;;"\\\\\"" (shell-quote-argument project-path) "\\\\\""
+              ;;(shell-quote-argument ")") "'; fi"))
               "  emacs --eval '(goto-project \"" project-path "\")' & fi"))
             ))))
   (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)
@@ -184,7 +163,7 @@
                   '((side . left) (window-width . 0.2)))))
     (set-window-dedicated-p window t)
     (select-window window)
-    (hl-line-update-face window)
+    (hl-line-highlight)
     (project-explorer-find-file))
   (setq window-sides-vertical t))
 
@@ -203,6 +182,25 @@
             (
              ))
         (message "file doesn't exist: '%s';" $path)))))
+
+(require 'package)
+(defun require-package (package)
+  (unless (require package nil 'noerror)
+    (progn
+      (unless (assoc package package-archive-contents)
+	(package-refresh-contents))
+      (package-install package)
+      (require package))))
+(defun install-package (package)
+  (unless (package-installed-p package nil 'noerror)
+    (progn
+      (unless (assoc package package-archive-contents)
+	(package-refresh-contents))
+      (package-install package))))
+(add-to-list 'package-archives
+	     '("melpa" . "https://melpa.org/packages/") t)
+(package-initialize)
+;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el
 
 ;; view-mode
 ;; https://github.com/emacs-evil/evil
