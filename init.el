@@ -114,9 +114,6 @@
               "  i3-msg [workspace=\"^" workspace-name " /\"] kill; "
               "  i3-msg [workspace=__focused__] kill; "
               "  i3-msg workspace '\"" workspace-name "\"'; "
-              ;;"  i3-msg exec 'emacs --eval " (shell-quote-argument "(goto-project ")
-              ;;"\\\\\"" (shell-quote-argument project-path) "\\\\\""
-              ;;(shell-quote-argument ")") "'; fi"))
               "  emacs --eval '(goto-project \"" project-path "\")' & fi"))
             ))))
   (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)
