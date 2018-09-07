@@ -25,12 +25,10 @@
 (setq-default cursor-in-non-selected-windows nil)
 
 (add-to-list 'default-frame-alist '(foreground-color . "#222222"))
-(set-face-attribute 'highlight nil :background "LightSkyBlue1")
-(set-face-attribute 'region nil :background "LightSkyBlue1")
+(set-face-attribute 'highlight nil :background "#dddddd")
+(set-face-attribute 'region nil :background "#dddddd")
 (set-face-attribute 'default nil :height 105)
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
-(add-hook 'prog-mode-hook 'goto-address-mode)
-(add-hook 'text-mode-hook 'goto-address-mode)
 (setq-default indent-tabs-mode nil)
 (setq-default truncate-lines t)
 
@@ -61,31 +59,16 @@
 (setq dired-listing-switches "-l -I \".*\" -I \"#*#\" -I \"*.lock\" -I \"target\"")
 ;; "^\\(\\.*\\)\\'\\|^target\\'|\\.lock\\'\\|^\\(\\#*\\)\\#\\'"
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Regexps.html
-(add-hook 'dired-mode-hook (lambda () (progn (dired-hide-details-mode 1)
-                                             (setq cursor-type nil)
-                                             (hl-line-mode 1))))
-;; remove first and last lines in dired;
+(add-hook 'dired-mode-hook 'dired-hide-details-mode)
+(add-hook 'dired-mode-hook 'hl-line-mode)
+;; remove first line in dired;
 (add-hook 'dired-after-readin-hook
           (lambda () (let ((buffer-read-only))
                        (save-excursion
                          (delete-region (progn (goto-char (point-min)) (point))
-                                        (progn (forward-line 1) (point)))
-                         (delete-region (progn (goto-char (point-max)) (point))
-                                        (progn (backward-char 1) (point)))))))
+                                        (progn (forward-line 1) (point)))))))
 ;; https://www.emacswiki.org/emacs/DiredView
 ;; async file operations in dired
-
-(require 'hl-line)
-;; make highlighted lines in other (not selected) windows gray;
-(defun hl-line-update-face (window)
-  "update the `hl-line' face in WINDOW to indicate whether the window is selected;"
-  (with-current-buffer (window-buffer window)
-    (when (or global-hl-line-mode hl-line-mode)
-      (if (eq (current-buffer) (window-buffer (selected-window)))
-          (face-remap-reset-base 'hl-line)
-        (face-remap-set-base 'hl-line :background "#dddddd")))))
-(add-hook 'buffer-list-update-hook
-          (lambda () (walk-windows #'hl-line-update-face nil t)))
 
 (defun show-projects ()
   (dired "~/projects")
