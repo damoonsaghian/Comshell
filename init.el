@@ -64,6 +64,14 @@
 (add-hook 'dired-mode-hook (lambda () (progn (dired-hide-details-mode 1)
                                              (setq cursor-type nil)
                                              (hl-line-mode 1))))
+;; remove first and last lines in dired;
+(add-hook 'dired-after-readin-hook
+          (lambda () (let ((buffer-read-only))
+                       (save-excursion
+                         (delete-region (progn (goto-char (point-min)) (point))
+                                        (progn (forward-line 1) (point)))
+                         (delete-region (progn (goto-char (point-max)) (point))
+                                        (progn (backward-char 1) (point)))))))
 ;; https://www.emacswiki.org/emacs/DiredView
 ;; async file operations in dired
 
