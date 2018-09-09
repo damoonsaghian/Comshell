@@ -69,6 +69,12 @@
                                         (progn (forward-line 1) (point)))))))
 ;; https://www.emacswiki.org/emacs/DiredView
 ;; async file operations in dired
+;; for copy_paste mechanism:
+;;   https://github.com/Fuco1/dired-hacks/blob/master/dired-ranger.el
+
+;; i'm going to replace the following approach with a solution based on
+;;   how save-place work, but with individual save-place-file for every project;
+;; this way there is no need for multiple emacs instances;
 
 (defun show-projects ()
   (dired "~/projects")
@@ -190,18 +196,8 @@
 (package-initialize)
 ;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el
 
-;; view-mode
-;; https://github.com/emacs-evil/evil
-;; https://github.com/emacs-evil/evil-collection
-;; https://www.gnu.org/software/emacs/manual/html_mono/viper.html
+;; modal key_bindings
 ;; https://github.com/mrkkrp/modalka
-;; https://github.com/jyp/boon
-;; http://retroj.net/modal-mode
-;; https://github.com/abo-abo/hydra
-;; https://github.com/chrisdone/god-mode
-;; https://github.com/xahlee/xah-fly-keys
-;; https://github.com/ergoemacs/ergoemacs-mode
-;; https://github.com/justbur/emacs-which-key
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffers-and-Frames.html
