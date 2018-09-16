@@ -4,11 +4,10 @@ we need a framework which provides everything we need,
   the best choice i've found is GTK and Javascript;
 "https://gitlab.gnome.org/GNOME/gjs/wikis/Home"
 "https://gitlab.gnome.org/GNOME/gjs/tree/master/examples"
-"https://github.com/optimisme/gjs-examples"
 "https://github.com/gcampax/gtk-js-app"
 "http://devdocs.baznga.org"
 "https://www.liip.ch/en/blog/why-i-dont-use-the-javascript-new-keyword"
-  so just use the "Class.new()" instead of "new Class()";
+  in "gjs" we can use "Class.new()" instead of "new Class()";
 
 Arch Linux provides a shared_library distribution system,
   which is simple and effective,
@@ -38,7 +37,7 @@ now to reuse previously downloaded packages on your system,
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
   networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip sway \
   ttf-hack ttf-droid adapta-gtk-theme \
-  gtk3 gtksourceview3 vte3 gst-plugins-{base,good,bad} gst-libav webkit2gtk gjs
+  gtk3 gnome-desktop gtksourceview3 vte3 gst-plugins-{base,good,bad} gst-libav webkit2gtk gjs
 
 install bootloader:
 ; grub-install --target=i386-pc /dev/sdx
@@ -78,7 +77,7 @@ automatic login:
 ; mkdir -p ~/.config/gtk-3.0; emacs ~/.config/gtk-3.0/settings.ini
   [Settings]
   gtk-theme-name = Adapta-Eta
-  gtk-font-name = Sans
+  gtk-font-name = Hack
 
 for devices with hardware mute and volume control,
   PulseAudio mutes and silences them by default;
