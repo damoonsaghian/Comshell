@@ -9,6 +9,10 @@ we need a framework which provides everything we need,
 "https://www.liip.ch/en/blog/why-i-dont-use-the-javascript-new-keyword"
   in "gjs" we can use "Class.new()" instead of "new Class()";
 
+"https://github.com/karlch/vimiv"
+"https://github.com/MeanEYE/Sunflower/blob/develop/application/plugins/file_list/file_list.py"
+"https://gitlab.gnome.org/World/eolie/tree/master/eolie"
+
 Arch Linux provides a shared_library distribution system,
   which is simple and effective,
   and is very close to the original build process;
@@ -36,7 +40,7 @@ now to reuse previously downloaded packages on your system,
 ; arch-chroot /mnt
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
   networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip sway \
-  ttf-hack ttf-droid adapta-gtk-theme \
+  ttf-hack ttf-droid materia-gtk-theme \
   gtk3 gnome-desktop gtksourceview3 vte3 gst-plugins-{base,good,bad} gst-libav webkit2gtk gjs
 
 install bootloader:
@@ -76,8 +80,8 @@ automatic login:
 
 ; mkdir -p ~/.config/gtk-3.0; emacs ~/.config/gtk-3.0/settings.ini
   [Settings]
-  gtk-theme-name = Adapta-Eta
-  gtk-font-name = Hack
+  gtk-theme-name = Materia-light-compact
+  gtk-font-name = Sans
 
 for devices with hardware mute and volume control,
   PulseAudio mutes and silences them by default;
