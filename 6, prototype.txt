@@ -1,17 +1,4 @@
-we can use existing tools to create a prototype of Comshell;
-we need a framework which provides everything we need,
-  and we need a simple way to script it;
-  the best choice i've found is GTK and Javascript;
-"https://gitlab.gnome.org/GNOME/gjs/wikis/Home"
-"https://gitlab.gnome.org/GNOME/gjs/tree/master/examples"
-"https://github.com/gcampax/gtk-js-app"
-"http://devdocs.baznga.org"
-"https://www.liip.ch/en/blog/why-i-dont-use-the-javascript-new-keyword"
-  in "gjs" we can use "Class.new()" instead of "new Class()";
-
-"https://github.com/karlch/vimiv"
-"https://github.com/MeanEYE/Sunflower/blob/develop/application/plugins/file_list/file_list.py"
-"https://gitlab.gnome.org/World/eolie/tree/master/eolie"
+we can use existing tools to create a prototype of command based user interface;
 
 Arch Linux provides a shared_library distribution system,
   which is simple and effective,
@@ -39,9 +26,9 @@ now to reuse previously downloaded packages on your system,
 ; pacstrap /mnt pacman
 ; arch-chroot /mnt
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
-  networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip sway \
-  ttf-hack ttf-droid materia-gtk-theme \
-  gtk3 gnome-desktop gtksourceview3 vte3 gst-plugins-{base,good,bad} gst-libav webkit2gtk gjs
+  networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip \
+  xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-wm i3status xdotool\
+  ttf-hack emacs materia-gtk-theme ttf-droid firefox mpv
 
 install bootloader:
 ; grub-install --target=i386-pc /dev/sdx
@@ -91,23 +78,15 @@ so if you like you can do this:
 
 ; nano ~/.bash_profile
   export TZ="/usr/share/zoneinfo/<your_location>"
-  sway
-
-; mkdir -p ~/.config/sway
-; nano ~/.config/sway/config
-  default_border none
-  exec "gjs comshell.js; swaymsg exit"
-
-actually Sway (with "wlroot") is not ready yet;
-  so til then, we can use "i3-wm";
-; pacman -S xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-wm
-; nano ~/.bash_profile
-  export TZ="/usr/share/zoneinfo/<your_location>"
   startx
 ; nano ~/.xinitrc
   exec i3
+
 ; mkdir -p ~/.config/i3
-; nano ~/.config/i3/config
-  default_border none
-  exec compton --shadow-exclude "class_g %= '*'" --unredir-if-possible-exclude "class_g %= '*'"
-  exec "gjs comshell.js; i3-msg exit"
+; cp i3.conf ~/.config/i3/config
+; mkdir -p ~/.config/i3status
+; cp i3status.conf ~/.config/i3status/config
+
+; cp init.el ~/.emacs.d/init.el
+ELisp is terrible as a programming language,
+  but it's pretty good as a command interface (ie as a shell, like Bash);
