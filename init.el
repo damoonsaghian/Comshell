@@ -1,3 +1,4 @@
+(server-start)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (setq inhibit-startup-screen t)
@@ -7,7 +8,10 @@
 (setq insert-default-directory nil) ;; or use double slash mechanism;
 (global-eldoc-mode -1)
 (setq make-backup-files nil)
+(setq create-lockfiles nil)
+(setq window-sides-vertical t)
 (global-set-key (kbd "C-x k") #'kill-this-buffer)
+(cua-mode 1)
 
 (setq window-divider-default-places t
       window-divider-default-right-width 1
@@ -56,7 +60,8 @@
 (require 'dired)
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
-(setq dired-listing-switches "-l -I \".*\" -I \"#*#\" -I \"*.lock\" -I \"target\"")
+(setq dired-listing-switches "-l -I \"#*#\" -I \"*.lock\" -I \"target\"")
+;; auto-save-file-name-transforms
 ;; "^\\(\\.*\\)\\'\\|^target\\'|\\.lock\\'\\|^\\(\\#*\\)\\#\\'"
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Regexps.html
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
@@ -72,29 +77,12 @@
 ;; for copy_paste mechanism:
 ;;   https://github.com/Fuco1/dired-hacks/blob/master/dired-ranger.el
 
-(defun my-find-file ()
-  (interactive)
-  (let ((file-name (dired-get-filename)))
-    (if (and (file-directory-p file-name) (string-match-p "\\.m\\'" file-name))
-        (progn
-          (select-window
-           (display-buffer-use-some-window (find-file-noselect file-name) nil)))
-      (select-window
-       (display-buffer-use-some-window (find-file-noselect file-name) nil)))
-    (select-window
-     (display-buffer-use-some-window (find-file-noselect file-name) nil))))
-(define-key dired-mode-map [remap dired-find-file] 'my-find-file)
-(define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file)
-
-;; i'm going to replace the following approach with a solution based on
-;;   how save-place work, but with individual save-place-file for every project;
-;; this way there is no need for multiple emacs instances;
-;; buffer groups + save and restore
-;; to-alist, alist-to-file + timer
-;; list of buffer groups
-
 (defun show-projects ()
-  (dired "~/projects")
+  (let* ((buffer (dired-noselect "~/projects/1"))
+         (window (display-buffer buffer)))
+    (set-window-dedicated-p window t)
+    (select-window window)
+    (hl-line-highlight))
 
   ;; to do: automatically mount storage devices when available,
   ;;   and show their "projects" directories in seperate panes (Emacs windows);
@@ -103,70 +91,62 @@
   ;; after unmounting a pane, we must force close all windows
   ;;   in workspaces named "*/partition_name/";
   ;; https://wiki.archlinux.org/index.php/Udisks#udevadm_monitor
+  )
+(show-projects)
 
-  (defun dired-find-project ()
-    (interactive)
-    (let ((project-path (dired-get-filename)))
-      (if (file-directory-p project-path)
-          (let* ((project-name (file-name-nondirectory project-path))
-                 (workspace-name (concat "1:" project-name)))
-            ;; go to the workspace named "1:project_name";
-            ;; rename it to "1:project_name"; (this apparently mundane command is for
-            ;;     moving workspace button to the first position in i3-bar);
-            ;; then if there is no Emacs frame with title "project_name" in the workspace:
-            ;; , first close all windows in current workspace,
-            ;;   and all workspaces named like this: "1:project_name /*";
-            ;; , then run a new instance of Emacs for this project;
-            (call-process-shell-command
-             (concat
-              "i3-msg workspace '\"" workspace-name "\"'; "
-              "i3-msg rename workspace '\"" workspace-name "\"' "
-              "  to '\"" workspace-name "\"'; "
-              "if [[ \"$(i3-msg [workspace=__focused__ class=Emacs tiling] mark a)\" "
-              "  =~ \"false\" ]]; "
-              "then "
-              "  i3-msg [workspace=\"^" workspace-name " /\"] kill; "
-              "  i3-msg [workspace=__focused__] kill; "
-              "  i3-msg workspace '\"" workspace-name "\"'; "
-              "  emacs --eval '(goto-project \"" project-path "\")' & fi"))
-            ))))
-  (define-key dired-mode-map [remap dired-find-file] 'dired-find-project)
-)
+(defun my-find-file ()
+  (interactive)
+  (let ((file-name (dired-get-filename)))
+    (cond
+     ((string-match-p "/projects/[^/]*/[^/]*.\\'" file-name)
+      (when (file-directory-p file-name)
+        ;; go to the workspace named "file-name";
+        ;; then if there is no Emacs frame in the workspace:
+        ;; , first close all windows in current workspace,
+        ;;   and all workspaces named like this: "1:project_name /*";
+        ;; , then run a new instance of Emacs for this project;
+        (call-process-shell-command
+         (concat
+          "i3-msg workspace '\"" file-name "\"'; "
+          "if [[ \"$(i3-msg [workspace=__focused__ class=Emacs tiling] mark a)\" "
+          "  =~ \"false\" ]]; "
+          "then "
+          "  i3-msg [workspace=__focused__] kill; "
+          "  i3-msg workspace '\"" file-name "\"'; "
+          "  emacsclient -c --eval '(goto-project \"" file-name "\")' & fi"))))
+     
+     ((file-directory-p file-name)
+      (cond
+       ((string-match-p "\\.m\\'" file-name)
+        ;; open image-dired/movie in the right window
+        ;; http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
+        ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
+        ;; https://www.emacswiki.org/emacs/ThumbsMode
+        ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
+        ;; https://github.com/larsmagne/movie.el
+        ;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
+        ;; https://www.gnu.org/software/emms/
+        ;; http://wikemacs.org/wiki/Media_player
+        ;; https://github.com/dbrock/bongo
+        (select-window
+         (display-buffer-use-some-window (find-file-noselect file-name) nil))
+        )
+       (t
+        (select-window
+         (display-buffer-use-some-window (find-file-noselect file-name) nil))
+        )))
+
+     (t (select-window
+         (display-buffer-use-some-window (find-file-noselect file-name) nil))))))
+(define-key dired-mode-map [remap dired-find-file] 'my-find-file)
+(define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file)
 
 (defun goto-project (project-path)
-  (require 'desktop)
-  (let ((desktop-file-dir-path (expand-file-name ".cache/" project-path))
-        (desktop-file-path (expand-file-name ".cache/.emacs.desktop" project-path)))
-    (unless (file-exists-p desktop-file-dir-path)
-      (make-directory desktop-file-dir-path t))
-    (unless (file-exists-p desktop-file-path)
-      (desktop-save desktop-file-dir-path))
-    (setq desktop-path (list desktop-file-dir-path)
-          desktop-restore-frames nil
-          desktop-load-locked-desktop t)
-    (desktop-save-mode 1)
-    (desktop-read desktop-file-dir-path))
-
-  (defun project-explorer-find-file ()
-    (interactive)
-    (let ((file-name (dired-get-filename)))
-      (if (and (file-directory-p file-name) (string-match-p "\\.m\\'" file-name))
-          (progn
-            ;; open image-dired/movie in the right window
-            ;; http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
-            ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
-            ;; https://www.emacswiki.org/emacs/ThumbsMode
-            ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
-            ;; https://github.com/larsmagne/movie.el
-            ;; http://www.mplayerhq.hu/DOCS/tech/slave.txt
-            ;; https://www.gnu.org/software/emms/
-            ;; http://wikemacs.org/wiki/Media_player
-            ;; https://github.com/dbrock/bongo
-            (select-window
-             (display-buffer-use-some-window (find-file-noselect file-name) nil)))
-        (select-window
-         (display-buffer-use-some-window (find-file-noselect file-name) nil)))))
-  (define-key dired-mode-map [remap dired-find-file] 'project-explorer-find-file)
+  ;; to remember places use a solution based on how save-place,
+  ;;   but with individual save-place-file for every project;
+  ;; list of buffer groups
+  ;; buffer groups + save and restore
+  ;; to-alist, alist-to-file + timer
 
   (let* ((buffer (dired-noselect project-path))
          (window (display-buffer-in-side-window
@@ -175,8 +155,7 @@
     (set-window-dedicated-p window t)
     (select-window window)
     (hl-line-highlight)
-    (project-explorer-find-file))
-  (setq window-sides-vertical t))
+    (my-find-file)))
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/FFAP.html
 (defun goto-link-at-point ()
