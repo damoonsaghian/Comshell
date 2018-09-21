@@ -77,6 +77,16 @@
 ;; for copy_paste mechanism:
 ;;   https://github.com/Fuco1/dired-hacks/blob/master/dired-ranger.el
 
+(require 'desktop)
+(setq desktop-restore-frames nil
+      desktop-load-locked-desktop t)
+(desktop-save-mode 1)
+;; i'm going to replace above with a solution based on save-place,
+;;   but with individual save-place-file for every project;
+;; list of buffer groups
+;; buffer groups + save and restore
+;; to-alist, alist-to-file + timer
+
 (defun show-projects ()
   (let* ((buffer (dired-noselect "~/projects/1"))
          (window (display-buffer buffer)))
@@ -98,7 +108,7 @@
   (interactive)
   (let ((file-name (dired-get-filename)))
     (cond
-     ((string-match-p "/projects/[^/]*/[^/]*.\\'" file-name)
+     ((string-match-p "/projects/[^/]*/[^/]*/?\\'" file-name)
       (when (file-directory-p file-name)
         ;; go to the workspace named "file-name";
         ;; then if there is no Emacs frame in the workspace:
@@ -117,7 +127,7 @@
      
      ((file-directory-p file-name)
       (cond
-       ((string-match-p "\\.m\\'" file-name)
+       ((string-match-p "\\.m/?\\'" file-name)
         ;; open image-dired/movie in the right window
         ;; http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
         ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
@@ -142,12 +152,6 @@
 (define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file)
 
 (defun goto-project (project-path)
-  ;; to remember places use a solution based on how save-place,
-  ;;   but with individual save-place-file for every project;
-  ;; list of buffer groups
-  ;; buffer groups + save and restore
-  ;; to-alist, alist-to-file + timer
-
   (let* ((buffer (dired-noselect project-path))
          (window (display-buffer-in-side-window
                   buffer
