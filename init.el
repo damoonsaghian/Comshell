@@ -77,10 +77,13 @@
 ;; for copy_paste mechanism:
 ;;   https://github.com/Fuco1/dired-hacks/blob/master/dired-ranger.el
 
-(require 'desktop)
-(setq desktop-restore-frames nil
-      desktop-load-locked-desktop t)
-(desktop-save-mode 1)
+;;(require 'desktop)
+;;(unless (file-exists-p "~/.emacs.d/.emacs.desktop")
+;;  (desktop-save "~/.emacs.d"))
+;;(setq desktop-restore-frames nil
+;;      desktop-load-locked-desktop t)
+;;(desktop-save-mode 1)
+;;(desktop-read "~/.emacs.d")
 ;; i'm going to replace above with a solution based on save-place,
 ;;   but with individual save-place-file for every project;
 ;; list of buffer groups
@@ -89,17 +92,14 @@
 
 (defun show-projects ()
   (let* ((buffer (dired-noselect "~/projects/1"))
-         (window (display-buffer buffer)))
+         (window (display-buffer-use-some-window buffer nil)))
     (set-window-dedicated-p window t)
     (select-window window)
     (hl-line-highlight))
 
   ;; to do: automatically mount storage devices when available,
   ;;   and show their "projects" directories in seperate panes (Emacs windows);
-  ;; the name of projects in other panes will be named like this:
-  ;;   "project_name/partition_name/";
-  ;; after unmounting a pane, we must force close all windows
-  ;;   in workspaces named "*/partition_name/";
+  ;; use display-buffer instead of display-buffer-use-some-window for other;
   ;; https://wiki.archlinux.org/index.php/Udisks#udevadm_monitor
   )
 (show-projects)
