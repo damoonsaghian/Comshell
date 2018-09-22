@@ -77,15 +77,9 @@
 ;; for copy_paste mechanism:
 ;;   https://github.com/Fuco1/dired-hacks/blob/master/dired-ranger.el
 
-;;(require 'desktop)
-;;(unless (file-exists-p "~/.emacs.d/.emacs.desktop")
-;;  (desktop-save "~/.emacs.d"))
-;;(setq desktop-restore-frames nil
-;;      desktop-load-locked-desktop t)
-;;(desktop-save-mode 1)
-;;(desktop-read "~/.emacs.d")
-;; i'm going to replace above with a solution based on save-place,
-;;   but with individual save-place-file for every project;
+;; to remember point's places in buffers between sessions,
+;;   i'm going to use a solution based on save-place,
+;;   but with individual save-place-file for any project;
 ;; list of buffer groups
 ;; buffer groups + save and restore
 ;; to-alist, alist-to-file + timer
