@@ -3,15 +3,25 @@
 (tool-bar-mode -1)
 (setq inhibit-startup-screen t)
 (setq visible-bell t)
-;; (setq-default mode-line-format nil)
-;; headline instead of modeline;
 (setq insert-default-directory nil) ;; or use double slash mechanism;
-(global-eldoc-mode -1)
 (setq make-backup-files nil)
 (setq create-lockfiles nil)
 (setq window-sides-vertical t)
 (global-set-key (kbd "C-x k") #'kill-this-buffer)
 (cua-mode 1)
+
+;; (setq-default mode-line-format ...)
+;; header line instead of modeline;
+
+(defun minibuffer-line-update ()
+  (with-current-buffer " *Minibuf-0*"
+    (erase-buffer)
+    (insert (propertize (format-time-string "%F %a %I:%M%P")
+                        'face '(:foreground "#777777")))))
+(run-with-timer t 2 #'minibuffer-line-update)
+(global-eldoc-mode -1)
+;; https://blog.idorobots.org/entries/system-monitor-in-emacs-mode-line.html
+;; https://github.com/zk-phi/symon/blob/master/symon.el
 
 (setq window-divider-default-places t
       window-divider-default-right-width 1
@@ -19,7 +29,8 @@
 (window-divider-mode 1)
 (scroll-bar-mode -1)
 (add-to-list 'default-frame-alist '(left-fringe . 2))
-(add-to-list 'default-frame-alist '(right-fringe . 0))
+(add-to-list 'default-frame-alist '(right-fringe . 2))
+(set-face-attribute 'fringe nil :background nil)
 
 (setq scroll-conservatively 200) ;; never recenter point
 ;; move point to top/bottom of buffer before signaling a scrolling error;
@@ -35,6 +46,7 @@
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
 (setq-default indent-tabs-mode nil)
 (setq-default truncate-lines t)
+(add-hook 'text-mode-hook 'turn-on-flyspell)
 
 ;; paragraphs
 (setq paragraph-start "\n" paragraph-separate "\n")
@@ -204,12 +216,6 @@
 ;;   workspace back and forth
 ;;   projects
 ;; firefox-insert-mode: Esc -> normal mode
-
-;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffers-and-Frames.html
-;; https://stackoverflow.com/questions/5079466/hide-emacs-echo-area-during-inactivity
-;; https://stackoverflow.com/questions/3050011/is-it-possible-to-move-the-emacs-minibuffer-to-the-top-of-the-screen
-;; https://emacs.stackexchange.com/questions/1074/how-to-display-the-content-of-minibuffer-in-the-middle-of-the-emacs-frame
-;; https://www.emacswiki.org/emacs/Dedicated_Minibuffer_Frame
 
 ;; https://orgmode.org/manual/Tables.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html

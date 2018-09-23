@@ -27,7 +27,7 @@ now to reuse previously downloaded packages on your system,
 ; arch-chroot /mnt
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
   networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip \
-  xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-wm i3status xdotool\
+  xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-wm xdotool\
   ttf-hack emacs materia-gtk-theme ttf-droid firefox mpv
 
 install bootloader:
@@ -81,11 +81,8 @@ so if you like you can do this:
   startx
 ; nano ~/.xinitrc
   exec i3
-
 ; mkdir -p ~/.config/i3
 ; cp i3.conf ~/.config/i3/config
-; mkdir -p ~/.config/i3status
-; cp i3status.conf ~/.config/i3status/config
 
 ; cp init.el ~/.emacs.d/init.el
 ELisp is terrible as a programming language,
