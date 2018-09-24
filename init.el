@@ -10,8 +10,17 @@
 (global-set-key (kbd "C-x k") #'kill-this-buffer)
 (cua-mode 1)
 
-;; (setq-default mode-line-format ...)
 ;; header line instead of modeline;
+(setq-default header-line-format
+              '(" "
+                mode-line-buffer-identification
+                (:propertize (buffer-modified-p "*" " ") 'face '(:foreground "red"))
+                " [" mode-line-position "] "
+                (vc-mode vc-mode) "  "
+                mode-line-modes "  "
+                mode-line-misc-info))
+(setq-default mode-line-format nil)
+;; https://www.emacswiki.org/emacs/HeaderLine#toc2
 
 (defun minibuffer-line-update ()
   (with-current-buffer " *Minibuf-0*"
