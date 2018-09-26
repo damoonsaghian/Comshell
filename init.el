@@ -4,23 +4,12 @@
 (setq inhibit-startup-screen t)
 (setq visible-bell t)
 (setq insert-default-directory nil) ;; or use double slash mechanism;
+;; (setq-default mode-line-format nil)
 (setq make-backup-files nil)
 (setq create-lockfiles nil)
 (setq window-sides-vertical t)
 (global-set-key (kbd "C-x k") #'kill-this-buffer)
 (cua-mode 1)
-
-;; header line instead of modeline;
-(setq-default header-line-format
-              '(" "
-                mode-line-buffer-identification
-                (:propertize (buffer-modified-p "*" " ") 'face '(:foreground "red"))
-                " [" mode-line-position "] "
-                (vc-mode vc-mode) "  "
-                mode-line-modes "  "
-                mode-line-misc-info))
-(setq-default mode-line-format nil)
-;; https://www.emacswiki.org/emacs/HeaderLine#toc2
 
 (defun minibuffer-line-update ()
   (with-current-buffer " *Minibuf-0*"
@@ -32,13 +21,26 @@
 ;; https://blog.idorobots.org/entries/system-monitor-in-emacs-mode-line.html
 ;; https://github.com/zk-phi/symon/blob/master/symon.el
 
+;; header line instead of modeline;
+(setq-default
+ header-line-format
+ '((:eval (propertize " " 'display '((space :align-to (2)))))
+   (:eval (if (buffer-modified-p)
+              '(:propertize "%b  " face (:foreground "red"))
+            "%b  "))
+   (:propertize "%q                              " face (:foreground "blue"))
+   (:propertize ("line:%l  " (vc-mode vc-mode) "  (%m)  " mode-line-misc-info)
+                face (:foreground "#555555"))))
+(setq-default mode-line-format nil)
+(setq Info-use-header-line nil)
+
 (setq window-divider-default-places t
       window-divider-default-right-width 1
       window-divider-default-bottom-width 1)
 (window-divider-mode 1)
 (scroll-bar-mode -1)
 (add-to-list 'default-frame-alist '(left-fringe . 2))
-(add-to-list 'default-frame-alist '(right-fringe . 2))
+(add-to-list 'default-frame-alist '(right-fringe . 0))
 (set-face-attribute 'fringe nil :background nil)
 
 (setq scroll-conservatively 200) ;; never recenter point
