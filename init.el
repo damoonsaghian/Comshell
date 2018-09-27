@@ -24,14 +24,18 @@
 ;; header line instead of modeline;
 (setq-default
  header-line-format
- '((:eval (propertize " " 'display '((space :align-to (2)))))
+ '((:eval (propertize " " 'display '((space :align-to 0))))
    (:eval (if (buffer-modified-p)
               '(:propertize "%b  " face (:foreground "red"))
             "%b  "))
-   (:propertize "%q                              " face (:foreground "blue"))
+   (:propertize "%q                              " face (:foreground "grey50"))
    (:propertize ("line:%l  " (vc-mode vc-mode) "  (%m)  " mode-line-misc-info)
-                face (:foreground "#555555"))))
+                face (:foreground "grey50"))))
 (setq-default mode-line-format nil)
+(set-face-attribute 'header-line nil
+                    :foreground "grey20"
+                    :background "grey90"
+                    :box '(:line-width -1 :color "grey75"))
 (setq Info-use-header-line nil)
 
 (setq window-divider-default-places t
@@ -41,6 +45,7 @@
 (scroll-bar-mode -1)
 (add-to-list 'default-frame-alist '(left-fringe . 2))
 (add-to-list 'default-frame-alist '(right-fringe . 0))
+(set-face-attribute 'window-divider nil :foreground "gray20")
 (set-face-attribute 'fringe nil :background nil)
 
 (setq scroll-conservatively 200) ;; never recenter point
