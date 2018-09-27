@@ -16,7 +16,7 @@
     (erase-buffer)
     (insert (propertize (format-time-string "%F %a %I:%M%P")
                         'face '(:foreground "#777777")))))
-(run-with-timer t 2 #'minibuffer-line-update)
+(run-with-timer 2 2 #'minibuffer-line-update)
 (global-eldoc-mode -1)
 ;; https://blog.idorobots.org/entries/system-monitor-in-emacs-mode-line.html
 ;; https://github.com/zk-phi/symon/blob/master/symon.el
@@ -25,17 +25,18 @@
 (setq-default
  header-line-format
  '((:eval (propertize " " 'display '((space :align-to 0))))
+   "%b"
    (:eval (if (buffer-modified-p)
-              '(:propertize "%b  " face (:foreground "red"))
-            "%b  "))
-   (:propertize "%q                              " face (:foreground "grey50"))
+              (propertize "* " 'face '(:foreground "red"))
+            "  "))
+   (:propertize "%30q" face (:foreground "dark cyan"))
    (:propertize ("line:%l  " (vc-mode vc-mode) "  (%m)  " mode-line-misc-info)
-                face (:foreground "grey50"))))
+                face (:foreground "#777777"))))
 (setq-default mode-line-format nil)
 (set-face-attribute 'header-line nil
-                    :foreground "grey20"
-                    :background "grey90"
-                    :box '(:line-width -1 :color "grey75"))
+                    :foreground "#222222"
+                    :background "#dddddd"
+                    :box '(:line-width -1 :color "#aaaaaa"))
 (setq Info-use-header-line nil)
 
 (setq window-divider-default-places t
@@ -44,8 +45,8 @@
 (window-divider-mode 1)
 (scroll-bar-mode -1)
 (add-to-list 'default-frame-alist '(left-fringe . 2))
-(add-to-list 'default-frame-alist '(right-fringe . 0))
-(set-face-attribute 'window-divider nil :foreground "gray20")
+(add-to-list 'default-frame-alist '(right-fringe . 2))
+(set-face-attribute 'window-divider nil :foreground "#222222")
 (set-face-attribute 'fringe nil :background nil)
 
 (setq scroll-conservatively 200) ;; never recenter point
@@ -56,8 +57,10 @@
 (setq-default cursor-in-non-selected-windows nil)
 
 (add-to-list 'default-frame-alist '(foreground-color . "#222222"))
-(set-face-attribute 'highlight nil :background "#dddddd")
-(set-face-attribute 'region nil :background "#dddddd")
+(set-face-attribute 'highlight nil
+                    :background "LightBlue1"
+                    :box '(:line-width -1 :color "SkyBlue1"))
+(set-face-attribute 'region nil :background "LightBlue1")
 (set-face-attribute 'default nil :height 105)
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
 (setq-default indent-tabs-mode nil)
@@ -111,6 +114,8 @@
 ;; list of buffer groups
 ;; buffer groups + save and restore
 ;; to-alist, alist-to-file + timer
+(save-place-mode 1)
+(run-with-idle-timer 30 30 #'save-place-alist-to-file)
 
 (defun show-projects ()
   (let* ((buffer (dired-noselect "~/projects/1"))
