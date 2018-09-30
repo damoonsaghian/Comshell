@@ -44,8 +44,8 @@
       window-divider-default-bottom-width 1)
 (window-divider-mode 1)
 (scroll-bar-mode -1)
-(add-to-list 'default-frame-alist '(left-fringe . 2))
-(add-to-list 'default-frame-alist '(right-fringe . 2))
+(add-to-list 'default-frame-alist '(left-fringe . 3))
+(add-to-list 'default-frame-alist '(right-fringe . 8))
 (set-face-attribute 'window-divider nil :foreground "#222222")
 (set-face-attribute 'fringe nil :background nil)
 
@@ -57,15 +57,13 @@
 (setq-default cursor-in-non-selected-windows nil)
 
 (add-to-list 'default-frame-alist '(foreground-color . "#222222"))
-(set-face-attribute 'highlight nil
-                    :background "LightBlue1"
-                    :box '(:line-width -1 :color "SkyBlue1"))
+(set-face-attribute 'highlight nil :background "white" :foreground "red")
 (set-face-attribute 'region nil :background "LightBlue1")
 (set-face-attribute 'default nil :height 105)
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
+
 (setq-default indent-tabs-mode nil)
 (setq-default truncate-lines t)
-(add-hook 'text-mode-hook 'turn-on-flyspell)
 
 ;; paragraphs
 (setq paragraph-start "\n" paragraph-separate "\n")
@@ -108,14 +106,12 @@
 ;; for copy_paste mechanism:
 ;;   https://github.com/Fuco1/dired-hacks/blob/master/dired-ranger.el
 
-;; to remember point's places in buffers between sessions,
-;;   i'm going to use a solution based on save-place,
-;;   but with individual save-place-file for any project;
-;; list of buffer groups
-;; buffer groups + save and restore
-;; to-alist, alist-to-file + timer
 (save-place-mode 1)
 (run-with-idle-timer 30 30 #'save-place-alist-to-file)
+;; i'm going to extend this to have separate save-place-file for each project;
+;; list of buffer groups
+;; list of buffer groups
+;; to-alist, alist-to-file
 
 (defun show-projects ()
   (let* ((buffer (dired-noselect "~/projects/1"))
@@ -125,8 +121,8 @@
     (hl-line-highlight))
 
   ;; to do: automatically mount storage devices when available,
-  ;;   and show their "projects" directories in seperate panes (Emacs windows);
-  ;; use display-buffer instead of display-buffer-use-some-window for other;
+  ;;   and show their "projects/*" directories in seperate panes (Emacs windows);
+  ;; note: use display-buffer instead of display-buffer-use-some-window for these new panes;
   ;; https://wiki.archlinux.org/index.php/Udisks#udevadm_monitor
   )
 (show-projects)
@@ -151,7 +147,7 @@
           "  i3-msg [workspace=__focused__] kill; "
           "  i3-msg workspace '\"" file-name "\"'; "
           "  emacsclient -c --eval '(goto-project \"" file-name "\")' & fi"))))
-     
+
      ((file-directory-p file-name)
       (cond
        ((string-match-p "\\.m/?\\'" file-name)
@@ -225,7 +221,6 @@
 
 ;; modal key_bindings
 ;; https://github.com/mrkkrp/modalka
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
 ;; in insert mode: Esc -> send key, normal mode;
 ;; in normal mode:
 ;;   one key (only received by i3) -> go to projects, send Esc to Emacs
@@ -237,6 +232,15 @@
 ;;   workspace back and forth
 ;;   projects
 ;; firefox-insert-mode: Esc -> normal mode
+(require-package 'modalka)
+(add-hook 'modalka-mode-hook (lambda () (set-cursor-color "black")))
+;;(modalka-global-mode 1)
+;;(global-set-key (kbd "<escape>") #'modalka-mode)
+;;(global-set-key (kbd "<tab>") #'modalka-mode)
+(define-key modalka-mode-map (kbd "<enter>")
+  (lambda () (modalka-mode -1) (set-cursor-color "red")))
+
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
 
 ;; https://orgmode.org/manual/Tables.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html
