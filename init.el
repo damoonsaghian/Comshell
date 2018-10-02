@@ -43,11 +43,30 @@
       window-divider-default-right-width 1
       window-divider-default-bottom-width 1)
 (window-divider-mode 1)
-(scroll-bar-mode -1)
-(add-to-list 'default-frame-alist '(left-fringe . 3))
-(add-to-list 'default-frame-alist '(right-fringe . 8))
 (set-face-attribute 'window-divider nil :foreground "#222222")
-(set-face-attribute 'fringe nil :background nil)
+(scroll-bar-mode -1)
+
+(add-to-list 'default-frame-alist '(left-fringe . 3))
+(add-to-list 'default-frame-alist '(right-fringe . 3))
+(set-face-attribute 'fringe nil :background 'unspecified :foreground "red")
+(define-fringe-bitmap 'right-arrow
+  [#b01100000
+   #b01100000
+   #b00000000
+   #b01100000
+   #b01100000
+   #b00000000
+   #b01100000
+   #b01100000])
+(define-fringe-bitmap 'left-arrow
+  [#b01100000
+   #b01100000
+   #b00000000
+   #b01100000
+   #b01100000
+   #b00000000
+   #b01100000
+   #b01100000])
 
 (setq scroll-conservatively 200) ;; never recenter point
 ;; move point to top/bottom of buffer before signaling a scrolling error;
@@ -57,7 +76,7 @@
 (setq-default cursor-in-non-selected-windows nil)
 
 (add-to-list 'default-frame-alist '(foreground-color . "#222222"))
-(set-face-attribute 'highlight nil :background "white" :foreground "red")
+(set-face-attribute 'highlight nil :background "LightBlue1")
 (set-face-attribute 'region nil :background "LightBlue1")
 (set-face-attribute 'default nil :height 105)
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
