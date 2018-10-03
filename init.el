@@ -253,11 +253,21 @@
 ;; firefox-insert-mode: Esc -> normal mode
 (require-package 'modalka)
 (add-hook 'modalka-mode-hook (lambda () (set-cursor-color "black")))
-;;(modalka-global-mode 1)
-;;(global-set-key (kbd "<escape>") #'modalka-mode)
-;;(global-set-key (kbd "<tab>") #'modalka-mode)
+;; (modalka-global-mode 1)
+(global-set-key (kbd "<escape>") #'modalka-global-mode)
+(global-set-key (kbd "<tab>") #'modalka-global-mode)
 (define-key modalka-mode-map (kbd "<enter>")
-  (lambda () (modalka-mode -1) (set-cursor-color "red")))
+  (lambda () (modalka-global-mode -1) (set-cursor-color "red")))
+
+(modalka-define-kbd "f" "C-f")
+(modalka-define-kbd "b" "C-b")
+(modalka-define-kbd "n" "C-n")
+(modalka-define-kbd "p" "C-p")
+(modalka-define-kbd "a" "C-a")
+(modalka-define-kbd "e" "C-e")
+(modalka-define-kbd "m" "C-SPC")
+(modalka-define-kbd "<escape>" "C-g")
+(modalka-define-kbd "<tab>" "C-g")
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
 
