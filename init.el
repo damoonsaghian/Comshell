@@ -240,34 +240,35 @@
 
 ;; modal key_bindings
 ;; https://github.com/mrkkrp/modalka
-;; in insert mode: Esc -> send key, normal mode;
-;; in normal mode:
-;;   one key (only received by i3) -> go to projects, send Esc to Emacs
-;;     (all Emacs through xdotool);
-;;   i-> send key, go to insert mode;
-;; firefox-normal-mode:
-;;   block all letter keys;
-;;   i -> insert mode
-;;   workspace back and forth
-;;   projects
-;; firefox-insert-mode: Esc -> normal mode
 (require-package 'modalka)
-(add-hook 'modalka-mode-hook (lambda () (set-cursor-color "black")))
-;; (modalka-global-mode 1)
-(global-set-key (kbd "<escape>") #'modalka-global-mode)
-(global-set-key (kbd "<tab>") #'modalka-global-mode)
-(define-key modalka-mode-map (kbd "<enter>")
-  (lambda () (modalka-global-mode -1) (set-cursor-color "red")))
+(add-hook 'modalka-mode-hook (lambda ()
+                               (set-cursor-color "black")
+                               (call-process-shell-command "i3-msg mode default")))
+(define-key modalka-mode-map (kbd "RET")
+  (lambda ()
+    (interactive)
+    (modalka-global-mode -1)
+    (set-cursor-color "red")
+    (call-process-shell-command "i3-msg mode insert")))
 
-(modalka-define-kbd "f" "C-f")
-(modalka-define-kbd "b" "C-b")
-(modalka-define-kbd "n" "C-n")
-(modalka-define-kbd "p" "C-p")
-(modalka-define-kbd "a" "C-a")
-(modalka-define-kbd "e" "C-e")
-(modalka-define-kbd "m" "C-SPC")
-(modalka-define-kbd "<escape>" "C-g")
-(modalka-define-kbd "<tab>" "C-g")
+;;(modalka-define-kbd "f" "C-f")
+;;(modalka-define-kbd "b" "C-b")
+;;(modalka-define-kbd "n" "C-n")
+;;(modalka-define-kbd "p" "C-p")
+;;(modalka-define-kbd "a" "C-a")
+;;(modalka-define-kbd "e" "C-e")
+;;(modalka-define-kbd "m" "C-SPC")
+;;(modalka-define-kbd "<escape>" "C-g")
+;;(modalka-define-kbd "<tab>" "C-g")
+;;(define-key modalka-mode-map (kbd "x f")
+;;  (lambda () (interactive) (call-process-shell-command "i3-msg workspace /Firefox/;
+;;    if [[ \"$(i3-msg [workspace=__focused__ class=Firefox] focus)\" =~ \"false\" ]];
+;;    then i3-msg 'workspace /Firefox/; exec firefox'; fi")))
+
+(add-to-list 'modalka-excluded-modes 'dired-mode)
+(add-to-list 'modalka-excluded-modes 'help-mode)
+(add-to-list 'modalka-excluded-modes 'Info-mode)
+;;(modalka-global-mode 1)
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
 
