@@ -3,10 +3,9 @@
 (tool-bar-mode -1)
 (setq inhibit-startup-screen t)
 (setq visible-bell t)
-(setq insert-default-directory nil) ;; or use double slash mechanism;
-;; (setq-default mode-line-format nil)
+(setq insert-default-directory nil) ;; alternatively we can use double slash mechanism;
 (setq make-backup-files nil)
-(setq create-lockfiles nil)
+(setq create-lockfiles nil) ;; because we only use one Emacs instance;
 (setq window-sides-vertical t)
 (global-set-key (kbd "C-x k") #'kill-this-buffer)
 (cua-mode 1)
@@ -44,7 +43,6 @@
       window-divider-default-bottom-width 1)
 (window-divider-mode 1)
 (set-face-attribute 'window-divider nil :foreground "#222222")
-(scroll-bar-mode -1)
 
 (add-to-list 'default-frame-alist '(left-fringe . 3))
 (add-to-list 'default-frame-alist '(right-fringe . 3))
@@ -68,9 +66,11 @@
    #b01100000
    #b01100000])
 
+(scroll-bar-mode -1)
 (setq scroll-conservatively 200) ;; never recenter point
 ;; move point to top/bottom of buffer before signaling a scrolling error;
 (setq scroll-error-top-bottom t)
+pixel-scroll-mode
 
 (setq blink-cursor-blinks 0)
 (setq-default cursor-in-non-selected-windows nil)
@@ -109,9 +109,6 @@
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
 (setq dired-listing-switches "-l -I \"#*#\" -I \"*.lock\" -I \"target\"")
-;; auto-save-file-name-transforms
-;; "^\\(\\.*\\)\\'\\|^target\\'|\\.lock\\'\\|^\\(\\#*\\)\\#\\'"
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Regexps.html
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
 (add-hook 'dired-mode-hook 'hl-line-mode)
 ;; remove first line in dired;
@@ -127,24 +124,20 @@
 
 (save-place-mode 1)
 (run-with-idle-timer 30 30 #'save-place-alist-to-file)
-;; i'm going to extend this to have separate save-place-file for each project;
+;; todo: separate save-place-file for each project;
 ;; list of buffer groups
-;; list of buffer groups
-;; to-alist, alist-to-file
+;; save-place-to-alist, save-place-alist-to-file
 
-(defun show-projects ()
-  (let* ((buffer (dired-noselect "~/projects/1"))
-         (window (display-buffer-use-some-window buffer nil)))
-    (set-window-dedicated-p window t)
-    (select-window window)
-    (hl-line-highlight))
-
-  ;; to do: automatically mount storage devices when available,
-  ;;   and show their "projects/*" directories in seperate panes (Emacs windows);
-  ;; note: use display-buffer instead of display-buffer-use-some-window for these new panes;
-  ;; https://wiki.archlinux.org/index.php/Udisks#udevadm_monitor
-  )
-(show-projects)
+;; show projects
+(let* ((buffer (dired-noselect "~/projects/1"))
+       (window (display-buffer-use-some-window buffer nil)))
+  (set-window-dedicated-p window t)
+  (select-window window)
+  (hl-line-highlight))
+;; to do: automatically mount storage devices when available,
+;;   and show their "projects/*" directories in seperate panes (Emacs windows);
+;; note: use display-buffer instead of display-buffer-use-some-window for these new panes;
+;; https://wiki.archlinux.org/index.php/Udisks#udevadm_monitor
 
 (defun my-find-file ()
   (interactive)
@@ -262,12 +255,21 @@
 ;;    if [[ \"$(i3-msg [workspace=__focused__ class=Firefox] focus)\" =~ \"false\" ]];
 ;;    then i3-msg 'workspace /Firefox/; exec firefox'; fi")))
 
-(add-to-list 'modalka-excluded-modes 'dired-mode)
-(add-to-list 'modalka-excluded-modes 'help-mode)
-(add-to-list 'modalka-excluded-modes 'Info-mode)
+;; change the definition of "modalka--maybe-activate" such that
+;;   "modalka-global-mode" activates modalka, only for buffers
+;;   whose major modes are derived from "text-mode" or "prog-mode";
+(defun modalka--maybe-activate ()
+  (unless (or (minibufferp)
+              (not (derived-mode-p 'text-mode 'prog-mode)))
+    (modalka-mode 1)))
 (modalka-global-mode 1)
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
+
+;; (setq ido-enable-flex-matching t)
+;; (setq ido-everywhere t)
+;; (ido-mode 1)
+;; ido-ubiquitous, helm, icicles, icomplete
 
 ;; https://orgmode.org/manual/Tables.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html
@@ -285,13 +287,8 @@
 ;; https://github.com/flycheck/flycheck-rust
 ;; http://julienblanchard.com/2016/fancy-rust-development-with-emacs/
 
-;; (setq ido-enable-flex-matching t)
-;; (setq ido-everywhere t)
-;; (ido-mode 1)
-;; ido-ubiquitous, helm, icicles, icomplete
-
 ;; https://github.com/dengste/minimap
-;; https://www.gnu.org/software/emacs/draft/manual/html_node/elisp/Side-Windows.html
+;; https://github.com/Fuco1/smartparens
 ;; https://github.com/hlissner/doom-emacs/wiki/FAQ#how-is-dooms-startup-so-fast
 ;; https://www.emacswiki.org/emacs/DiredSync
 ;; http://ergoemacs.org/emacs/emacs_magit-mode_tutorial.html
@@ -305,15 +302,13 @@
 ;;   https://www.gnu.org/software/emacs/manual/html_node/emacs/Sending-Mail.html
 ;;   https://www.gnu.org/software/emacs/manual/html_node/emacs/Rmail.html
 ;;   https://www.gnu.org/software/emacs/manual/html_node/mh-e/index.html
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Calendar_002fDiary.html
-;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Timers.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Spelling.html
 ;; https://www.emacswiki.org/emacs/DictMode
 ;;   https://github.com/gromnitsky/wordnut
 ;;   https://www.emacswiki.org/emacs/ThesauriAndSynonyms
 ;;   https://github.com/atykhonov/google-translate
 ;; https://www.gnu.org/software/emacs/manual/html_node/calc/index.html
-;; https://github.com/domtronn/all-the-icons.el
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Calendar_002fDiary.html
 ;; https://www.gnu.org/software/emacs-muse/manual/html_node/Extending-Muse.html#Extending-Muse
-;; https://github.com/Fuco1/smartparens
 ;; http://company-mode.github.io/
+;; https://github.com/domtronn/all-the-icons.el
