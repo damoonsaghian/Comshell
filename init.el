@@ -241,15 +241,12 @@
 ;; modal key_bindings
 ;; https://github.com/mrkkrp/modalka
 (require-package 'modalka)
-(add-hook 'modalka-mode-hook (lambda ()
-                               (set-cursor-color "black")
-                               (call-process-shell-command "i3-msg mode default")))
+(add-hook 'modalka-mode-hook (lambda () (set-cursor-color "black")))
 (define-key modalka-mode-map (kbd "RET")
   (lambda ()
     (interactive)
     (modalka-global-mode -1)
-    (set-cursor-color "red")
-    (call-process-shell-command "i3-msg mode insert")))
+    (set-cursor-color "red")))
 
 ;;(modalka-define-kbd "f" "C-f")
 ;;(modalka-define-kbd "b" "C-b")
@@ -268,7 +265,7 @@
 (add-to-list 'modalka-excluded-modes 'dired-mode)
 (add-to-list 'modalka-excluded-modes 'help-mode)
 (add-to-list 'modalka-excluded-modes 'Info-mode)
-;;(modalka-global-mode 1)
+(modalka-global-mode 1)
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
 
