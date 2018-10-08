@@ -20,6 +20,17 @@
 ;; https://blog.idorobots.org/entries/system-monitor-in-emacs-mode-line.html
 ;; https://github.com/zk-phi/symon/blob/master/symon.el
 
+;; use double space (instead of tab) for completion;
+(defun my-complete ()
+  (interactive)
+  (if (equal (char-before (point)) ?\s)
+      (progn (delete-backward-char 1)
+             (minibuffer-complete))
+    (insert " ")))
+(define-key minibuffer-local-must-match-map (kbd "SPC") 'my-complete)
+(define-key minibuffer-local-completion-map (kbd "SPC") 'my-complete)
+(define-key minibuffer-local-filename-completion-map (kbd "SPC") 'my-complete)
+
 ;; header line instead of modeline;
 (setq-default
  header-line-format
@@ -234,13 +245,28 @@ pixel-scroll-mode
 ;; modal key_bindings
 ;; https://github.com/mrkkrp/modalka
 (require-package 'modalka)
-(add-hook 'modalka-mode-hook (lambda () (set-cursor-color "black")))
+(define-minor-mode my-modalka-mode
+  nil nil nil nil
+  (if my-modalka-mode (modalka-mode 1) (modalka-mode -1))
+  (setq-local cursor-type (if my-modalka-mode 'box 'hollow)))
+
+;; changed the definition of "modalka--maybe-activate" such that
+;;   "my-modalka-global-mode" activates modalka, only in "shell-mode",
+;;   and modes derived from "text-mode" or "prog-mode";
+(defun my-modalka--maybe-activate ()
+  (unless (or (minibufferp)
+              (and
+               (not (derived-mode-p 'text-mode 'prog-mode))
+               (not (equal major-mode 'shell-mode))))
+    (my-modalka-mode 1)))
+(define-globalized-minor-mode my-modalka-global-mode
+  my-modalka-mode
+  my-modalka--maybe-activate)
+
 (define-key modalka-mode-map (kbd "RET")
   (lambda ()
     (interactive)
-    (modalka-global-mode -1)
-    (set-cursor-color "red")))
-
+    (my-modalka-global-mode -1)))
 ;;(modalka-define-kbd "f" "C-f")
 ;;(modalka-define-kbd "b" "C-b")
 ;;(modalka-define-kbd "n" "C-n")
@@ -250,21 +276,7 @@ pixel-scroll-mode
 ;;(modalka-define-kbd "m" "C-SPC")
 ;;(modalka-define-kbd "<escape>" "C-g")
 ;;(modalka-define-kbd "<tab>" "C-g")
-;;(define-key modalka-mode-map (kbd "x f")
-;;  (lambda () (interactive) (call-process-shell-command "i3-msg workspace /Firefox/;
-;;    if [[ \"$(i3-msg [workspace=__focused__ class=Firefox] focus)\" =~ \"false\" ]];
-;;    then i3-msg 'workspace /Firefox/; exec firefox'; fi")))
-
-;; change the definition of "modalka--maybe-activate" such that
-;;   "modalka-global-mode" activates modalka, only for buffers
-;;   whose major modes are derived from "text-mode" or "prog-mode";
-(defun modalka--maybe-activate ()
-  (unless (or (minibufferp)
-              (and
-               (not (derived-mode-p 'text-mode 'prog-mode))
-               (not (equal major-mode 'shell-mode))))
-    (modalka-mode 1)))
-(modalka-global-mode 1)
+(my-modalka-global-mode 1)
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
 
