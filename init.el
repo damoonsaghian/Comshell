@@ -27,9 +27,17 @@
       (progn (delete-backward-char 1)
              (minibuffer-complete))
     (insert " ")))
-(define-key minibuffer-local-must-match-map (kbd "SPC") 'my-complete)
-(define-key minibuffer-local-completion-map (kbd "SPC") 'my-complete)
+(define-key minibuffer-local-filename-must-match-map (kbd "SPC") 'my-complete)
 (define-key minibuffer-local-filename-completion-map (kbd "SPC") 'my-complete)
+(require 'shell)
+(defun my-shell-complete ()
+  (interactive)
+  (if (equal (char-before (point)) ?\s)
+      (progn (delete-backward-char 1)
+             (completion-at-point))
+    (insert " ")))
+(define-key minibuffer-local-shell-command-map (kbd "SPC") 'my-shell-complete)
+(define-key shell-mode-map (kbd "SPC") 'my-shell-complete)
 
 ;; header line instead of modeline;
 (setq-default
