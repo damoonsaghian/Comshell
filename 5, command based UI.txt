@@ -51,21 +51,16 @@ in normal mode we can:
 , find
 , enter insert mode
 
-projects are looked for in "~/projects/" and all directories named "projects" on all disks,
-  and shown in lists side by side (files from different disks will be in separate lists);
+projects are looked for in "~/projects/*/" and all "projects/*/" directories on all disks,
+  and shown in lists side by side (files from different directories will be in separate lists);
 from these lists, we can open projects (or switch to them if they are already open),
   create new projects, etc;
 
 automatically mount storage devices when available,
-  and show their "projects" directories in seperate panes;
-the name of projects in other panes will be named like this:
-  "project_name/partition_name/";
-after unmounting a pane, we must close it'e views
+  and show their "projects/*/" directories in seperate panes;
+after unmounting a disk, the correspoding panes must be closed;
 
-a bar at the top shows project name,
-  and at the right end, date and various status informations;
-
-a panel at the left shows a tree view of the files in the project;
+a panel at the left shows the files in the project;
 text files are opened in a text editor panel at the right;
 directories with ".m" extension are opened in a panel at the right,
   showing thumbnails of the files in it;

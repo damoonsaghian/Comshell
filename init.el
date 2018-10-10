@@ -253,12 +253,18 @@ pixel-scroll-mode
 ;; modal key_bindings
 ;; https://github.com/mrkkrp/modalka
 (require-package 'modalka)
-(defun modalka-mode-maybe ()
-  (if (or (derived-mode-p 'text-mode 'prog-mode 'conf-mode)
-          (equal major-mode 'shell-mode))
-      (modalka-mode 1))
-  (set-cursor-color "black"))
-(add-hook 'buffer-list-update-hook #'modalka-mode-maybe)
+(defun modal-buffer-p ()
+  (or (derived-mode-p 'text-mode 'prog-mode 'conf-mode)
+      (equal major-mode 'shell-mode)))
+(defun modalka--maybe-activate ()
+  (if (modal-buffer-p) (modalka-mode 1)))
+(add-hook 'modalka-mode-hook (lambda () (set-cursor-color "black")))
+(add-hook 'buffer-list-update-hook
+          (lambda ()
+            (if (with-current-buffer (window-buffer (selected-window))
+                  (and (not modalka-mode) (modal-buffer-p)))
+                (set-cursor-color "red")
+              (set-cursor-color "black"))))
 
 (define-key modalka-mode-map (kbd "RET")
   (lambda ()
@@ -274,6 +280,7 @@ pixel-scroll-mode
 ;;(modalka-define-kbd "m" "C-SPC")
 ;;(modalka-define-kbd "<escape>" "C-g")
 ;;(modalka-define-kbd "<tab>" "C-g")
+(modalka-global-mode 1)
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
 
