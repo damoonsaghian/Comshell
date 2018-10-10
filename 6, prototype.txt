@@ -27,7 +27,7 @@ now to reuse previously downloaded packages on your system,
 ; arch-chroot /mnt
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
   networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip \
-  xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-wm\
+  xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-wm \
   ttf-hack emacs materia-gtk-theme ttf-droid firefox mpv
 
 install bootloader:
