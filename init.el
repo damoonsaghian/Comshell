@@ -253,28 +253,18 @@ pixel-scroll-mode
 ;; modal key_bindings
 ;; https://github.com/mrkkrp/modalka
 (require-package 'modalka)
-(define-minor-mode my-modalka-mode
-  nil nil nil nil
-  (if my-modalka-mode (modalka-mode 1) (modalka-mode -1))
-  (setq-local cursor-type (if my-modalka-mode 'box 'hollow)))
-
-;; changed the definition of "modalka--maybe-activate" such that
-;;   "my-modalka-global-mode" activates modalka, only in "shell-mode",
-;;   and modes derived from "text-mode" or "prog-mode";
-(defun my-modalka--maybe-activate ()
-  (unless (or (minibufferp)
-              (and
-               (not (derived-mode-p 'text-mode 'prog-mode))
-               (not (equal major-mode 'shell-mode))))
-    (my-modalka-mode 1)))
-(define-globalized-minor-mode my-modalka-global-mode
-  my-modalka-mode
-  my-modalka--maybe-activate)
+(defun modalka-mode-maybe ()
+  (if (or (derived-mode-p 'text-mode 'prog-mode 'conf-mode)
+          (equal major-mode 'shell-mode))
+      (modalka-mode 1))
+  (set-cursor-color "black"))
+(add-hook 'buffer-list-update-hook #'modalka-mode-maybe)
 
 (define-key modalka-mode-map (kbd "RET")
   (lambda ()
     (interactive)
-    (my-modalka-global-mode -1)))
+    (modalka-mode -1)
+    (set-cursor-color "red")))
 ;;(modalka-define-kbd "f" "C-f")
 ;;(modalka-define-kbd "b" "C-b")
 ;;(modalka-define-kbd "n" "C-n")
@@ -284,7 +274,6 @@ pixel-scroll-mode
 ;;(modalka-define-kbd "m" "C-SPC")
 ;;(modalka-define-kbd "<escape>" "C-g")
 ;;(modalka-define-kbd "<tab>" "C-g")
-(my-modalka-global-mode 1)
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
 
