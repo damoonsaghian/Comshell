@@ -142,7 +142,12 @@ pixel-scroll-mode
 ;;   https://github.com/Fuco1/dired-hacks/blob/master/dired-ranger.el
 
 (save-place-mode 1)
-(run-with-idle-timer 30 30 #'save-place-alist-to-file)
+(run-with-idle-timer
+ 30 30 (lambda ()
+         (let ((inhibit-message t))
+           (save-places-to-alist)
+           (if save-place-loaded
+               (save-place-alist-to-file)))))
 ;; todo: separate save-place-file for each project;
 ;; list of buffer groups
 ;; save-place-to-alist, save-place-alist-to-file
