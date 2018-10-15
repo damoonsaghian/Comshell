@@ -1,11 +1,11 @@
-(server-start)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
+(setq use-dialog-box nil)
 (setq inhibit-startup-screen t)
 (setq visible-bell t)
 (setq insert-default-directory nil) ;; alternatively we can use double slash mechanism;
 (setq make-backup-files nil)
-(setq create-lockfiles nil) ;; because we only use one Emacs instance;
+;; (setq create-lockfiles nil) ;; because we only use one Emacs instance;
 (setq window-sides-vertical t)
 (global-set-key (kbd "C-x k") #'kill-this-buffer)
 (cua-mode 1)
@@ -76,20 +76,20 @@
    #b01100000
    #b01100000])
 (define-fringe-bitmap 'left-arrow
-  [#b01100000
-   #b01100000
+  [#b11000000
+   #b11000000
    #b00000000
-   #b01100000
-   #b01100000
+   #b11000000
+   #b11000000
    #b00000000
-   #b01100000
-   #b01100000])
+   #b11000000
+   #b11000000])
 
 (scroll-bar-mode -1)
 (setq scroll-conservatively 200) ;; never recenter point
 ;; move point to top/bottom of buffer before signaling a scrolling error;
 (setq scroll-error-top-bottom t)
-pixel-scroll-mode
+;; pixel-scroll-mode
 
 (setq blink-cursor-blinks 0)
 (setq-default cursor-in-non-selected-windows nil)
@@ -169,15 +169,10 @@ pixel-scroll-mode
     (cond
      ((string-match-p "/projects/[^/]*/[^/]*/?\\'" file-name)
       (when (file-directory-p file-name)
-        ;; go to the workspace named "file-name";
-        ;; then if there is no Emacs frame in the workspace:
-        ;; , first close all windows in current workspace,
-        ;;   and all workspaces named like this: "1:project_name /*";
-        ;; , then run a new instance of Emacs for this project;
         (call-process-shell-command
          (concat
           "i3-msg workspace '\"" file-name "\"'; "
-          "if [[ \"$(i3-msg [workspace=__focused__ class=Emacs tiling] mark a)\" "
+          "if [[ \"$(i3-msg [workspace=__focused__ class=Emacs] mark a)\" "
           "  =~ \"false\" ]]; "
           "then "
           "  i3-msg [workspace=__focused__] kill; "
@@ -220,6 +215,8 @@ pixel-scroll-mode
     (hl-line-highlight)
     (my-find-file)))
 
+(add-hook 'prog-mode-hook 'goto-address-mode)
+(add-hook 'text-mode-hook 'goto-address-mode)
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/FFAP.html
 (defun goto-link-at-point ()
   "open the project with the URL under cursor; 
@@ -271,20 +268,51 @@ pixel-scroll-mode
                 (set-cursor-color "red")
               (set-cursor-color "black"))))
 
+(global-set-key (kbd "<escape>") (lambda () (interactive) (modalka--maybe-activate)))
+(global-set-key (kbd "<tab>") (lambda () (interactive) (modalka--maybe-activate)))
 (define-key modalka-mode-map (kbd "RET")
   (lambda ()
     (interactive)
     (modalka-mode -1)
     (set-cursor-color "red")))
-;;(modalka-define-kbd "f" "C-f")
-;;(modalka-define-kbd "b" "C-b")
-;;(modalka-define-kbd "n" "C-n")
-;;(modalka-define-kbd "p" "C-p")
-;;(modalka-define-kbd "a" "C-a")
-;;(modalka-define-kbd "e" "C-e")
-;;(modalka-define-kbd "m" "C-SPC")
-;;(modalka-define-kbd "<escape>" "C-g")
-;;(modalka-define-kbd "<tab>" "C-g")
+
+(modalka-define-kbd "a" "C-a") ;; move-beginning-of-line
+(modalka-define-kbd "b" "C-b") ;; backward-char
+(modalka-define-kbd "c" "C-c") ;;
+(modalka-define-kbd "e" "C-e") ;; move-end-of-line
+(modalka-define-kbd "f" "C-f") ;; forward-char
+(modalka-define-kbd "g" "C-g") ;;
+(modalka-define-kbd "h" "C-h") ;;
+(modalka-define-kbd "i" "C-i") ;; * indent-for-tab-command
+(modalka-define-kbd "j" "C-j") ;; * electric-newline-and-maybe-indent
+(modalka-define-kbd "k" "C-k") ;; * kill-line
+(modalka-define-kbd "l" "C-l") ;; * recenter-top-bottom
+(modalka-define-kbd "m" "C-SPC") ;; cua-set-mark
+(modalka-define-kbd "n" "C-n") ;; next-line
+(modalka-define-kbd "o" "C-o") ;; * open-line
+(modalka-define-kbd "p" "C-p") ;; previous-line
+(modalka-define-kbd "q" "C-q") ;; * quoted-insert
+(modalka-define-kbd "r" "C-r") ;; isearch-repeat-backward
+(modalka-define-kbd "s" "C-s") ;; isearch-forward
+(modalka-define-kbd "t" "C-t") ;; * transpose-char
+(modalka-define-kbd "u" "C-u") ;; universal-argument
+(modalka-define-kbd "v" "C-v") ;; cua-paste
+(modalka-define-kbd "w" "C-w") ;; * kill-region
+(modalka-define-kbd "x" "C-x") ;; 
+(modalka-define-kbd "y" "C-y") ;; * cua-paste
+(modalka-define-kbd "z" "C-z") ;; undo
+(modalka-define-kbd "1" "C-1") ;; (digit-argument 1)
+(modalka-define-kbd "2" "C-2")
+(modalka-define-kbd "3" "C-3")
+(modalka-define-kbd "4" "C-4")
+(modalka-define-kbd "5" "C-5")
+(modalka-define-kbd "6" "C-6")
+(modalka-define-kbd "7" "C-7")
+(modalka-define-kbd "8" "C-8")
+(modalka-define-kbd "9" "C-9")
+(modalka-define-kbd "0" "C-0")
+(modalka-define-kbd "," "C-,")
+(modalka-define-kbd "_" "C-_") ;; * undo
 (modalka-global-mode 1)
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
@@ -335,3 +363,5 @@ pixel-scroll-mode
 ;; https://www.gnu.org/software/emacs-muse/manual/html_node/Extending-Muse.html#Extending-Muse
 ;; http://company-mode.github.io/
 ;; https://github.com/domtronn/all-the-icons.el
+
+(server-start)

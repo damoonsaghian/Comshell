@@ -28,7 +28,7 @@ now to reuse previously downloaded packages on your system,
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
   networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip \
   xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-wm \
-  ttf-hack emacs materia-gtk-theme ttf-droid firefox mpv
+  ttf-hack ttf-droid emacs mpv deepin-gtk-theme firefox
 
 install bootloader:
 ; grub-install --target=i386-pc /dev/sdx
@@ -67,7 +67,7 @@ automatic login:
 
 ; mkdir -p ~/.config/gtk-3.0; emacs ~/.config/gtk-3.0/settings.ini
   [Settings]
-  gtk-theme-name = Materia-light-compact
+  gtk-theme-name = deepin
   gtk-font-name = Sans
 
 for devices with hardware mute and volume control,
