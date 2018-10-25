@@ -1,0 +1,16 @@
+"https://julialang.org/"
+
+types show us what we can do with the data (which operations are valid);
+
+the class hierarchy design like in Java is problematic;
+  "http://ptgmedia.pearsoncmg.com/images/020163371x/items/item33.html"
+also the problem of covariance for generic types, has its root in this problem;
+  "https://en.wikipedia.org/wiki/Wildcard_(Java)"
+i think this is also the reason that
+  some prefer dynamic typing (another bad design) over static typing;
+the right way is to use inheritance only from abstract types (like in Julia, Rust and Go);
+  abstract types can be inherited from, but can't be instantiated;
+
+shared mutability is the root of many complexities,
+  especially in concurrent environments;
+all references must either be unique or immutable;
