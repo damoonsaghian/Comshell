@@ -25,7 +25,7 @@ now to reuse previously downloaded packages on your system,
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
   networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip ttf-hack ttf-droid sway \
   gtk3 gnome-desktop gtksourceview3 vte3 gst-plugins-{base,good,bad} gst-libav webkit2gtk deepin-gtk-theme \
-  julia
+  rustup
 
 install bootloader:
 ; grub-install --target=i386-pc /dev/sdx
@@ -73,6 +73,21 @@ so if you like you can do this:
 ; pactl set-sink-mute @DEFAULT_SINK@ 0
 ; pactl set-sink-volume @DEFAULT_SINK@ 100%
 
+; rustup gcc
+; rustup install stable
+; rustup default stable
+
+; nano ~/.bash_profile
+  export TZ="/usr/share/zoneinfo/<your_location>"
+  sway
+; mkdir -p ~/.config/sway
+; nano ~/.config/sway/config
+  default_border none
+  exec "cargo run comshell-project-dir; swaymsg exit"
+
+actually Sway (with "wlroot") is not ready yet;
+  so til then, we can use "i3-wm";
+; pacman -S xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-wm
 ; nano ~/.bash_profile
   export TZ="/usr/share/zoneinfo/<your_location>"
   startx
@@ -82,5 +97,5 @@ so if you like you can do this:
 ; nano ~/.config/i3/config
   # i3 config file (v4)
   default_border none
-  exec compton --unredir-if-possible-exclude "class_g %= '*'"
-  exec --no-startup-id "julia comshell.jl; i3-msg exit"
+  exec compton --shadow-exclude "class_g %= '*'" --unredir-if-possible-exclude "class_g %= '*'"
+  exec --no-startup-id "cargo run comshell-project-dir; i3-msg exit"

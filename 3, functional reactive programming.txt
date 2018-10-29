@@ -31,7 +31,7 @@ passing data across functions:
 
 , static data (like functions): no problem, share by reference
 , dynamic data
-  , small data: move it, or share by copying
+  , small data: move (share by copying)
   , big data: move (no sharing)
 functional reactive programming allow us to program without the need to share big data;
 
@@ -66,9 +66,12 @@ the acceptance by a function of a linear argument object,
 a linear language is ideal for a dataflow architecture,
   which must explicitly duplicate/delete (linear) tokens;
 
+move semantics + streams:
+  the right approach to functional reactive programming
+
 in software, there is a limited number of central processing units
   (unlike in hardware where there is distinct processing units);
   so we use an event_loop and a thread pool to implement functional reactive programming;
 
-"https://github.com/JuliaGizmos/Reactive.jl"
-"https://github.com/JuliaGizmos/GtkReactive.jl"
+"https://docs.rs/bus/2.0.0/bus/"
+"https://github.com/antoyo/relm"
