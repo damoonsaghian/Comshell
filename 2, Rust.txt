@@ -1,22 +1,20 @@
 Rust makes bad programming hard, and good programming fun;
 Rust does not hide complexity, in fact it bolds it, so we can see it, and avoid it;
 
-evolution of C language:
-, wrong approach:
-  classes (C++)
-  garbage collection:
-    , classes (Java, C#, ...)
-    , immutable data (Haskell)
-, right approach: traits, move semantics (Rust)
+resources (as opposed to small primitive data linke integers) are passed by references,
+  because copying them is expensive;
+managing references in an imperative program is a complex task;
+Rust does not hide these complexities behind a garbage collector;
+instead it presents them clearly, as is shown in the following;
 
-shared mutability is the root of many complexities,
-  especially in concurrent environments;
-all references in Rust must either be unique or immutable;
-
-any resource have exactly one owner which takes care of its resource deallocation;
+in Rust any resource have exactly one owner which takes care of its resource deallocation;
 "http://blog.skylight.io/rust-means-never-having-to-close-a-socket/"
 owners can share their data by lending them to references;
-  references must have a lifetime less than the owner;
+references must have a lifetime less than the owner;
+
+furthermore all references in Rust must either be unique or immutable;
+cause shared mutability is the root of many complexities,
+  especially in concurrent environments;
 
 owner can:
 , control resource deallocation
@@ -32,14 +30,14 @@ owner can't:
   , access the resource
   , lend the resource
 
-reference can:
+references can:
 , access borrowed resource
-, share (copy) an immutable borrow
+, immutably lend
 mutable reference can:
 , access and mutate resource
-, hand over (move) the mutable borrow (mutable ref is moved by default)
+, mutably lend
 
-life_time of argument references ends after function call; so we can have this:
+note that life_time of argument references ends after function call; so we can have this:
   f(&mut a);
   g(&mut a);
 
@@ -79,27 +77,23 @@ also the problem of covariance for generic types, has its root in this problem;
   "https://en.wikipedia.org/wiki/Wildcard_(Java)"
 i think this is also the reason that
   some prefer dynamic typing (another bad design) over static typing;
-the right way is to use structs and traits (like in Rust and Go):
-, structs are like final classes in Java, we use them to make object,
-  but we can't inherit other classes from them;
-, traits are like abstract classes in Java, we can inherit other classes from them,
-  but we can't directly use them to make objects;
-this way, all non_leaf classes will be abstract (traits),
-  and all leaf classes will be final (structs);
+the right way as done in Rust, Go and Julia:
+, concrete types (like final classes in Java) can be instantiated, but cannot have subtypes;
+, abstract types (like abstract classes in Java) cannot be instantiated, but can have subtypes;
 
-tuples (heterogeneous, fixed size collection):
-x = (1, "aaa")
+tuples (heterogeneous, fixed size collection): (1, "aaa")
 named tuple: {i: 1, j: "aaa"}
-access:
+element access:
 , destructuring
-  let (a, b) = (1, "aaa")
+  let (a, b) = (1, "aaa");
+  let {i: a, j: b} = {i: 1, j: "aaa"}
 , dot notation
   tuples: x.0 (literal number only)
   named tuples: x.i
 
+dot notation is used where we can destucture (tuples, structures);
+double colon "::" is for namespacing;
+
 arrays (homogeneous, fixed sized collection):
   indexing can be done at runtime because all elements have the same type;
 vectors and hash tables (homogeneous, varying sized collection)
-
-dot notation is used where we can destucture (tuples, structures);
-double colon "::" is for namespacing;

@@ -1,6 +1,7 @@
 imperative programming is done by procedurally changing stored values,
   it resembles the way CPU runs the instructions stored in memory;
-imperative programming leads to unmaintainable code in large programs,
+imperative programming leads to unmaintainable code in large programs
+  (even if we hide the complexities mentioned in previous chapter, behind a garbage collector),
   and it makes writing parallel programs a cumbersome task;
 
 functional reactive programming:
@@ -23,48 +24,26 @@ the key to a real solution is move semantics (also known as uniqueness or linear
   as used in LinearML, Mercury and Rust;
   note that none of these languages need run_time garbage collection;
 
-passing data across functions:
-, copy (for small primitive data)
-, borrow (immutable, lifetime is known at compile_time)
-, counted reference (immutable, lifetime is unknown at compile_time)
-, move (for linear type data, in_place mutability is possible)
-
-, static data (like functions): no problem, share by reference
-, dynamic data
-  , small data: move (share by copying)
-  , big data: move (no sharing)
-functional reactive programming allow us to program without the need to share big data;
-
-keep related states in one place (to avoid copying big data);
-a set of messages as input;
-each kind of message changes one part of the state;
+, static data (functions, structs, constants): no problem, share by reference;
+, dynamic data:
+  , small data: copy (share by copying);
+  , big data: move (no sharing);
+functional reactive programming allows us to program without the need to share big data;
+, just keep related states in one place;
+, a set of messages can be received at inputs;
+, each kind of message changes one part of the state;
 
 from "Henry G Baker, use_once variables and linear objects":
-programming languages should have use_once variables,
-  in addition to the usual multiple_use variables;
 use_once variables are bound to linear (unshared, unaliased, or singly_referenced) objects;
 linear objects are cheap to access and manage,
   because they require no synchronization or tracing garbage collection;
 linear objects can elegantly and efficiently solve
   otherwise difficult problems of functional systems,
   eg in_place updating and the efficient initialization of functional objects;
-a use_once variable must be dynamically referenced exactly once within its scope;
-  unreferenced use_once variables must be explicitly killed,
-  and multiply_referenced use_once variables must be explicitly copied;
-  use_once variables are bound only to linear objects,
-    which may reference other linear or non_linear objects;
-  non_linear objects can reference other non_linear objects,
-    but can reference a linear object only in a way that ensures mutual exclusion;
 linear objects and use_once variables map elegantly
   into data_flow models of concurrent computation;
   and the graphical representations of data_flow models
     make an appealing visual linear programming language;
-the acceptance by a function of a linear argument object,
-  places a great responsibility on the function;
-  the function must either pass the linear object to another function as an argument,
-    explicitly dispose of it, or return it as a return value;
-a linear language is ideal for a dataflow architecture,
-  which must explicitly duplicate/delete (linear) tokens;
 
 move semantics + streams:
   the right approach to functional reactive programming
@@ -73,5 +52,6 @@ in software, there is a limited number of central processing units
   (unlike in hardware where there is distinct processing units);
   so we use an event_loop and a thread pool to implement functional reactive programming;
 
-"https://docs.rs/bus/2.0.0/bus/"
-"https://github.com/antoyo/relm"
+"https://docs.rs/bus"
+"https://docs.rs/spmc"
+"https://docs.rs/bidule"
