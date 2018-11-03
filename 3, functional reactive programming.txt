@@ -1,0 +1,69 @@
+imperative programming is done by procedurally changing stored values,
+  it resembles the way CPU runs the instructions stored in memory;
+imperative programming leads to unmaintainable code in large programs
+  (even if we hide the complexities mentioned in previous chapter, behind a garbage collector),
+  and it makes writing parallel programs a cumbersome task;
+
+functional reactive programming:
+when the output channels of a function is empty and the input channels are full,
+  the function consumes its inputs and fills its outputs with computed values;
+initially all channels have default values, so feedbacks are possible;
+
+functions just compute new data, they don't change anything outside of the function;
+  but many computations need to mutate the data given to them,
+    because the data is big and copying it would be inefficient;
+one method as seen in languages like Haskell and Clojure is to use persistent data structures;
+  in this method only the mutated part of data is computed,
+    and the rest of data is accessed through a reference to the original data;
+  this may introduce some efficiency costs,
+    but more importantly this method needs garbage collection;
+another method is to use value semantics and copy_on_write, as in Swift;
+  this method introduces some run_time cost because of reference counting;
+  (it's actually a run_time solution;)
+the key to a real solution is move semantics (also known as uniqueness or linear types),
+  as used in LinearML, Mercury and Rust;
+  note that none of these languages need run_time garbage collection;
+
+, static data (functions, structs, constants): no problem, share by reference;
+, dynamic data:
+  , small data: copy (share by copying);
+  , big data: move (no sharing);
+functional reactive programming allows us to program without the need to share big data;
+, just keep related states in one place;
+, a set of messages can be received at inputs;
+, each kind of message changes one part of the state;
+
+from "Henry G Baker, use_once variables and linear objects":
+use_once variables are bound to linear (unshared, unaliased, or singly_referenced) objects;
+linear objects are cheap to access and manage,
+  because they require no synchronization or tracing garbage collection;
+linear objects can elegantly and efficiently solve
+  otherwise difficult problems of functional systems,
+  eg in_place updating and the efficient initialization of functional objects;
+linear objects and use_once variables map elegantly
+  into data_flow models of concurrent computation;
+  and the graphical representations of data_flow models
+    make an appealing visual linear programming language;
+
+in software, there is a limited number of central processing units
+  (unlike in hardware where there is distinct processing units);
+  so we use an event_loop and a thread pool to implement functional reactive programming;
+
+"https://docs.rs/spmc"
+"https://docs.rs/bus" (the problem with this is that "send" and "recv" methods need &mut)
+functions and channels are defined statically; the dynamic part is the (async) computation loops;
+  "https://crates.io/crates/lazy_static"
+
+lazy_static! {
+  static out_chan = spmc::channel();
+  static in_chan = spmc::channel();
+}
+fn main() {
+  spawn(|| {
+    loop {
+      out_chan.1.send(
+        function(in_chan.2.recv())
+      );
+    }
+  });
+}
