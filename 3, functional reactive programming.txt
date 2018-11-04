@@ -54,16 +54,34 @@ in software, there is a limited number of central processing units
 functions and channels are defined statically; the dynamic part is the (async) computation loops;
   "https://crates.io/crates/lazy_static"
 
+struct Stream<T> {
+  tx: Sender<T>,
+  rx: Receiver<T>,
+  task: Fn() + 'static
+}
 lazy_static! {
-  static out_chan = spmc::channel();
-  static in_chan = spmc::channel();
+  static stream1: Stream<T1> = {
+    let (tx, rx) = channel();
+    let task = ||{};
+    Stream {tx: tx, rx: rx, task: task}
+  }
+}
+fn function() {}
+lazy_static! {
+  static stream2: Stream<T2> = {
+    let (tx, rx) = channel();
+    let task = || {
+      stream2.tx.send(T2{...});
+      loop {
+        stream2.tx.send(
+          function(stream1.rx.recv())
+        );
+      }
+    };
+    Stream {tx: tx, rx: rx, task: task}
+  };
 }
 fn main() {
-  spawn(|| {
-    loop {
-      out_chan.1.send(
-        function(in_chan.2.recv())
-      );
-    }
-  });
+  spawn(stream1.task);
+  spwan(stream2.task);
 }
