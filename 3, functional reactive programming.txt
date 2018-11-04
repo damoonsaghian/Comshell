@@ -49,39 +49,21 @@ in software, there is a limited number of central processing units
   (unlike in hardware where there is distinct processing units);
   so we use an event_loop and a thread pool to implement functional reactive programming;
 
+"https://docs.rs/bus"
 "https://docs.rs/spmc"
-"https://docs.rs/bus" (the problem with this is that "send" and "recv" methods need &mut)
-functions and channels are defined statically; the dynamic part is the (async) computation loops;
-  "https://crates.io/crates/lazy_static"
 
-struct Stream<T> {
-  tx: Sender<T>,
-  rx: Receiver<T>,
-  task: Fn() + 'static
-}
-lazy_static! {
-  static stream1: Stream<T1> = {
-    let (tx, rx) = channel();
-    let task = ||{};
-    Stream {tx: tx, rx: rx, task: task}
+let mut stream1 = Bus.new(0);
+let mut stream1_rx = stream1.add_rx();
+// set initial value to make feedbacks possible;
+stream1.try_broadcast(initial_value);
+
+let mut stream2 = Bus.new(0);
+let mut stream2_rx = stream2.add_rx();
+stream2.try_broadcast(initial_value);
+spawn(move || {
+  loop {
+    stream2.broadcast(
+      function(stream1_rx.recv().unwrap())
+    );
   }
-}
-fn function() {}
-lazy_static! {
-  static stream2: Stream<T2> = {
-    let (tx, rx) = channel();
-    let task = || {
-      stream2.tx.send(T2{...});
-      loop {
-        stream2.tx.send(
-          function(stream1.rx.recv())
-        );
-      }
-    };
-    Stream {tx: tx, rx: rx, task: task}
-  };
-}
-fn main() {
-  spawn(stream1.task);
-  spwan(stream2.task);
-}
+};
