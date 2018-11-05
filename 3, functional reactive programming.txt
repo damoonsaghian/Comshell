@@ -59,7 +59,7 @@ channels for syncing:
 "https://docs.rs/bus"
 "https://docs.rs/spmc"
 
-
+let pool = ThreadPool::new(num_cpus::get_physical());
 
 let mut stream1 = Bus.new(0);
 let mut stream1_rx1 = stream1.add_rx();
@@ -70,10 +70,10 @@ stream1.try_broadcast(initial_value);
 let mut stream2 = Bus.new(0);
 let mut stream2_rx = stream2.add_rx();
 stream2.try_broadcast(initial_value);
-spawn(move || {
+pool.execute(move || {
   loop {
     stream2.broadcast(
-      function(stream1_rx.recv().unwrap())
+      function(stream1_rx1.recv().unwrap())
     );
   }
 };
