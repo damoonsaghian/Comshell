@@ -1,8 +1,6 @@
 Rust makes bad programming hard, and good programming fun;
 Rust does not hide complexity, in fact it bolds it, so we can see it, and avoid it;
 
-resources (as opposed to small primitive data like integers) are passed by references,
-  because copying them is expensive;
 managing references in an imperative program is a complex task;
 Rust does not hide these complexities behind a garbage collector;
 instead it presents them clearly, as is shown in the following;
@@ -11,62 +9,37 @@ in Rust any resource have exactly one owner which takes care of its resource dea
 "http://blog.skylight.io/rust-means-never-having-to-close-a-socket/"
 owners can share their data by lending them to references;
 references must have a lifetime less than the owner;
-
-furthermore all references in Rust must either be unique or immutable;
-cause shared mutability is the root of many complexities,
-  especially in concurrent environments;
+furthermore lifetime of a mutable reference must not overlap with other references;
 
 owner can:
-, control resource deallocation
-, lend the resource:
-  , immutably (multiple refs)
-  , mutably (only one ref)
-, hand over ownership (move)
+, control resource deallocation;
+, lend the resource to a reference;
+, hand over ownership (move);
 owner can't:
-, during borrow:
-  , mutate the resource
-  , mutably lend the resource
-, during mutable borrow:
-  , access the resource
-  , lend the resource
+, mutate the resource, during borrow;
+, access the resource, during mutable borrow;
 
 references can:
-, access borrowed resource
-, immutably lend
+, access borrowed resource;
+, immutably lend resource to other references;
 mutable reference can:
-, access and mutate resource
-, mutably lend
+, access and mutate resource;
+, mutably lend resouce to aother reference;
 
-note that life_time of argument references ends after function call; so we can have this:
-  f(&mut a);
-  g(&mut a);
-
-scenarios that involve multiple refs or returning refs often require explicit lifetimes;
+scenarios that involve returning refs often require explicit lifetimes;
   so don't return refs, instead use mutable refs in inputs;
 structs and enums containing refs must have explicit lifetimes;
-  impl of these must use lifetimes too;
   so don't use them;
 
 Rust have separate types for static and dynamic values; (str/String, fn/Fn)
+static data can be defined using only other static data;
 functions can only access static environment;
   closures don't have this limitation; so when using them we must be more careful;
-static data can be defined using only other static data;
 
-arrays have a fixed size, so they can be implemented on stack;
-  but they are mutable, so unlike "str" they can't be static;
-
-automatic referencing in method calls (auto_borrow for self);
-
-Rust auto_dereferences variables when:
-, making method calls on a reference
-, passing a ref as a function argument
-  (because the type signature for functions are mandatory)
-you have to deref vars when:
-, assigning to them without type annotation
-, using overloaded operators
-
-if x doesn't implement foo() but implements Deref then:
-  x.foo() --> x.deref().foo()
+Rust has automatic dereferencing in function and method calls
+  (because the type signature for functions are mandatory);
+although we have to deref explicitly when using overloaded operators
+in addition Rust has automatic referencing for self in  method calls;
 
 = type system
 types show us what we can do with the data (which operations are valid);
@@ -75,25 +48,14 @@ the class hierarchy design like in Java is problematic;
   "http://ptgmedia.pearsoncmg.com/images/020163371x/items/item33.html"
 also the problem of covariance for generic types, has its root in this problem;
   "https://en.wikipedia.org/wiki/Wildcard_(Java)"
-i think this is also the reason that
-  some prefer dynamic typing (another bad design) over static typing;
+i think this is also the motivation for dynamic typing (another bad design);
 the right way as done in Rust, Go and Julia:
 , concrete types (like final classes in Java) can be instantiated, but cannot have subtypes;
 , abstract types (like abstract classes in Java) cannot be instantiated, but can have subtypes;
 
-tuples (heterogeneous, fixed size collection): (1, "aaa")
-named tuple: {i: 1, j: "aaa"}
-element access:
-, destructuring
-  let (a, b) = (1, "aaa");
-  let {i: a, j: b} = {i: 1, j: "aaa"}
-, dot notation
-  tuples: x.0 (literal number only)
-  named tuples: x.i
-
 dot notation is used where we can destucture (tuples, structures);
 double colon "::" is for namespacing;
 
-arrays (homogeneous, fixed sized collection):
-  indexing can be done at runtime because all elements have the same type;
-vectors and hash tables (homogeneous, varying sized collection)
+arrays in Rust are homogeneous, fixed sized collection;
+since all elements have the same type (unlike tuples), indexing can be done at runtime;
+vectors and hash tables are homogeneous, varying sized collection;
