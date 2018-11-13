@@ -30,6 +30,11 @@ linear objects and use_once variables map elegantly
   and the graphical representations of data_flow models
     make an appealing visual linear programming language;
 
+streams in future crate:
+, the designed types are not suitable for stream combination;
+, currently there is no way (that i know) to branch streams;
+  pinned trait solves this;
+
 async computations:
 "https://docs.rs/threadpool"
 "https://docs.rs/jobpool"
