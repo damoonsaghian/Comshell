@@ -18,6 +18,11 @@ functional reactive programming allows us to program without the need to share b
 , a set of messages can be received at inputs;
 , each kind of message changes one part of the state;
 
+functions which only move/copy (ie do not borrow) their input/output are called gates;
+async programming with gates are much simpler,
+  without the need for shared mutability (RefCell) and shared ownership (RC),
+  which need runtime solutions;
+
 from "Henry G Baker, use_once variables and linear objects":
 use_once variables are bound to linear (unshared, unaliased, or singly_referenced) objects;
 linear objects are cheap to access and manage,
@@ -30,16 +35,23 @@ linear objects and use_once variables map elegantly
   and the graphical representations of data_flow models
     make an appealing visual linear programming language;
 
-streams in future crate:
+streams in "future" crate:
 , the designed types are not suitable for stream combination;
 , currently there is no way (that i know) to branch streams;
   pinned trait solves this;
+"carboxyl" crate:
+, two separate concepts: streams (which are push based), signals (which are pull based);
+, seems abondoned;
+, 'static in the type of values of a stream !?
+"bidule" crate:
+, the implementation seems sequential (not async);
+, lifetimes for the values of a stream !?
 
 async computations:
 "https://docs.rs/threadpool"
 "https://docs.rs/jobpool"
-"https://crates.io/crates/threads_pool"
-"https://docs.rs/rayon-core/*/rayon_core/struct.ThreadPool.html"
+"https://crates.io/crates/threads_pool" (depends on crossbeam)
+"https://docs.rs/rayon-core/*/rayon_core/struct.ThreadPool.html" (depends on crossbeam)
 
 channels for syncing:
 "https://docs.rs/bus"

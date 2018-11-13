@@ -12,35 +12,69 @@ references must have a lifetime less than the owner;
 furthermore lifetime of a mutable reference must not overlap with other references;
 
 owner can:
-, control resource deallocation;
+, access and mutate resource;
 , lend the resource to a reference;
 , hand over ownership (move);
+, control resource deallocation;
 owner can't:
 , mutate the resource, during borrow;
 , access the resource, during mutable borrow;
 
-references can:
+references (shared references) can:
 , access borrowed resource;
 , immutably lend resource to other references;
-mutable reference can:
+mutable reference (exclusive reference) can:
 , access and mutate resource;
 , mutably lend resouce to aother reference;
+
+actually borrowing is only needed in imperative programming;
+in functional reactive programming, arguments of functions must be copied or moved;
+in general Rust shows us that move semantic is more suitable for async programming;
 
 scenarios that involve returning refs often require explicit lifetimes;
   so don't return refs, instead use mutable refs in inputs;
 structs and enums containing refs must have explicit lifetimes;
   so don't use them;
 
+shared mutability for fixed sized data (called interior mutability)
+  can be done statically using "Cell";
+if the size is not fixed, a runtime solution is needed (RefCell);
+note that "Cell" and "RefCell" can work only in a single thread;
+  use "RwLock" for multiple threads;
+
+RC: shared owning (a runtime solution);
+ARC: multi_threaded;
+
 Rust have separate types for static and dynamic values; (str/String, fn/Fn)
 static data can be defined using only other static data;
 functions can only access static environment;
   closures don't have this limitation; so when using them we must be more careful;
 
-Rust has automatic dereferencing in function and method calls
-  (because the type signature for functions are mandatory);
-although we have to deref explicitly when using overloaded operators
-in addition Rust has automatic referencing for self in  method calls;
+s: String -> &s: &String -> &s[..]: &str
+v: Vec<T> -> &v: &Vec<T> -> &v[..]: &[T]
+&str and &[T] are slices; str and [T] are unsized types;
+slicing is like borrowing from an unsized type;
+since the the slice contains the size, the lending type itself doesn't need to have a definite size;
 
+x = a[i] -> this is possible if the elements of "a" are copy
+  (cause moving out of collections is not possible);
+x = &a[i] -> this is for the case when the elements are not copy;
+x = a[i..j] -> this is always invalid;
+x = &a[i..j] -> slicing;
+
+auto ref/deref for self in method calls:
+  insert as many * or & as necessary to get it right;
+cause in method calls name and context of a method call is almost always sufficient
+  to infer the move/borrow semantics;
+
+deref coercion:
+, &T -> &U when T: Deref<Target=U>
+, &mut T -> &U when T: Deref<Target=U>
+, &mut T -> &mut U when T: DerefMut<Target=U>
+examples:
+  &&i32 -> &i32 because &i32: Deref<Target=i32>
+  &String -> &str because String: Deref<Target=str>
+  &Vec<T> -> &[T] because Vec<T>: Deref<Target=[T]>
 = type system
 types show us what we can do with the data (which operations are valid);
 
@@ -55,7 +89,12 @@ the right way as done in Rust, Go and Julia:
 
 dot notation is used where we can destucture (tuples, structures);
 double colon "::" is for namespacing;
+note that "x.m()" is method call syntax, which completely differs from "(x.m)()";
 
-arrays in Rust are homogeneous, fixed sized collection;
-since all elements have the same type (unlike tuples), indexing can be done at runtime;
+arrays like tuples have fixed size and are copy;
+  but since they are homogeneous (all elements are of the same type), indexing can be done at runtime;
 vectors and hash tables are homogeneous, varying sized collection;
+
+Rust does not have named arguments and named tuples; and it's a good thing;
+functions with lots of arguments, and tuples with lots of elements
+  are a sign that you need to restructure your code using structs;
