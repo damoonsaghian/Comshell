@@ -28,8 +28,9 @@ mutable reference (exclusive reference) can:
 , mutably lend resouce to aother reference;
 
 actually borrowing is only needed in imperative programming;
-in functional reactive programming, arguments of functions must be copied or moved;
-in general Rust shows us that move semantic is more suitable for async programming;
+in functional reactive programming (discussed in the next chapter),
+  arguments of functions must be copied or moved;
+in general Rust shows us that for async programming, move semantic is more suitable;
 
 scenarios that involve returning refs often require explicit lifetimes;
   so don't return refs, instead use mutable refs in inputs;
@@ -96,5 +97,5 @@ arrays like tuples have fixed size and are copy;
 vectors and hash tables are homogeneous, varying sized collection;
 
 Rust does not have named arguments and named tuples; and it's a good thing;
-functions with lots of arguments, and tuples with lots of elements
-  are a sign that you need to restructure your code using structs;
+when you need functions with lots of arguments, or tuples with lots of elements,
+  it could indicate that you need to restructure your code and use structs to define new types;
