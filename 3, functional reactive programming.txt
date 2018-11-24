@@ -4,7 +4,7 @@ imperative programming leads to unmaintainable code in large programs
   (even if we hide the mentioned complexities behind a garbage collector),
   and it makes writing parallel programs a cumbersome task;
 
-functional reactive programming:
+functional reactive programming (FRP):
 when the output channels of a function is empty and the input channels are full,
   the function consumes its inputs and fills its outputs with computed values;
 initially all channels have default values, so feedbacks are possible;
@@ -41,9 +41,11 @@ linear objects and use_once variables map elegantly
     make an appealing visual linear programming language;
 
 streams in "future" crate:
-, i don't like its API:
-  a bunch of different types implementing the stream trait;
 , can't see a way to easily create feedbacks;
+, i really don't like its API:
+  a bunch of different types implementing the stream trait;
+  it trys to generalize the concept of the "Iterator" trait,
+    but i don't think this is appropriate for FRP;
 "carboxyl" crate:
 , two separate concepts: streams (which are push based), signals (which are pull based);
 , seems abondoned;
@@ -65,14 +67,12 @@ channels for syncing:
 let pool = ThreadPool::new(num_cpus::get_physical());
 
 let mut stream1 = Bus.new(0);
-let mut stream1_rx1 = stream1.add_rx();
-let mut stream1_rx2 = stream1.add_rx();
 // set initial value to make feedbacks possible;
 stream1.try_broadcast(initial_value);
 
 let mut stream2 = Bus.new(0);
-let mut stream2_rx = stream2.add_rx();
 stream2.try_broadcast(initial_value);
+let mut stream1_rx1 = stream1.add_rx();
 pool.execute(move || {
   loop {
     stream2.broadcast(

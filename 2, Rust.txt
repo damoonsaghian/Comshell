@@ -46,11 +46,6 @@ note that "Cell" and "RefCell" can work only in a single thread;
 RC: shared owning (a runtime solution);
 ARC: multi_threaded;
 
-Rust have separate types for static and dynamic values; (str/String, fn/Fn)
-static data can be defined using only other static data;
-functions can only access static environment;
-  closures don't have this limitation; so when using them we must be more careful;
-
 s: String -> &s: &String -> &s[..]: &str
 v: Vec<T> -> &v: &Vec<T> -> &v[..]: &[T]
 &str and &[T] are slices; str and [T] are unsized types;
@@ -76,6 +71,7 @@ examples:
   &&i32 -> &i32 because &i32: Deref<Target=i32>
   &String -> &str because String: Deref<Target=str>
   &Vec<T> -> &[T] because Vec<T>: Deref<Target=[T]>
+
 = type system
 types show us what we can do with the data (which operations are valid);
 
@@ -92,8 +88,8 @@ dot notation is used where we can destucture (tuples, structures);
 double colon "::" is for namespacing;
 note that "x.m()" is method call syntax, which completely differs from "(x.m)()";
 
-arrays like tuples have fixed size and are copy;
-  but since they are homogeneous (all elements are of the same type), indexing can be done at runtime;
+arrays like tuples have fixed size and thus stored on stack;
+  but since they are homogeneous (all elements are of the same type), they can be indexed at runtime;
 vectors and hash tables are homogeneous, varying sized collection;
 
 Rust does not have named arguments and named tuples; and it's a good thing;
