@@ -1,0 +1,154 @@
+= computers
+cpu, memory, peripherals,
+  this seems to be the only practical architecture for the hardware of computers;
+cpu runs a sequence of simple computations called instructions (packages of 0 and 1),
+  one by one;
+
+programs usually do not run directly on computer hardware;
+instead they run on a more sophisticated software machine (a virtual machine) called kernel;
+Linux is a highly developed, constantly evolving, open_source kernel;
+in Linux (and other Unix based operating systems) most things appear in the file system;
+  i think the reason is to make it possible to do a lot of things using shell scripts
+    instead of a proper programming language;
+  while i can understand the convenience it provides, i don't think it's good design;
+"https://github.com/thepowersgang/rust_os"
+"https://github.com/ryanra/RustOS"
+"https://dominuscarnufex.github.io/cours/rs-kernel/en.html"
+
+compilers are special programs that obtain computer instructions
+  from a program written in a language which is structured and human readable;
+  this way the written program will be portable to different computer architectures;
+Rust is a programming language which provides zero cost abstractions
+  (eg a well designed type system, and functional programming techniques),
+  and memory safety without garbage collection;
+thus there is absolutely no reason to write new software in C/C++;
+
+= Rust
+Rust makes bad programming hard, and good programming fun;
+Rust does not hide (inherent) complexity, in fact it bolds it, so we can see it, and avoid it;
+  by inherent complexity i mean a complexity which can not be abstracted completely;
+  ie if we attempt to hide it, it will appear somewhere else;
+
+managing references in an imperative program is a complex task;
+Rust does not hide these complexities behind a garbage collector;
+instead it presents them clearly, as is shown in the following;
+
+in Rust any resource have exactly one owner which takes care of its resource deallocation;
+"http://blog.skylight.io/rust-means-never-having-to-close-a-socket/"
+owners can share their data by lending them to references;
+references must have a lifetime less than the owner;
+furthermore lifetime of a mutable reference must not overlap with other references;
+
+owner can:
+, access and mutate resource;
+, lend the resource to a reference;
+, hand over ownership (move);
+, control resource deallocation;
+owner can't:
+, mutate the resource, during borrow;
+, access the resource, during mutable borrow;
+
+references (shared references) can:
+, access borrowed resource;
+, immutably lend resource to other references;
+mutable reference (exclusive reference) can:
+, access and mutate resource;
+, mutably lend resouce to aother reference;
+
+actually borrowing is only needed in imperative programming;
+in functional reactive programming (discussed in the next chapter),
+  arguments of functions must be copied or moved;
+in general Rust shows us that for async programming, move semantic is more suitable;
+
+scenarios that involve returning refs often require explicit lifetimes;
+  so don't return refs, instead use mutable refs in inputs;
+structs and enums containing refs must have explicit lifetimes;
+  so don't use them;
+
+shared mutability for fixed sized data (called interior mutability)
+  can be done statically using "Cell";
+if the size is not fixed, a runtime solution is needed (RefCell);
+note that "Cell" and "RefCell" can work only in a single thread;
+  use "RwLock" for multiple threads;
+
+RC: shared owning (a runtime solution);
+ARC: multi_threaded;
+
+s: String -> &s: &String -> &s[..]: &str
+v: Vec<T> -> &v: &Vec<T> -> &v[..]: &[T]
+&str and &[T] are slices; str and [T] are unsized types;
+slicing is like borrowing from an unsized type;
+since the the slice contains the size, the lending type itself doesn't need to have a definite size;
+
+x = a[i] -> this is possible if the elements of "a" are copy
+  (cause moving out of collections is not possible);
+x = &a[i] -> this is for the case when the elements are not copy;
+x = a[i..j] -> this is always invalid;
+x = &a[i..j] -> slicing;
+
+auto ref/deref for self in method calls:
+  insert as many * or & as necessary to get it right;
+cause in method calls name and context of a method call is almost always sufficient
+  to infer the move/borrow semantics;
+
+deref coercion:
+, &T -> &U when T: Deref<Target=U>
+, &mut T -> &U when T: Deref<Target=U>
+, &mut T -> &mut U when T: DerefMut<Target=U>
+examples:
+  &&i32 -> &i32 because &i32: Deref<Target=i32>
+  &String -> &str because String: Deref<Target=str>
+  &Vec<T> -> &[T] because Vec<T>: Deref<Target=[T]>
+"https://github.com/rust-lang/rfcs/blob/master/text/0241-deref-conversions.md"
+
+= type system
+types show us what we can do with the data (which operations are valid);
+
+the class hierarchy design like in Java is problematic;
+  "http://ptgmedia.pearsoncmg.com/images/020163371x/items/item33.html"
+also the problem of covariance for generic types, has its root in this problem;
+  "https://en.wikipedia.org/wiki/Wildcard_(Java)"
+i think this is also the motivation for dynamic typing (another bad design);
+the right way as done in Rust, Go and Julia:
+, concrete types (like final classes in Java) can be instantiated, but cannot have subtypes;
+, abstract types (like abstract classes in Java) cannot be instantiated, but can have subtypes;
+
+dot notation is used where we can destucture (tuples, structures);
+double colon "::" is for namespacing;
+note that "x.m()" is method call syntax, which completely differs from "(x.m)()";
+
+arrays like tuples have fixed size and thus stored on stack;
+  but since they are homogeneous (all elements are of the same type), they can be indexed at runtime;
+vectors and hash tables are homogeneous, varying sized collection;
+
+Rust does not have named arguments and named tuples; and it's a good thing;
+when you need functions with lots of arguments, or tuples with lots of elements,
+  it could indicate that you need to restructure your code and use structs to define new types;
+
+= message passing
+imperative programming is done by procedurally changing stored values,
+  it resembles the way CPU runs the instructions stored in memory;
+imperative programming leads to unmaintainable code in large programs
+  (even if we hide the mentioned complexities behind a garbage collector),
+  and it makes writing parallel programs a cumbersome task;
+
+in message passing programming, we have a number of async processes;
+when a process recieves a message,
+  it may change its internal state, and send messages to other processes;
+
+, static data (functions, structs, constants): no problem, copy or share by reference;
+, dynamic data:
+  , small data: copy;
+  , big data: move;
+message passing programming allows us to program without the need to share big data;
+this means that we won't need:
+  , complex reference sharing, which needs lifetime indication;
+  , shared mutability (RefCell) or shared ownership (RC), which needs runtime solutions;
+
+async processes:
+"https://docs.rs/threadpool"
+"https://docs.rs/jobpool"
+"https://crates.io/crates/threads_pool" (depends on crossbeam)
+"https://docs.rs/rayon-core/*/rayon_core/struct.ThreadPool.html" (depends on crossbeam)
+
+use std::sync::mpsc channels for message passing;
