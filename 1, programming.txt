@@ -46,6 +46,7 @@ owner can:
 , control resource deallocation;
 owner can't:
 , mutate the resource, during borrow;
+, mutably lend resouce to another reference, during borrow;
 , access the resource, during mutable borrow;
 
 references (shared references) can:
@@ -53,7 +54,17 @@ references (shared references) can:
 , immutably lend resource to other references;
 mutable reference (exclusive reference) can:
 , access and mutate resource;
-, mutably lend resouce to aother reference;
+, mutably lend resouce to another reference;
+
+during shared borrow (immutabel borrow) no one owns the data;
+  so even the original owner can't change the it;
+during mutable borrow the (unique) borrower owns it;
+so "&mut" is actually a temporary transfer of ownership;
+
+a type is "Copy" if all the data it owns is part of its stack representation;
+  in other words if a copy of its stack representation doesn't violate memory safety;
+  "&T" and raw pointers are copy, "&mut T" is move (not copy);
+"https://manishearth.github.io/blog/2015/05/17/the-problem-with-shared-mutability/"
 
 actually borrowing is only needed in imperative programming;
 in functional reactive programming (discussed in the next chapter),
