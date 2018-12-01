@@ -29,12 +29,33 @@ Rust does not hide (inherent) complexity, in fact it bolds it, so we can see it,
   by inherent complexity i mean a complexity which can not be abstracted completely;
   ie if we attempt to hide it, it will appear somewhere else;
 
-managing references in an imperative program is a complex task;
+managing references is a complex task;
 Rust does not hide these complexities behind a garbage collector;
 instead it presents them clearly, as is shown in the following;
+"https://manishearth.github.io/blog/2015/05/17/the-problem-with-shared-mutability/"
+"http://blog.skylight.io/rust-means-never-having-to-close-a-socket/"
+
+if a data has a fixed structure we usually put it on stack;
+so we don't share it across the program, we copy it;
+if the data is big and we want to share it, we put it inside a cell on the heap,
+  and share references to it across the program, using &;
+since the structure of data is fixed we can mutate it from anywhere (in the same tread);
+
+but in general where the structure of data is not fixed,
+  we need to check if the RWlock pattern is fulfilled,
+  either statically (when sharing refs using &mut),
+  or dynamically at runtime, by putting it inside a RefCell
+    (or its multi_threaded counterparts: Mutex or RwLock);
+note that if write our program in a way which breaks runtime RWlock, it will panic;
+this is true even for garbage collected languages,
+  and can be seen in rare occasions like iteration invalidation;
+  yes, inherent complexities can't be hidden completely;
+
+a type is "Copy" if all the data it owns is part of its stack representation;
+  in other words if a copy of its stack representation doesn't violate memory safety;
+  "&T" and raw pointers are copy, "&mut T" is move (not copy);
 
 in Rust any resource have exactly one owner which takes care of its resource deallocation;
-"http://blog.skylight.io/rust-means-never-having-to-close-a-socket/"
 owners can share their data by lending them to references;
 references must have a lifetime less than the owner;
 furthermore lifetime of a mutable reference must not overlap with other references;
@@ -55,35 +76,24 @@ references (shared references) can:
 mutable reference (exclusive reference) can:
 , access and mutate resource;
 , mutably lend resouce to another reference;
+  they can immutably lend resource, but then they can mutate it;
+  just like when an owner immutably lends its resource;
 
-during shared borrow (immutabel borrow) no one owns the data;
+during shared borrow (immutable borrow) no one owns the data;
   so even the original owner can't change the it;
 during mutable borrow the (unique) borrower owns it;
 so "&mut" is actually a temporary transfer of ownership;
 
-a type is "Copy" if all the data it owns is part of its stack representation;
-  in other words if a copy of its stack representation doesn't violate memory safety;
-  "&T" and raw pointers are copy, "&mut T" is move (not copy);
-"https://manishearth.github.io/blog/2015/05/17/the-problem-with-shared-mutability/"
+RC: shared owning (a runtime solution);
+ARC: multi_threaded;
 
-actually borrowing is only needed in imperative programming;
-in functional reactive programming (discussed in the next chapter),
-  arguments of functions must be copied or moved;
-in general Rust shows us that for async programming, move semantic is more suitable;
+sync sharing (& and &mut) can be checked statically;
+async sharing needs runtime checking, so it's better to move/copy in async situations;
 
 scenarios that involve returning refs often require explicit lifetimes;
   so don't return refs, instead use mutable refs in inputs;
 structs and enums containing refs must have explicit lifetimes;
   so don't use them;
-
-shared mutability for fixed sized data (called interior mutability)
-  can be done statically using "Cell";
-if the size is not fixed, a runtime solution is needed (RefCell);
-note that "Cell" and "RefCell" can work only in a single thread;
-  use "RwLock" for multiple threads;
-
-RC: shared owning (a runtime solution);
-ARC: multi_threaded;
 
 s: String -> &s: &String -> &s[..]: &str
 v: Vec<T> -> &v: &Vec<T> -> &v[..]: &[T]
@@ -135,6 +145,15 @@ vectors and hash tables are homogeneous, varying sized collection;
 Rust does not have named arguments and named tuples; and it's a good thing;
 when you need functions with lots of arguments, or tuples with lots of elements,
   it could indicate that you need to restructure your code and use structs to define new types;
+
+in Rust each closure instance has its own unique anonymous type;
+cause closures are like structs made of variables captured from environment;
+closures implement closure traits (Fn or FnMut or FnOnce);
+"fn(T1) -> T2" is not an unsized type like "str", it's a function pointer;
+
+iterators can have different number of iterations, so we need an iterator trait;
+but this is not true for futures or streams;
+  so i think iterator API is not suitable for them;
 
 = message passing
 imperative programming is done by procedurally changing stored values,
