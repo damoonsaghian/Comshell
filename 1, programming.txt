@@ -4,17 +4,6 @@ cpu, memory, peripherals,
 cpu runs a sequence of simple computations called instructions (packages of 0 and 1),
   one by one;
 
-programs usually do not run directly on computer hardware;
-instead they run on a more sophisticated software machine (a virtual machine) called kernel;
-Linux is a highly developed, constantly evolving, open_source kernel;
-in Linux (and other Unix based operating systems) most things appear in the file system;
-  i think the reason is to make it possible to do a lot of things using shell scripts
-    instead of a proper programming language;
-  while i can understand the convenience it provides, i don't think it's good design;
-"https://github.com/thepowersgang/rust_os"
-"https://github.com/ryanra/RustOS"
-"https://dominuscarnufex.github.io/cours/rs-kernel/en.html"
-
 compilers are special programs that obtain computer instructions
   from a program written in a language which is structured and human readable;
   this way the written program will be portable to different computer architectures;
@@ -22,6 +11,21 @@ Rust is a programming language which provides zero cost abstractions
   (eg a well designed type system, and functional programming techniques),
   and memory safety without garbage collection;
 thus there is absolutely no reason to write new software in C/C++;
+
+programs usually do not run directly on computer hardware;
+instead they run on a more sophisticated software machine (a virtual machine) called kernel;
+Linux is a highly developed, constantly evolving, open_source kernel;
+in Linux (and other Unix based operating systems) most things appear in the file system;
+  i think the reason is to make it possible to do a lot of things using shell scripts
+    instead of a proper programming language;
+  while i can understand the convenience it provides, i don't think it's good design;
+if we want to use existing libraries, and run multiple programs,
+  we must use a traditional OS like Linux;
+  at best we can start to rewrite Linux in Rust:
+  "https://dominuscarnufex.github.io/cours/rs-kernel/en.html"
+but if we rewrite the required libraries on bare metal, and want to run a single program,
+  we can use a library operating system;
+"https://github.com/ryanra/RustOS"
 
 = Rust
 Rust makes bad programming hard, and good programming fun;
@@ -134,9 +138,8 @@ the right way as done in Rust, Go and Julia:
 , concrete types (like final classes in Java) can be instantiated, but cannot have subtypes;
 , abstract types (like abstract classes in Java) cannot be instantiated, but can have subtypes;
 
-dot notation is used where we can destucture (tuples, structures);
-double colon "::" is for namespacing;
 note that "x.m()" is method call syntax, which completely differs from "(x.m)()";
+i think this is also the reason for a symbol other than dot, for namespacing (ie "::");
 
 arrays like tuples have fixed size and thus stored on stack;
   but since they are homogeneous (all elements are of the same type), they can be indexed at runtime;
@@ -147,13 +150,9 @@ when you need functions with lots of arguments, or tuples with lots of elements,
   it could indicate that you need to restructure your code and use structs to define new types;
 
 in Rust each closure instance has its own unique anonymous type;
-cause closures are like structs made of variables captured from environment;
+cause closures are like anonymous structs made of variables captured from environment;
 closures implement closure traits (Fn or FnMut or FnOnce);
 "fn(T1) -> T2" is not an unsized type like "str", it's a function pointer;
-
-iterators can have different number of iterations, so we need an iterator trait;
-but this is not true for futures or streams;
-  so i think iterator API is not suitable for them;
 
 = message passing
 imperative programming is done by procedurally changing stored values,
