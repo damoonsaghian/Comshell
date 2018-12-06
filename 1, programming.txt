@@ -141,8 +141,12 @@ the right way as done in Rust, Go and Julia:
 
 note that "x.m()" is method call syntax, which completely differs from "(x.m)()";
 i think this is also the reason for a symbol other than dot, for namespacing (ie "::");
-::crate_name::...
-local_item::...
+
+in "use" statements:
+, crate_name::...
+, self::local_item::...
+this makes your paths portable (to anywhere in the modules tree),
+  and it will be compatible with the upcoming "anchored_use_path";
 
 arrays like tuples have fixed size and thus stored on stack;
   but since they are homogeneous (all elements are of the same type), they can be indexed at runtime;
