@@ -23,7 +23,8 @@ if we want to use existing libraries, and run multiple programs,
   we must use a traditional OS like Linux;
   at best we can start to rewrite Linux in Rust:
   "https://dominuscarnufex.github.io/cours/rs-kernel/en.html"
-but if we rewrite the required libraries on bare metal, and want to run a single program,
+but if we rewrite the required libraries on bare metal,
+  and want to run a single program (all other programs must be used through a lib API),
   we can use a library operating system;
 "https://github.com/ryanra/RustOS"
 
@@ -140,6 +141,8 @@ the right way as done in Rust, Go and Julia:
 
 note that "x.m()" is method call syntax, which completely differs from "(x.m)()";
 i think this is also the reason for a symbol other than dot, for namespacing (ie "::");
+::crate_name::...
+local_item::...
 
 arrays like tuples have fixed size and thus stored on stack;
   but since they are homogeneous (all elements are of the same type), they can be indexed at runtime;
@@ -149,9 +152,12 @@ Rust does not have named arguments and named tuples; and it's a good thing;
 when you need functions with lots of arguments, or tuples with lots of elements,
   it could indicate that you need to restructure your code and use structs to define new types;
 
-in Rust each closure instance has its own unique anonymous type;
+in Rust each closure has its own unique, un_writable type;
+  they do implement the "Fn" family of traits, however;
+note that if we put a generic type parameter in the return type of a fuction,
+  we have to provide the concrete type when we call the function;
+  thus we can't use generic type parameters to return a closure, we have to use "impl";
 cause closures are like anonymous structs made of variables captured from environment;
-closures implement closure traits (Fn or FnMut or FnOnce);
 "fn(T1) -> T2" is not an unsized type like "str", it's a function pointer;
 
 = message passing
@@ -180,4 +186,4 @@ async processes:
 "https://crates.io/crates/threads_pool" (depends on crossbeam)
 "https://docs.rs/rayon-core/*/rayon_core/struct.ThreadPool.html" (depends on crossbeam)
 
-use std::sync::mpsc channels for message passing;
+use "std::sync::mpsc" channels for message passing;
