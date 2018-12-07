@@ -140,7 +140,6 @@ the right way as done in Rust, Go and Julia:
 , abstract types (like abstract classes in Java) cannot be instantiated, but can have subtypes;
 
 note that "x.m()" is method call syntax, which completely differs from "(x.m)()";
-i think this is also the reason for a symbol other than dot, for namespacing (ie "::");
 
 in "use" statements:
 , crate_name::...
