@@ -7,10 +7,9 @@ cpu runs a sequence of simple computations called instructions (packages of 0 an
 compilers are special programs that obtain computer instructions
   from a program written in a language which is structured and human readable;
   this way the written program will be portable to different computer architectures;
-Rust is a programming language which provides zero cost abstractions
-  (eg a well designed type system, and functional programming techniques),
+Rust is a programming language which provides zero cost abstractions,
   and memory safety without garbage collection;
-thus there is absolutely no reason to write new software in C/C++;
+  thus there is absolutely no reason to write new software in C/C++;
 
 programs usually do not run directly on computer hardware;
 instead they run on a more sophisticated software machine (a virtual machine) called kernel;
@@ -20,19 +19,17 @@ in Linux (and other Unix based operating systems) most things appear in the file
     instead of a proper programming language;
   while i can understand the convenience it provides, i don't think it's good design;
 if we want to use existing libraries, and run multiple programs,
-  we must use a traditional OS like Linux;
-  at best we can start to rewrite Linux in Rust:
-  "https://dominuscarnufex.github.io/cours/rs-kernel/en.html"
-but if we rewrite the required libraries on bare metal,
-  and want to run a single program (all other programs must be used through a lib API),
+  we are stuck with traditional operating systems like Linux;
+"https://dominuscarnufex.github.io/cours/rs-kernel/en.html"
+but if we rewrite the required libraries on bare metal, and want to run just one program,
   we can use a library operating system;
 "https://github.com/ryanra/RustOS"
 
 = Rust
 Rust makes bad programming hard, and good programming fun;
 Rust does not hide (inherent) complexity, in fact it bolds it, so we can see it, and avoid it;
-  by inherent complexity i mean a complexity which can not be abstracted completely;
-  ie if we attempt to hide it, it will appear somewhere else;
+by inherent complexity i mean a complexity which can not be abstracted away completely;
+  ie if we attempt to hide it, it will re_emerge somewhere else;
 
 managing references is a complex task;
 Rust does not hide these complexities behind a garbage collector;
@@ -54,11 +51,11 @@ but in general where the structure of data is not fixed,
 note that if write our program in a way which breaks runtime RWlock, it will panic;
 this is true even for garbage collected languages,
   and can be seen in rare occasions like iteration invalidation;
-  yes, inherent complexities can't be hidden completely;
+  now you see, inherent complexities can't be hidden completely;
 
 a type is "Copy" if all the data it owns is part of its stack representation;
   in other words if a copy of its stack representation doesn't violate memory safety;
-  "&T" and raw pointers are copy, "&mut T" is move (not copy);
+"&T" and raw pointers are copy, "&mut T" is move (not copy);
 
 in Rust any resource have exactly one owner which takes care of its resource deallocation;
 owners can share their data by lending them to references;
@@ -173,6 +170,7 @@ imperative programming leads to unmaintainable code in large programs
 in message passing programming, we have a number of async processes;
 when a process recieves a message,
   it may change its internal state, and send messages to other processes;
+"https://csperkins.org/teaching/2016-2017/adv-os/lecture11.pdf"
 
 , static data (functions, structs, constants): no problem, copy or share by reference;
 , dynamic data:
@@ -182,6 +180,8 @@ message passing programming allows us to program without the need to share big d
 this means that we won't need:
   , complex reference sharing, which needs lifetime indication;
   , shared mutability (RefCell) or shared ownership (RC), which needs runtime solutions;
+
+we need asynchronous sends and unbounded channels;
 
 async processes:
 "https://docs.rs/threadpool"
