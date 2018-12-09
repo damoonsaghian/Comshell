@@ -170,7 +170,6 @@ imperative programming leads to unmaintainable code in large programs
 in message passing programming, we have a number of async processes;
 when a process recieves a message,
   it may change its internal state, and send messages to other processes;
-"https://csperkins.org/teaching/2016-2017/adv-os/lecture11.pdf"
 
 , static data (functions, structs, constants): no problem, copy or share by reference;
 , dynamic data:
@@ -180,6 +179,9 @@ message passing programming allows us to program without the need to share big d
 this means that we won't need:
   , complex reference sharing, which needs lifetime indication;
   , shared mutability (RefCell) or shared ownership (RC), which needs runtime solutions;
+
+a process can have a set of parameters which can be adjusted based on recieved messages;
+  so processes can have learning capabilities;
 
 we need asynchronous sends and unbounded channels;
 
