@@ -30,10 +30,9 @@ Rust makes bad programming hard, and good programming fun;
 Rust does not hide (inherent) complexity, in fact it bolds it, so we can see it, and avoid it;
 by inherent complexity i mean a complexity which can not be abstracted away completely;
   ie if we attempt to hide it, it will re_emerge somewhere else;
+furthermore hiding inherent complexity usually leads to choosing wrong approaches;
 
-managing references is a complex task;
-Rust does not hide these complexities behind a garbage collector;
-instead it presents them clearly, as is shown in the following;
+Rust doen not hide the complexities of managing references behind a garbage collector;
 "https://manishearth.github.io/blog/2015/05/17/the-problem-with-shared-mutability/"
 "http://blog.skylight.io/rust-means-never-having-to-close-a-socket/"
 
@@ -51,7 +50,7 @@ but in general where the structure of data is not fixed,
 note that if write our program in a way which breaks runtime RWlock, it will panic;
 this is true even for garbage collected languages,
   and can be seen in rare occasions like iteration invalidation;
-  now you see, inherent complexities can't be hidden completely;
+  you see? inherent complexities can't be hidden completely;
 
 a type is "Copy" if all the data it owns is part of its stack representation;
   in other words if a copy of its stack representation doesn't violate memory safety;
@@ -65,12 +64,12 @@ furthermore lifetime of a mutable reference must not overlap with other referenc
 owner can:
 , access and mutate resource;
 , lend the resource to a reference;
-, hand over ownership (move);
-, control resource deallocation;
-owner can't:
-, mutate the resource, during borrow;
-, mutably lend resouce to another reference, during borrow;
-, access the resource, during mutable borrow;
+, hand over ownership (move), or deallocate resource;
+but during a lend, owner can't:
+, mutate the resource;
+, mutably lend resouce to another reference;
+, hand over ownership (move), or deallocate resource;
+and during a mutable lend, owner can't even access the resource;
 
 references (shared references) can:
 , access borrowed resource;
@@ -180,7 +179,7 @@ this means that we won't need:
   , complex reference sharing, which needs lifetime indication;
   , shared mutability (RefCell) or shared ownership (RC), which needs runtime solutions;
 
-a process can have a set of parameters which can be adjusted based on recieved messages;
+a process can have a set of parameters which can be adjusted based on the recieved messages;
   so processes can have learning capabilities;
 
 we need asynchronous sends and unbounded channels;
