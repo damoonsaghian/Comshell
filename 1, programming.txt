@@ -13,17 +13,17 @@ Rust is a programming language which provides zero cost abstractions,
 
 programs usually do not run directly on computer hardware;
 instead they run on a more sophisticated software machine (a virtual machine) called kernel;
+in theory we can live without a kernel (an idea sometimes called a library operating system);
+but in that case, we have to rewrite all the required libraries, on bare metal;
+more importantly, this means that we can't have more than one program;
+  developing new programs on such a system will be difficult, if not impossible;
+
 Linux is a highly developed, constantly evolving, open_source kernel;
 in Linux (and other Unix based operating systems) most things appear in the file system;
   i think the reason is to make it possible to do a lot of things using shell scripts
     instead of a proper programming language;
   while i can understand the convenience it provides, i don't think it's good design;
-if we want to use existing libraries, and run multiple programs,
-  we are stuck with traditional operating systems like Linux;
 "https://dominuscarnufex.github.io/cours/rs-kernel/en.html"
-but if we rewrite the required libraries on bare metal, and want to run just one program,
-  we can use a library operating system;
-"https://github.com/ryanra/RustOS"
 
 = Rust
 Rust makes bad programming hard, and good programming fun;
@@ -140,8 +140,10 @@ note that "x.m()" is method call syntax, which completely differs from "(x.m)()"
 in "use" statements:
 , crate_name::...
 , self::local_item::...
-this makes your paths portable (to anywhere in the modules tree),
-  and it will be compatible with the upcoming "anchored_use_path";
+even outside "use" statements, we can build absolute paths using crate names at the begining;
+  but since it can conflict with a local name, it's better to avoid it, and instead,
+  either insert a "::" at the begining, before the crate's name,
+  or bring the crate's name into scope using a "use" statement;
 
 arrays like tuples have fixed size and thus stored on stack;
   but since they are homogeneous (all elements are of the same type), they can be indexed at runtime;

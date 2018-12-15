@@ -51,14 +51,10 @@ in normal mode we can:
 , find
 , enter insert mode
 
-projects are looked for in "~/workspaces/*/" and all "workspaces/*/" directories on all disks,
+projects are looked for in "~/workspaces/*/", and all "workspaces/*/" directories on all disks,
   and shown in lists side by side (one list per workspace);
 from these lists, we can open projects (or switch to them if they are already open),
   create new projects, etc;
-
-automatically mount storage devices when available,
-  and show their "workspaces/*/" directories in seperate panes;
-after unmounting a disk, the correspoding panes must be closed;
 
 a panel at the left shows the files in the project;
 text files are opened in a text editor panel at the right;

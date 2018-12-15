@@ -24,7 +24,7 @@ now to reuse previously downloaded packages on your system,
 ; arch-chroot /mnt
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
   networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip ttf-hack ttf-droid sway \
-  gtk3 gnome-desktop gtksourceview3 vte3 gst-plugins-{base,good,bad} gst-libav webkit2gtk deepin-gtk-theme \
+  gtk3 gtksourceview4 gst-plugins-{base,good,bad} gst-libav webkit2gtk deepin-gtk-theme \
   rustup
 
 install bootloader:
