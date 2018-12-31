@@ -1,0 +1,204 @@
+Rust makes bad programming hard, and good programming fun;
+Rust does not hide (inherent) complexity, in fact it bolds it, so we can see it, and avoid it;
+by inherent complexity i mean a complexity which can not be abstracted away completely;
+  ie if we attempt to hide it, it will re_emerge somewhere else;
+furthermore hiding inherent complexity usually leads to choosing wrong approaches;
+
+for example, references (sharing data) are problematic in two situations:
+, async sharing (eg in callbacks);
+, mutable sharing (eg GUI widgets put in containers);
+most programming languages hide these problems behind a garbage collection, or other runtime solutions;
+but the right approach is to simply avoid them;
+"https://manishearth.github.io/blog/2015/05/17/the-problem-with-shared-mutability/"
+"http://blog.skylight.io/rust-means-never-having-to-close-a-socket/"
+
+if a data has a fixed structure we usually put it on stack;
+so we don't share it across the program, we copy it;
+if the data is big and we want to share it, we put it inside a cell on the heap,
+  and share references to it across the program, using &;
+since the structure of data is fixed we can mutate it from anywhere (in the same tread);
+
+but in general where the structure of data is not fixed,
+  we need to check if the RWlock pattern is fulfilled,
+  either statically (when sharing refs using &mut),
+  or dynamically at runtime, by putting it inside a RefCell
+    (or its multi_threaded counterparts: Mutex or RwLock);
+note that if write our program in a way which breaks runtime RWlock, it will panic;
+this is true even for garbage collected languages,
+  and can be seen in rare occasions like iteration invalidation;
+  you see? inherent complexities can't be hidden completely;
+
+a type is "Copy" if all the data it owns is part of its stack representation;
+  in other words if a copy of its stack representation doesn't violate memory safety;
+"&T" and raw pointers are copy, "&mut T" is move (not copy);
+
+in Rust any resource have exactly one owner which takes care of its resource deallocation;
+owners can share their data by lending them to references;
+references must have a lifetime less than the owner;
+furthermore lifetime of a mutable reference must not overlap with other references;
+
+owner can:
+, access and mutate resource;
+, lend the resource to a reference;
+, hand over ownership (move), or deallocate resource;
+but during a lend, owner can't:
+, mutate the resource;
+, mutably lend resouce to another reference;
+, hand over ownership (move), or deallocate resource;
+and during a mutable lend, owner can't even access the resource;
+
+references (shared references) can:
+, access borrowed resource;
+, immutably lend resource to other references;
+mutable reference (exclusive reference) can:
+, access and mutate resource;
+, mutably lend resouce to another reference;
+  they can immutably lend resource, but then they can mutate it;
+  just like when an owner immutably lends its resource;
+
+during shared borrow (immutable borrow) no one owns the data;
+  so even the original owner can't change the it;
+during mutable borrow the (unique) borrower owns it;
+so "&mut" is actually a temporary transfer of ownership;
+
+RC: shared owning (a runtime solution);
+ARC: multi_threaded version;
+
+sync sharing can be checked statically;
+async sharing needs runtime checking, so it's better to move/copy in async situations;
+
+scenarios that involve returning refs often require explicit lifetimes;
+  so don't return refs, instead use mutable refs in inputs;
+structs and enums containing refs must have explicit lifetimes;
+  so don't use them;
+
+s: String -> &s: &String -> &s[..]: &str
+v: Vec<T> -> &v: &Vec<T> -> &v[..]: &[T]
+&str and &[T] are slices; str and [T] are unsized types;
+slicing is like borrowing from an unsized type;
+since the the slice contains the size, the lending type itself doesn't need to have a definite size;
+
+x = a[i] -> this is possible if the elements of "a" are copy
+  (cause moving out of collections is not possible);
+x = &a[i] -> this is for the case when the elements are not copy;
+x = a[i..j] -> this is always invalid;
+x = &a[i..j] -> slicing;
+
+auto ref/deref for self in method calls:
+  insert as many * or & as necessary to get it right;
+cause in method calls name and context of a method call is almost always sufficient
+  to infer the move/borrow semantics;
+
+deref coercion:
+, &T -> &U when T: Deref<Target=U>
+, &mut T -> &U when T: Deref<Target=U>
+, &mut T -> &mut U when T: DerefMut<Target=U>
+examples:
+  &&i32 -> &i32 because &i32: Deref<Target=i32>
+  &String -> &str because String: Deref<Target=str>
+  &Vec<T> -> &[T] because Vec<T>: Deref<Target=[T]>
+"https://github.com/rust-lang/rfcs/blob/master/text/0241-deref-conversions.md"
+
+= type system
+types show us what we can do with the data (which operations are valid);
+
+the class hierarchy design like in Java is problematic;
+  "http://ptgmedia.pearsoncmg.com/images/020163371x/items/item33.html"
+also the problem of covariance for generic types, has its root in this problem;
+  "https://en.wikipedia.org/wiki/Wildcard_(Java)"
+i think this is also the motivation for dynamic typing (another bad design);
+the right way as done in Rust, Go and Julia:
+, concrete types (like final classes in Java) can be instantiated, but cannot have subtypes;
+, abstract types (like abstract classes in Java) cannot be instantiated, but can have subtypes;
+
+note that "x.m()" is method call syntax, which completely differs from "(x.m)()";
+
+in "use" statements:
+, crate_name::...
+, self::local_item::...
+even outside "use" statements, we can build absolute paths using crate names at the begining;
+  but since it can conflict with a local name, it's better to avoid it, and instead,
+  either insert a "::" at the begining, before the crate's name,
+  or bring the crate's name into scope using a "use" statement;
+
+arrays like tuples have fixed size and thus stored on stack;
+  but since they are homogeneous (all elements are of the same type), they can be indexed at runtime;
+vectors and hash tables are homogeneous, varying sized collection;
+
+Rust does not have named arguments and named tuples; and it's a good thing;
+when you need functions with lots of arguments, or tuples with lots of elements,
+  it could indicate that you need to restructure your code and use structs to define new types;
+
+in Rust each closure has its own unique, un_writable type;
+  they do implement the "Fn" family of traits, however;
+note that if we put a generic type parameter in the return type of a fuction,
+  we have to provide the concrete type when we call the function;
+  thus we can't use generic type parameters to return a closure, we have to use "impl";
+cause closures are like anonymous structs made of variables captured from environment;
+"fn(T1) -> T2" is not an unsized type like "str", it's a function pointer;
+
+= async programming
+the right approach to async programming is the same as the one used in async digital circuts;
+each async part:
+, recieves its inputs, and sends its outputs as a whole;
+, has its own internal state;
+, sends/recieves acknowlege signals from/to other async parts connected to its output/input;
+
+, static data (functions, structs, constants): no problem, copy or share by reference;
+, dynamic data:
+  , small data: copy;
+  , big data: move;
+the method explained above, allows us to program without the need to share big data;
+this means that we won't need:
+  , complex reference sharing, which needs lifetime indication;
+  , shared mutability (RefCell) or shared ownership (RC), which needs runtime solutions;
+
+an async process can have a set of parameters which can be adjusted based on the recieved inputs;
+  this can be used to implement learning capabilities;
+
+streams in "future" crate:
+the API is basically a bunch of different types implementing the stream trait;
+  it trys to generalize the concept of the "Iterator" trait;
+iterators can have different number of iterations, so we need an iterator trait;
+  but this is not true for futures or streams;
+  so i think iterator API is not suitable for them;
+
+we either need acknowlege feedback, or unbounded buffers;
+
+spmc channels:
+"https://docs.rs/bus"
+"https://docs.rs/spmc"
+
+let pool = ThreadPool::new(num_cpus::get_physical());
+
+let mut stream1 = Bus.new(0);
+// set initial value to make feedbacks possible;
+stream1.try_broadcast(initial_value);
+
+let mut stream2 = Bus.new(0);
+stream2.try_broadcast(initial_value);
+let mut stream1_rx1 = stream1.add_rx();
+pool.execute(move || {
+  loop {
+    let out = function(stream1_rx1.recv().unwrap())
+    stream2.broadcast(out);
+  }
+};
+
+async processes:
+"https://docs.rs/threadpool"
+"https://docs.rs/jobpool"
+"https://crates.io/crates/threads_pool" (depends on crossbeam)
+"https://docs.rs/rayon-core/*/rayon_core/struct.ThreadPool.html" (depends on crossbeam)
+
+from "Henry G Baker, use_once variables and linear objects":
+use_once variables are bound to linear (unshared, unaliased, or singly_referenced) objects;
+linear objects are cheap to access and manage,
+  because they require no synchronization or tracing garbage collection;
+linear objects can elegantly and efficiently solve
+  otherwise difficult problems of functional systems,
+  eg in_place updating and the efficient initialization of functional objects;
+linear objects and use_once variables map elegantly
+  into data_flow models of concurrent computation;
+  and the graphical representations of data_flow models
+    make an appealing visual linear programming language;
