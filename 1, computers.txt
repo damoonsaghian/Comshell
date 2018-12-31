@@ -1,0 +1,42 @@
+in conventional digital circuits when the inputs change,
+  the outputs can have temporary incorrect values,
+    until they stabilize to correct values;
+  so gates with memory, must be synchronized with a global clock signal;
+  the period of clock signal is made long enough for the circuit to become stable;
+this forces us to split long operations into several smaller ones,
+  which can be performed in successive clock cycles (a technique known as pipelining);
+  otherwise the circuit would be slow and inefficient;
+in addition the widely distributed clock signal takes a lot of power,
+  and must run whether the circuit is receiving inputs or not;
+
+the solution is to divide the circuit into async parts;
+each async part:
+, recieves its inputs, and sends its outputs as a whole;
+, has its own independent memory (using feedbacks);
+, sends/recieves acknowlege signals from/to other async parts connected to its output/input;
+
+cpu, memory, peripherals,
+  this seems to be the only practical architecture for the hardware of computers;
+cpu runs a sequence of simple computations called instructions (packages of 0 and 1),
+  one by one;
+
+compilers are special programs that obtain computer instructions
+  from a program written in a language which is structured and human readable;
+  this way the written program will be portable to different computer architectures;
+Rust is a programming language which provides zero cost abstractions,
+  and memory safety without garbage collection;
+  thus there is absolutely no reason to write new software in C/C++;
+
+programs usually do not run directly on computer hardware;
+instead they run on a more sophisticated software machine (a virtual machine) called kernel;
+in theory we can live without a kernel (an idea sometimes called a library operating system);
+but in that case, we have to rewrite all the required libraries, on bare metal;
+more importantly, this means that we can't have more than one program;
+  developing new programs on such a system will be difficult, if not impossible;
+
+Linux is a highly developed, constantly evolving, open_source kernel;
+in Linux (and other Unix based operating systems) most things appear in the file system;
+  i think the reason is to make it possible to do a lot of things using shell scripts
+    instead of a proper programming language;
+  while i can understand the convenience it provides, i don't think it's good design;
+"https://dominuscarnufex.github.io/cours/rs-kernel/en.html"
