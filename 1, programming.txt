@@ -170,19 +170,9 @@ note that if we put a generic type parameter in the return type of a fuction,
 cause closures are like anonymous structs made of variables captured from environment;
 "fn(T1) -> T2" is not an unsized type like "str", it's a function pointer;
 
-= message passing
+= actors
 async sharing must be avoided; async processes must communicate only through messages;
-in message passing programming, we have a number of async processes;
-when a process recieves a message,
-  it may change its internal state, and send messages to other processes;
+"https://crates.io/crates/may_actor"
 
-a process can have a set of parameters which can be adjusted based on the recieved inputs;
+an actor can have a set of parameters which can be adjusted based on the recieved messages;
   this can be used to implement learning capabilities;
-
-use "std::sync::mpsc" channels for message passing;
-
-async processes:
-"https://docs.rs/threadpool"
-"https://docs.rs/jobpool"
-"https://crates.io/crates/threads_pool" (depends on crossbeam)
-"https://docs.rs/rayon-core/*/rayon_core/struct.ThreadPool.html" (depends on crossbeam)
