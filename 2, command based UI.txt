@@ -51,6 +51,7 @@ in normal mode we can:
 , find
 , enter insert mode
 
+= Comshell
 projects are looked for in "~/workspaces/*/", and all "workspaces/*/" directories on all disks,
   and shown in lists side by side (one list per workspace);
 from these lists, we can open projects (or switch to them if they are already open),
