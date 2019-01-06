@@ -1,6 +1,7 @@
 software rendering gives us a lot more flexibility,
   because we are not any more limited by a hardware implementation,
   with triangle only rasterization, isolated shader programs, and fixed size buffers;
+the benefits of GPUs can be compensated using SIMD;
 
 graphical objects are made of primitives;
   each primitive has a specific algorithm for rasterization;
@@ -41,6 +42,7 @@ data structure for graphical objects:
 "https://docs.rs/rusterize/"
 "https://docs.rs/softrender/"
 "https://crates.io/crates/line_drawing"
+"https://crates.io/crates/barg"
 "https://www.siggraph.org/education/materials/HyperGraph/scanline/outprims/drawline.htm"
 "https://en.wikipedia.org/wiki/Midpoint_circle_algorithm"
 "https://en.wikipedia.org/wiki/Xiaolin_Wu%27s_line_algorithm"
