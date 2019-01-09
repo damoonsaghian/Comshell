@@ -14,5 +14,6 @@ path = "main.rs"
 [dependencies]
 may_actor = "0.2.2"
 gtk = { version = "", features = ["v3_22_30"] }
+gdk = { version = "", features = ["v3_22_30"] }
 sourceview = { version = "", features = ["v3_24"] }
 webkit2gtk = { version = "", features = ["v2_16"] }

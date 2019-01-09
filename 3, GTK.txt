@@ -1,18 +1,31 @@
-to use GTK in a way that looks idiomatic in Rust:
-, instead of callbacks, do event handling in a loop (don't use "gtk::main()");
-, instead of container widgets, create structs which implement a trait named "Container";
-  "Container" trait has a method "widget(&self)" which returns the appropriate GTK container widget;
-  the structs contain elements which are a GTK widget or another struct implementing "Container";
-
-size and location can only be determined for container widgets;
-other widgets must always be put inside a container;
-
 "https://mmstick.github.io/gtkrs-tutorials/introduction.html"
 "https://gtk-rs.org/"
 "https://gtk-rs.org/docs/gtk/"
 "https://github.com/gtk-rs/examples/tree/master/src/bin"
 "http://gtk-rs.org/docs/sourceview/"
 "http://gtk-rs.org/docs/gtk/trait.TextBufferExt.html#tymethod.get_text"
+
+instead of callbacks, do event handling in a loop (instead of using "gtk::main()"):
+  while window.get_window() != None {
+    gtk::main_iteration();
+    
+    if let mut Some(event) = gtk::get_current_event() {
+      if let keyval = event.get_keyval() {
+        match keyval {
+          key::space => ,
+          _ => ()
+        }
+      }
+      gtk::main_do_event(&mut event);
+    }
+  }
+
+instead of container widgets, create structs that implement a trait named "Container";
+  "Container" trait has a method "widget(&self)" which returns the appropriate GTK container widget;
+  the structs contain elements which are a GTK widget or another struct implementing "Container";
+
+size and location can only be determined for container widgets;
+other widgets must always be put inside a container;
 
 gradient + animation -> cursor
 https://developer.gnome.org/gtk3/stable/chap-css-properties.html
