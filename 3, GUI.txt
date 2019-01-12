@@ -1,0 +1,54 @@
+creating an actor from a struct itself made of actors: tree of actors;
+user input is feeded to the root GUI actor;
+each actor decides if it's going to apply the recieved input, or pass it to its children;
+other sources (like a timer) can be feeded to any actor in the tree;
+
+implementing a complete GUI toolkit is a huge lot of work;
+  and existing ones (like GTK) are single threaded;
+so we have to bend our design to fit in the single_treaded event_driven nature of GTK;
+instead of a tree of actors, we use a tree of ordinary data structures;
+these structs store the parent widget, the child widgets, and other states like focus index;
+they implement methods to set the size and location of children,
+  and methods to decide what to do with the received keys;
+
+"https://mmstick.github.io/gtkrs-tutorials/introduction.html"
+"https://github.com/gtk-rs/examples/tree/master/src/bin"
+"https://gtk-rs.org/docs/gtk/"
+"https://gtk-rs.org/docs/sourceview/"
+"https://gtk-rs.org/docs/gtk/trait.TextBufferExt.html#tymethod.get_text"
+
+gradient + animation -> cursor
+https://developer.gnome.org/gtk3/stable/chap-css-properties.html
+gtk cursor-aspect-ratio style property;
+in "~/.config/gtk-3.0/gtk.css":
+* {
+  -GtkTextView-error-underline-color: #FC4138;
+  -gtk-outline-radius: 2px; 
+  -GtkWidget-cursor-aspect-ratio: 1;
+  -GtkTextView-cursor_aspect_ratio: 1;
+  -EelEditableLabe-cursor_aspect_ratio: 1;
+  -GtkWidget-focus-line-width: 3;
+}
+https://superuser.com/questions/1365329/how-do-i-make-the-focus-rectangle-in-gtk3-more-prominent
+https://github.com/xi/gtk-theme-clearcodes/tree/master/gtk-3.0
+draw arrow at cursor position in TextView in GTK3:
+  https://gist.github.com/musiKk/2266946
+
+https://wiki.archlinux.org/index.php/Udisks#udevadm_monitor
+
+"https://crates.io/crates/webkit2gtk"
+pdf.js
+
+for gallery view: gtk::FlowBox, gtk::Scrollable
+gstreamer, gstreamer_player
+https://slomo.pages.freedesktop.org/rustdocs/gstreamer/gstreamer/
+https://gitlab.freedesktop.org/gstreamer/gstreamer-rs/tree/master/examples
+https://gitlab.freedesktop.org/gstreamer/gstreamer-rs/tree/master/tutorials
+https://gstreamer.freedesktop.org/documentation/
+gtkglsink, gtksink:
+  https://stackoverflow.com/a/32695253
+  https://stackoverflow.com/a/39173641
+  https://riptutorial.com/gtk3/example/24777/embed-a-video-in-a-gtk-window-in-python3
+  https://wiki.gnome.org/Projects/Vala/GStreamerSample
+
+gspell
