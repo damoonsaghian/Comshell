@@ -7,9 +7,14 @@ implementing a complete GUI toolkit is a huge lot of work;
   and existing ones (like GTK) are single threaded;
 so we have to bend our design to fit in the single_treaded event_driven nature of GTK;
 instead of a tree of actors, we use a tree of ordinary data structures;
-these structs store the parent widget, the child widgets, and other states like focus index;
-they implement methods to set the size and location of children,
-  and methods to decide what to do with the received keys;
+these structs store the widgets, and other states like focus index;
+they implement methods to set the size and location of their children,
+  and methods to decide what to do with the received key_press events;
+
+keyboard focus is alway on root window, it must be disabled for other widgets;
+
+some structs store mode state;
+when they recieve "Esc" key, they activate the normal mode, and pss the key to their children;
 
 "https://mmstick.github.io/gtkrs-tutorials/introduction.html"
 "https://github.com/gtk-rs/examples/tree/master/src/bin"

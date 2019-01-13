@@ -34,32 +34,28 @@ by inherent complexity i mean a complexity which can not be abstracted away comp
 in fact, hiding inherent complexity usually leads to choosing the wrong approach;
 
 for example, references (sharing data) are problematic in two situations:
-, async sharing (eg in callbacks);
+, data structures made of references (eg a closure capturing a reference);
 , mutable sharing (eg GUI widgets put in containers);
-most programming languages hide these problems behind a garbage collection, or other runtime solutions;
-but the right approach is to simply avoid them;
-to avoid async sharing we can use actors (discussed in the next section);
-in the following we see how to avoid mutable sharing;
+most programming languages hide these problems behind runtime solutions like garbage collection;
+but the right approach is to simply avoid them, or at least make their usage controlled and limited;
 "https://manishearth.github.io/blog/2015/05/17/the-problem-with-shared-mutability/"
 
 static data (functions, structs, constants): no problem, copy or share by reference;
-dynamic data: fixed structure, dynamic structure;
-
-if a data has a fixed structure we usually put it on stack;
-so we don't share it across the program, we copy it;
-if the data is big and we want to share it, we can put it inside a cell on the heap,
-  and share references to it across the program, using &;
-since the structure of data is fixed we can mutate it from anywhere (in the same tread);
-
-but in general where the structure of data is not fixed,
+dynamic data: can have fixed structure, or dynamic structure;
+, if data has a fixed structure we usually put it on stack;
+  so we don't share it across the program, we copy it;
+  if the data is big and we want to share it, we can put it inside a cell on the heap,
+    and share references to it across the program, using &;
+  since the structure of data is fixed we can mutate it from anywhere (in the same tread);
+, but in general where the structure of data is not fixed,
   we need to check if the read_write_lock pattern is fulfilled,
   either statically (when sharing refs using &mut),
   or dynamically at runtime, by putting it inside a RefCell
     (or its multi_threaded counterparts: Mutex or RwLock);
-note that if runtime rea_write_lock pattern fails, the program will panic;
-this is true even for garbage collected languages,
-  and can be seen in rare occasions like iteration invalidation;
-  you see? inherent complexities can't be hidden completely;
+  note that if runtime read_write_lock pattern fails, the program will panic;
+  this is true even for garbage collected languages,
+    and can be seen in rare occasions like iteration invalidation;
+    you see? inherent complexities can't be hidden completely;
 
 a type is "Copy" if all the data it owns is part of its stack representation;
   in other words if a copy of its stack representation doesn't violate memory safety;
@@ -91,19 +87,20 @@ mutable reference (exclusive reference) can:
   just like when an owner immutably lends its resource;
 
 during shared borrow (immutable borrow) no one owns the data;
-  so even the original owner can't change the it;
+  so even the original owner can't change it;
 during mutable borrow the (unique) borrower owns it;
 so "&mut" is actually a temporary transfer of ownership;
 
-runtime borrow check: RefCell;
-runtime memory management: Rc;
-RC: shared owning (a runtime solution);
-ARC: multi_threaded version;
+runtime borrow check: RefCell (or its multi_threaded counterparts: Mutex or RwLock);
+runtime memory management (owner check): Rc (or its multi_threaded counterpart: Arc);
+
+structs and enums containing refs must have explicit lifetimes; so don't use them;
+one situation that they seem unavoidable is async sharing (ie closures capturing references);
+async sharing needs runtime checking (as opposed to sync sharing which can be checked statically);
+  so it's better to move/copy in async situations;
 
 scenarios that involve returning refs often require explicit lifetimes;
   so don't return refs, instead use mutable refs in inputs;
-structs and enums containing refs must have explicit lifetimes;
-  so don't use them;
 
 s: String -> &s: &String -> &s[..]: &str
 v: Vec<T> -> &v: &Vec<T> -> &v[..]: &[T]
@@ -172,8 +169,7 @@ note that if we put a generic type parameter in the return type of a fuction,
 "fn(T1) -> T2" is not an unsized type like "str", it's a function pointer;
 
 = actors
-sync sharing can be checked statically;
-async sharing needs runtime checking, so it's better to move/copy in async situations;
+actors can help us to avoid mutable sharing, and control async sharing;
 "https://crates.io/crates/may_actor"
 
 an actor can have a set of parameters which can be adjusted based on the recieved messages;
