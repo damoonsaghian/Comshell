@@ -1,5 +1,3 @@
-https://en.wikipedia.org/wiki/Presentation%E2%80%93abstraction%E2%80%93control
-
 creating an actor from a struct itself made of actors: tree of actors;
 user input is feeded to the root GUI actor;
 each actor decides if it's going to apply the recieved input, or pass it to its children;
