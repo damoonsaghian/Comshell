@@ -1,6 +1,6 @@
 implementing a complete GUI toolkit is a huge lot of work;
-  and existing ones (like GTK) are single threaded;
-so we have to bend actors to fit in the single_treaded event_driven nature of GTK;
+  and existing ones (like GTK) are single threaded, and thus can't be used inside actors;
+so we will have data structures made of two parts: actor part, and widget part;
 
 keyboard focus is alway on root window, it must be disabled for other widgets;
 

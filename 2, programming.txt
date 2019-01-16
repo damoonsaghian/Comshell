@@ -33,11 +33,8 @@ by inherent complexity i mean a complexity which can not be abstracted away comp
   ie if we attempt to hide it, it will re_emerge somewhere else;
 in fact, hiding inherent complexity usually leads to choosing the wrong approach;
 
-for example, references (sharing data) are problematic in two situations:
-, data structures made of references (eg a closure capturing a reference);
-, mutable sharing (eg GUI widgets put in containers);
-most programming languages hide these problems behind runtime solutions like garbage collection;
-but the right approach is to simply avoid them, or at least make their usage controlled and limited;
+sharing mutable data, ie having a mutable reference to some data,
+  while it is shared using other references, is the root of many (inherent) complexities;
 "https://manishearth.github.io/blog/2015/05/17/the-problem-with-shared-mutability/"
 
 static data (functions, structs, constants): no problem, copy or share by reference;
@@ -53,9 +50,10 @@ dynamic data: can have fixed structure, or dynamic structure;
   or dynamically at runtime, by putting it inside a RefCell
     (or its multi_threaded counterparts: Mutex or RwLock);
   note that if runtime read_write_lock pattern fails, the program will panic;
-  this is true even for garbage collected languages,
-    and can be seen in rare occasions like iteration invalidation;
-    you see? inherent complexities can't be hidden completely;
+
+actors can help us to avoid sharing mutable data,
+  and in contrast to "RefCell" RWLock is guaranteed at compile_time;
+"https://crates.io/crates/may_actor"
 
 a type is "Copy" if all the data it owns is part of its stack representation;
   in other words if a copy of its stack representation doesn't violate memory safety;
@@ -90,14 +88,6 @@ during shared borrow (immutable borrow) no one owns the data;
   so even the original owner can't change it;
 during mutable borrow the (unique) borrower owns it;
 so "&mut" is actually a temporary transfer of ownership;
-
-runtime borrow check: RefCell (or its multi_threaded counterparts: Mutex or RwLock);
-runtime memory management (owner check): Rc (or its multi_threaded counterpart: Arc);
-
-structs and enums containing refs must have explicit lifetimes; so don't use them;
-one situation that they seem unavoidable is async sharing (ie closures capturing references);
-async sharing needs runtime checking (as opposed to sync sharing which can be checked statically);
-  so it's better to move/copy in async situations;
 
 scenarios that involve returning refs often require explicit lifetimes;
   so don't return refs, instead use mutable refs in inputs;
@@ -168,9 +158,6 @@ note that if we put a generic type parameter in the return type of a fuction,
 
 "fn(T1) -> T2" is not an unsized type like "str", it's a function pointer;
 
-= actors
-actors can help us to avoid mutable sharing, and control async sharing;
-"https://crates.io/crates/may_actor"
-
-an actor can have a set of parameters which can be adjusted based on the recieved messages;
+= learning
+data structures can contain parameters which can be adjusted, by repeatedly calling adjusting methods;
   this can be used to implement learning capabilities;
