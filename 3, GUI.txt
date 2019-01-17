@@ -1,8 +1,8 @@
 implementing a complete GUI toolkit is a huge lot of work;
   and existing ones (like GTK) are single threaded, and thus can't be used inside actors;
-so we will have data structures made of two parts: actor part, and widget part;
-
-keyboard focus is alway on root window, it must be disabled for other widgets;
+we have access to any actor from other actors and widgets, and to any widget from other widgets;
+but to access widgets from actors we need a little trick:
+  "https://github.com/Phaiax/gtk-rs-state"
 
 "https://mmstick.github.io/gtkrs-tutorials/introduction.html"
 "https://github.com/gtk-rs/examples/tree/master/src/bin"
