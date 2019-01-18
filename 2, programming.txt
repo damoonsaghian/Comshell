@@ -15,9 +15,7 @@ programs usually do not run directly on computer hardware;
 instead they run on a more sophisticated software machine (a virtual machine) called the kernel;
 in theory we can live without a kernel (an idea sometimes called a library operating system);
 but in that case, we have to rewrite all the required libraries, on bare metal;
-in addition since  we can't have more than one program,
-  to develop and test new programs on such a system, we need hot_pluggable libraries;
-  "https://github.com/draivin/rust-hotswap"
+anyway, having an operating system, makes developing and testing new programs much easier;
 
 Linux is a highly developed, constantly evolving, open_source kernel;
 "https://dominuscarnufex.github.io/cours/rs-kernel/en.html"
