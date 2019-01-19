@@ -125,7 +125,7 @@ the class hierarchy design, eg in Java, is problematic;
 also the problem of covariance for generic types, has its root in this problem;
   "https://en.wikipedia.org/wiki/Wildcard_(Java)"
 i think this problem is also the motivation for dynamic typing (another bad design);
-the right way as done in Rust, Go and Julia:
+the right way as done in Rust:
 , concrete types (like final classes in Java) can be instantiated, but cannot have subtypes;
 , abstract types (like abstract classes in Java) cannot be instantiated, but can have subtypes;
 
