@@ -1,10 +1,14 @@
 use std::collections::HashMap;
-use may_actor;
+use may_actor::Actor;
+
 use gtk;
-use gtk::prelude::*; // this imports gtk traits; apparently to use their methods, this is necessary;
+use gtk::prelude::*;
 use gdk::enums::key;
+
 use sourceview as editor;
+use sourceview::prelude::*;
 use webkit2gtk as webkit;
+use webkit2gtk::WebViewExt;
 
 #[drive(Clone)]
 pub struct Editor {
