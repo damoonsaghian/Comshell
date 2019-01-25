@@ -40,19 +40,22 @@ Kinesis Advantage 2 keyboard
 = Comshell
 Comshell is a unified computing environment, with command based user interface;
 
-projects are looked for in "~/workspaces/*/", and all "workspaces/*/" directories on all disks,
-  and shown in lists side by side (one list per workspace);
-from these lists, we can open projects (or switch to them if they are already open),
-  create new projects, etc;
+"./data/comshell.png"
+workspace and project areas show the name of active workspace and project;
+they will expand to show the list of all workspaces and projects;
 
-a panel at the left shows the files in the project;
+workspaces are directories located in "~/workspaces/"
+also workspaces on external disks ("mounted_disk/workspaces/")
+  will have symbolic links in "~/workspaces/";
+projects are directories inside a workspace;
+
 text files are opened in a text editor panel at the right;
 directories with ".m" extension are opened in a panel at the right,
   showing thumbnails of the files in it;
 in the left panel, we can move between files, and copy/rename/delete/create them;
 
 non_local projects, web pages, pdf documents, etc,
-  can be opened and accessed from links inside the main project;
+  can be opened (in a floating layer) and accessed from links inside the main project;
 
 scroll by paragraph: scroll to reveal the whole paragraph;
 

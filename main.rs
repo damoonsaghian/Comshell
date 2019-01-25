@@ -8,7 +8,7 @@ use gdk::enums::key;
 use sourceview as editor;
 use sourceview::prelude::*;
 use webkit2gtk as webkit;
-use webkit2gtk::WebViewExt;
+use webkit2gtk::{WebViewExt, WebContextExt};
 
 #[drive(Clone)]
 pub struct Editor {
@@ -47,22 +47,22 @@ impl Project {
   pub fn next_chapter() {}
 }
 
-// list of projects in a directory inside "~/workspaces/" or "<a-disk-mount-path>/workspaces/"
+// list of projects in a workspace directory;
 #[derive(Clone)]
-pub struct Workspace {}
+pub struct ProjectsList {}
 
-#[derive(Clone)]
-pub struct Home {
-  pub workspaces: HashMap<String, Workspace>,
-}
-
-impl Home {
-  pub fn new() -> Home {
-
-    Home {}
+impl ProjectList {
+  pub fn new() -> ProjectList {
+    ProjectList {}
   }
 
   pub fn go_to_project(&mut self, project_path: &str) {}
+}
+
+// list of workspace directories (located in "~/workspaces/");
+#[derive(Clone)]
+pub struct WorkspacesList {
+  pub workspaces: HashMap<String, Workspace>,
 }
 
 fn main() {
@@ -73,7 +73,7 @@ fn main() {
 
   let normal_mode = true;
   let open_projects: HashMap<String, Project> = HashMap::new();
-  let home = Home::new();
+  let workspace_list = WorkspaceList::new();
   let main_view = gtk::Stack::new();
   // show home
 
