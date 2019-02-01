@@ -1,0 +1,94 @@
+cpu, memory, peripherals,
+  this seems to be the only practical architecture for the hardware of computers;
+cpu runs a sequence of simple computations called instructions (packages of 0 and 1),
+  one by one;
+
+compilers are special programs that obtain computer instructions
+  from a program written in a language which is structured and human readable;
+  this way the written program will be portable to different computer architectures;
+Rust is a programming language which provides zero cost abstractions,
+  and memory safety without garbage collection;
+  thus there is absolutely no reason to write new software in C/C++;
+
+programs usually do not run directly on computer hardware;
+instead they run on a more sophisticated software machine (a virtual machine) called the kernel;
+in theory we can live without a kernel (an idea sometimes called a library operating system);
+but in that case, we have to rewrite all the required libraries, on bare metal;
+anyway, having an operating system, makes developing and testing new programs much easier;
+
+Linux is a highly developed, constantly evolving, open_source kernel;
+"https://dominuscarnufex.github.io/cours/rs-kernel/en.html"
+in Linux (and other Unix based operating systems) most things appear in the file system;
+  i think the reason is to make it possible to do a lot of things using shell scripts
+    instead of a proper programming language;
+  while i can understand the convenience it provides, i don't think it's good design;
+
+= Arch Linux
+Arch Linux help us to setup and maintain a Linux system; it's simple and effective;
+
+first boot to an existing Arch Linux (the live image,
+  or an already installed Arch Linux with arch-install-scripts package installed);
+; timedatectl set-ntp true
+
+list disks using "fdisk -l"; then use "fdisk /dev/sdx" to create 3 partitions:
+  , +1M BIOS boot (partition type code: 4)
+  , +550M EFI System (partition tye code: 1)
+  , and the rest for Linux filesystem
+  (first enter "g" command to create a GPT partition table,
+    then enter "n" to add a new partition, and change its type using "t" command;
+    at the end enter "w" to write and exit;)
+format the partitions:
+  ; mkfs.fat -F32 /dev/sdx2; mkfs.ext4 /dev/sdx3
+
+; mount /dev/sdx3 /mnt
+now you can even reuse packages previously downloaded on current system,
+  by copying them to "/mnt/var/cache/pacman/pkg";
+; pacstrap /mnt pacman
+; arch-chroot /mnt
+; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
+  networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip ttf-hack ttf-droid sway rustup gcc
+actually Sway (with "wlroot") is not ready yet; til then, we can use "i3-wm":
+; pacman -S xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-wm
+
+install bootloader:
+; grub-install --target=i386-pc /dev/sdx
+; mkdir /boot/efi; mount /dev/sdx2 /boot/efi
+; grub-install --target=x86_64-efi --efi-directory=/boot/efi --removable
+; grub-mkconfig -o /boot/grub/grub.cfg
+; nano /boot/grub/grub.cfg
+  set timeout = 0
+
+create user:
+; useradd -m -G wheel user1
+; passwd -d user1
+; EDITOR=nano visudo
+  %wheel ALL=(ALL) ALL
+i know that having sudo without password has no security advantage over just using root;
+but a regular user is necessary, because
+  some programs (like PulseAudio) wouldn't work normally when run as root;
+
+automatic login:
+; mkdir /etc/systemd/system/getty@tty1.service.d
+; nano /etc/systemd/system/getty@tty1.service.d/override.conf
+  [Service]
+  ExecStart=
+  ExecStart=-/usr/bin/agetty --autologin user1 --noclear %I $TERM
+
+; nano /etc/locale.gen
+  en_US.UTF-8 UTF-8
+; locale-gen
+; nano /etc/locale.conf
+  LANG=en_US.UTF-8
+
+; systemctl enable NetworkManager.service
+; systemctl enable systemd-timesyncd.service
+; exit
+; reboot
+
+for devices with hardware mute and volume control, PulseAudio mutes and silences them by default;
+so if you like you can do this:
+; pactl set-sink-mute @DEFAULT_SINK@ 0
+; pactl set-sink-volume @DEFAULT_SINK@ 100%
+
+; rustup install stable
+; rustup default stable

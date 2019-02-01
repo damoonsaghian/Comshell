@@ -1,0 +1,31 @@
+we can use existing tools to create a prototype of Comshell;
+
+; sudo pacman -S emacs mpv
+vimb
+
+; nano ~/.bash_profile
+  export TZ="/usr/share/zoneinfo/<your_location>"
+  sway
+; mkdir -p ~/.config/sway
+; nano ~/.config/sway/config
+  default_border none
+  default_floating_border pixel 1
+  focus_follows_mouse no
+  for_window [title="^(?!comshell$)"] floating enable, resize set 90 ppt 90 ppt, move position center, \
+    move scratchpad, scratchpad show
+  for_window [title="^comshell$"] floating disable
+  exec --no-startup-id "emacs; swaymsg '[class=.] kill'; swaymsg exit"
+
+or for "i3-wm":
+; nano ~/.bash_profile
+  export TZ="/usr/share/zoneinfo/<your_location>"
+  startx
+; nano ~/.xinitrc
+  exec i3
+; mkdir -p ~/.config/i3
+; cp i3.config ~/.config/i3/config
+
+; mkdir ~/.emacs.d
+; cp init.el ~/.emacs.d/init.el
+ELisp is terrible as a programming language,
+  but it's pretty good as a command interface (ie as a shell, like Bash);
