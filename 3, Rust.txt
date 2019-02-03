@@ -1,11 +1,12 @@
 Rust makes bad programming hard, and good programming fun;
 Rust does not hide (inherent) complexity, in fact it bolds it, so we can see it, and avoid it;
 by inherent complexity i mean a complexity which can not be abstracted away completely;
-  ie if we attempt to hide it, it will re_emerge somewhere else;
+  ie if we try to hide it, it will re_emerge somewhere else;
 in fact, hiding inherent complexity usually leads to choosing the wrong approach;
 
-sharing mutable data, ie having a mutable reference to some data,
-  while it is shared using other references, is the root of many (inherent) complexities;
+sharing mutable data,
+  ie having a mutable reference to some data, while it is shared using other references,
+  is the root of many (inherent) complexities;
 "https://manishearth.github.io/blog/2015/05/17/the-problem-with-shared-mutability/"
 
 static data (functions, structs, constants): no problem, copy or share by reference;
@@ -22,8 +23,7 @@ dynamic data: can have fixed structure, or dynamic structure;
     (or its multi_threaded counterparts: Mutex or RwLock);
   note that if runtime read_write_lock pattern fails, the program will panic;
 
-actors can help us to avoid sharing mutable data,
-  and in contrast to "RefCell" RWLock is guaranteed at compile_time;
+actors can help us to avoid the need for read_write_lock check (either during compile or at runtime);
 "https://crates.io/crates/may_actor"
 
 a type is "Copy" if all the data it owns is part of its stack representation;
@@ -130,5 +130,5 @@ note that if we put a generic type parameter in the return type of a fuction,
 "fn(T1) -> T2" is not an unsized type like "str", it's a function pointer;
 
 = learning
-data structures can contain parameters which can be adjusted, by repeatedly calling adjusting methods;
+actors can contain parameters which can be adjusted gradually, based on received messages;
   this can be used to implement learning capabilities;

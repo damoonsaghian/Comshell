@@ -8,8 +8,9 @@ vimb
   sway
 ; mkdir -p ~/.config/sway
 ; nano ~/.config/sway/config
-  default_border none
   default_floating_border pixel 1
+  default_border pixel 1
+  hide_edge_borders smart
   focus_follows_mouse no
   for_window [title="^(?!comshell$)"] floating enable, resize set 90 ppt 90 ppt, move position center, \
     move scratchpad, scratchpad show
@@ -23,7 +24,22 @@ or for "i3-wm":
 ; nano ~/.xinitrc
   exec i3
 ; mkdir -p ~/.config/i3
-; cp i3.config ~/.config/i3/config
+content of "~/.config/i3/config" is like the one written above for "sway";
+  just add "# i3 config file (v4)" in the first line;
+  and in the last line, replace "swaymsg" with "i3-msg"
+
+Firefox:
+; sudo pacman -S firefox materia-gtk-theme
+; mkdir -p ~/.config/gtk-3.0; nano ~/.config/gtk-3.0/settings.ini
+  [Settings]
+  gtk-theme-name = Materia-light-compact
+  gtk-font-name = Sans
+then add these to i3/sway config:
+  for_window [class=Firefox window_type=normal] resize set 100 ppt 100 ppt, move position center
+  bindsym Mod1+Tab exec --no-startup-id \
+    "if [[ \\"$(i3-msg [workspace=__focused__ class=Firefox] scratchpad show)\\" =~ \\"false\\" ]]; \
+    then if [[ \\"$(i3-msg [class=Firefox] scratchpad show)\\" =~ \\"false\\" ]]; \
+         then firefox; fi fi"
 
 ; mkdir ~/.emacs.d
 ; cp init.el ~/.emacs.d/init.el

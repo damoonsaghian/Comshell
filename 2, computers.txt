@@ -1,11 +1,9 @@
 cpu, memory, peripherals,
   this seems to be the only practical architecture for the hardware of computers;
-cpu runs a sequence of simple computations called instructions (packages of 0 and 1),
-  one by one;
+cpu runs a sequence of simple computations, called instruction codes, one by one;
 
-compilers are special programs that obtain computer instructions
-  from a program written in a language which is structured and human readable;
-  this way the written program will be portable to different computer architectures;
+compilers are special programs that generate instruction codes,
+  from a program written in a structured and human readable language;
 Rust is a programming language which provides zero cost abstractions,
   and memory safety without garbage collection;
   thus there is absolutely no reason to write new software in C/C++;
@@ -19,7 +17,7 @@ anyway, having an operating system, makes developing and testing new programs mu
 Linux is a highly developed, constantly evolving, open_source kernel;
 "https://dominuscarnufex.github.io/cours/rs-kernel/en.html"
 in Linux (and other Unix based operating systems) most things appear in the file system;
-  i think the reason is to make it possible to do a lot of things using shell scripts
+  i think the reason is to make it possible to do lots of things using shell scripts,
     instead of a proper programming language;
   while i can understand the convenience it provides, i don't think it's good design;
 
@@ -63,7 +61,7 @@ create user:
 ; passwd -d user1
 ; EDITOR=nano visudo
   %wheel ALL=(ALL) ALL
-i know that having sudo without password has no security advantage over just using root;
+actually, "sudo" without password has no security advantage over just logging in as root;
 but a regular user is necessary, because
   some programs (like PulseAudio) wouldn't work normally when run as root;
 
@@ -85,7 +83,8 @@ automatic login:
 ; exit
 ; reboot
 
-for devices with hardware mute and volume control, PulseAudio mutes and silences them by default;
+some audio devices can send and_or receive volume control signals;
+  PulseAudio mutes and silences these device, by default;
 so if you like you can do this:
 ; pactl set-sink-mute @DEFAULT_SINK@ 0
 ; pactl set-sink-volume @DEFAULT_SINK@ 100%

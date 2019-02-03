@@ -38,11 +38,11 @@ Kinesis Advantage 2 keyboard
 "http://www.allthingsergo.com/the-best-ergonomic-mechanical-keyboards/"
 
 = Comshell
-Comshell is a unified computing environment, with command based user interface;
+Comshell is a unified computing environment, utilizing command based user interface;
 
-a pannel at the left shows the files in the project;
+a pannel at the left shows a tree view of files in the project;
    we can move between files, and copy/rename/delete/create them;
-when we want to see the list of projects, a list will be opened on top of this left pannel;
+to see the list of all projects, a view will be opened in the left pannel, below the tree view;
 projects are directories inside "~/projects/";
 
 text files are opened in a text editor panel at the right;
@@ -50,11 +50,11 @@ directories with ".m" extension are opened in a panel at the right,
   showing thumbnails of the files in it;
 
 non_local projects, web pages, pdf documents, etc,
-  can be opened (in a floating layer) and accessed from links inside the main project;
-projects inside external disks (in a directory named "projects")
-  can be accessed in a pannel, and will be opened in a floating layer;
+  accessed from links inside the main project, and will be opened in a floating layer;
+projects in external disks (inside a root directory named "projects"),
+  can be accessed from a list view, and will be opened in a floating layer;
 
-scroll by paragraph: scroll to reveal the whole paragraph;
+scroll by paragraph: scroll as much to reveal the whole paragraph;
 
 modal key_bindings;
 modes (like normal mode and insert mode) must be visually distinctive;
