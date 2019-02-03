@@ -139,6 +139,8 @@
 ;;   https://github.com/Fuco1/dired-hacks/blob/master/dired-ranger.el
 ;; sort numbers (10 after 9)
 
+;; to_do: implement "dir-tree", and use that instead of "dired";
+
 (save-place-mode 1)
 (run-with-idle-timer
  30 30 (lambda ()
@@ -151,7 +153,6 @@
 ;; save-place-to-alist, save-place-alist-to-file
 
 (defvar projects-window)
-;; (load "./dir-tree.el")
 (defun show-projects ()
   (interactive)
   (let ((buffer (dired-noselect "~/projects/")))
