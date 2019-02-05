@@ -14,7 +14,6 @@
 (setq-default cursor-in-non-selected-windows nil)
 (setq-default mode-line-format nil)
 (global-set-key (kbd "C-x k") #'kill-this-buffer)
-(global-set-key (kbd "M-SPC") #'other-window)
 (cua-mode 1)
 ;; automatically recover unsaved files;
 
@@ -61,11 +60,7 @@
 (setq-default
  header-line-format
  '((:eval (propertize " " 'display '((space :align-to 0))))
-   (:eval (let ((file (buffer-file-name)))
-            (if file (file-name-nondirectory file)
-              (or (ignore-errors (file-name-nodirectory (directory-file-name
-                                                         (dired-current-directory))))
-                  "%b"))))
+   (:eval (replace-regexp-in-string "<.*>" "" (buffer-name)))
    (:eval (if (buffer-modified-p)
               (propertize "* " 'face '(:foreground "red"))
             "  "))
@@ -127,20 +122,6 @@
                         (right-char))))
 (global-set-key (kbd "C-<up>") 'previous-paragraph)
 
-(require 'dired)
-(setq dired-recursive-deletes 'always)
-(setq dired-recursive-copies 'always)
-(setq dired-listing-switches "-l -I \"#*#\" -I \"*.lock\" -I \"target\"")
-(add-hook 'dired-mode-hook 'dired-hide-details-mode)
-(add-hook 'dired-mode-hook 'hl-line-mode)
-;; https://www.emacswiki.org/emacs/DiredView
-;; async file operations in dired
-;; for copy_paste mechanism:
-;;   https://github.com/Fuco1/dired-hacks/blob/master/dired-ranger.el
-;; sort numbers (10 after 9)
-
-;; to_do: implement "dir-tree", and use that instead of "dired";
-
 (save-place-mode 1)
 (run-with-idle-timer
  30 30 (lambda ()
@@ -151,6 +132,28 @@
 ;; to_do: separate save-place-file for each project;
 ;; list of buffer groups
 ;; save-place-to-alist, save-place-alist-to-file
+
+(require 'dired)
+(require 'hl-line)
+(setq dired-recursive-deletes 'always)
+(setq dired-recursive-copies 'always)
+(setq dired-listing-switches "-l -I \"#*#\" -I \"*.lock\" -I \"target\"")
+(add-hook 'dired-mode-hook 'dired-hide-details-mode)
+(add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
+;; https://www.emacswiki.org/emacs/DiredView
+;; async file operations in dired
+;; for copy_paste mechanism:
+;;   https://github.com/Fuco1/dired-hacks/blob/master/dired-ranger.el
+;; sort numbers (10 after 9)
+
+;; to_do: implement "dir-tree", and use that instead of "dired";
+
+;; when moving between windows, send point to highlighted line (if there is any);
+(defun my-other-window ()
+  (interactive)
+  (if hl-line-overlay (goto-char (overlay-start hl-line-overlay)))
+  (other-window 1))
+(global-set-key (kbd "M-SPC") #'my-other-window)
 
 (defvar projects-window)
 (defun show-projects ()
@@ -179,7 +182,7 @@
             (set-window-dedicated-p window t)
             (select-window window)
             (hl-line-highlight)
-            (delete-window projects-window)
+            (ignore-errors (delete-window projects-window))
             (my-find-file))))
 
      ((file-directory-p file-name)
@@ -197,14 +200,17 @@
         ;; https://github.com/dbrock/bongo
         (select-window
          (display-buffer-use-some-window (find-file-noselect file-name) nil))
+        (delete-other-windows)
         )
        (t
         (select-window
          (display-buffer-use-some-window (find-file-noselect file-name) nil))
+        (delete-other-windows)
         )))
 
      (t (select-window
-         (display-buffer-use-some-window (find-file-noselect file-name) nil))))))
+         (display-buffer-use-some-window (find-file-noselect file-name) nil))
+        (delete-other-windows)))))
 (define-key dired-mode-map [remap dired-find-file] 'my-find-file)
 (define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file)
 
