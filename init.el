@@ -198,19 +198,23 @@
         ;; https://www.gnu.org/software/emms/
         ;; http://wikemacs.org/wiki/Media_player
         ;; https://github.com/dbrock/bongo
+        (hl-line-highlight)
         (select-window
          (display-buffer-use-some-window (find-file-noselect file-name) nil))
         (delete-other-windows)
         )
        (t
+        (hl-line-highlight)
         (select-window
          (display-buffer-use-some-window (find-file-noselect file-name) nil))
         (delete-other-windows)
         )))
 
-     (t (select-window
-         (display-buffer-use-some-window (find-file-noselect file-name) nil))
-        (delete-other-windows)))))
+     (t
+      (hl-line-highlight)
+      (select-window
+       (display-buffer-use-some-window (find-file-noselect file-name) nil))
+      (delete-other-windows)))))
 (define-key dired-mode-map [remap dired-find-file] 'my-find-file)
 (define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file)
 
