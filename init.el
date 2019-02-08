@@ -219,8 +219,6 @@
 (define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file)
 
 (show-projects)
-(my-find-file)
-(show-projects)
 
 (add-hook 'prog-mode-hook 'goto-address-mode)
 (add-hook 'text-mode-hook 'goto-address-mode)
