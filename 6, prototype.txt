@@ -24,9 +24,10 @@ or for "i3-wm":
 ; nano ~/.xinitrc
   exec i3
 ; mkdir -p ~/.config/i3
-content of "~/.config/i3/config" is like the one written above for "sway";
-  just add "# i3 config file (v4)" in the first line;
-  and in the last line, replace "swaymsg" with "i3-msg"
+content of "~/.config/i3/config" is like the one written above for "sway", just:
+  add this to the first line: # i3 config file (v4)
+  add this line: exec compton --vsync opengl-swc
+  in the last line, replace "swaymsg" with "i3-msg";
 
 Firefox:
 ; sudo pacman -S firefox materia-gtk-theme
