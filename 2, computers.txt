@@ -62,7 +62,7 @@ create user:
 ; EDITOR=nano visudo
   %wheel ALL=(ALL) ALL
 actually, "sudo" without password has no security advantage over just logging in as root;
-but a regular user is necessary, because
+nonetheless a regular user is necessary, because
   some programs (like PulseAudio) wouldn't work normally when run as root;
 
 automatic login:

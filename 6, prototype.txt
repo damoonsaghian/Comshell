@@ -12,10 +12,13 @@ vimb
   default_border pixel 1
   hide_edge_borders smart
   focus_follows_mouse no
-  for_window [title="^(?!comshell$)"] floating enable, resize set 90 ppt 90 ppt, move position center, \
-    move scratchpad, scratchpad show
-  for_window [title="^comshell$"] floating disable
-  exec --no-startup-id "emacs; swaymsg '[class=.] kill'; swaymsg exit"
+  for_window [class="^(?!Emacs$)"] floating enable, \
+    resize set 90 ppt 90 ppt, move position center, move scratchpad, scratchpad show
+  for_window [class="^Emacs$" title=.] floating enable, \
+    resize set 90 ppt 90 ppt, move position center
+  for_window [class="^Emacs$" title="^projects$"] floating enable, \
+    resize set 25 ppt 90 ppt, move position center
+  exec --no-startup-id "emacs --name=''; swaymsg '[class=.] kill'; swaymsg exit"
 
 or for "i3-wm":
 ; nano ~/.bash_profile

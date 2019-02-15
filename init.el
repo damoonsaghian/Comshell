@@ -2,7 +2,6 @@
 (tool-bar-mode -1)
 ;; to introduce this frame as the main Emacs frame, to the window manager,
 ;;   so it doesn't make it floating, like other frames;
-(set-frame-name "comshell")
 (setq use-dialog-box nil)
 (setq inhibit-startup-screen t)
 (setq visible-bell t)
@@ -155,17 +154,11 @@
   (other-window 1))
 (global-set-key (kbd "M-SPC") #'my-other-window)
 
-(defvar projects-window)
 (defun show-projects ()
   (interactive)
-  (let ((buffer (dired-noselect "~/projects/")))
-    (setq projects-window (display-buffer-in-side-window
-                           buffer
-                           '((side . left) (slot . 1) (window-width . 0.2))))
-    (set-window-parameter projects-window 'no-delete-other-windows t)
-    (set-window-dedicated-p projects-window t) ;; not sure if this is necessary;
-    (select-window projects-window)
-    (hl-line-highlight)))
+  (select-frame (make-frame '((name . "projects") (minibuffer . nil))))
+  (dired "~/projects/")
+  (hl-line-highlight))
 (global-set-key (kbd "M-RET") #'show-projects)
 
 (defun my-find-file ()
@@ -174,16 +167,16 @@
     (cond
      ((string-match-p "/projects/[^/]*/?\\'" file-name)
       (when (file-directory-p file-name)
-          (let* ((buffer (dired-noselect file-name))
-                 (window (display-buffer-in-side-window
-                          buffer
-                          '((side . left) (slot . 0) (window-width . 0.2)))))
-            (set-window-parameter window 'no-delete-other-windows t)
-            (set-window-dedicated-p window t)
-            (select-window window)
-            (hl-line-highlight)
-            (ignore-errors (delete-window projects-window))
-            (my-find-file))))
+        (delete-frame)
+        (let* ((buffer (dired-noselect file-name))
+               (window (display-buffer-in-side-window
+                        buffer
+                        '((side . left) (slot . 0) (window-width . 0.2)))))
+          (set-window-parameter window 'no-delete-other-windows t)
+          (set-window-dedicated-p window t) ;; not sure if this is necessary;
+          (select-window window)
+          (hl-line-highlight)
+          (my-find-file))))
 
      ((file-directory-p file-name)
       (cond
