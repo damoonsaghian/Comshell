@@ -1,0 +1,28 @@
+we can use existing tools to create a prototype of Comshell;
+Atom text editor
+
+; sudo pacman atom
+; cp ./Atom/* ~/.atom/
+
+; nano ~/.bash_profile
+  sway
+; mkdir -p ~/.config/sway
+; nano ~/.config/sway/config
+  default_border none
+  default_floating_border pixel 1
+  focus_follows_mouse no
+  exec --no-startup-id "atom; swaymsg exit"
+
+or for "i3-wm":
+; nano ~/.bash_profile
+  startx
+; nano ~/.xinitrc
+  exec i3
+; mkdir -p ~/.config/i3
+; nano ~/.config/i3/config
+  # i3 config file (v4)
+  default_border none
+  default_floating_border pixel 1
+  focus_follows_mouse no
+  exec compton --vsync opengl-swc
+  exec --no-startup-id "atom; i3-msg exit"
