@@ -2,7 +2,6 @@
 command based user interfaces (using keyboard, voice, gesture) are
   faster, more convenient and more powerful
   than pointer based user interfaces (using mouse, touch, pen);
-
 touch interfaces can still be useful in simple limited applications;
 also for some special artistic applications, pen input remains the only choice;
 touch interface may seem very convenient at first sight,
@@ -24,7 +23,7 @@ missing characters can be entered like this:
 , two commas --> ;
 , ";" followed by comma --> .
 , ";" followed by "c" --> :
-, ";" folloed by "n" --> ::
+, ";" followed by "n" --> ::
 , comma followed by "add" followed by comma --> +
 , comma followed by "add" followed by space --> + followed by space
 , comma followed by "psi" followed by space --> ψ followed by space
