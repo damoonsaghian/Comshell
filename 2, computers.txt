@@ -44,9 +44,7 @@ now you can even reuse packages previously downloaded on current system,
 ; pacstrap /mnt pacman
 ; arch-chroot /mnt
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
-  networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip ttf-hack ttf-droid sway rustup gcc
-actually Sway (with "wlroot") is not ready yet; til then, we can use "i3-wm":
-; pacman -S xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-wm
+  networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip ttf-hack ttf-droid rustup gcc
 
 install bootloader:
 ; grub-install --target=i386-pc /dev/sdx

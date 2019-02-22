@@ -10,7 +10,11 @@ but to access widgets from actors we need a little trick:
 "https://gtk-rs.org/docs/sourceview/"
 "https://gtk-rs.org/docs/gtk/trait.TextBufferExt.html#tymethod.get_text"
 
-; sudo pacman -S gtk3 gtksourceview3 webkit2gtk gst-plugins-{base,good,bad} gst-libav materia-gtk-theme
+; sudo pacman -S gtk3 gtksourceview3 webkit2gtk gst-plugins-{base,good,bad} gst-libav \
+  materia-gtk-theme sway
+actually Sway (with "wlroot") is not ready yet; til then, we can use "i3-wm":
+; sudo pacman -S xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-wm
+
 ; mkdir -p ~/.config/gtk-3.0; nano ~/.config/gtk-3.0/settings.ini
   [Settings]
   gtk-theme-name = Materia-light-compact

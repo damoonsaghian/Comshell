@@ -20,15 +20,16 @@ for those who neither can use all their fingers, nor can talk,
 
 ".data/keyboard.png"
 missing characters can be entered like this:
+, double "space" --> "enter"
+, "tab" is used for indentation, tabulation and completion
 , two commas --> ;
 , ";" followed by comma --> .
-, ";" followed by "c" --> :
-, ";" followed by "n" --> ::
-, comma followed by "add" followed by comma --> +
-, comma followed by "add" followed by space --> + followed by space
+, comma followed by "c" followed by space --> : followed by space
+, comma followed by "n" followed by comma --> ::
 , comma followed by "psi" followed by space --> ψ followed by space
-, __a --> A
-, ab_cd__ followed by space --> AB_CD followed by space
+, "ab_cd" followed by two underscores --> AbCd
+, "_ab_cd" followed by two underscores --> AB_CD
+, "__ab_cd__" remained unchanged
 "https://github.com/adereth/dactyl-keyboard"
 "https://ergodox-ez.com/pages/change-it-yourself"
 "https://shop.keyboard.io/"
