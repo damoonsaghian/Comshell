@@ -132,6 +132,19 @@
 (setq dired-listing-switches "-l -I \"#*#\" -I \"*.lock\" -I \"target\"")
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
 (add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
+;; auto refresh dired, but be quiet about it;
+;;(add-hook 'dired-mode-hook 'auto-revert-mode) ;;(setq global-auto-revert-non-file-buffers t)
+;;(setq auto-revert-verbose nil)
+
+;; make the first line of dired, invisible;
+(add-hook
+ 'dired-after-readin-hook
+ (lambda ()
+   (let ((buffer-read-only))
+     (save-excursion
+       (set-text-properties 1 (progn (goto-char 1) (forward-line 1) (point))
+                            '(invisible t))))))
+
 ;; https://www.emacswiki.org/emacs/DiredView
 ;; async file operations in dired
 ;;   https://github.com/jwiegley/emacs-async/blob/master/dired-async.el
