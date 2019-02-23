@@ -14,6 +14,7 @@
 (setq-default mode-line-format nil)
 (global-set-key (kbd "C-x k") #'kill-this-buffer)
 (cua-mode 1)
+(setq-default major-mode 'text-mode)
 ;; automatically recover unsaved files;
 
 (defun sleep ()
@@ -139,8 +140,6 @@
 ;; sort numbers (10 after 9)
 ;;   https://emacs.stackexchange.com/questions/5649/sort-file-names-numbered-in-dired
 
-;; to_do: implement "dir-tree", and use that instead of "dired";
-
 ;; when moving between windows, send point to highlighted line (if there is any);
 (defun my-other-window ()
   (interactive)
@@ -160,6 +159,7 @@
   (let ((file-name (dired-get-filename)))
     (cond
      ((string-match-p "/projects/[^/]*/?\\'" file-name)
+      ;; http://www.rexegg.com/
       (when (file-directory-p file-name)
         (delete-frame)
         (let* ((buffer (dired-noselect file-name))
