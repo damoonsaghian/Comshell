@@ -19,17 +19,19 @@ for those who neither can use all their fingers, nor can talk,
   gesture based (2d) input can be implemented;
 
 ".data/keyboard.png"
-missing characters can be entered like this:
-, double "space" --> "enter"
 , "tab" is used for indentation, tabulation and completion
+, double "space" --> "enter"
 , two commas --> ;
 , ";" followed by comma --> .
 , comma followed by "c" followed by space --> : followed by space
 , comma followed by "n" followed by comma --> ::
 , comma followed by "psi" followed by space --> ψ followed by space
 , "ab_cd" followed by two underscores --> AbCd
-, "_ab_cd" followed by two underscores --> AB_CD
-, "__ab_cd__" remained unchanged
+, "AbCd" (ie if the first letter is capital)
+  followed by two underscores --> AB_CD
+, "AB_CD (ie if all letters are capital)
+  followed by two underscores --> ab_cd
+, "_ab_cd__" remains unchanged
 "https://github.com/adereth/dactyl-keyboard"
 "https://ergodox-ez.com/pages/change-it-yourself"
 "https://shop.keyboard.io/"
@@ -40,8 +42,8 @@ Kinesis Advantage 2 keyboard
 = Comshell
 Comshell is a unified computing environment, utilizing command based user interface;
 
-a pannel at the left shows a tree view of files in the project;
-   we can move between files, and copy/rename/delete/create them;
+a pannel at the left shows the list of files in the project;
+  we can move between files, and copy/rename/delete/create them;
 projects are directories inside "~/projects/";
 list of all projects will appear in a floating layer, at the center of screen;
 
@@ -54,16 +56,13 @@ non_local projects, web pages, pdf documents, etc,
 projects in external disks (inside a root directory named "projects"),
   can be accessed from a list view, and will be opened in a floating layer;
 
-scroll by paragraph: scroll as much to reveal the whole paragraph;
-
 modal key_bindings;
 modes (like normal mode and insert mode) must be visually distinctive;
-press escape to go back to normal mode;
+press "escape" to go back to normal mode;
 in normal mode we can:
-, move the cursor to the next or previous characters or words
-, move the cursor to the next or previous
-  (or by entering the number directly to) lines (or table cells)
-, move the cursor to the next or previous paragraphs
+, move the cursor to the next or previous character or word
+, move the cursor to the next or previous lines or table cells
+, move the cursor to the next or previous paragraph
 , start and end selection, then copy or cut
 , paste
 , undo, redo

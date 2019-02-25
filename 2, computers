@@ -87,5 +87,18 @@ so if you like you can do this:
 ; pactl set-sink-mute @DEFAULT_SINK@ 0
 ; pactl set-sink-volume @DEFAULT_SINK@ 100%
 
+monitor block events and mount drives when a new block device is created;
+  stale mount points are automatically removed by "udisksd";
+; nano ~/.bash_profile
+  pathtoname() {
+    udevadm info -p /sys/"$1" | awk -v FS== '/DEVNAME/ {print $2}'
+  }
+  stdbuf -oL -- udevadm monitor --udev -s block | while read -r -- _ _ event devpath _; do
+    if [ "$event" = add ]; then
+      devname=$(pathtoname "$devpath")
+      udisksctl mount --block-device "$devname" --no-user-interaction
+    fi
+  done&
+
 ; rustup install stable
 ; rustup default stable
