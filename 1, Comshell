@@ -51,6 +51,8 @@ text files are opened in a text editor panel at the right;
 directories with ".m" extension are opened in a panel at the right,
   showing thumbnails of the files in it;
 
+we can have views of differnt locations in a project in separate tabs;
+
 non_local projects, web pages, pdf documents, etc,
   accessed from links inside the main project, and will be opened in a floating layer;
 projects in external disks (inside a root directory named "projects"),
