@@ -12,9 +12,10 @@ path = "main.rs"
 
 [dependencies]
 may_actor = ""
+gtk-fnonce-on-eventloop = ""
+gtk = { version = "0.6.0", features = ["v3_24"] }
+gdk = { version = "0.10.0", features = ["v3_24"] }
+sourceview = { version = "0.6.0", features = ["v3_24"] }
+webkit2gtk = { version = "", features = ["v2_16"] }
 chrono = ""
 chrono-tz = ""
-gtk = { version = "", features = ["v3_22_30"] }
-gdk = { version = "", features = ["v3_22_30"] }
-sourceview = { version = "", features = ["v3_24"] }
-webkit2gtk = { version = "", features = ["v2_16"] }

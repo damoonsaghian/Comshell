@@ -121,7 +121,7 @@ fn main() {
     root_box.pack_end(main_view, true, true, 0);
     let window = gtk::Window::new(gtk::WindowType::Toplevel);
     window.connect_delete_event(move |_, _| {
-      main_quit();
+      gtk::main_quit();
       Inhibit(false)
     });
     window.add(root_box);

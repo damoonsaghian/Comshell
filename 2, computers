@@ -1,3 +1,31 @@
+= asynchronous digital circuits
+in conventional digital circuits when the inputs change,
+  the outputs can have temporary incorrect values, until they stabilize to the correct values;
+but for the circuit to do its job,
+  gates with memory (registers) must operate only when the inputs have correct values;
+one solution is to synchronize registers with a global clock signal;
+  the period of clock signal is made long enough for the circuit to become stable;
+
+disadvantages of synchronous circuits:
+, we have to split long operations into several smaller ones,
+  which can be performed in successive clock cycles (a technique known as pipelining);
+  otherwise the circuit would be slow and inefficient;
+, distributing a high-fan-out, timing-sensitive clock signal can be complicated;
+, electromagnetic interference at the clock frequency and its harmonics;
+, widely distributed clock signal takes a lot of power,
+  and must run whether the circuit is receiving inputs or not;
+although "clock gating" can help to reduce some of the problems of synchronous circuits,
+ i think the real solution is to use asynchronous circuits;
+
+the only sane kind of asynchronous circuit which i could imagine is this:
+, next to any data wire there is a control wire which determines if the data is valid or not;
+, when a register wants to change its outputs, it first invalidates them,
+  for a duration equal to the delay of one gate;
+, any gate recieving an invalid input, invalidates its outputs;
+, this way all data which is going to change in the future, is first invalidated;
+, registers operate only when all inputs are valid;
+
+= computers
 cpu, memory, peripherals,
   this seems to be the only practical architecture for the hardware of computers;
 cpu runs a sequence of simple computations, called instruction codes, one by one;

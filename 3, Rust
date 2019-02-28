@@ -23,7 +23,7 @@ dynamic data: can have fixed structure, or dynamic structure;
     (or its multi_threaded counterparts: Mutex or RwLock);
   note that if runtime read_write_lock pattern fails, the program will panic;
 
-actors can help us to avoid the need for read_write_lock check (either during compile or at runtime);
+actors can help us to avoid the need for read_write_lock check (during compilation or at runtime);
 "https://crates.io/crates/may_actor"
 
 a type is "Copy" if all the data it owns is part of its stack representation;
