@@ -1,8 +1,10 @@
 implementing a complete GUI toolkit is a huge lot of work;
   and existing ones (like GTK) are single threaded, and thus can't be used inside actors;
-we have access to any actor from other actors and widgets, and to any widget from other widgets;
-but to access widgets from actors we need a little trick:
+actually there are some tricks to access widgets in other threads:
   "https://github.com/Phaiax/gtk-rs-state"
+  but this is very restrictive, and only works in static use cases;
+so for structs containing widgets, instead of making actors from them,
+  we have to use Rc and RefCell;
 
 "https://mmstick.github.io/gtkrs-tutorials/introduction.html"
 "https://github.com/gtk-rs/examples/tree/master/src/bin"
