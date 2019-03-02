@@ -1,11 +1,12 @@
 implementing a complete GUI toolkit is a huge lot of work;
   and existing ones (like GTK) are single threaded, and thus can't be used directly inside actors;
-however there is a trick to access widgets in other threads:
+however there is a trick to access non_send data like widgets, in other threads:
   "https://github.com/Phaiax/gtk-rs-state"
-so this is what we do:
+so here is what we do:
 , we can always create actors from data structures that implement "Send";
-, for data structs containing widgets, instead of making actors from them, we use Rc and RefCell,
-  and using the above trick we can access them from actors;
+, for data structs containing widgets, to make other fields mutable we use RefCell,
+  and instead of making actors from them, we use Rc,
+  and then using the above trick we can access them from actors;
 
 "https://mmstick.github.io/gtkrs-tutorials/introduction.html"
 "https://github.com/gtk-rs/examples/tree/master/src/bin"

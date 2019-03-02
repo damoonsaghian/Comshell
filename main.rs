@@ -10,53 +10,61 @@ use sourceview::prelude::*;
 use webkit2gtk as webkit;
 use webkit2gtk::{WebViewExt, WebContextExt};
 
-#[drive(Clone)]
 pub struct TextEditor {
   buffer: editor::Buffer,
-  view: editor::View,
+  view: editor::View
 }
 
 impl TextEditor {
-  pub fn prev_page() {}
-  pub fn next_page() {}
-  pub fn prev_item() {} 
-  pub fn next_item() {} 
+  pub fn prev_page(self) {}
+  pub fn next_page(self) {}
+  pub fn prev_item(self) {} 
+  pub fn next_item(self) {} 
 }
 
-#[drive(Clone)]
 pub struct Gallery {}
 
-#[drive(Clone)]
-pub enum Chapter {
-  TextEditor,
-  Gallery,
-}
-
-#[derive(Clone)]
 pub struct ProjectTree {}
 
-#[derive(Clone)]
-pub struct Project {
+pub struct ProjectView {
+  overlay: ,
   project_tree: ProjectTree,
-  open_chapters: HashMap<String, Chapter>,
+  vbox: gtk::box,
+}
+
+impl ProjectView {
+  fn new() {
+    let overlay = ;
+    let project_tree = ;
+    let vbox = gtk::Box::new();
+    box.pack();
+    ProjectView { overlay, project_tree, vbox }
+  }
+}
+
+pub struct Project {
+  text_buffers: RefCell<HasMap<String, editor::Buffer>>,
+  project_views: RefCell<HashMap<String, ProjectView>>
 } 
 
 impl Project {
-  pub fn go_to_chapter(chapter_path: &str) {}
-  pub fn prev_chapter() {}
-  pub fn next_chapter() {}
+  pub fn go_to_chapter(self, chapter_path: &str) {}
+  pub fn prev_chapter(self) {}
+  pub fn next_chapter(self) {}
 }
 
 // list of projects in "~/projects/";
-#[derive(Clone)]
-pub struct ProjectsList {}
+pub struct ProjectsList {
+  paths_list: RefCell<Vec<Path>>,
+  list_view:
+}
 
 impl ProjectList {
   pub fn new() -> ProjectList {
     ProjectList {}
   }
 
-  pub fn go_to_project(&mut self, project_path: &str) {}
+  pub fn go_to_project(self, project_path: &str) {}
 }
 
 mod r {
