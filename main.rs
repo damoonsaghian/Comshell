@@ -59,6 +59,18 @@ impl ProjectList {
   pub fn go_to_project(&mut self, project_path: &str) {}
 }
 
+mod r {
+  pub struct Refs {
+    main_view: gtk::Stack,
+    open_projects: HashMap<String, Project>
+  }
+
+  // This macro emits the following public elements:
+  //   pub fn init_storage(&Refs);
+  //   pub fn do_in_gtk_eventloop( FnOnce(Rc<Refs>) );
+  ::gtk_fnonce_on_eventloop::with_gtk!(Refs);
+}
+
 fn main() {
   if gtk::init().is_err() {
     println!("failed to initialize GTK;");
