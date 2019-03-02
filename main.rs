@@ -24,12 +24,17 @@ impl TextEditor {
 
 pub struct Gallery {}
 
+pub enum Chapter {
+  TextEditor,
+  Gallery
+}
+
 pub struct ProjectTree {}
 
 pub struct ProjectView {
   overlay: ,
   project_tree: ProjectTree,
-  vbox: gtk::box,
+  chapter: RefCell<Chapter>
 }
 
 impl ProjectView {
@@ -37,8 +42,8 @@ impl ProjectView {
     let overlay = ;
     let project_tree = ;
     let vbox = gtk::Box::new();
-    box.pack();
-    ProjectView { overlay, project_tree, vbox }
+    vbox.pack();
+    ProjectView { overlay, project_tree,  }
   }
 }
 
@@ -73,10 +78,10 @@ mod r {
     open_projects: HashMap<String, Project>
   }
 
-  // This macro emits the following public elements:
+  ::gtk_fnonce_on_eventloop::with_gtk!(Refs);
+  // this macro emits the following public elements:
   //   pub fn init_storage(&Refs);
   //   pub fn do_in_gtk_eventloop( FnOnce(Rc<Refs>) );
-  ::gtk_fnonce_on_eventloop::with_gtk!(Refs);
 }
 
 fn main() {
@@ -86,7 +91,7 @@ fn main() {
   }
 
   let normal_mode = true;
-  let open_projects: HashMap<String, Project> = HashMap::new();
+  let open_projects: Rc<Refcell<HashMap<String, Project>>> = HashMap::new();
   let projects_list = ProjectsList::new();
   let main_view = gtk::Stack::new();
 
@@ -104,11 +109,10 @@ fn main() {
   statusbar_info.set_margin_start(2);
   statusbar_info.set_margin_end(2);
 
-  // find a way to update the date shown in statusbar_info, every (full) minute;
+  // update the date shown in statusbar_info, every (full) minute;
   // https://docs.rs/timer/0.2.0/timer/struct.Timer.html#method.schedule
-  // eg create a gobject "WallClock" which every (full) minute emits a "notify::clock" signal;
   /*
-  WallClock::new().connect("notify::clock", {
+  {
     let statusbar_info = statusbar_info.clone();
     move || {
       use chrono::prelude::*;
@@ -122,7 +126,7 @@ fn main() {
       // let date = Local::now().format("%F %a %I:%M%P").to_string();
       statusbar_info.set_text(&date);
     }
-  });
+  }
   */
 
   // this is only for testing;
