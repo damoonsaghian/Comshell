@@ -1,14 +1,11 @@
 use std::collections::HashMap;
 use may_actor::Actor;
 
-use gtk;
-use gtk::prelude::*;
+use std::{rc::Rc, cell::RefCell};
+use gtk::{self, prelude::*};
 use gdk::enums::key;
-
-use sourceview as editor;
-use sourceview::prelude::*;
-use webkit2gtk as webkit;
-use webkit2gtk::{WebViewExt, WebContextExt};
+use sourceview::{self as editor, prelude::*};
+use webkit2gtk::{self as webkit, WebViewExt, WebContextExt};
 
 pub struct TextEditor {
   buffer: editor::Buffer,
@@ -91,7 +88,8 @@ fn main() {
   }
 
   let normal_mode = true;
-  let open_projects: Rc<Refcell<HashMap<String, Project>>> = HashMap::new();
+  let open_projects: Rc<Refcell<HashMap<String, Project>>> =
+    Rc::new(RefCell::new(HashMap::new()));
   let projects_list = ProjectsList::new();
   let main_view = gtk::Stack::new();
 
@@ -110,24 +108,18 @@ fn main() {
   statusbar_info.set_margin_end(2);
 
   // update the date shown in statusbar_info, every (full) minute;
-  // https://docs.rs/timer/0.2.0/timer/struct.Timer.html#method.schedule
-  /*
-  {
-    let statusbar_info = statusbar_info.clone();
+  ::timer::Timer.new().schedule(::chrono::Local::now(), Some(::std::time::Duration.new(60, 0)),
     move || {
       use chrono::prelude::*;
-      // use chrono_tz as tz;
-      // let now = Utc::now().with_timezone(&tz::...)
-      let now = Local::now();
+      let now = Utc::now().with_timezone(&::chrono_tz::...)
       let (is_pm, hour) = now.hour12();
       let date = format!("{year}-{month:02}-{day:02} {weekday:?} {hour:02}:{minute:02}{am_pm}",
                          year = now.year(), month = now.month(), day = now.day(), weekday = now.weekday(),
                          hour = hour, minute = now.minute(), am_pm = if is_pm {"pm"} else {"am"});
-      // let date = Local::now().format("%F %a %I:%M%P").to_string();
-      statusbar_info.set_text(&date);
+      // let date = now.format("%F %a %I:%M%P").to_string();
+      r::do_in-gtk_eventloop(|refs| refs.statusbar_info.set_text(&date));
     }
-  }
-  */
+  );
 
   // this is only for testing;
   let view = webkit::WebView::new();
@@ -152,6 +144,14 @@ fn main() {
     window.show_all();
     window.maximize();
   }
-  
+
+  // and in other threads:
+  // r::do_in_gtk_eventloop(|refs| {refs.open_projects.borrow_mut().insert(_, _)});
+
+  r::init_storage(r::Refs {
+    main_view,
+    open_projects
+  });
+
   gtk::main();
 }
