@@ -1,0 +1,6 @@
+'atom-text-editor':
+  'ctrl-down': 'editor:move-to-beginning-of-next-paragraph'
+  'ctrl-up': 'editor:move-to-beginning-of-previous-paragraph'
+  'space': 'custom:space'
+'atom-text-editor[min]':
+  'space': 'custom:space'
