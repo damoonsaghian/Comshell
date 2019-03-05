@@ -1,11 +1,28 @@
 // one pane per project
+// in center workspace, only the active pane is displayed, others will be hidden,
+//   by setting their CSS display property, to none:
 // panes are stored/restored to/form a file in the ".cache" directory of each project;
-// in center workspace, only the active pane is displayed, others will be hidden
-//   (by setting their CSS display property, to none);
 
-// projects list view:
+// projects list:
 // https://github.com/chocoelho/project-switcher2/blob/master/lib/utils.coffee
-// https://github.com/chuckhendo/project-quick-open/blob/master/lib/project-quick-open-view.coffee
+const fs = require("fs");
+const SelectList = require("atom-select-list");
+const projectsList = new SelectList({ items: [] });
+// if "~/projects/" directory does not exist, create it;
+fs.readdir("~/projects/", (err, paths) => {
+  if (err) { alert(err.message); }
+  else {
+    let projectPaths = paths.filter(paths =>
+                                    path[0] != '.' &&
+                                    fs.existsSync("~/projects/" + file) &&
+                                    fs.statSync("~/projects/" + file).isDirectory());
+    // set items, and populate list
+  }
+});
+// projectsList.element
+// on confirmed:
+// , change root dir in the tree_view,
+// , if there is a pane named "project_name" switch to it, otherwise create it, and focus tree_view
 
 // store/restore workspace to/from a config field:
 // https://github.com/denieler/save-workspace-atom-plugin/blob/master/lib/models/workspace.js
@@ -22,9 +39,6 @@
 // https://github.com/atom/settings-view/blob/master/lib/package-manager.coffee
 // https://atom.io/packages/simple-git
 // https://atom.io/packages/git-plus
-
-// https://stackoverflow.com/questions/35620764/how-to-disable-alert-dialogs-when-errors-occur-in-atom-electron
-// https://discuss.atom.io/t/how-to-disable-alert-dialogs-when-errors-occur/20037/2
 
 // https://medium.com/hacking-atom/tweak-your-atom-s-init-script-without-reloading-atom-with-a-declarative-module-8b1c0f208663
 
