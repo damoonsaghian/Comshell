@@ -20,15 +20,23 @@ const projectsList = {
   selectList: new SelectList({
     items: [],
 
+    elementForItem: (item) => {
+      const li = document.createElement('li');
+      const span = document.createElement('span');
+      span.textContent = item;
+      li.appendChild(span);
+      return li;
+    },
+
     didConfirmSelection: (item) => {
       // item is actually a project's name;
       this.selectList.reset();
       // change root dir in the tree_view;
-      
-      if (!(item in projectPans)) {
-        let newPane = atom.workspace.getCenter().getActivePane().splitRight();
-        projectPanes[item] = newPane;
-        // focus tree_view
+
+      if (!(item in projectPanes)) {
+        projectPanes[item] = atom.workspace.getCenter().getActivePane().splitRight();
+        // focus tree_view;
+        atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree_view:toggle-focus')
       }
       // hide all panes, show only the the selected project pane, and activate it;
     },
@@ -36,14 +44,6 @@ const projectsList = {
     didCancelSelection: () => {
       this.selectList.reset();
       this.modalPanel.hide();
-    },
-    
-    elementForItem: (item) => {
-      const li = document.createElement('li');
-      const span = document.createElement('span');
-      span.textContent = item;
-      li.appendChild(span);
-      return li;
     }
   }),
 
@@ -70,6 +70,10 @@ const projectsList = {
 
   createNewProject() {}
 };
+
+atom.commands.add('atom-workspace', {
+  'comshell:projects-list': () => projectsList.show()
+});
 
 // to define keybindings for projectsList, add a class:
 projectsList.selectList.element.classList.add('projects-list');
@@ -102,7 +106,7 @@ function getFileName(filename) {
 // https://medium.com/hacking-atom/tweak-your-atom-s-init-script-without-reloading-atom-with-a-declarative-module-8b1c0f208663
 
 // 2 spaces -> enter
-atom.commands.add('atom-text-editor', 'custom:space', () => {
+atom.commands.add('atom-text-editor', 'comshell:space', () => {
   const editor = atom.workspace.getActiveTextEditor();
   const cursor = editor.getLastCursor();
 
@@ -126,8 +130,9 @@ atom.packages.activatePackage("tree-view").then((pkg) => {
       return;
     }
   }},
+
   (reason) => {
-    atom.notifications.addWarning("failure", {
+    atom.notifications.addWarning('failure', {
       description: reason.message
     });
   }
