@@ -4,6 +4,6 @@
 'atom-text-editor':
   'ctrl-down': 'editor:move-to-beginning-of-next-paragraph'
   'ctrl-up': 'editor:move-to-beginning-of-previous-paragraph'
-  'space': 'comshell:space'
-'atom-text-editor[min]':
-  'space': 'comshell:space'
+#  'space': 'comshell:space'
+#'atom-text-editor[min]':
+#  'space': 'comshell:space'

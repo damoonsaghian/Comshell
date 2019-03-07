@@ -10,66 +10,98 @@
 // nonetheless here is an alternative method:
 //   
 
-const fs = require("fs");
-const SelectList = require("atom-select-list");
+const fs = require('fs');
+const path = require('path');
+const SelectList = require('/usr/lib/atom/node_modules/atom-select-list');
 
-// { "project name": projectPane }
-var projectPanes = {};
+const projectsDir = path.join(require('os').homedir(), 'projects');
+// if "~/projects/" directory does not exist, create it;
+fs.stat(projectsDir, (err, stats) => {
+  if (err) {
+    fs.mkdir(projectsDir, (err) => {
+      if (err) { alert(err.message); }
+    });
+  }
+  else if (!stats.isDirectory()) {
+    alert('"projects" directory can\'t be created, because there is a file with the same name');
+  }
+});
 
-const projectsList = {
-  selectList: new SelectList({
-    items: [],
+atom.enablePersistence = false;
 
-    elementForItem: (item) => {
-      const li = document.createElement('li');
-      const span = document.createElement('span');
-      span.textContent = item;
-      li.appendChild(span);
-      return li;
-    },
+// { 'project name': projectPane }
+const projectPanes = {};
 
-    didConfirmSelection: (item) => {
-      // item is actually a project's name;
-      this.selectList.reset();
-      // change root dir in the tree_view;
+class ProjectsList {
+  constructor() {
+    this.modalPanel = null;
+    this.selectList = new SelectList({
+      items: [],
+      elementForItem: (item) => {
+        const li = document.createElement('li');
+        const span = document.createElement('span');
+        span.textContent = item;
+        li.appendChild(span);
+        return li;
+      },
 
-      if (!(item in projectPanes)) {
-        projectPanes[item] = atom.workspace.getCenter().getActivePane().splitRight();
-        // focus tree_view;
-        atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree_view:toggle-focus')
+      didConfirmSelection: (item) => {
+        // item is actually a project's name;
+        this.selectList.reset();
+        atom.project.setPaths([path.join(projectsDir, item)]);
+
+        if (!(item in projectPanes)) {
+          let newPane = atom.workspace.getCenter().getActivePane().splitRight();
+          projectPanes[item] = newPane;
+          // focus tree-view;
+          atom.commands.dispatch(atom.views.getView(atom.workspace.element), 'tree-view:toggle-focus');
+        }
+
+        // hide all panes, show only the selected project pane, and activate it;
+        atom.workspace.getCenter().getPanes().forEach((pane) => {
+          const view = atom.views.getView(pane);
+          view.style.display = 'none';
+        });
+        const projectPane = projectPanes[item];
+        const view = atom.views.getView(projectPane);
+        view.style.display = '';
+        projectPane.activate();
+
+        this.selectList.update(
+          { initialSelectionIndex: this.selectList.items.indexOf(item)}
+        );
+      },
+
+      didCancelSelection: () => {
+        this.selectList.reset();
+        this.modalPanel.hide();
       }
-      // hide all panes, show only the the selected project pane, and activate it;
-    },
-
-    didCancelSelection: () => {
-      this.selectList.reset();
-      this.modalPanel.hide();
-    }
-  }),
-
-  modalPanel: null,
+    });
+  }
 
   show() {
-    // if "~/projects/" directory does not exist, create it;
-    fs.readdir("~/projects/", (err, fileNames) => {
+    fs.readdir(projectsDir, (err, fileNames) => {
       if (err) { alert(err.message); }
       else {
         let projectNames = fileNames.filter((fileName) =>
                                             fileName[0] != '.' &&
-                                            fs.statSync("~/projects/" + fileName).isDirectory());
+                                            fs.statSync(path.join(projectsDir, fileName)).isDirectory());
         this.selectList.update({ items: projectNames });
       }
     });
-        
-    if (!this.panel) {
-      this.modalPanel = atom.workspace.addModalPanel({ item: this.selectList , autoFocus: true });
+
+    if (!this.modalPanel) {
+      this.modalPanel = atom.workspace.addModalPanel({ item: this.selectList});
     }
-    this.panel.show();
-    //this.selectList.focus();
-  },
+    this.modalPanel.show();
+    this.selectList.focus(); 
+  }
 
   createNewProject() {}
-};
+}
+
+const projectsList = new ProjectsList();
+projectsList.show();
 
 atom.commands.add('atom-workspace', {
   'comshell:projects-list': () => projectsList.show()
@@ -88,14 +120,6 @@ projectsList.selectList.element.classList.add('projects-list');
 // https://atom.io/packages/tree-view-git-status
 // https://atom.io/packages/file-icons
 
-function getFileExtension(filename) {
-  return filename.slice((filename.lastIndexOf('.') - 1 >>> 0) + 2);
-}
-
-function getFileName(filename) {
-  return filename.slice(0, (filename.lastIndexOf('.') - 1 >>> 0) + 1);
-}
-
 // https://github.com/alexfu/atom-replace-pane
 // https://atom.io/packages/atom-clock
 // https://github.com/atom/settings-view/blob/master/lib/package-manager.coffee
@@ -107,16 +131,16 @@ function getFileName(filename) {
 
 // 2 spaces -> enter
 atom.commands.add('atom-text-editor', 'comshell:space', () => {
-  const editor = atom.workspace.getActiveTextEditor();
+  const editor = atom.workspace.getActiveTextEditor(); // WRONG
   const cursor = editor.getLastCursor();
 
   if (cursor.hasPrecedingCharactersOnLine()) {
-    editor.setText(" ");
+    editor.setText(' ');
   } else if (cursor.isAtBeginningOfLine()) {
-    editor.setText("\n");
+    editor.setText('\n');
   } else {
     editor.backspace();
-    editor.setText("\n");
+    editor.setText('\n');
   }
 })
 
