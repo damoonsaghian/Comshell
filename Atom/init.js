@@ -53,8 +53,7 @@ class ProjectsList {
         if (!(item in projectPanes)) {
           let newPane = atom.workspace.getCenter().getActivePane().splitRight();
           projectPanes[item] = newPane;
-          // focus tree-view;
-          atom.commands.dispatch(atom.views.getView(atom.workspace.element), 'tree-view:toggle-focus');
+          // open the first file, if there is none, prompt to create one;
         }
 
         // hide all panes, show only the selected project pane, and activate it;
@@ -68,7 +67,7 @@ class ProjectsList {
         projectPane.activate();
 
         this.selectList.update(
-          { initialSelectionIndex: this.selectList.items.indexOf(item)}
+          { initialSelectionIndex: this.selectList.items.indexOf(item) }
         );
       },
 
