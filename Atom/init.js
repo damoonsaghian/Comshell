@@ -21,8 +21,8 @@ fs.stat(projectsDir, (err, stats) => {
   }
 });
 
-// { 'project name': { changed: bool, pane: Pane } }
-const projects = {};
+// { 'project name': { isChanged: bool, pane: Pane } }
+const openProjects = {};
 
 class ProjectsList {
   constructor() {
@@ -43,9 +43,13 @@ class ProjectsList {
         this.modalPanel.hide();
         atom.project.setPaths([path.join(projectsDir, item)]);
 
-        if (!(item in projects)) {
+        if (!openProjects[item] || openProjects[item].pane.isDestroyed()) {
           let newPane = atom.workspace.getCenter().getActivePane().splitRight();
-          projects[item] = { changed: false, pane: newPane };
+          newPane.onWillDestroy(() => {
+            atom.project.setPaths([]);
+            this.show();
+          });
+          openProjects[item] = { isChanged: false, pane: newPane };
           // restore pane items;          
         }
 
@@ -54,7 +58,7 @@ class ProjectsList {
           const view = atom.views.getView(pane);
           view.style.display = 'none';
         });
-        const projectPane = projects[item].pane;
+        const projectPane = openProjects[item].pane;
         const view = atom.views.getView(projectPane);
         view.style.display = '';
         projectPane.activate();
@@ -80,7 +84,6 @@ class ProjectsList {
       if (err) { alert(err.message); }
       else {
         let projectNames = fileNames.filter((fileName) =>
-                                            fileName[0] != '.' &&
                                             fs.statSync(path.join(projectsDir, fileName)).isDirectory());
         this.selectList.update({ items: projectNames });
       }
@@ -108,7 +111,9 @@ projectsList.selectList.element.classList.add('projects-list');
 
 // store project panes;
 function storeProjectPanes() {
-  for (const project in projects) {}
+  for (const project in openProjects) {
+    if (openProjects[project].isChanged) {}
+  }
 }
 
 // https://atom.io/packages/tree-view-auto-collapse
