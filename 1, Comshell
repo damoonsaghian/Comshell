@@ -42,16 +42,15 @@ Kinesis Advantage 2 keyboard
 = Comshell
 Comshell is a unified computing environment, utilizing command based user interface;
 
-a pannel at the left shows the list of files in the project;
-  we can move between files, and copy/rename/delete/create them;
-projects are directories inside "~/projects/";
 list of all projects will appear in a floating layer, at the center of screen;
+  projects are directories inside "~/projects/";
+list of files in the project will be displayed in a tree_view at the left;
+  we can move between files, and copy/rename/delete/create them;
+we can have views of differnt locations in a project (even in the same file) in separate tabs;
 
-text files are opened in a text editor panel at the right;
-directories with ".m" extension are opened in a panel at the right,
-  showing thumbnails of the files in it;
-
-we can have views of differnt locations in a project in separate tabs;
+images, videos, etc, will be put in ".data" directory:
+  .data/file_name/media_number.png
+and will be displayed inside the text by putting their location inside double quotes;  
 
 non_local projects, web pages, pdf documents, etc,
   accessed from links inside the main project, and will be opened in a floating layer;

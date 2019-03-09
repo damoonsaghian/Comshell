@@ -7,23 +7,16 @@ use gdk::enums::key;
 use sourceview::{self as editor, prelude::*};
 use webkit2gtk::{self as webkit, WebViewExt, WebContextExt};
 
-pub struct TextEditor {
+pub struct Editor {
   buffer: editor::Buffer,
   view: editor::View
 }
 
-impl TextEditor {
+impl Editor {
   pub fn prev_page(self) {}
   pub fn next_page(self) {}
   pub fn prev_item(self) {} 
   pub fn next_item(self) {} 
-}
-
-pub struct Gallery {}
-
-pub enum Chapter {
-  TextEditor,
-  Gallery
 }
 
 pub struct ProjectTree {}
@@ -31,7 +24,7 @@ pub struct ProjectTree {}
 pub struct ProjectView {
   overlay: ,
   project_tree: ProjectTree,
-  chapter: RefCell<Chapter>
+  editor: RefCell<Editor>
 }
 
 impl ProjectView {
@@ -45,8 +38,8 @@ impl ProjectView {
 }
 
 pub struct Project {
-  text_buffers: RefCell<HasMap<String, editor::Buffer>>,
-  project_views: RefCell<HashMap<String, ProjectView>>
+  project_views: RefCell<HashMap<String, ProjectView>>,
+  notebook: gtk::NoteBook
 } 
 
 impl Project {

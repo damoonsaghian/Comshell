@@ -76,3 +76,7 @@ in "~/.config/gtk-3.0/gtk.css":
 "https://github.com/xi/gtk-theme-clearcodes/tree/master/gtk-3.0"
 draw arrow at cursor position in TextView in GTK3:
   "https://gist.github.com/musiKk/2266946"XS
+
+"https://crates.io/crates/serde"
+"https://github.com/ron-rs/ron"
+"https://crates.io/crates/rustbreak"
