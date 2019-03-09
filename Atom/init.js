@@ -1,14 +1,8 @@
-// one pane per project
-// in center workspace, only the active pane is displayed, others will be hidden;
-// panes are stored/restored to/form a file in the ".cache" directory of each project;
+atom.enablePersistence = false;
 
-// hiding panes is done by setting their CSS display property of inactive panes, to none;
-// this method can be problematic;
-// eg when using the project mechanism of Atom the initial pane will not have "active" property,
-//   until another pane is added;
-// since we do not use project mechanism, we can ignore this;
-// nonetheless here is an alternative method:
-//   
+// one pane per project
+// only the active project's pane is displayed, others will be hidden;
+// panes are stored/restored to/from a file in the ".cache" directory of each project;
 
 const fs = require('fs');
 const path = require('path');
@@ -27,10 +21,8 @@ fs.stat(projectsDir, (err, stats) => {
   }
 });
 
-atom.enablePersistence = false;
-
-// { 'project name': projectPane }
-const projectPanes = {};
+// { 'project name': { changed: bool, pane: Pane } }
+const projects = {};
 
 class ProjectsList {
   constructor() {
@@ -46,15 +38,15 @@ class ProjectsList {
       },
 
       didConfirmSelection: (item) => {
-        // item is actually a project's name;
+        // here "item" is actually a project's name;
         this.selectList.reset();
+        this.modalPanel.hide();
         atom.project.setPaths([path.join(projectsDir, item)]);
 
-        if (!(item in projectPanes)) {
+        if (!(item in projects)) {
           let newPane = atom.workspace.getCenter().getActivePane().splitRight();
-          projectPanes[item] = newPane;
-          // focus tree-view
-          atom.commands.dispatch(atom.views.getView(atom.workspace.element), 'tree-view:toggle-focus');
+          projects[item] = { changed: false, pane: newPane };
+          // restore pane items;          
         }
 
         // hide all panes, show only the selected project pane, and activate it;
@@ -62,10 +54,14 @@ class ProjectsList {
           const view = atom.views.getView(pane);
           view.style.display = 'none';
         });
-        const projectPane = projectPanes[item];
+        const projectPane = projects[item].pane;
         const view = atom.views.getView(projectPane);
         view.style.display = '';
-        if (projectPane.getItems().length != 0) { projectPane.activate(); }
+        projectPane.activate();
+        // if there is no item in the pane, focus tree-view;
+        if (projectPane.getItems().length == 0) {
+          atom.commands.dispatch(atom.views.getView(atom.workspace.element), 'tree-view:toggle-focus');
+        }
 
         this.selectList.update(
           { initialSelectionIndex: this.selectList.items.indexOf(item) }
@@ -110,8 +106,10 @@ atom.commands.add('atom-workspace', {
 // to define keybindings for projectsList, add a class:
 projectsList.selectList.element.classList.add('projects-list');
 
-// store/restore workspace to/from a config field:
-// https://github.com/denieler/save-workspace-atom-plugin/blob/master/lib/models/workspace.js
+// store project panes;
+function storeProjectPanes() {
+  for (const project in projects) {}
+}
 
 // https://atom.io/packages/tree-view-auto-collapse
 // https://atom.io/packages/tree-view-scope-lines
