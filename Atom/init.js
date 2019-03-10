@@ -51,7 +51,7 @@ class ProjectsList {
             this.show();
           });
           projectPanes[item] = newPane;
-          restoreProjectPane(item);
+          restoreOpenEditors(item);
         }
 
         // hide all panes, show only the selected project pane, and activate it;
@@ -110,55 +110,57 @@ atom.commands.add('atom-workspace', {
 // to define keybindings for projectsList, add a class:
 projectsList.selectList.element.classList.add('projects-list');
 
-function storeBuffer(buffer, projectName, relativePath) {
-  const data = JSON.stringify(buffer.serialize());
+function storeCachedText(buffer, projectName, relativePath) {
+  const data = buffer.cachedText;
   const cachePath = path.join(projectsDir, projectName, '.cache/buffers', relativePath);
-  fs.createWriteStream(cachePath).write(data);
+  // create the directories if they don't exist;
+  //fs.writeFile(cachePath, data, (err) => { if (err) { throw err; } });
 }
 
-function restoreBuffer(buffer, projectName, relativePath) {
+function restoreCachedText(buffer, projectName, relativePath) {
   const cachePath = path.join(projectsDir, projectName, '.cache/buffers', relativePath);
   fs.readFile(cachePath, (err, data) => {
     if (err) { return; }
-    const serializedBuffer = JSON.parse(data);
-    buffer.deserialize(serializedBuffer);
+    // restore cached text;
   });
 }
 
-function storeProjectPane(projectName) {
+function storeOpenEditors(projectName) {
   const pane = projectPanes[projectName];
   if (pane.isDestroyed()) { return; }
-  const data = JSON.stringify(pane.serialize());
+  const data = JSON.stringify([/*list of paths and cursor position of open editors*/]);
   const cachePath = path.join(projectsDir, projectName, '.cache/open_editors');
-  fs.createWriteStream(cachePath).write(data);
+  // create ".cache" directory if it doesn't exist;
+  //fs.writeFile(cachePath, data, (err) => { if (err) { throw err; } });
 }
 
-function restoreProjectPane(projectName) {
+function restoreOpenEditors(projectName) {
   const pane = projectPanes[projectName];
   if (pane.isDestroyed()) { return; }
   const cachePath = path.join(projectsDir, projectName, '.cache/open_editors');
   fs.readFile(cachePath, (err, data) => {
     if (err) { return; }
-    const serializedPane = JSON.parse(data);
-    pane.deserialize(serializedBuffer);
+    let serializedOpenEditors;
+    try { serializedOpenEditors = JSON.parse(data); } catch (e) {}
+    // open the editors with the given paths, inside this pane, and restore their cursor position;
   });
 }
-/*
+
 atom.workspace.getCenter().observeTextEditors((editor) => {
-  const pathSegments = editor.getPath().relative(projectsDir, editorPath).split(path.sep);
+  const pathSegments = path.relative(projectsDir, editor.getPath()).split(path.sep);
   const projectName = pathSegments[0];
   const relativePath = path.join(...pathSegments.slice(1));
   const buffer = editor.getBuffer();
-  restoreBuffer(buffer, projectName, relativePath);
+  restoreCachedText(buffer, projectName, relativePath);
 
   editor.onDidChangeCursorPosition((event) => {
     _.debounce(() => {
-      if (event.textChanged) { storeBuffer(buffer, projectName, relativePath); }
-      storeProjectPane(projectName);
-    }, 30000)();
+      if (event.textChanged) { storeCachedText(buffer, projectName, relativePath); }
+      storeOpenEditors(projectName);
+    }, 3000)();
   });
 });
-*/
+
 // https://atom.io/packages/tree-view-auto-collapse
 // https://atom.io/packages/tree-view-scope-lines
 // https://atom.io/packages/tree-lines
