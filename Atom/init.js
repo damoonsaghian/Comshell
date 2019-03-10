@@ -6,6 +6,7 @@ atom.enablePersistence = false;
 
 const fs = require('fs');
 const path = require('path');
+const _ = require('/usr/lib/atom/node_modules/underscore');
 const SelectList = require('/usr/lib/atom/node_modules/atom-select-list');
 
 const projectsDir = path.join(require('os').homedir(), 'projects');
@@ -22,7 +23,7 @@ fs.stat(projectsDir, (err, stats) => {
 });
 
 // { 'project name': { isChanged: bool, pane: Pane } }
-const openProjects = {};
+const projectPanes = {};
 
 class ProjectsList {
   constructor() {
@@ -43,14 +44,14 @@ class ProjectsList {
         this.modalPanel.hide();
         atom.project.setPaths([path.join(projectsDir, item)]);
 
-        if (!openProjects[item] || openProjects[item].pane.isDestroyed()) {
+        if (!projectPanes[item] || projectPanes[item].isDestroyed()) {
           let newPane = atom.workspace.getCenter().getActivePane().splitRight();
           newPane.onWillDestroy(() => {
             atom.project.setPaths([]);
             this.show();
           });
-          openProjects[item] = { isChanged: false, pane: newPane };
-          // restore pane items;          
+          projectPanes[item] = newPane;
+          restoreProjectPane(item);
         }
 
         // hide all panes, show only the selected project pane, and activate it;
@@ -58,12 +59,12 @@ class ProjectsList {
           const view = atom.views.getView(pane);
           view.style.display = 'none';
         });
-        const projectPane = openProjects[item].pane;
-        const view = atom.views.getView(projectPane);
+        const selectedProjectPane = projectPanes[item];
+        const view = atom.views.getView(selectedProjectPane);
         view.style.display = '';
-        projectPane.activate();
+        selectedProjectPane.activate();
         // if there is no item in the pane, focus tree-view;
-        if (projectPane.getItems().length == 0) {
+        if (selectedProjectPane.getItems().length == 0) {
           atom.commands.dispatch(atom.views.getView(atom.workspace.element), 'tree-view:toggle-focus');
         }
 
@@ -109,13 +110,55 @@ atom.commands.add('atom-workspace', {
 // to define keybindings for projectsList, add a class:
 projectsList.selectList.element.classList.add('projects-list');
 
-// store project panes;
-function storeProjectPanes() {
-  for (const project in openProjects) {
-    if (openProjects[project].isChanged) {}
-  }
+function storeBuffer(buffer, projectName, relativePath) {
+  const data = JSON.stringify(buffer.serialize());
+  const cachePath = path.join(projectsDir, projectName, '.cache/buffers', relativePath);
+  fs.createWriteStream(cachePath).write(data);
 }
 
+function restoreBuffer(buffer, projectName, relativePath) {
+  const cachePath = path.join(projectsDir, projectName, '.cache/buffers', relativePath);
+  fs.readFile(cachePath, (err, data) => {
+    if (err) { return; }
+    const serializedBuffer = JSON.parse(data);
+    buffer.deserialize(serializedBuffer);
+  });
+}
+
+function storeProjectPane(projectName) {
+  const pane = projectPanes[projectName];
+  if (pane.isDestroyed()) { return; }
+  const data = JSON.stringify(pane.serialize());
+  const cachePath = path.join(projectsDir, projectName, '.cache/open_editors');
+  fs.createWriteStream(cachePath).write(data);
+}
+
+function restoreProjectPane(projectName) {
+  const pane = projectPanes[projectName];
+  if (pane.isDestroyed()) { return; }
+  const cachePath = path.join(projectsDir, projectName, '.cache/open_editors');
+  fs.readFile(cachePath, (err, data) => {
+    if (err) { return; }
+    const serializedPane = JSON.parse(data);
+    pane.deserialize(serializedBuffer);
+  });
+}
+/*
+atom.workspace.getCenter().observeTextEditors((editor) => {
+  const pathSegments = editor.getPath().relative(projectsDir, editorPath).split(path.sep);
+  const projectName = pathSegments[0];
+  const relativePath = path.join(...pathSegments.slice(1));
+  const buffer = editor.getBuffer();
+  restoreBuffer(buffer, projectName, relativePath);
+
+  editor.onDidChangeCursorPosition((event) => {
+    _.debounce(() => {
+      if (event.textChanged) { storeBuffer(buffer, projectName, relativePath); }
+      storeProjectPane(projectName);
+    }, 30000)();
+  });
+});
+*/
 // https://atom.io/packages/tree-view-auto-collapse
 // https://atom.io/packages/tree-view-scope-lines
 // https://atom.io/packages/tree-lines
