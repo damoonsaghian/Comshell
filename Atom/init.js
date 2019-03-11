@@ -13,9 +13,7 @@ const projectsDir = path.join(require('os').homedir(), 'projects');
 // if "~/projects/" directory does not exist, create it;
 fs.stat(projectsDir, (err, stats) => {
   if (err) {
-    fs.mkdir(projectsDir, (err) => {
-      if (err) { alert(err.message); }
-    });
+    fs.mkdir(projectsDir, (err) => { if (err) alert(err.message); });
   }
   else if (!stats.isDirectory()) {
     alert('"projects" directory can\'t be created, because there is a file with the same name');
@@ -51,7 +49,10 @@ class ProjectsList {
             this.show();
           });
           projectPanes[item] = newPane;
-          restoreOpenEditors(item);
+
+          const pane = projectPanes[item];
+          const paneStorePath = path.join(projectsDir, item, '.cache/pane');
+          restorePane(pane, paneStorePath);
         }
 
         // hide all panes, show only the selected project pane, and activate it;
@@ -110,39 +111,47 @@ atom.commands.add('atom-workspace', {
 // to define keybindings for projectsList, add a class:
 projectsList.selectList.element.classList.add('projects-list');
 
-function storeCachedText(buffer, projectName, relativePath) {
-  const data = buffer.cachedText;
-  const cachePath = path.join(projectsDir, projectName, '.cache/buffers', relativePath);
-  // create the directories if they don't exist;
-  //fs.writeFile(cachePath, data, (err) => { if (err) { throw err; } });
-}
-
-function restoreCachedText(buffer, projectName, relativePath) {
-  const cachePath = path.join(projectsDir, projectName, '.cache/buffers', relativePath);
-  fs.readFile(cachePath, (err, data) => {
-    if (err) { return; }
-    // restore cached text;
+function storeBuffer(buffer, bufStorePath) {
+  if (buffer.isDestroyed()) return;
+  const data = JSON.stringify({/*non_saved portion of buffer*/});
+  fs.writeFile(bufStorePath, data, (err) => {
+    if (err) fs.mkdir(path.dirname(bufStorePath), { recursive: true }, (err) => {
+      if (err) fs.writeFile(bufStorePath, data, () => { if (err) throw err; })
+    })
   });
 }
 
-function storeOpenEditors(projectName) {
-  const pane = projectPanes[projectName];
-  if (pane.isDestroyed()) { return; }
-  const data = JSON.stringify([/*list of paths and cursor position of open editors*/]);
-  const cachePath = path.join(projectsDir, projectName, '.cache/open_editors');
-  // create ".cache" directory if it doesn't exist;
-  //fs.writeFile(cachePath, data, (err) => { if (err) { throw err; } });
+function restoreBuffer(buffer, bufStorePath) {
+  if (buffer.isDestroyed()) return;
+  fs.readFile(bufStorePath, (err, data) => {
+    if (err) return;
+    try {
+      const serializedData = JSON.parse(data);
+      // restore non_saved data
+    }
+    catch (err) { throw err }
+  });
 }
 
-function restoreOpenEditors(projectName) {
-  const pane = projectPanes[projectName];
-  if (pane.isDestroyed()) { return; }
-  const cachePath = path.join(projectsDir, projectName, '.cache/open_editors');
-  fs.readFile(cachePath, (err, data) => {
-    if (err) { return; }
-    let serializedOpenEditors;
-    try { serializedOpenEditors = JSON.parse(data); } catch (e) {}
-    // open the editors with the given paths, inside this pane, and restore their cursor position;
+function storePane(pane, paneStorePath) {
+  if (pane.isDestroyed()) return;
+  const data = JSON.stringify([/*list of paths and cursor position of open editors*/]);
+  fs.writeFile(paneStorePath, data, (err) => {
+    if (err) fs.mkdir(path.dirname(paneStorePath), { recursive: true }, (err) => {
+      if (err) fs.writeFile(paneStorePath, data, () => { if (err) throw err; })
+    })
+  });
+}
+
+function restorePane(pane, paneStorePath) {
+  if (pane.isDestroyed()) return;
+  fs.readFile(paneStorePath, (err, data) => {
+    if (err) return;
+    try {
+      const serializedData = JSON.parse(data);
+      // open the editors with the given paths, inside this pane, and restore their cursor position;
+    }
+    catch (err) { throw err }
   });
 }
 
@@ -150,14 +159,18 @@ atom.workspace.getCenter().observeTextEditors((editor) => {
   const pathSegments = path.relative(projectsDir, editor.getPath()).split(path.sep);
   const projectName = pathSegments[0];
   const relativePath = path.join(...pathSegments.slice(1));
+  const bufStorePath = path.join(projectsDir, projectName, '.cache/buffers', relativePath);
   const buffer = editor.getBuffer();
-  restoreCachedText(buffer, projectName, relativePath);
+  restoreBuffer(buffer, bufStorePath);
+
+  const pane = projectPanes[projectName];
+  const paneStorePath = path.join(projectsDir, projectName, '.cache/pane');
 
   editor.onDidChangeCursorPosition((event) => {
     _.debounce(() => {
-      if (event.textChanged) { storeCachedText(buffer, projectName, relativePath); }
-      storeOpenEditors(projectName);
-    }, 3000)();
+      if (event.textChanged) { storeBuffer(buffer, bufStorePath); }
+      storePane(pane, paneStorePath);
+    }, 5000)();
   });
 });
 
