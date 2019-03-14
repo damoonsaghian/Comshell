@@ -21,12 +21,37 @@ const openProjects = {};
 const changedProjects = new Set();
 const changedBuffers = new Set();
 
+atom.workspace.getCenter().observeTextEditors(editor => {
+  const projectName = path.relative(projectsDir, atom.project.getPaths()[0]);
+  openProjects[projectName].editors.push(editor);
+  editor.onWillDestroy(() => delete openProjects[projectName].editors[editor]);
+  changedProjects.add(projectName);
+
+  const buffer = editor.getBuffer();
+  restoreUnsaved(buffer);
+
+  editor.onDidStopChanging(() => changedBuffers.add(buffer));
+  editor.onDidChangeBuffer(() => changedProjects.add(projectName));
+  editor.onDidChangeCursorPosition(event => changedProjects.add(projectName));
+});
+
+// when an item appears, push it to the items of current open project;
+atom.workspace.getCenter().observePaneItems(item => {
+  const projectName = path.relative(projectsDir, atom.project.getPaths()[0]);
+  openProjects[projectName].items.push(item);
+});
+
+atom.workspace.getCenter().onWillDestroyPaneItem(event => {
+  const projectName = path.relative(projectsDir, atom.project.getPaths()[0]);
+  delete openProjects[projectName].items[event.item];
+});
+
 class ProjectsList {
   constructor() {
     this.modalPanel = null;
     this.selectList = new SelectList({
       items: [],
-      elementForItem: (item) => {
+      elementForItem: item => {
         const li = document.createElement('li');
         const span = document.createElement('span');
         span.textContent = item;
@@ -39,7 +64,7 @@ class ProjectsList {
         this.modalPanel.hide();
         // remove all items in the center workspace;
         atom.workspace.getCenter().getPanes().forEach(pane => {
-          pane.getItems().forEach(item => pane.removeItem(item));
+          pane.getItems().forEach(item => pane.removeItem(item)); //! "removeItem" is not in the API;
         });
         atom.project.setPaths([path.join(projectsDir, projectName)]);
 
@@ -48,12 +73,12 @@ class ProjectsList {
         if (openProjects[projectName]) {
           activePane.addItems(openProjects[projectsName].items);
         } else {
-          restoreEditors(projectName);
+          restoreState(projectName);
         }
 
         // if there is no open item, focus tree-view;
         if (activePane.getItems().length == 0) {
-          try { document.querySelector('.tree-view').focus(); }
+          try { document.querySelector('.tree-view').focus(); } catch (err) { throw err }
         }
 
         this.selectList.update(
@@ -111,75 +136,51 @@ function restoreUnsaved(buffer) {
     if (err) return;
     try {
       const serializedData = JSON.parse(data);
-      // restore unsaved data
+      // restore unsaved portion of buffer;
     }
     catch (err) { throw err }
   });
 }
 
-function storeEditors(projectName) {
-  const paneStorePath = path.join(projectsDir, projectName, '.cache/pane');
-  openProjects[projectName].editors.forEach();
-  const items = atom.getTextEditors().forEach(editor => {
-    const editorPath = editor.getPath();
-    const cursorPosition = editor.getCursorBufferPosition();
-    return [uri, cursorPosition];
-  })
-  const data = JSON.stringify([/*list of paths and cursor position of open editors*/]);
-  fs.writeFile(paneStorePath, data, (err) => {
-    if (err) fs.mkdir(path.dirname(paneStorePath), { recursive: true }, (err) => {
-      if (err) fs.writeFile(paneStorePath, data, () => { if (err) throw err; })
-    })
+function storeState(projectName) {
+  if (openProjects[projectName]) return;
+  const storePath = path.join(projectsDir, projectName, '.cache/state');
+  // list of paths and cursor position of open editors
+  const serializedData = openProjects[projectName].editors.map(
+    editor => [editor.getPath(), editor.getCursorBufferPosition()]
+  );
+  const data = JSON.stringify(serializedData);
+  fs.writeFile(storePath, data, (err) => {
+    if (err) fs.mkdir(path.dirname(storePath), { recursive: true }, (err) => {
+      if (err) { throw err } else {
+        fs.writeFile(storePath, data, (err) => { if (err) throw err; })
+      }
+    });
   });
 }
 
-function restoreEditors(projectName) {
-  const paneStorePath = path.join(projectsDir, projectName, '.cache/pane');
-  if (pane.isDestroyed()) return;
-  fs.readFile(paneStorePath, (err, data) => {
+function restoreState(projectName) {
+  const storePath = path.join(projectsDir, projectName, '.cache/state');
+  fs.readFile(storePath, (err, data) => {
     if (err) return;
     try {
-      const serializedData = JSON.parse(data);
-      // open the editors with the given paths, inside this pane, and restore their cursor position;
+      // open the editors with the given paths, and restore their cursor position;
+      JSON.parse(data).forEach(([editorPath, cursorPosition]) => {
+      });
     }
     catch (err) { throw err }
   });
 }
 
-atom.workspace.getCenter().observeTextEditors(editor => {
-  const projectName = path.relative(projectsDir, atom.project.getPaths()[0]);
-  openProjects[projectName].editors.push(editor);
-  editor.onWillDestroy(() => delete openProjects[projectName].editors[editor]);
-  changedProjects.add(projectName);
+setInterval(() => {
+  changedProjects.forEach(projectName => storeState(projectName));
+  changedProjects.clear();
+}, 30000);
 
-  const buffer = editor.getBuffer();
-  restoreUnsaved(buffer);
-
-  editor.onDidStopChanging(() => changedBuffers.add(buffer));
-  editor.onDidChangeBuffer(() => changedProjects.add(projectName));
-  editor.onDidChangeCursorPosition(event => changedProjects.add(projectName));
-});
-
-setInterval(() => changedProjects.forEach(projectName => {
-  storeEditors(projectName);
-  changedProjects.delete(projectName);
-}), 30000);
-
-setInterval(() => changedBuffers.forEach(buffer => {
-  storeBuffer(buffer);
-  changedBuffers.delete(buffer);
-}), 30000);
-
-// when an item appears, push it to the items of current open project;
-atom.workspace.getCenter().observePaneItems(item => {
-  const projectName = path.relative(projectsDir, atom.project.getPaths()[0]);
-  openProjects[projectName].items.push(item);
-});
-
-atom.workspace.getCenter().onWillDestroyPaneItem(event => {
-  const projectName = path.relative(projectsDir, atom.project.getPaths()[0]);
-  delete openProjects[projectName].items[event.item];
-});
+setInterval(() => {
+  changedBuffers.forEach(buffer => storeBuffer(buffer));
+  changedBuffers.clear();
+}, 30000);
 
 // https://atom.io/packages/tree-view-auto-collapse
 // https://atom.io/packages/tree-view-scope-lines
