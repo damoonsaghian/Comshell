@@ -131,6 +131,7 @@ atom.workspace.getCenter().observeTextEditors(editor => {
 class ProjectsList {
   constructor() {
     this.modalPanel = null;
+    this.previouslyFocusedElement = null;
     this.selectList = new SelectList({
       items: [],
 
@@ -178,11 +179,17 @@ class ProjectsList {
       didCancelSelection: () => {
         this.selectList.reset();
         this.modalPanel.hide();
+        if (this.previouslyFocusedElement) {
+          this.previouslyFocusedElement.focus();
+          this.previouslyFocusedElement = null;
+        }
       }
     });
   }
 
   show() {
+    this.previouslyFocusedElement = document.activeElement;
+    
     fs.readdir(projectsDir, (err, fileNames) => {
       if (err) { alert(err.message); }
       else {
