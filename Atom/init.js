@@ -1,12 +1,11 @@
-atom.enablePersistence = false;
-
 // one pane per project
 // only the active project's pane is displayed, others will be hidden;
 // panes are stored/restored to/from a file in the ".cache" directory of each project;
 
+atom.enablePersistence = false;
+
 const fs = require('fs');
 const path = require('path');
-const _ = require('/usr/lib/atom/node_modules/underscore');
 const SelectList = require('/usr/lib/atom/node_modules/atom-select-list');
 
 const projectsDir = path.join(require('os').homedir(), 'projects');
@@ -20,14 +19,121 @@ fs.stat(projectsDir, (err, stats) => {
   }
 });
 
-// { 'project name': { isChanged: bool, pane: Pane } }
+function storeUnsaved(buffer) {
+  if (!buffer || buffer.isDestroyed()) return;
+  const data = JSON.stringify('unsaved portion of buffer');
+  //fs.writeFile(buffer.getPath() + '.unsaved', data, err => { if (err) throw err; });
+}
+
+function restoreUnsaved(buffer) {
+  if (!buffer || buffer.isDestroyed()) return;
+  fs.readFile(buffer.getPath() + '.unsaved', (err, data) => {
+    if (err) return;
+    try {
+      const serializedData = JSON.parse(data);
+      // restore unsaved portion of buffer;
+    }
+    catch (err) { throw err }
+  });
+}
+
+setInterval(() => {
+  changedBuffers.forEach(buffer => storeUnsaved(buffer));
+  changedBuffers.clear();
+}, 30000);
+
+// { 'project name': projectPane }
 const projectPanes = {};
+
+function storeProjectState(projectName) {
+  const projectPane = projectPanes[projectName];
+  if (!projectPane) return;
+
+  const serializedData = {
+    // list of paths and cursor position of open editors;
+    editorsList: [],
+    activeItemIndex: projectPane.getActiveItemIndex()
+  }
+
+  // populate editorsList;
+  projectPane.getItems().forEach(item => {
+    const uri = typeof item.getURI === 'function' && item.getURI();
+    const cursorPosition = typeof item.getCursorBufferPosition === 'function' &&
+          item.getCursorBufferPosition();
+    if (uri && cursorPosition)
+      serializedData.editorsList.push([uri, cursorPosition]);
+  })
+  
+  const data = JSON.stringify(serializedData);
+  const storePath = path.join(projectsDir, projectName, '.cache/project_state');
+  fs.writeFile(storePath, data, (err) => {
+    if (err) fs.mkdir(path.dirname(storePath), { recursive: true }, (err) => {
+      if (err) { throw err } else {
+        fs.writeFile(storePath, data, (err) => { if (err) throw err; })
+      }
+    });
+  });
+}
+
+function restoreProjectState(projectName) {
+  const projectPane = projectPanes[projectName];
+  if (!projectPane) return;
+
+  const storePath = path.join(projectsDir, projectName, '.cache/project_state');
+  fs.readFile(storePath, (err, data) => {
+    if (err) {
+      atom.commands.dispatch(atom.views.getView(atom.workspace.element), 'tree-view:toggle-focus');
+      return;
+    }
+    
+    try {
+      const serializedData = JSON.parse(data);
+
+      serializedData.editorsList.reduce((p, [uri, cursorPosition]) =>
+        p.then(() =>
+          atom.workspace.createItemForURI(uri).then(item => {
+            projectPane.addItem(item);
+            typeof item.setCursorBufferPosition === 'function' &&
+            item.setCursorBufferPosition(cursorPosition);
+          })
+        )
+        , Promise.resolve()).then(() => {
+        projectPane.activateItemAtIndex(serializedData.activeitemIndex);
+        // if there is no item in projectPane, focus tree-view;
+        if (projectPane.getItems().length == 0) {
+          atom.commands.dispatch(atom.views.getView(atom.workspace.element), 'tree-view:toggle-focus');
+        }
+      });
+    }
+    catch (err) { throw err }
+  });
+}
+
+setInterval(() => {
+  changedProjects.forEach(projectName => storeProjectState(projectName));
+  changedProjects.clear();
+}, 30000);
+
+const changedProjects = new Set();
+const changedBuffers = new Set();
+
+atom.workspace.getCenter().observeTextEditors(editor => {
+  const buffer = editor.getBuffer();
+  restoreUnsaved(buffer);
+
+  const projectName = path.relative(projectsDir, atom.project.getPaths()[0]);
+  changedProjects.add(projectName);
+
+  editor.onDidChangeCursorPosition(event => changedProjects.add(projectName));
+  editor.onDidStopChanging(() => changedBuffers.add(buffer));
+});
 
 class ProjectsList {
   constructor() {
     this.modalPanel = null;
     this.selectList = new SelectList({
       items: [],
+
       elementForItem: (item) => {
         const li = document.createElement('li');
         const span = document.createElement('span');
@@ -36,41 +142,36 @@ class ProjectsList {
         return li;
       },
 
-      didConfirmSelection: (item) => {
-        // here "item" is actually a project's name;
+      didConfirmSelection: (projectName) => {
         this.selectList.reset();
         this.modalPanel.hide();
-        atom.project.setPaths([path.join(projectsDir, item)]);
+        atom.project.setPaths([path.join(projectsDir, projectName)]);
 
-        if (!projectPanes[item] || projectPanes[item].isDestroyed()) {
-          let newPane = atom.workspace.getCenter().getActivePane().splitRight();
-          newPane.onWillDestroy(() => {
+        let projectPane = projectPanes[projectName];
+        if (!projectPane) {
+          projectPane = atom.workspace.getCenter().getActivePane().splitRight();
+          projectPane.onWillDestroy(() => {
+            delete projectPanes[projectName];
             atom.project.setPaths([]);
             this.show();
           });
-          projectPanes[item] = newPane;
-
-          const pane = projectPanes[item];
-          const paneStorePath = path.join(projectsDir, item, '.cache/pane');
-          restorePane(pane, paneStorePath);
+          projectPanes[projectName] = projectPane;
+          restoreProjectState(projectName);
         }
 
         // hide all panes, show only the selected project pane, and activate it;
-        atom.workspace.getCenter().getPanes().forEach((pane) => {
+        atom.workspace.getCenter().getPanes().forEach(pane => {
           const view = atom.views.getView(pane);
           view.style.display = 'none';
         });
-        const selectedProjectPane = projectPanes[item];
-        const view = atom.views.getView(selectedProjectPane);
-        view.style.display = '';
-        selectedProjectPane.activate();
-        // if there is no item in the pane, focus tree-view;
-        if (selectedProjectPane.getItems().length == 0) {
-          atom.commands.dispatch(atom.views.getView(atom.workspace.element), 'tree-view:toggle-focus');
+        {
+          const view = atom.views.getView(projectPane);
+          view.style.display = '';
         }
+        projectPane.activate();
 
         this.selectList.update(
-          { initialSelectionIndex: this.selectList.items.indexOf(item) }
+          { initialSelectionIndex: this.selectList.items.indexOf(projectName) }
         );
       },
 
@@ -85,8 +186,9 @@ class ProjectsList {
     fs.readdir(projectsDir, (err, fileNames) => {
       if (err) { alert(err.message); }
       else {
-        let projectNames = fileNames.filter((fileName) =>
-                                            fs.statSync(path.join(projectsDir, fileName)).isDirectory());
+        const projectNames = fileNames.filter(
+          fileName => fs.statSync(path.join(projectsDir, fileName)).isDirectory()
+        );
         this.selectList.update({ items: projectNames });
       }
     });
@@ -110,69 +212,6 @@ atom.commands.add('atom-workspace', {
 
 // to define keybindings for projectsList, add a class:
 projectsList.selectList.element.classList.add('projects-list');
-
-function storeBuffer(buffer, bufStorePath) {
-  if (buffer.isDestroyed()) return;
-  const data = JSON.stringify({/*non_saved portion of buffer*/});
-  fs.writeFile(bufStorePath, data, (err) => {
-    if (err) fs.mkdir(path.dirname(bufStorePath), { recursive: true }, (err) => {
-      if (err) fs.writeFile(bufStorePath, data, () => { if (err) throw err; })
-    })
-  });
-}
-
-function restoreBuffer(buffer, bufStorePath) {
-  if (buffer.isDestroyed()) return;
-  fs.readFile(bufStorePath, (err, data) => {
-    if (err) return;
-    try {
-      const serializedData = JSON.parse(data);
-      // restore non_saved data
-    }
-    catch (err) { throw err }
-  });
-}
-
-function storePane(pane, paneStorePath) {
-  if (pane.isDestroyed()) return;
-  const data = JSON.stringify([/*list of paths and cursor position of open editors*/]);
-  fs.writeFile(paneStorePath, data, (err) => {
-    if (err) fs.mkdir(path.dirname(paneStorePath), { recursive: true }, (err) => {
-      if (err) fs.writeFile(paneStorePath, data, () => { if (err) throw err; })
-    })
-  });
-}
-
-function restorePane(pane, paneStorePath) {
-  if (pane.isDestroyed()) return;
-  fs.readFile(paneStorePath, (err, data) => {
-    if (err) return;
-    try {
-      const serializedData = JSON.parse(data);
-      // open the editors with the given paths, inside this pane, and restore their cursor position;
-    }
-    catch (err) { throw err }
-  });
-}
-
-atom.workspace.getCenter().observeTextEditors((editor) => {
-  const pathSegments = path.relative(projectsDir, editor.getPath()).split(path.sep);
-  const projectName = pathSegments[0];
-  const relativePath = path.join(...pathSegments.slice(1));
-  const bufStorePath = path.join(projectsDir, projectName, '.cache/buffers', relativePath);
-  const buffer = editor.getBuffer();
-  restoreBuffer(buffer, bufStorePath);
-
-  const pane = projectPanes[projectName];
-  const paneStorePath = path.join(projectsDir, projectName, '.cache/pane');
-
-  editor.onDidChangeCursorPosition((event) => {
-    _.debounce(() => {
-      if (event.textChanged) { storeBuffer(buffer, bufStorePath); }
-      storePane(pane, paneStorePath);
-    }, 5000)();
-  });
-});
 
 // https://atom.io/packages/tree-view-auto-collapse
 // https://atom.io/packages/tree-view-scope-lines
