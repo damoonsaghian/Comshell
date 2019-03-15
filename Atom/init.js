@@ -56,12 +56,12 @@ function storeProjectState(projectName) {
   }
 
   // populate editorsList;
-  projectPane.getItems().forEach(item => {
+  projectPane.getItems().forEach((item, index) => {
     const uri = typeof item.getURI === 'function' && item.getURI();
     const cursorPosition = typeof item.getCursorBufferPosition === 'function' &&
           item.getCursorBufferPosition();
     if (uri && cursorPosition)
-      serializedData.editorsList.push([uri, cursorPosition]);
+      serializedData.editorsList.push([uri, index, cursorPosition]);
   })
   
   const data = JSON.stringify(serializedData);
@@ -89,16 +89,16 @@ function restoreProjectState(projectName) {
     try {
       const serializedData = JSON.parse(data);
 
-      serializedData.editorsList.reduce((p, [uri, cursorPosition]) =>
+      serializedData.editorsList.reduce((p, [uri, index, cursorPosition]) =>
         p.then(() =>
           atom.workspace.createItemForURI(uri).then(item => {
-            projectPane.addItem(item);
+            projectPane.addItem(item, {index});
             typeof item.setCursorBufferPosition === 'function' &&
-            item.setCursorBufferPosition(cursorPosition);
+              item.setCursorBufferPosition(cursorPosition);
           })
         )
         , Promise.resolve()).then(() => {
-        projectPane.activateItemAtIndex(serializedData.activeitemIndex);
+        projectPane.activateItemAtIndex(serializedData.activeItemIndex);
         // if there is no item in projectPane, focus tree-view;
         if (projectPane.getItems().length == 0) {
           atom.commands.dispatch(atom.views.getView(atom.workspace.element), 'tree-view:toggle-focus');
