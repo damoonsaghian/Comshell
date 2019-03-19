@@ -1,12 +1,13 @@
 // one pane per project
 // only the active project's pane is displayed, others will be hidden;
-// panes are stored/restored to/from a file in the ".cache" directory of each project;
+// the state of a project's pane, is stored/restored to/from a file,
+//   in the ".cache" directory of each project;
 
 atom.enablePersistence = false;
 
 const fs = require('fs');
 const path = require('path');
-const SelectList = require('/usr/lib/atom/node_modules/atom-select-list');
+const SelectList = global.require('atom-select-list');
 
 const projectsDir = path.join(require('os').homedir(), 'projects');
 // if "~/projects/" directory does not exist, create it;
@@ -220,6 +221,12 @@ atom.commands.add('atom-workspace', {
 // to define keybindings for projectsList, add a class:
 projectsList.selectList.element.classList.add('projects-list');
 
+atom.packages.onDidActivatePackage(activatedPackage => {
+  if (activatedPackage === atom.packages.getActivePackage('status-bar')) {
+    require('./status-bar-date-time').showDateTime();
+  }
+});
+
 // https://atom.io/packages/tree-view-auto-collapse
 // https://atom.io/packages/tree-view-scope-lines
 // https://atom.io/packages/tree-lines
@@ -228,7 +235,6 @@ projectsList.selectList.element.classList.add('projects-list');
 // https://atom.io/packages/file-icons
 
 // https://github.com/alexfu/atom-replace-pane
-// https://atom.io/packages/atom-clock
 // https://github.com/atom/settings-view/blob/master/lib/package-manager.coffee
 // https://atom.io/packages/structure-view
 // https://atom.io/packages/simple-git
