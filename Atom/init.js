@@ -221,11 +221,7 @@ atom.commands.add('atom-workspace', {
 // to define keybindings for projectsList, add a class:
 projectsList.selectList.element.classList.add('projects-list');
 
-atom.packages.onDidActivatePackage(activatedPackage => {
-  if (activatedPackage === atom.packages.getActivePackage('status-bar')) {
-    require('./status-bar-date-time').showDateTime();
-  }
-});
+require('./status-bar');
 
 // https://atom.io/packages/tree-view-auto-collapse
 // https://atom.io/packages/tree-view-scope-lines
