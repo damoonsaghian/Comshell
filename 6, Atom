@@ -1,7 +1,10 @@
 we can use Atom editor to create a prototype of Comshell;
 
 ; sudo pacman -S xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} i3-wm atom
+
 ; cp Atom/* ~/.atom/
+you can change "fallBackTimeZone" in "status-bar.js";
+
 ; nano ~/.bash_profile
   startx
 ; nano ~/.xinitrc
@@ -10,7 +13,7 @@ we can use Atom editor to create a prototype of Comshell;
 ; nano ~/.config/i3/config
   # i3 config file (v4)
   default_border none
-  exec atom
+  exec --no-startup-id "atom --wait; i3-msg exit"
 
 "https://discuss.atom.io/t/creating-a-better-kiosk-with-electron/19443"
 when Ozone backend for Chromium is ready, and is available in Electron,
