@@ -23,7 +23,7 @@ fs.stat(projectsDir, (err, stats) => {
 function storeUnsaved(buffer) {
   if (!buffer || buffer.isDestroyed()) return;
   const data = JSON.stringify('unsaved portion of buffer');
-  //fs.writeFile(buffer.getPath() + '.unsaved', data, err => { if (err) throw err; });
+  //fs.writeFile(buffer.getPath() + '.unsaved', data, err => { if (err) console.error(err); });
 }
 
 function restoreUnsaved(buffer) {
@@ -34,7 +34,7 @@ function restoreUnsaved(buffer) {
       const serializedData = JSON.parse(data);
       // restore unsaved portion of buffer;
     }
-    catch (err) { throw err }
+    catch (err) { console.error(err); }
   });
 }
 
@@ -64,13 +64,13 @@ function storeProjectState(projectName) {
     if (uri && cursorPosition)
       serializedData.editorsList.push([uri, index, cursorPosition]);
   })
-  
+
   const data = JSON.stringify(serializedData);
   const storePath = path.join(projectsDir, projectName, '.cache/project_state');
   fs.writeFile(storePath, data, (err) => {
     if (err) fs.mkdir(path.dirname(storePath), { recursive: true }, (err) => {
-      if (err) { throw err } else {
-        fs.writeFile(storePath, data, (err) => { if (err) throw err; })
+      if (err) { console.error(err) } else {
+        fs.writeFile(storePath, data, (err) => { if (err) console.error(err); })
       }
     });
   });
@@ -86,7 +86,7 @@ function restoreProjectState(projectName) {
       atom.commands.dispatch(atom.views.getView(atom.workspace.element), 'tree-view:toggle-focus');
       return;
     }
-    
+
     try {
       const serializedData = JSON.parse(data);
 
@@ -106,7 +106,7 @@ function restoreProjectState(projectName) {
         }
       });
     }
-    catch (err) { throw err }
+    catch (err) { console.error(err); }
   });
 }
 
@@ -190,7 +190,7 @@ class ProjectsList {
 
   show() {
     this.previouslyFocusedElement = document.activeElement;
-    
+
     fs.readdir(projectsDir, (err, fileNames) => {
       if (err) { alert(err.message); }
       else {
@@ -205,7 +205,7 @@ class ProjectsList {
       this.modalPanel = atom.workspace.addModalPanel({ item: this.selectList});
     }
     this.modalPanel.show();
-    this.selectList.focus(); 
+    this.selectList.focus();
   }
 
   createNewProject() {}
@@ -235,6 +235,7 @@ require('./status-bar');
 // https://atom.io/packages/structure-view
 // https://atom.io/packages/simple-git
 // https://atom.io/packages/git-plus
+// https://atom.io/packages/atom-video
 
 // https://medium.com/hacking-atom/tweak-your-atom-s-init-script-without-reloading-atom-with-a-declarative-module-8b1c0f208663
 

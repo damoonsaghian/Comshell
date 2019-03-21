@@ -1,6 +1,6 @@
 function showDateTime(statusBarPkg, timeZone) {
   if (statusBarPkg.mainModule.statusBar) {
-   
+
     const dateTimeElement = document.createElement('div');
     dateTimeElement.classList.add('inline-block');
     const statusBar = statusBarPkg.mainModule.statusBar;
@@ -30,7 +30,7 @@ function showDateTime(statusBarPkg, timeZone) {
 
     function updateDateTime() {
       const dateTime = {};
-      dateTimeFormatter.formatToParts(new Date()).forEach(({type, value}) => { 
+      dateTimeFormatter.formatToParts(new Date()).forEach(({type, value}) => {
         switch (type) {
         case 'weekday': dateTime.weekday = value;
         case 'month': dateTime.month = value;
@@ -41,14 +41,14 @@ function showDateTime(statusBarPkg, timeZone) {
         case 'dayPeriod': dateTime.dayPeriod = value;
         case 'dayperiod': dateTime.dayPeriod = value;
         case 'timeZoneName': dateTime.timeZoneName = value;
-        default : return; 
-        } 
+        default : return;
+        }
       });
       dateTimeElement.textContent = `(${dateTime.timeZoneName}) ` +
         `${dateTime.year}.${dateTime.month}.${dateTime.day} ` +
         `${dateTime.weekday} ${dateTime.hour}:${dateTime.minute}${dateTime.dayPeriod.toLowerCase()}`;
 
-      setTimeout(updateDateTime, (60 - new Date(Date.now()).getSeconds()) * 1000);
+      setTimeout(updateDateTime, (60 - new Date().getSeconds()) * 1000);
       // according to the following link, "setTime" circumvents system sleeps:
       // https://stackoverflow.com/a/38408581
     }
@@ -76,9 +76,9 @@ atom.packages.onDidActivatePackage(activatedPackage => {
             const timeZone = JSON.parse(body.toString())['time_zone'];
             showDateTime(activatedPackage, timeZone);
           }
-          catch (err) { throw err; showDateTime(activatedPackage); };
+          catch (err) { console.error(err); showDateTime(activatedPackage); };
         });
       }
-    ).on('error', err => { throw err; showDateTime(activatedPackage); });
+    ).on('error', err => { console.error(err); showDateTime(activatedPackage); });
   }
 });

@@ -30,6 +30,8 @@
     softWrapHangingIndent: 2
   "exception-reporting":
     userId: "acabaca1-0ca6-43da-aa6f-0249774f4a52"
+  tabs:
+    alwaysShowTabBar: false
   "tree-view":
     autoReveal: true
     hideIgnoredNames: true
