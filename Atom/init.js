@@ -20,6 +20,7 @@ fs.stat(projectsDir, (err, stats) => {
   }
 });
 
+// https://github.com/mpeterson2/save-session/blob/master/lib/files.coffee
 function storeUnsaved(buffer) {
   if (!buffer || buffer.isDestroyed()) return;
   const data = JSON.stringify('unsaved portion of buffer');
@@ -215,7 +216,13 @@ const projectsList = new ProjectsList();
 projectsList.show();
 
 atom.commands.add('atom-workspace', {
-  'comshell:projects-list': () => projectsList.show()
+  'comshell:projects-list': () => {
+    if (projectsList.modalPanel.isVisible()) {
+      projectsList.selectList.props.didCancelSelection();
+    } else {
+      projectsList.show();
+    }
+  }
 });
 
 // to define keybindings for projectsList, add a class:
@@ -232,6 +239,8 @@ require('./status-bar');
 
 // https://github.com/alexfu/atom-replace-pane
 // https://github.com/atom/settings-view/blob/master/lib/package-manager.coffee
+// modal key bindings:
+//   https://github.com/Kesin11/atom-vim-like-tab/#keymap
 // https://atom.io/packages/structure-view
 // https://atom.io/packages/simple-git
 // https://atom.io/packages/git-plus

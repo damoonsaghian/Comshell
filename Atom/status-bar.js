@@ -1,3 +1,7 @@
+// time_zone will be automatically detected from IP;
+// but when a problem occurs, "fallBackTimeZone" will be used instead;
+const fallBackTimeZone = 'UTC';
+
 function showDateTime(statusBarPkg, timeZone) {
   if (statusBarPkg.mainModule.statusBar) {
 
@@ -14,17 +18,15 @@ function showDateTime(statusBarPkg, timeZone) {
       hour: '2-digit',
       minute: '2-digit',
       timeZoneName: 'short',
+      timeZone: timeZone,
       hour12: true
     };
-    if (timeZone) { options.timeZone = timeZone };
 
     let dateTimeFormatter;
-    // i have to do this because when "timeZone" is undefined, NodeJS throws an error,
-    //   instead of just using the system's time_zone (like in Firefox for example);
     try {
       dateTimeFormatter = new Intl.DateTimeFormat('en-US', options);
     } catch (err) {
-      options.timeZone = 'UTC';
+      options.timeZone = fallBackTimeZone;
       dateTimeFormatter = new Intl.DateTimeFormat('en-US', options);
     }
 
@@ -76,9 +78,17 @@ atom.packages.onDidActivatePackage(activatedPackage => {
             const timeZone = JSON.parse(body.toString())['time_zone'];
             showDateTime(activatedPackage, timeZone);
           }
-          catch (err) { console.error(err); showDateTime(activatedPackage); };
+          catch (err) {
+            console.error(err);
+            showDateTime(activatedPackage, fallBackTimeZone);
+          };
         });
       }
-    ).on('error', err => { console.error(err); showDateTime(activatedPackage); });
+    ).on('error', err => {
+      console.error(err);
+      showDateTime(activatedPackage, fallBackTimeZone);
+    });
   }
 });
+
+// https://github.com/sebhildebrandt/systeminformation

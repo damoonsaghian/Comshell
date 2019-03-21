@@ -1,5 +1,5 @@
 'atom-workspace':
-  'alt-space': 'comshell:projects-list'
+  'cmd': 'comshell:projects-list'
 
 'atom-text-editor':
   'ctrl-down': 'editor:move-to-beginning-of-next-paragraph'
