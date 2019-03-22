@@ -128,5 +128,8 @@ monitor block events and mount drives when a new block device is created;
     fi
   done&
 
+; nano ~/.bash_profile
+  export TZ="/usr/share/zoneinfo/<your_location>"
+
 ; rustup install stable
 ; rustup default stable
