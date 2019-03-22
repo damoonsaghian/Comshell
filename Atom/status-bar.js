@@ -18,9 +18,9 @@ function showDateTime(statusBar) {
 
     const weekDay = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][now.getDay()];
     const hour = now.getHours();
-    const hour12 = (hour > 12) ? (hour - 12) : hour;
-    const dayPeriod = (hour > 12) ? 'pm' : 'am';
-    dateTimeElement.textContent = weekDay +' '+ hour12 +':'+ now.getMinutes() + dayPeriod;
+    const hour12 = hour == 0 ? 12 : hour > 12 ? hour - 12 : hour;
+    const dayPeriod = hour > 12 ? 'PM' : 'AM';
+    dateTimeElement.textContent = weekDay +' '+ hour12 +':'+ now.getMinutes() +' '+ dayPeriod;
   }
 
   updateDateTime();
