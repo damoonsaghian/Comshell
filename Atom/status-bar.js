@@ -13,16 +13,20 @@ function showDateTime(statusBar) {
   function updateDateTime() {
     const now = new Date();
     setTimeout(updateDateTime, (60 - now.getSeconds()) * 1000);
-    // according to the following link, "setTime" circumvents system sleeps:
-    // https://stackoverflow.com/a/38408581
 
     const weekDay = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][now.getDay()];
     const hour = now.getHours();
     const hour12 = hour == 0 ? 12 : hour > 12 ? hour - 12 : hour;
+    const minute = now.getMinutes();
+    const minute2digits = minute > 9 ? minute : '0' + minute;
     const dayPeriod = hour > 12 ? 'PM' : 'AM';
-    dateTimeElement.textContent = weekDay +' '+ hour12 +':'+ now.getMinutes() +' '+ dayPeriod;
+    dateTimeElement.textContent =
+      now.getFullYear() +'/'+ (now.getMonth()+1) +'/'+ now.getDate() +' '+
+      weekDay +' '+ dayPeriod +' '+ hour12 +':'+ minute2digits;
   }
 
+  // update date after computer wakes up from sleep;
+  require('electron').remote.powerMonitor.on('resume', () => updateDateTime())
   updateDateTime();
 }
 
