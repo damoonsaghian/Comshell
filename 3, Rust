@@ -51,7 +51,7 @@ references (shared references) can:
 , immutably lend resource to other references;
 mutable reference (exclusive reference) can:
 , access and mutate resource;
-, mutably lend resouce to another reference;
+, mutably lend resource to another reference;
   they can immutably lend resource, but then they can mutate it;
   just like when an owner immutably lends its resource;
 
@@ -107,9 +107,9 @@ note that "x.m()" is method call syntax, which completely differs from "(x.m)()"
 in "use" statements:
 , crate_name::...
 , self::local_item::...
-even outside "use" statements, we can build absolute paths using crate names at the begining;
+even outside "use" statements, we can build absolute paths using crate names at the beginning;
   but since it can conflict with a local name, it's better to avoid it, and instead,
-  either insert a "::" at the begining, before the crate's name,
+  either insert a "::" at the beginning, before the crate's name,
   or bring the crate's name into scope using a "use" statement;
 
 arrays like tuples have fixed size and thus stored on stack;
@@ -123,7 +123,7 @@ when you need functions with lots of arguments, or tuples with lots of elements,
 a closure is like an anonymous struct made of variables captured from environment,
   that is callable (implements Fn/FnMut/FnOnce trait);
 so all closures are unique types, but they have traits in common;
-note that if we put a generic type parameter in the return type of a fuction,
+note that if we put a generic type parameter in the return type of a function,
   we have to provide the concrete type when we call the function;
   thus we can't use generic type parameters to return a closure, we have to use "impl";
 

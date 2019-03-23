@@ -53,7 +53,7 @@ data structure for graphical objects:
 "https://www.scratchapixel.com"
 "https://www.scratchapixel.com/lessons/3d-basic-rendering/phong-shader-BRDF"
 
-monospace fonts:
+mono_space fonts:
   wide characters are forced to squeeze;
   narrow characters are forced to stretch;
   uppercase letters look skinny next to lowercase;

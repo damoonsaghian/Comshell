@@ -46,11 +46,10 @@ list of all projects will appear in a floating layer, at the center of screen;
   projects are directories inside "~/projects/";
 list of files in the project will be displayed in a tree_view at the left;
   we can move between files, and copy/rename/delete/create them;
-we can have views of differnt locations in a project (even in the same file) in separate tabs;
+we can have views of different locations in a project (even in the same file) in separate tabs;
 
-images, videos, etc, will be put in ".data" directory:
-  .data/file_name/media_number.png
-and will be displayed inside the text by putting their location inside double quotes;  
+text files will be opened in a text editor;
+directories containing a file named ".gallery" will be opened in a view showing thumbnails;
 
 non_local projects, web pages, pdf documents, etc,
   accessed from links inside the main project, and will be opened in a floating layer;

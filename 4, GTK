@@ -10,6 +10,7 @@ so here is what we do:
 
 "https://mmstick.github.io/gtkrs-tutorials/introduction.html"
 "https://github.com/gtk-rs/examples/tree/master/src/bin"
+"https://github.com/oakes/SolidOak/tree/master/src"
 "https://gtk-rs.org/docs/gtk/"
 "https://gtk-rs.org/docs/sourceview/"
 "https://gtk-rs.org/docs/gtk/trait.TextBufferExt.html#tymethod.get_text"
@@ -29,7 +30,8 @@ actually Sway (with "wlroot") is not ready yet; til then, we can use "i3-wm":
 ; mkdir -p ~/.config/sway
 ; nano ~/.config/sway/config
   default_border none
-  exec --no-startup-id "cargo run --release --manifest-path "comshell-Cargo.toml-path"; swaymsg exit"
+  exec --no-startup-id "cargo run --release --manifest-path "comshell-Cargo.toml-path"; \
+    swaymsg exit"
 
 or for "i3-wm":
 ; nano ~/.bash_profile
@@ -41,7 +43,8 @@ or for "i3-wm":
   # i3 config file (v4)
   default_border none
   exec compton --vsync opengl-swc
-  exec --no-startup-id "cargo run --release --manifest-path "comshell-Cargo.toml-path"; i3-msg exit"
+  exec --no-startup-id "cargo run --release --manifest-path "comshell-Cargo.toml-path"; \
+    i3-msg exit"
 
 "https://crates.io/crates/webkit2gtk"
 pdf.js
@@ -66,7 +69,7 @@ gtk cursor-aspect-ratio style property;
 in "~/.config/gtk-3.0/gtk.css":
 * {
   -GtkTextView-error-underline-color: #FC4138;
-  -gtk-outline-radius: 2px; 
+  -gtk-outline-radius: 2px;
   -GtkWidget-cursor-aspect-ratio: 1;
   -GtkTextView-cursor_aspect_ratio: 1;
   -EelEditableLabe-cursor_aspect_ratio: 1;

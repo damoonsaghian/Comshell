@@ -15,8 +15,15 @@ pub struct Editor {
 impl Editor {
   pub fn prev_page(self) {}
   pub fn next_page(self) {}
-  pub fn prev_item(self) {} 
-  pub fn next_item(self) {} 
+  pub fn prev_item(self) {}
+  pub fn next_item(self) {}
+}
+
+pub struct Gallery {}
+
+pub enum Item {
+  Editor,
+  Gallery
 }
 
 pub struct ProjectTree {}
@@ -24,7 +31,7 @@ pub struct ProjectTree {}
 pub struct ProjectView {
   overlay: ,
   project_tree: ProjectTree,
-  editor: RefCell<Editor>
+  editor: RefCell<Item>
 }
 
 impl ProjectView {
@@ -40,7 +47,7 @@ impl ProjectView {
 pub struct Project {
   project_views: RefCell<HashMap<String, ProjectView>>,
   notebook: gtk::NoteBook
-} 
+}
 
 impl Project {
   pub fn go_to_chapter(self, chapter_path: &str) {}

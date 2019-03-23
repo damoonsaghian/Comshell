@@ -21,7 +21,7 @@ the only sane kind of asynchronous circuit which i could imagine is this:
 , next to any data wire there is a control wire which determines if the data is valid or not;
 , when a register wants to change its outputs, it first invalidates them,
   for a duration equal to the delay of one gate;
-, any gate recieving an invalid input, invalidates its outputs;
+, any gate receiving an invalid input, invalidates its outputs;
 , this way all data which is going to change in the future, is first invalidated;
 , registers operate only when all inputs are valid;
 
@@ -74,7 +74,7 @@ now you can even reuse packages previously downloaded on current system,
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
   networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip ttf-hack ttf-droid rustup gcc
 
-install bootloader:
+install boot_loader:
 ; grub-install --target=i386-pc /dev/sdx
 ; mkdir /boot/efi; mount /dev/sdx2 /boot/efi
 ; grub-install --target=x86_64-efi --efi-directory=/boot/efi --removable
@@ -98,8 +98,7 @@ automatic login:
   ExecStart=
   ExecStart=-/usr/bin/agetty --autologin user1 --noclear %I $TERM
 
-; nano /etc/locale.gen
-  en_US.UTF-8 UTF-8
+in "/etc/locale.gen" uncomment "en_US.UTF-8 UTF-8";
 ; locale-gen
 ; nano /etc/locale.conf
   LANG=en_US.UTF-8
