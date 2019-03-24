@@ -1,3 +1,7 @@
+if (atom.packages.isPackageActive('status-bar')) {
+  const statusBar = atom.packages.getActivePackage('status-bar').mainModule.statusBar;
+  if (statusBar) { showDateTime(statusBar) }
+}
 atom.packages.onDidActivatePackage(activatedPackage => {
   if (activatedPackage === atom.packages.getActivePackage('status-bar')) {
     const statusBar = activatedPackage.mainModule.statusBar;

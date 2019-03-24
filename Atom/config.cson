@@ -32,6 +32,5 @@
   tabs:
     alwaysShowTabBar: false
   "tree-view":
-    autoReveal: true
     hideIgnoredNames: true
     sortFoldersBeforeFiles: false

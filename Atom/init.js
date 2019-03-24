@@ -1,6 +1,6 @@
 // one pane per project
 // only the active project's pane is displayed, others will be hidden;
-// the state of a project's pane, is stored/restored to/from a file,
+// the state of a project's pane, is stored/restored to/from a file named "project_state",
 //   in the ".cache" directory of each project;
 
 atom.enablePersistence = false;
@@ -16,7 +16,7 @@ fs.stat(projectsDir, (err, stats) => {
     fs.mkdir(projectsDir, (err) => { if (err) alert(err.message); });
   }
   else if (!stats.isDirectory()) {
-    alert('"projects" directory can\'t be created, because there is a file with the same name');
+    alert('can\'t create projects directory, cause there is a file with the same name');
   }
 });
 
@@ -229,13 +229,7 @@ atom.commands.add('atom-workspace', {
 projectsList.selectList.element.classList.add('projects-list');
 
 require('./status-bar');
-
-// https://atom.io/packages/tree-view-auto-collapse
-// https://atom.io/packages/tree-view-scope-lines
-// https://atom.io/packages/tree-lines
-// https://github.com/hswolff/tree-view-extended/tree/master/lib
-// https://atom.io/packages/tree-view-git-status
-// https://atom.io/packages/file-icons
+require('./tree-view');
 
 // https://github.com/alexfu/atom-replace-pane
 // https://github.com/atom/settings-view/blob/master/lib/package-manager.coffee
