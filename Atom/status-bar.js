@@ -19,7 +19,7 @@ function showDateTime(statusBar) {
     const hour12 = hour == 0 ? 12 : hour > 12 ? hour - 12 : hour;
     const minute = now.getMinutes();
     const minute2digits = minute > 9 ? minute : '0' + minute;
-    const dayPeriod = hour > 12 ? 'PM' : 'AM';
+    const dayPeriod = hour > 11 ? 'PM' : 'AM';
     dateTimeElement.textContent =
       now.getFullYear() +'/'+ (now.getMonth()+1) +'/'+ now.getDate() +' '+
       weekDay +' '+ dayPeriod +' '+ hour12 +':'+ minute2digits;
