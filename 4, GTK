@@ -42,7 +42,7 @@ or for "i3-wm":
 ; nano ~/.config/i3/config
   # i3 config file (v4)
   default_border none
-  exec compton --vsync opengl-swc
+  exec compton
   exec --no-startup-id "cargo run --release --manifest-path "comshell-Cargo.toml-path"; \
     i3-msg exit"
 
