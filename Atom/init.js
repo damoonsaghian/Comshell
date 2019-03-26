@@ -20,29 +20,45 @@ fs.stat(projectsDir, (err, stats) => {
   }
 });
 
-// https://github.com/mpeterson2/save-session/blob/master/lib/files.coffee
 function storeUnsaved(buffer) {
   if (!buffer || buffer.isDestroyed()) return;
-  const data = JSON.stringify('unsaved portion of buffer');
-  //fs.writeFile(buffer.getPath() + '.unsaved', data, err => { if (err) console.error(err); });
+  const data = JSON.stringify(buffer.serialize());
+  fs.writeFile(buffer.getPath() + '.unsaved', data, err => { if (err) console.error(err); });
 }
 
-function restoreUnsaved(buffer) {
-  if (!buffer || buffer.isDestroyed()) return;
-  fs.readFile(buffer.getPath() + '.unsaved', (err, data) => {
-    if (err) return;
-    try {
-      const serializedData = JSON.parse(data);
-      // restore unsaved portion of buffer;
-    }
-    catch (err) { console.error(err); }
-  });
-}
-
+const changedBuffers = new Set();
 setInterval(() => {
   changedBuffers.forEach(buffer => storeUnsaved(buffer));
   changedBuffers.clear();
 }, 30000);
+
+// before opening a text editor, see if there is an associated ".unsaved" file,
+//   restore the buffer;
+atom.workspace.addOpener(uri => {
+  let data;
+  try { data = fs.readFileSync(uri + '.unsaved') }
+  catch (_) { return }
+
+  let serializedBuffer;
+  try { serializedBuffer = JSON.parse(data) }
+  catch (err) { console.error(err); return }
+
+  // this makes "workspace.open()" wait til the buffer is added to the workspace;
+  atom.workspace.incoming.set(uri, new Promise(resolve =>
+    require('atom').TextBuffer.deserialize(serializedBuffer).then(
+      buffer => {
+        atom.project.addBuffer(buffer); // this doesn't work!
+        atom.workspace.incoming.delete(uri);
+        resolve();
+      },
+      err => {
+        console.log(err);
+        atom.workspace.incoming.delete(uri);
+        resolve();
+      }
+    )
+  ));
+});
 
 // { 'project name': projectPane }
 const projectPanes = {};
@@ -98,36 +114,37 @@ function restoreProjectState(projectName) {
             typeof item.setCursorBufferPosition === 'function' &&
               item.setCursorBufferPosition(cursorPosition);
           })
-        )
-        , Promise.resolve()).then(() => {
+        ),
+        Promise.resolve()
+      ).then(() => {
         projectPane.activateItemAtIndex(serializedData.activeItemIndex);
         // if there is no item in projectPane, focus tree-view;
         if (projectPane.getItems().length == 0) {
-          atom.commands.dispatch(atom.views.getView(atom.workspace.element), 'tree-view:toggle-focus');
+          atom.commands.dispatch(atom.views.getView(atom.workspace.element),
+            'tree-view:toggle-focus');
         }
       });
     }
-    catch (err) { console.error(err); }
+    catch (err) { console.error(err) }
   });
 }
 
+const changedProjects = new Set();
 setInterval(() => {
   changedProjects.forEach(projectName => storeProjectState(projectName));
   changedProjects.clear();
 }, 30000);
 
-const changedProjects = new Set();
-const changedBuffers = new Set();
-
 atom.workspace.getCenter().observeTextEditors(editor => {
-  const buffer = editor.getBuffer();
-  restoreUnsaved(buffer);
-
   const projectName = path.relative(projectsDir, atom.project.getPaths()[0]);
   changedProjects.add(projectName);
-
   editor.onDidChangeCursorPosition(event => changedProjects.add(projectName));
-  editor.onDidStopChanging(() => changedBuffers.add(buffer));
+
+  const buffer = editor.getBuffer();
+  buffer.onDidStopChanging(() => changedBuffers.add(buffer));
+  buffer.onDidSave((_) => {
+    if (!editor.isModified()) fs.unlink(buffer.getPath() + '.unsaved', err => {});
+  });
 });
 
 class ProjectsList {

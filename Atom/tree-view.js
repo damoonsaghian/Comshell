@@ -20,6 +20,8 @@ function init(treeView) {
   atom.workspace.getCenter().onDidStopChangingActivePaneItem(() => {
     treeView.collapseDirectory(true, true);
     treeView.revealActiveFile({show: false, focus: false});
+    // to do: change this function to open gallery directories, instead of expanding them;
+    // https://github.com/atom/tree-view/blob/master/lib/tree-view.coffee#L364
   })
   atom.project.onDidChangePaths(() => {
     treeView.collapseDirectory(true, true);

@@ -11,6 +11,7 @@
     ]
     ignoredNames: [
       ".*"
+      "*.unsaved"
       "target"
       "Cargo.lock"
     ]
