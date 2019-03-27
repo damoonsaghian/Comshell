@@ -45,7 +45,7 @@ atom.workspace.addOpener(uri => {
   try { serializedBuffer = JSON.parse(data) }
   catch (err) { console.error(err); return }
 
-  // this makes "project.buildBuffer()" wait til the buffer is ready;
+  // this makes "atom.project.buildBuffer()" wait til the buffer is ready;
   // i can't understand why this does not work;
   atom.project.loadPromisesByPath[uri] =
     require('atom').TextBuffer.deserialize(serializedBuffer)
@@ -140,9 +140,18 @@ atom.workspace.getCenter().observeTextEditors(editor => {
   editor.onDidChangeCursorPosition(event => changedProjects.add(projectName));
 
   const buffer = editor.getBuffer();
-  buffer.onDidStopChanging(() => changedBuffers.add(buffer));
+  buffer.onDidStopChanging(() => {
+    if (!buffer.isModified()) {
+      changedBuffers.delete(buffer);
+      fs.unlink(buffer.getPath() + '.unsaved', err => {});
+    }
+    else { changedBuffers.add(buffer) }
+  });
   buffer.onDidSave((_) => {
-    if (!editor.isModified()) fs.unlink(buffer.getPath() + '.unsaved', err => {});
+    if (!buffer.isModified()) {
+      changedBuffers.delete(buffer);
+      fs.unlink(buffer.getPath() + '.unsaved', err => {});
+    }
   });
 });
 
