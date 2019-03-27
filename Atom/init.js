@@ -34,6 +34,8 @@ setInterval(() => {
 
 // before opening a text editor, see if there is an associated ".unsaved" file,
 //   restore the buffer;
+// an "opener" was the only mechanism i found for checking before opening a file;
+//   there can be better options;
 atom.workspace.addOpener(uri => {
   let data;
   try { data = fs.readFileSync(uri + '.unsaved') }
@@ -43,21 +45,18 @@ atom.workspace.addOpener(uri => {
   try { serializedBuffer = JSON.parse(data) }
   catch (err) { console.error(err); return }
 
-  // this makes "workspace.open()" wait til the buffer is added to the workspace;
-  atom.workspace.incoming.set(uri, new Promise(resolve =>
-    require('atom').TextBuffer.deserialize(serializedBuffer).then(
-      buffer => {
-        atom.project.addBuffer(buffer); // this doesn't work!
-        atom.workspace.incoming.delete(uri);
-        resolve();
-      },
-      err => {
-        console.log(err);
-        atom.workspace.incoming.delete(uri);
-        resolve();
-      }
-    )
-  ));
+  // this makes "project.buildBuffer()" wait til the buffer is ready;
+  // i can't understand why this does not work;
+  atom.project.loadPromisesByPath[uri] =
+    require('atom').TextBuffer.deserialize(serializedBuffer)
+      .then(buffer => {
+        delete atom.project.loadPromisesByPath[uri];
+        return buffer;
+      })
+      .catch(err => {
+        delete atom.project.loadPromisesByPath[uri];
+        throw err;
+      });
 });
 
 // { 'project name': projectPane }
