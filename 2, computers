@@ -1,6 +1,6 @@
 = asynchronous digital circuits
 in conventional digital circuits when the inputs change,
-  the outputs can have temporary incorrect values, until they stabilize to the correct values;
+  the outputs can have temporary invalid values, until they stabilize to the valid values;
 but for the circuit to do its job,
   gates with memory (registers) must operate only when the inputs have correct values;
 one solution is to synchronize registers with a global clock signal;
@@ -126,6 +126,30 @@ monitor block events and mount drives when a new block device is created;
       udisksctl mount --block-device "$devname" --no-user-interaction
     fi
   done&
+
+; mkdir -p ~/.config/fontconfig
+; nano ~/.config/fontconfig/fonts.conf
+  <?xml version='1.0'?>
+  <!DOCTYPE fontconfig SYSTEM 'fonts.dtd'>
+  <fontconfig>
+    <!-- Set preferred serif, sans serif, and monospace fonts; -->
+    <alias>
+      <family>serif</family>
+      <prefer><family>Hack</family></prefer>
+    </alias>
+    <alias>
+      <family>sans-serif</family>
+      <prefer><family>Hack</family></prefer>
+    </alias>
+    <alias>
+      <family>sans</family>
+      <prefer><family>Hack</family></prefer>
+    </alias>
+    <alias>
+      <family>monospace</family>
+      <prefer><family>Hack</family></prefer>
+    </alias>
+  </fontconfig>
 
 ; nano ~/.bash_profile
   export TZ="/usr/share/zoneinfo/<your_location>"
