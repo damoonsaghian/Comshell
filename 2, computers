@@ -53,7 +53,7 @@ in Linux (and other Unix based operating systems) most things appear in the file
 Arch Linux help us to setup and maintain a Linux system; it's simple and effective;
 
 first boot to an existing Arch Linux (the live image,
-  or an already installed Arch Linux with arch-install-scripts package installed);
+  or an already installed Arch Linux with "arch-install-scripts" package installed);
 ; timedatectl set-ntp true
 
 list disks using "fdisk -l"; then use "fdisk /dev/sdx" to create 3 partitions:
