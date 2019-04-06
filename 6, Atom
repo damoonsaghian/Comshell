@@ -1,0 +1,22 @@
+we can use Atom editor to create a prototype of Comshell;
+
+; sudo pacman -S xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-wm
+; nano ~/.bash_profile
+  startx
+; nano ~/.xinitrc
+  exec i3
+; mkdir -p ~/.config/i3
+; nano ~/.config/i3/config
+  # i3 config file (v4)
+  default_border none
+  default_floating_border none
+  focus_follows_mouse no
+  exec compton
+  exec atom
+  for_window [class=Atom] floating enable, \
+    resize set 100 ppt 100 ppt, move position center
+  bindsym Control+q kill; \
+    exec --no-startup-id "pgrep -x atom >/dev/null || i3-msg exit"
+
+; sudo pacman -S atom
+; cp Atom/* ~/.atom/
