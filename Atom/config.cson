@@ -1,0 +1,34 @@
+"*":
+  core:
+    autoHideMenuBar: true
+    disabledPackages: [
+      "background-tips"
+      "encoding-selector"
+      "grammar-selector"
+      "line-ending-selector"
+      "wrap-guide"
+      "welcome"
+    ]
+    ignoredNames: [
+      ".*"
+      "target"
+      "Cargo.lock"
+    ]
+    openEmptyEditorOnStart: false
+    restorePreviousWindowsOnStart: "no"
+    telemetryConsent: "limited"
+    themes: [
+      "one-light-ui"
+      "one-light-syntax"
+    ]
+  editor:
+    preferredLineLength: 100
+    showIndentGuide: true
+    softWrap: true
+    softWrapAtPreferredLineLength: true
+    softWrapHangingIndent: 2
+  "exception-reporting":
+    userId: "acabaca1-0ca6-43da-aa6f-0249774f4a52"
+  "tree-view":
+    hideIgnoredNames: true
+    sortFoldersBeforeFiles: false
