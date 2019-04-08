@@ -16,7 +16,7 @@ function init(treeView) {
   // numerical sorting: 10 after 9;
   //treeView.roots[0].directory.constructor.prototype.sortEntries = sortEntries;
 
-  atom.workspace.onDidStopChangingActivePaneItem(() => {
+  atom.workspace.getCenter().onDidStopChangingActivePaneItem(() => {
     treeView.roots.forEach(root => {
       root.collapse(true);
       root.expand(false);
@@ -24,8 +24,6 @@ function init(treeView) {
     treeView.revealActiveFile({show: false, focus: false});
     // to do: change this function to open gallery directories, instead of expanding them;
     // https://github.com/atom/tree-view/blob/master/lib/tree-view.coffee#L364
-
-    if (!atom.workspace.getCenter().getActivePaneItem()) treeView.focus();
   })
 }
 
