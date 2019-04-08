@@ -2,6 +2,12 @@ const fs = require('fs');
 const path = require('path');
 const SelectList = global.require('atom-select-list');
 
+atom.workspace.observeTextEditors(editor => {
+  const grammar = editor.getGrammar();
+  if (grammar.name === "Plain Text" || grammar === atom.grammars.nullGrammar)
+    atom.textEditors.setGrammarOverride(editor, 'text.plain');
+});
+
 const projectsDir = path.join(require('os').homedir(), 'projects');
 // if "~/projects/" directory does not exist, create it;
 fs.stat(projectsDir, (err, stats) => {
