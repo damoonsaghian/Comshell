@@ -72,7 +72,7 @@ now you can even reuse packages previously downloaded on current system,
 ; pacstrap /mnt pacman
 ; arch-chroot /mnt
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
-  networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip ttf-hack ttf-droid rustup gcc
+  networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip ttf-hack noto-fonts rustup gcc
 
 install boot_loader:
 ; grub-install --target=i386-pc /dev/sdx
@@ -135,15 +135,15 @@ monitor block events and mount drives when a new block device is created;
     <!-- Set preferred serif, sans serif, and monospace fonts; -->
     <alias>
       <family>serif</family>
-      <prefer><family>Hack</family></prefer>
+      <prefer><family>NotoSerif</family></prefer>
     </alias>
     <alias>
       <family>sans-serif</family>
-      <prefer><family>Hack</family></prefer>
+      <prefer><family>NotoSans</family></prefer>
     </alias>
     <alias>
       <family>sans</family>
-      <prefer><family>Hack</family></prefer>
+      <prefer><family>NotoSans</family></prefer>
     </alias>
     <alias>
       <family>monospace</family>
