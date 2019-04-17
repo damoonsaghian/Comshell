@@ -16,7 +16,7 @@ so here is what we do:
 "https://gtk-rs.org/docs/gtk/trait.TextBufferExt.html#tymethod.get_text"
 
 ; sudo pacman -S gtk3 gtksourceview3 webkit2gtk gst-plugins-{base,good,bad} gst-libav \
-  materia-gtk-theme sway
+  materia-gtk-theme sway xorg-server-xwayland
 
 ; mkdir -p ~/.config/gtk-3.0; nano ~/.config/gtk-3.0/settings.ini
   [Settings]
