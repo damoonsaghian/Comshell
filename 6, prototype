@@ -1,7 +1,7 @@
 we can use existing tools to create a prototype of Comshell;
 
 ; sudo pacman -S xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-wm
-; sudo pacman -S emacs chromium mpv
+; sudo pacman -S emacs qutebrowser mpv
 
 ; nano ~/.bash_profile
   startx
@@ -14,21 +14,3 @@ we can use existing tools to create a prototype of Comshell;
 ; cp prototype/*.el ~/.emacs.d/
 ELisp is terrible as a programming language,
   but it's pretty good as a command_line interface (ie as a shell, like Bash);
-
-; mkdir -p ~/.config/gtk-3.0
-; nano ~/.config/gtk-3.0/gtk.css
-  GtkScrollbar {}
-
-user scripts:
-  https://github.com/fanglingsu/vimb/tree/master/src/scripts
-  https://surf.suckless.org/files/link_hints/
-  https://surf.suckless.org/files/easier_key/
-user style sheets:
-  // show scrollbar on the left;
-  .parent {
-    overflow: auto;
-    transform: scaleX(-1);
-  }
-  .sleeve {
-    transform: scaleX(-1);
-  }
