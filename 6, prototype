@@ -14,3 +14,18 @@ we can use existing tools to create a prototype of Comshell;
 ; cp prototype/*.el ~/.emacs.d/
 ELisp is terrible as a programming language,
   but it's pretty good as a command_line interface (ie as a shell, like Bash);
+
+; mkdir -p ~/.config/gtk-3.0
+; nano ~/.config/gtk-3.0/gtk.css
+  scrollbar {
+    min-width: 2px;
+    min-height: 2px;
+    background: repeating-linear-gradient(#777777, #777777 8px, #ffffff 8px, #ffffff 10px);
+  }
+  scrollbar slider {
+    min-width: 2px;
+    min-height: 2px;
+    border: 0px;
+    border-radius: 0px;
+    background-color: #ffffff;
+  }
