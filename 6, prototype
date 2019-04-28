@@ -1,6 +1,6 @@
 we can use existing tools to create a prototype of Comshell;
 
-; sudo pacman -S xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-wm i3status
+; sudo pacman -S xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-gaps i3status
 ; sudo pacman -S emacs qutebrowser mpv
 
 ; nano ~/.bash_profile
