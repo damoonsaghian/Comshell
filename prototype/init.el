@@ -72,7 +72,7 @@
 (add-to-list 'default-frame-alist '(foreground-color . "#222222"))
 (set-face-attribute 'highlight nil :background "#CCFFFF")
 (set-face-attribute 'region nil :background "#CCFFFF")
-(set-face-attribute 'default nil :family "Hack" :height 105)
+(set-face-attribute 'default nil :family "Monospace" :height 105)
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
 
 (setq-default truncate-lines t)
