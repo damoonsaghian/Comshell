@@ -13,11 +13,6 @@
 (setq-default major-mode 'text-mode)
 ;; automatically recover unsaved files;
 
-;; auto-save-file-name-transforms
-;;(when (not (file-exists-p ".cache"))
-;;  (make-directory ".cache"))
-;;(setq auto-save-file-name-transforms
-;;      '((".*" ".cache/" t)))
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Recover.html
 ;; https://www.emacswiki.org/emacs/AutoSave#toc1
 ;;   https://www.gnu.org/software/emacs/manual/html_node/emacs/Auto-Save-Files.html
@@ -31,7 +26,7 @@
 ;; (setq ido-enable-flex-matching t)
 ;; (setq ido-everywhere t)
 ;; (ido-mode 1)
-;; ido-ubiquitous, helm, icicles, icomplete
+;; ido-ubiquitous, helm, icomplete
 
 (defun double-space-to-tab ()
   (interactive)
@@ -148,7 +143,7 @@
 
 (load "./project-tree")
 
-(load "./modalka")
+;;(load "./modalka")
 
 (require-package 'adaptive-wrap)
 (setq-default adaptive-wrap-extra-indent tab-width)
