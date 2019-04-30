@@ -115,7 +115,7 @@ so if you like you can do this:
 ; pactl set-sink-mute @DEFAULT_SINK@ 0
 ; pactl set-sink-volume @DEFAULT_SINK@ 100%
 
-monitor block events and mount drives when a new block device is created;
+mount drives when a new block device is created;
   stale mount points are automatically removed by "udisksd";
 ; nano ~/.bash_profile
   pathtoname() {

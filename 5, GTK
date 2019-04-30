@@ -15,21 +15,26 @@ so here is what we do:
 "https://gtk-rs.org/docs/sourceview/"
 "https://gtk-rs.org/docs/gtk/trait.TextBufferExt.html#tymethod.get_text"
 
-; sudo pacman -S gtk3 gtksourceview3 webkit2gtk gst-plugins-{base,good,bad} gst-libav \
-  materia-gtk-theme sway xorg-server-xwayland
+; sudo pacman -S sway xorg-server-xwayland materia-gtk-theme
+; sudo pacman -S gtk3 gtksourceview3 webkit2gtk gst-plugins-{base,good,bad} gst-libav
 
-; mkdir -p ~/.config/gtk-3.0; nano ~/.config/gtk-3.0/settings.ini
+; mkdir -p ~/.config/gtk-3.0
+; nano ~/.config/gtk-3.0/settings.ini
   [Settings]
   gtk-theme-name = Materia-light-compact
   gtk-font-name = Sans
+; nano ~/.config/gtk-3.0/gtk.css
+  scrollbar slider {
+    border: 0px;
+    border-radius: 0px;
+  }
 
 ; nano ~/.bash_profile
   sway
 ; mkdir -p ~/.config/sway
 ; nano ~/.config/sway/config
   default_border none
-  exec --no-startup-id "cargo run --release --manifest-path "comshell-Cargo.toml-path"; \
-    swaymsg exit"
+  exec --no-startup-id "cargo run --release --manifest-path path-to-Cargo.toml; swaymsg exit"
 
 "https://crates.io/crates/webkit2gtk"
 pdf.js
@@ -63,7 +68,7 @@ in "~/.config/gtk-3.0/gtk.css":
 "https://superuser.com/questions/1365329/how-do-i-make-the-focus-rectangle-in-gtk3-more-prominent"
 "https://github.com/xi/gtk-theme-clearcodes/tree/master/gtk-3.0"
 draw arrow at cursor position in TextView in GTK3:
-  "https://gist.github.com/musiKk/2266946"XS
+  "https://gist.github.com/musiKk/2266946"
 
 "https://crates.io/crates/serde"
 "https://github.com/ron-rs/ron"
