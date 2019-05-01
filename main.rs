@@ -4,56 +4,6 @@ use may_actor::Actor;
 use std::{rc::Rc, cell::RefCell};
 use gtk::{self, prelude::*};
 use gdk::enums::key;
-use sourceview::{self as editor, prelude::*};
-use webkit2gtk::{self as webkit, WebViewExt, WebContextExt};
-
-pub struct Editor {
-  buffer: editor::Buffer,
-  view: editor::View
-}
-
-impl Editor {
-  pub fn prev_page(self) {}
-  pub fn next_page(self) {}
-  pub fn prev_item(self) {}
-  pub fn next_item(self) {}
-}
-
-pub struct Gallery {}
-
-pub enum Item {
-  Editor,
-  Gallery
-}
-
-pub struct ProjectTree {}
-
-pub struct ProjectView {
-  overlay: ,
-  project_tree: ProjectTree,
-  editor: RefCell<Item>
-}
-
-impl ProjectView {
-  fn new() {
-    let overlay = ;
-    let project_tree = ;
-    let vbox = gtk::Box::new();
-    vbox.pack();
-    ProjectView { overlay, project_tree,  }
-  }
-}
-
-pub struct Project {
-  project_views: RefCell<HashMap<String, ProjectView>>,
-  notebook: gtk::NoteBook
-}
-
-impl Project {
-  pub fn go_to_chapter(self, chapter_path: &str) {}
-  pub fn prev_chapter(self) {}
-  pub fn next_chapter(self) {}
-}
 
 // list of projects in "~/projects/";
 pub struct ProjectsList {
@@ -117,7 +67,7 @@ fn main() {
                          year = now.year(), month = now.month(), day = now.day(), weekday = now.weekday(),
                          hour = hour, minute = now.minute(), am_pm = if is_pm {"pm"} else {"am"});
       // let date = now.format("%F %a %I:%M%P").to_string();
-      r::do_in-gtk_eventloop(|refs| refs.statusbar_info.set_text(&date));
+      r::do_in_gtk_eventloop(|refs| refs.statusbar_info.set_text(&date));
     }
   );
 

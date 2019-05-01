@@ -129,6 +129,9 @@ note that if we put a generic type parameter in the return type of a function,
 
 "fn(T1) -> T2" is not an unsized type like "str", it's a function pointer;
 
+"https://crates.io/crates/serde"
+"https://github.com/ron-rs/ron"
+
 = learning
 actors can contain parameters which can be adjusted gradually, based on received messages;
   this can be used to implement learning capabilities;

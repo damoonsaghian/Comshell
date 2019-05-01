@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["Damoon Saghian <damoonsaghian84@gmail.com>"]
 description = "a unified computing environment, utilizing command based user interface"
 repository = "https://github.com/damoonsaghian/Comshell"
-license = "Unlicense"
+license = "MIT OR Apache-2.0"
 edition = "2018"
 
 [[bin]]

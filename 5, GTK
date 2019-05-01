@@ -15,19 +15,12 @@ so here is what we do:
 "https://gtk-rs.org/docs/sourceview/"
 "https://gtk-rs.org/docs/gtk/trait.TextBufferExt.html#tymethod.get_text"
 
+"https://github.com/donadigo/elementary-ide/tree/master/src/Widgets"
+"https://github.com/teejee2008/polo/tree/master/src/Gtk"
+"https://github.com/teejee2008/polo/tree/master/src/Utility"
+
 ; sudo pacman -S sway xorg-server-xwayland materia-gtk-theme
 ; sudo pacman -S gtk3 gtksourceview3 webkit2gtk gst-plugins-{base,good,bad} gst-libav
-
-; mkdir -p ~/.config/gtk-3.0
-; nano ~/.config/gtk-3.0/settings.ini
-  [Settings]
-  gtk-theme-name = Materia-light-compact
-  gtk-font-name = Sans
-; nano ~/.config/gtk-3.0/gtk.css
-  scrollbar slider {
-    border: 0px;
-    border-radius: 0px;
-  }
 
 ; nano ~/.bash_profile
   sway
@@ -36,22 +29,12 @@ so here is what we do:
   default_border none
   exec --no-startup-id "cargo run --release --manifest-path path-to-Cargo.toml; swaymsg exit"
 
-"https://crates.io/crates/webkit2gtk"
-pdf.js
-
-for gallery view: gtk::FlowBox, gtk::Scrollable
-gstreamer, gstreamer_player
-"https://slomo.pages.freedesktop.org/rustdocs/gstreamer/gstreamer/"
-"https://gitlab.freedesktop.org/gstreamer/gstreamer-rs/tree/master/examples"
-"https://gitlab.freedesktop.org/gstreamer/gstreamer-rs/tree/master/tutorials"
-"https://gstreamer.freedesktop.org/documentation/"
-gtkglsink, gtksink:
-  "https://stackoverflow.com/a/32695253"
-  "https://stackoverflow.com/a/39173641"
-  "https://riptutorial.com/gtk3/example/24777/embed-a-video-in-a-gtk-window-in-python3"
-  "https://wiki.gnome.org/Projects/Vala/GStreamerSample"
-
-gspell
+; mkdir -p ~/.config/gtk-3.0
+; cp gtk.css ~/.config/gtk-3.0/gtk.css
+; nano ~/.config/gtk-3.0/settings.ini
+  [Settings]
+  gtk-theme-name = Materia-light-compact
+  gtk-font-name = Sans
 
 gradient + animation -> cursor
 "https://developer.gnome.org/gtk3/stable/chap-css-properties.html"
@@ -69,7 +52,3 @@ in "~/.config/gtk-3.0/gtk.css":
 "https://github.com/xi/gtk-theme-clearcodes/tree/master/gtk-3.0"
 draw arrow at cursor position in TextView in GTK3:
   "https://gist.github.com/musiKk/2266946"
-
-"https://crates.io/crates/serde"
-"https://github.com/ron-rs/ron"
-"https://crates.io/crates/rustbreak"
