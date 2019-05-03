@@ -10,7 +10,6 @@ so here is what we do:
 
 "https://mmstick.github.io/gtkrs-tutorials/introduction.html"
 "https://github.com/gtk-rs/examples/tree/master/src/bin"
-"https://github.com/oakes/SolidOak/tree/master/src"
 "https://gtk-rs.org/docs/gtk/"
 "https://gtk-rs.org/docs/sourceview/"
 "https://gtk-rs.org/docs/gtk/trait.TextBufferExt.html#tymethod.get_text"
@@ -27,14 +26,15 @@ so here is what we do:
 ; mkdir -p ~/.config/sway
 ; nano ~/.config/sway/config
   default_border none
+  set $gnome-schema org.gnome.desktop.interface
+  exec_always {
+    gsettings set $gnome-schema gtk-theme Materia-light-compact
+    gsettings set $gnome-schema font-name Sans
+  }
   exec --no-startup-id "cargo run --release --manifest-path path-to-Cargo.toml; swaymsg exit"
 
 ; mkdir -p ~/.config/gtk-3.0
 ; cp gtk.css ~/.config/gtk-3.0/gtk.css
-; nano ~/.config/gtk-3.0/settings.ini
-  [Settings]
-  gtk-theme-name = Materia-light-compact
-  gtk-font-name = Sans
 
 gradient + animation -> cursor
 "https://developer.gnome.org/gtk3/stable/chap-css-properties.html"
