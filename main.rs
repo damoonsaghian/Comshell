@@ -8,12 +8,12 @@ use gdk::enums::key;
 // list of projects in "~/projects/";
 pub struct ProjectsList {
   paths_list: RefCell<Vec<Path>>,
-  list_view:
+  view: gtk::TreeView
 }
 
 impl ProjectList {
   pub fn new() -> ProjectList {
-    ProjectList {}
+  ProjectList {}
   }
 
   pub fn go_to_project(self, project_path: &str) {}
@@ -21,8 +21,9 @@ impl ProjectList {
 
 mod r {
   pub struct Refs {
-    main_view: gtk::Stack,
-    open_projects: HashMap<String, Project>
+    open_projects: HashMap<String, Project>,
+    projects_list: ProjectsList,
+    main_view: gtk::Stack
   }
 
   ::gtk_fnonce_on_eventloop::with_gtk!(Refs);
@@ -61,11 +62,11 @@ fn main() {
   ::timer::Timer.new().schedule(::chrono::Local::now(), Some(::std::time::Duration.new(60, 0)),
     move || {
       use chrono::prelude::*;
-      let now = Utc::now().with_timezone(&::chrono_tz::...)
+      let now = Local::now();
       let (is_pm, hour) = now.hour12();
       let date = format!("{year}-{month:02}-{day:02} {weekday:?} {hour:02}:{minute:02}{am_pm}",
-                         year = now.year(), month = now.month(), day = now.day(), weekday = now.weekday(),
-                         hour = hour, minute = now.minute(), am_pm = if is_pm {"pm"} else {"am"});
+        year = now.year(), month = now.month(), day = now.day(), weekday = now.weekday(),
+        hour = hour, minute = now.minute(), am_pm = if is_pm {"pm"} else {"am"});
       // let date = now.format("%F %a %I:%M%P").to_string();
       r::do_in_gtk_eventloop(|refs| refs.statusbar_info.set_text(&date));
     }
