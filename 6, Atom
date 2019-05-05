@@ -1,0 +1,39 @@
+we can use Atom editor to create a prototype of Comshell;
+
+; sudo pacman -S xorg-server xorg-xinit xf86-video-{intel,nouveau,amdgpu} compton i3-wm
+; nano ~/.bash_profile
+  startx
+; nano ~/.xinitrc
+  exec i3
+; mkdir -p ~/.config/i3
+; nano ~/.config/i3/config
+  # i3 config file (v4)
+  default_border none
+  default_floating_border none
+  focus_follows_mouse no
+  exec compton
+  exec atom
+  for_window [class=Atom] floating enable, \
+    resize set 100 ppt 100 ppt, move position center
+  bindsym Control+q kill; \
+    exec --no-startup-id "pgrep -x atom >/dev/null || i3-msg exit"
+
+; sudo pacman -S atom
+; cp Atom/* ~/.atom/
+
+native Launcher: rework Atom startup process by introducing a dedicated native executable that checks for a running Atom application and boots one up if needed;
+
+for treeview define a new command (and bind it) which first checks
+  if the entry is a directory containing a ".gallery" file,
+  if so, open gallery, if not, call the actual command;
+atom.workspace.addOpener(uri => ...)
+  if uri is a directory containing a ".gallery" file
+    return the model for gallery view implementing ".getPath()"
+
+atom.project.relativizePath(...)
+require("child-process").exec("")
+
+http://bluegalaxy.info/codewalk/2018/05/24/atom-enable-style-editor-scrollbars/
+https://discuss.atom.io/t/change-the-color-and-width-of-editors-sidebar/18545
+
+https://atom.io/packages/plain-simple
