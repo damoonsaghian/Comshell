@@ -16,10 +16,9 @@ use files_tree::FilesTree;
 use web_browser::WebBrowser;
 
 pub struct View {
-  item: RefCell<Item>,
-  file_tree: FilesTree,
-  web_browsers: RefCell<HashMap<String, WebBrowser>>,
-  external_projects: RefCell<HashMap<String, Project>>
+  item: Item,
+  files_tree: FilesTree,
+  floating_layer: gtk::Container
 }
 
 impl View {
@@ -33,8 +32,10 @@ impl View {
 }
 
 pub struct Project {
-  project_views: RefCell<HashMap<String, ProjectView>>,
-  notebook: gtk::NoteBook
+  views: RefCell<HashMap<String, View>>,
+  notebook: gtk::NoteBook,
+  web_browsers: RefCell<HashMap<String, WebBrowser>>,
+  external_projects: RefCell<HashMap<String, Project>>
 }
 
 impl Project {

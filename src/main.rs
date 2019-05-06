@@ -12,7 +12,6 @@ pub struct ProjectsList {
   view: gtk::TreeView
 }
 
-// https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview
 impl ProjectList {
   pub fn new() -> ProjectList {
   ProjectList {}
@@ -41,8 +40,9 @@ fn main() {
   }
 
   let normal_mode = true;
-  let open_projects: Rc<Refcell<HashMap<String, Project>>> =
-    Rc::new(RefCell::new(HashMap::new()));
+  use project::Project;
+  let open_projects: Actor<HashMap<String, Project>> =
+    Actor::new(HashMap::new());
   let projects_list = ProjectsList::new();
   let main_view = gtk::Stack::new();
 
@@ -75,6 +75,7 @@ fn main() {
   );
 
   // this is only for testing;
+  use webkit2gtk::{self as webkit, WebViewExt, WebContextExt};
   let view = webkit::WebView::new();
   view.load_uri("http://www.google.com/");
   main_view.add_named(view, "webview");
