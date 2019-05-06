@@ -10,7 +10,7 @@ edition = "2018"
 [dependencies]
 may_actor = "0.2.2"
 gtk-fnonce-on-eventloop = "0.2.1"
-Gtk = { version = "0.6.0", features = ["v3_24"] }
+gtk = { version = "0.6.0", features = ["v3_24"] }
 gdk = { version = "0.10.0", features = ["v3_24"] }
 sourceview = { version = "0.6.0", features = ["v3_24"] }
 webkit2gtk = { version = "0.6.0", features = ["v2_16"] }
