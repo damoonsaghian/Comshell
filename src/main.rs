@@ -5,6 +5,15 @@ use std::{rc::Rc, cell::RefCell};
 use gtk::{self, prelude::*};
 use gdk::enums::key;
 
+fn do_in_main_thread<F>(func: F)
+where F: FnOnce() {
+  use glib::source;
+  source::idle_add(|| {
+    func();
+    source::Continue(false)
+  });
+}
+
 // list of projects in "~/projects/";
 pub struct ProjectsList {
   paths_list: RefCell<Vec<Path>>,
@@ -18,19 +27,6 @@ impl ProjectList {
   }
 
   pub fn go_to_project(self, project_path: &str) {}
-}
-
-mod r {
-  pub struct Refs {
-    open_projects: HashMap<String, Project>,
-    projects_list: ProjectsList,
-    main_view: gtk::Stack
-  }
-
-  ::gtk_fnonce_on_eventloop::with_gtk!(Refs);
-  // this macro emits the following public elements:
-  //   pub fn init_storage(&Refs);
-  //   pub fn do_in_gtk_eventloop( FnOnce(Rc<Refs>) );
 }
 
 fn main() {
@@ -70,7 +66,10 @@ fn main() {
         year = now.year(), month = now.month(), day = now.day(), weekday = now.weekday(),
         hour = hour, minute = now.minute(), am_pm = if is_pm {"pm"} else {"am"});
       // let date = now.format("%F %a %I:%M%P").to_string();
-      r::do_in_gtk_eventloop(|refs| refs.statusbar_info.set_text(&date));
+      let statusbar_info_clone = statusbar_info.clone();
+      do_in_main_thread(move || {
+        statusbar_info.set_text(&date);
+      });
     }
   );
 
@@ -92,7 +91,7 @@ fn main() {
     let window = gtk::Window::new(gtk::WindowType::Toplevel);
     window.connect_delete_event(move |_, _| {
       gtk::main_quit();
-      Inhibit(false)
+      gtk::Inhibit(false)
     });
     window.add(root_box);
     window.show_all();
@@ -100,12 +99,7 @@ fn main() {
   }
 
   // and in other threads:
-  // r::do_in_gtk_eventloop(|refs| {refs.open_projects.borrow_mut().insert(_, _)});
-
-  r::init_storage(r::Refs {
-    main_view,
-    open_projects
-  });
+  // do_in_main_thread(move || { open_projects.borrow_mut().insert(_, _); });
 
   gtk::main();
 }
