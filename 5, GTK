@@ -4,8 +4,19 @@ so for data structures containing widgets:
 , use "RefCell", where you want mutability;
 , use "Rc" to create references;
 
+pub fn do_in_main_thread<F>(func: F)
+  where F: FnOnce()
+{
+  use glib::source;
+  source::idle_add(|| {
+    func();
+    source::Continue(false)
+  });
+}
+
 "https://mmstick.github.io/gtkrs-tutorials/introduction.html"
-"https://github.com/gtk-rs/examples/tree/master/src/bin"
+"https://github.com/gtk-rs/examples/tree/master/src/bin" (list_store ...)
+"https://developer.gnome.org/platform-overview/unstable/"
 "https://gtk-rs.org/docs/gtk/"
 "https://gtk-rs.org/docs/sourceview/"
 "https://gtk-rs.org/docs/gtk/trait.TextBufferExt.html#tymethod.get_text"
@@ -13,6 +24,8 @@ so for data structures containing widgets:
 "https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
 "https://github.com/teejee2008/polo/tree/master/src/Gtk"
 "https://github.com/teejee2008/polo/tree/master/src/Utility"
+"https://github.com/fengalin/media-toc"
+"https://developer.gnome.org/SaveWindowState/"
 
 ; sudo pacman -S sway xorg-server-xwayland materia-gtk-theme
 ; sudo pacman -S gtk3 gtksourceview3 webkit2gtk gst-plugins-{base,good,bad} gst-libav
@@ -30,7 +43,23 @@ so for data structures containing widgets:
   exec --no-startup-id "cargo run --release --manifest-path path-to-Cargo.toml; swaymsg exit"
 
 ; mkdir -p ~/.config/gtk-3.0
-; cp gtk.css ~/.config/gtk-3.0/gtk.css
+; nano ~/.config/gtk-3.0/gtk.css
+  scrollbar {
+    background-color: #dddddd;
+  }
+  scrollbar slider {
+    border: 0px;
+    border-radius:0px;
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+  scrollbar.overlay-indicator:not(.dragging):not(.hovering) slider {
+    border: 0px;
+    margin: 0px;
+  }
+  scrollbar.overlay-indicator:not(.dragging):not(.hovering) button {
+    border: 0px;
+    margin: 0px;
+  }
 
 gradient + animation -> cursor
 "https://developer.gnome.org/gtk3/stable/chap-css-properties.html"

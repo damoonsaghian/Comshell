@@ -45,9 +45,4 @@ https://atom.io/packages/Navigate
 https://atom.io/packages/quick-file-browser
 
 "https://atom.io/packages/plain-simple"
-
-atom.project.relativizePath(...)
-
-require("child-process").exec("")
-
 "https://medium.com/hacking-atom/tweak-your-atom-s-init-script-without-reloading-atom-with-a-declarative-module-8b1c0f208663"
