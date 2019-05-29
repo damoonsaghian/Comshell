@@ -11,6 +11,7 @@ we can use Atom editor to create a prototype of Comshell;
     resize set 100 ppt 100 ppt, move position center
   exec --no-startup-id "atom --wait; i3-msg exit"
 ; cp Atom/* ~/.atom/
+set your time_zone in "~/.atom/config.cson";
 
 native Launcher: rework Atom startup process by introducing a dedicated native executable that checks for a running Atom application and boots one up if needed;
 
@@ -33,16 +34,16 @@ modal key bindings:
 "https://atom.io/packages/git-plus"
 "https://atom.io/packages/atom-video"
 
-https://github.com/sh8/web-lookup/blob/master/lib/web-lookup.coffee
-  https://github.com/sh8/web-lookup/blob/master/lib/web-lookup-view.coffee
-https://github.com/skandasoft/browser-plus/blob/master/package.json
-  https://github.com/skandasoft/browser-plus/tree/master/lib
-https://github.com/skandasoft/browser-plus-open-new-window
-https://github.com/nju33/atom-pane-browser
-https://github.com/sean-codes/atom-browser
+"https://github.com/sh8/web-lookup/blob/master/lib/web-lookup.coffee"
+  "https://github.com/sh8/web-lookup/blob/master/lib/web-lookup-view.coffee"
+"https://github.com/skandasoft/browser-plus/blob/master/package.json"
+  "https://github.com/skandasoft/browser-plus/tree/master/lib"
+"https://github.com/skandasoft/browser-plus-open-new-window"
+"https://github.com/nju33/atom-pane-browser"
+"https://github.com/sean-codes/atom-browser"
 
-https://atom.io/packages/Navigate
-https://atom.io/packages/quick-file-browser
+"https://atom.io/packages/Navigate"
+"https://atom.io/packages/quick-file-browser"
 
 "https://atom.io/packages/plain-simple"
 "https://medium.com/hacking-atom/tweak-your-atom-s-init-script-without-reloading-atom-with-a-declarative-module-8b1c0f208663"
