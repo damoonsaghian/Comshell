@@ -22,6 +22,8 @@
       "one-light-ui"
       "one-light-syntax"
     ]
+  comshell:
+    timeZone: "UTC"
   editor:
     preferredLineLength: 100
     showIndentGuide: true

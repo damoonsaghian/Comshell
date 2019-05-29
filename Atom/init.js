@@ -21,8 +21,6 @@ fs.stat(projectsDir, (err, stats) => {
 
 class ProjectsList {
   constructor() {
-    this.modalPanel = null;
-    //this.previouslyFocusedElement = null;
     this.selectList = new SelectList({
       items: [],
 
@@ -47,39 +45,32 @@ class ProjectsList {
         this.modalPanel.hide();
 
         atom.workspace.getCenter().getActivePane().activate();
-        //if (this.previouslyFocusedElement) {
-        //  this.previouslyFocusedElement.focus();
-        //  this.previouslyFocusedElement = null;
-        //}
       }
     });
+
+    this.modalPanel = atom.workspace.addModalPanel({ item: this.selectList, visible: false});
   }
 
   show() {
     //this.previouslyFocusedElement = document.activeElement;
 
     fs.readdir(projectsDir, (err, fileNames) => {
-      if (err) { alert(err.message); }
-      else {
-        const projectNames = fileNames.filter(
-          fileName => fs.statSync(path.join(projectsDir, fileName)).isDirectory()
-        );
-        this.selectList.update({ items: projectNames });
-      }
+      if (err) { alert(err.message); return }
+
+      const projectNames = fileNames.filter(
+        fileName => fs.statSync(path.join(projectsDir, fileName)).isDirectory()
+      );
+      const currentProjectPath = atom.project.getPaths()[0];
+      const currentProjectName = currentProjectPath ?
+        path.relative(projectsDir, currentProjectPath) : null;
+
+      this.selectList.update({
+        items: projectNames,
+        initialSelectionIndex:
+          currentProjectName ? projectNames.indexOf(currentProjectName) : 0
+      });
     });
 
-    const projectPath = atom.project.getPaths()[0];
-    if (projectPath) this.selectList.update(
-      {
-        initialSelectionIndex: this.selectList.items.indexOf(
-          path.relative(projectsDir, projectPath)
-        )
-      }
-    );
-
-    if (!this.modalPanel) {
-      this.modalPanel = atom.workspace.addModalPanel({ item: this.selectList});
-    }
     this.modalPanel.show();
     this.selectList.focus();
   }
@@ -88,9 +79,7 @@ class ProjectsList {
 }
 
 const projectsList = new ProjectsList();
-projectsList.show();
-if (atom.project.getPaths()[0])
-  projectsList.selectList.props.didCancelSelection();
+if (!atom.project.getPaths()[0]) projectsList.show();
 
 atom.commands.add('atom-workspace', {
   'comshell:projects-list': () => {
@@ -105,22 +94,13 @@ atom.commands.add('atom-workspace', {
 // to define keybindings for projectsList, add a class:
 projectsList.selectList.element.classList.add('projects-list');
 
+//require('./state-store');
 require('./status-bar');
 require('./tree-view');
 
-// 2 spaces -> enter
 atom.commands.add('atom-text-editor', 'comshell:space', () => {
-  const editor = atom.workspace.getActiveTextEditor(); // WRONG
-  const cursor = editor.getLastCursor();
-
-  if (cursor.hasPrecedingCharactersOnLine()) {
-    editor.setText(' ');
-  } else if (cursor.isAtBeginningOfLine()) {
-    editor.setText('\n');
-  } else {
-    editor.backspace();
-    editor.setText('\n');
-  }
+})
+atom.commands.add('atom-text-editor', 'comshell:comma', () => {
 })
 
 /* importing from a package (probably a bad idea)

@@ -15,9 +15,12 @@ function showDateTime(statusBar) {
   statusBar.addRightTile({ item: dateTimeElement, priority: -1 });
 
   function updateDateTime() {
-    const now = new Date();
+    const now = new Date(new Date()
+      .toLocaleString("en-US", {timeZone: atom.config.get('comshell.timeZone')})
+    );
+
     setTimeout(updateDateTime, (60 - now.getSeconds()) * 1000);
-    /*
+
     const weekDay = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][now.getDay()];
     const hour = now.getHours();
     const hour12 = hour == 0 ? 12 : hour > 12 ? hour - 12 : hour;
@@ -27,11 +30,6 @@ function showDateTime(statusBar) {
     dateTimeElement.textContent =
       now.getFullYear() +'/'+ (now.getMonth()+1) +'/'+ now.getDate() +' '+
       weekDay +' '+ dayPeriod +' '+ hour12 +':'+ minute2digits;
-    */
-
-    new (require('atom').BufferedProcess)({command: 'date', args: ['+"%F %a %p %I:%M"'],
-      stdout: output => dateTimeElement.textContent = output.slice(0,output.length - 2).slice(1)
-    });
   }
 
   // update date after computer wakes up from sleep;
