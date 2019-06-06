@@ -1,48 +1,97 @@
-if (atom.packages.isPackageActive('tree-view')) {
-  const treeView = atom.packages.getActivePackage('tree-view').mainModule.getTreeViewInstance();
-  if (treeView) { init(treeView) }
+use std::collections::HashMap;
+use may_actor::Actor;
+
+use std::{rc::Rc, cell::RefCell};
+use utils::do_in_main_thread;
+use gtk::{self, prelude::*};
+use gdk::enums::key;
+
+// list of projects in "~/projects/";
+pub struct ProjectsList {
+  paths_list: RefCell<Vec<Path>>,
+  model: gtk::ListStore,
+  view: gtk::TreeView
 }
-atom.packages.onDidActivatePackage(activatedPackage => {
-  if (activatedPackage === atom.packages.getActivePackage('tree-view')) {
-    const treeView = activatedPackage.mainModule.getTreeViewInstance();
-    if (treeView) { init(treeView) }
+
+impl ProjectList {
+  pub fn new() -> ProjectList {
+  ProjectList {}
   }
-});
 
-function init(treeView) {
-  // remove disclosure arrows in tree_view;
-  treeView.list.classList.remove('has-collapsable-children');
+  pub fn go_to_project(self, project_path: &str) {}
+}
 
-  // numerical sorting: 10 after 9;
-  //treeView.roots[0].directory.constructor.prototype.sortEntries = sortEntries;
+fn main() {
+  if gtk::init().is_err() {
+    println!("failed to initialize GTK;");
+    return;
+  }
 
-  atom.workspace.getCenter().onDidStopChangingActivePaneItem(() => {
-    treeView.roots.forEach(root => {
-      root.collapse(true);
-      root.expand(false);
+  let normal_mode = true;
+  use project::Project;
+  let open_projects: Actor<HashMap<String, Project>> =
+    Actor::new(HashMap::new());
+  let projects_list = ProjectsList::new();
+  let main_view = gtk::Stack::new();
+
+  // show projects list
+
+  let statusbar_message = gtk::Label::new("");
+  statusbar_message.set_single_line_mode(true);
+  statusbar_message.set_halign(gtk::Align::Start);
+  statusbar_message.set_margin_start(2);
+  statusbar_message.set_margin_end(2);
+
+  let statusbar_info = gtk::Label::new("");
+  statusbar_info.set_single_line_mode(true);
+  statusbar_info.set_halign(gtk::Align::End);
+  statusbar_info.set_margin_start(2);
+  statusbar_info.set_margin_end(2);
+
+  // update the date shown in statusbar_info, every (full) minute;
+  ::timer::Timer.new().schedule(::chrono::Local::now(), Some(::std::time::Duration.new(60, 0)),
+    move || {
+      use chrono::prelude::*;
+      let now = Local::now();
+      let (is_pm, hour) = now.hour12();
+      let date = format!("{year}-{month:02}-{day:02} {weekday:?} {hour:02}:{minute:02}{am_pm}",
+        year = now.year(), month = now.month(), day = now.day(), weekday = now.weekday(),
+        hour = hour, minute = now.minute(), am_pm = if is_pm {"pm"} else {"am"});
+      // let date = now.format("%F %a %I:%M%P").to_string();
+      let statusbar_info_clone = statusbar_info.clone();
+      do_in_main_thread(move || {
+        statusbar_info.set_text(&date);
+      });
+    }
+  );
+
+  // this is only for testing;
+  use webkit2gtk::{self as webkit, WebViewExt, WebContextExt};
+  let view = webkit::WebView::new();
+  view.load_uri("http://www.google.com/");
+  main_view.add_named(&view, "webview");
+
+  // now connect the widgets, through intermidiate containers;
+  {
+    let statusbar = gtk::Box::new(gtk::Orientation::HORIZONTAL, 0);
+    statusbar.pack_start(&statusbar_message, true, true, 0);
+    statusbar.pack_start(&status_bar_info, false, false, 0);
+    let root_box = gtk::Box::new(gtk::Orientation::VERTICAL, 0);
+    root_box.pack_end(&statusbar, false, false, 0);
+    root_box.pack_end(gtk::Separator::new(gtk::Orientation::HORIZONTAL), false, false, 0);
+    root_box.pack_end(&main_view, true, true, 0);
+    let window = gtk::Window::new(gtk::WindowType::Toplevel);
+    window.connect_delete_event(move |_, _| {
+      gtk::main_quit();
+      gtk::Inhibit(false)
     });
-    treeView.revealActiveFile({show: false, focus: false});
-    // to do: change this function to open gallery directories, instead of expanding them;
-    // https://github.com/atom/tree-view/blob/master/lib/tree-view.coffee#L364
-  })
-  treeView.roots.forEach(root => {
-    root.collapse(true);
-    root.expand(false);
-  });
-  treeView.revealActiveFile({show: false, focus: false});
-}
+    window.add(&root_box);
+    window.show_all();
+    window.maximize();
+  }
 
-function sortEntries(combinedEntries) {
-  // https://github.com/hex-ci/atom-tree-view-sort/blob/master/lib/tree-view-sort.js#L158
-  return combinedEntries.sort((first, second) => {
-    const firstName = first.name ? first.name.toLowerCase() : first;
-    const secondName = second.name ? second.name.toLowerCase() : second;
-    return firstName.localeCompare(secondName)
-  });
-}
+  // and in other threads:
+  // do_in_main_thread(move || { open_projects.borrow_mut().insert(_, _); });
 
-// https://atom.io/packages/tree-view-scope-lines
-// https://atom.io/packages/tree-lines
-// https://github.com/hswolff/tree-view-extended/tree/master/lib
-// https://atom.io/packages/tree-view-git-status
-// https://atom.io/packages/file-icons
+  gtk::main();
+}
