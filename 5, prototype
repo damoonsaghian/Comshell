@@ -1,9 +1,8 @@
 unfortunately Pony is still not ready for developing a complex GUI application;
 we have to use existing tools to develop Comshell;
-  i think the best choice is Lua + GTK;
-https://github.com/pavouk/lgi
+"https://gitlab.gnome.org/GNOME/gjs/wikis/Home"
 
-; sudo pacman -S sway xorg-server-xwayland materia-gtk-theme lua-lgi
+; sudo pacman -S sway xorg-server-xwayland materia-gtk-theme gjs
 ; sudo pacman -S gtk3 gtksourceview3 webkit2gtk gst-plugins-{base,good,bad} gst-libav
 
 ; nano ~/.bash_profile
@@ -17,7 +16,7 @@ https://github.com/pavouk/lgi
     gsettings set $gnome-schema gtk-theme Materia-light-compact
     gsettings set $gnome-schema font-name Sans
   }
-  exec --no-startup-id "lua path-to-comshell.lua; swaymsg exit"
+  exec --no-startup-id "gis path-to-comshell.js; swaymsg exit"
 
 ; mkdir -p ~/.config/gtk-3.0
 ; cp prototype/gtk.css ~/.config/gtk-3.0/gtk.css
