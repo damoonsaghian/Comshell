@@ -32,6 +32,9 @@ cpu runs a sequence of simple computations, called instruction codes, one by one
 
 compilers are special programs that generate instruction codes,
   from a program written in a structured and human readable language;
+Rust is a programming language which provides zero cost abstractions,
+  and memory safety without garbage collection;
+  thus there is absolutely no reason to write new software in C/C++;
 
 programs usually do not run directly on computer hardware;
 instead they run on a more sophisticated software machine (a virtual machine) called the kernel;
@@ -69,7 +72,8 @@ now you can even reuse packages previously downloaded on current system,
 ; pacstrap /mnt pacman
 ; arch-chroot /mnt
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
-  networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip ttf-hack noto-fonts
+  networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip rust gcc \
+  ttf-hack noto-fonts
 
 install boot_loader:
 ; grub-install --target=i386-pc /dev/sdx

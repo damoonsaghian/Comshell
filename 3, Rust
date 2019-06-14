@@ -1,10 +1,3 @@
-Rust is a programming language which provides zero cost abstractions,
-  and memory safety without garbage collection;
-  thus there is absolutely no reason to write new software in C/C++;
-; sudo pacman -S rustup gcc
-; rustup install stable
-; rustup default stable
-
 Rust makes bad programming hard, and good programming fun;
 Rust does not hide (inherent) complexity, in fact it bolds it, so we can see it, and avoid it;
 by inherent complexity i mean a complexity which can not be abstracted away completely;
@@ -16,26 +9,29 @@ sharing mutable data,
   is the root of many (inherent) complexities;
 "https://manishearth.github.io/blog/2015/05/17/the-problem-with-shared-mutability/"
 
+to prevent sharing mutable data we can:
+1, control aliasing, like in Pony language;
+  this approach leads to complicated type rules;
+2, abandon aliasing altogether, and move instead; this is what Rust does;
+
 static data (functions, structs, constants): no problem, copy or share by reference;
 dynamic data:
-, if data is immutable (sometimes called copy) we usually put it on stack;
+, if data is small we usually put it on stack;
   so we don't share it across the program, we copy it;
-  if the data is big and we want to share it, we can put it inside a cell
-    (or its multi_threaded counterparts);
-    mutating the cell actually create a new copy of the internal value;
-, but in general where data is mutable,
-  we need to check if the read_write_lock pattern is fulfilled,
-  either statically (by checking mutable borrow lifetimes),
+, if data is big we put it on heap and make references to it;
+  in this case we have to check if the read_write_lock pattern is fulfilled,
+  either statically (when sharing refs using "&" and "&mut"),
   or dynamically at runtime, by putting it inside a RefCell
     (or its multi_threaded counterparts: Mutex or RwLock);
   note that if runtime read_write_lock pattern fails, the program will panic;
 
+RefCell (inside RC) is usually only needed in async situations;
+by using actors we can avoid RefCell;
+"https://crates.io/crates/may_actor"
+
 a type is "Copy" if all the data it owns is part of its stack representation;
   in other words if a copy of its stack representation doesn't violate memory safety;
 "&T" and raw pointers are "Copy", "&mut T" isn't "Copy" (it's "Move");
-
-actors can help us to avoid the need for read_write_lock check (during compilation or at runtime);
-"https://crates.io/crates/may_actor"
 
 in Rust any resource have exactly one owner which takes care of its resource deallocation;
 owners can share their data by lending them to references;

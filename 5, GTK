@@ -13,11 +13,16 @@ and in actors use "glib::source::idle_add" to run a function in the main thread;
 "https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
 "https://github.com/teejee2008/polo/tree/master/src/Gtk"
 "https://github.com/teejee2008/polo/tree/master/src/Utility"
+"https://gitlab.gnome.org/GNOME/fractal"
 "https://github.com/fengalin/media-toc"
 "https://gitlab.gnome.org/GNOME/pitivi"
 
 ; sudo pacman -S sway xorg-server-xwayland materia-gtk-theme
 ; sudo pacman -S gtk3 gtksourceview3 webkit2gtk gst-plugins-{base,good,bad} gst-libav
+
+; cargo build --release
+; mkdir ~/.bin
+; cp target/release/comshell ~/.bin/
 
 ; nano ~/.bash_profile
   export TZ="/usr/share/zoneinfo/<your_location>"
@@ -30,7 +35,7 @@ and in actors use "glib::source::idle_add" to run a function in the main thread;
     gsettings set $gnome-schema gtk-theme Materia-light-compact
     gsettings set $gnome-schema font-name Sans
   }
-  exec --no-startup-id "cargo run --release --manifest-path path-to-Cargo.toml; swaymsg exit"
+  exec --no-startup-id "comshell; swaymsg exit"
 
 ; mkdir -p ~/.config/gtk-3.0
 ; cp gtk.css ~/.config/gtk-3.0/gtk.css
