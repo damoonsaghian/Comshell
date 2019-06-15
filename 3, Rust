@@ -19,7 +19,8 @@ dynamic data:
 , if data is small we usually put it on stack;
   so we don't share it across the program, we copy it;
 , if data is big we put it on heap and make references to it;
-  in this case we have to check if the read_write_lock pattern is fulfilled,
+  if data is immutable there is no problem;
+  but if data is mutable we have to check if the read_write_lock pattern is fulfilled,
   either statically (when sharing refs using "&" and "&mut"),
   or dynamically at runtime, by putting it inside a RefCell
     (or its multi_threaded counterparts: Mutex or RwLock);

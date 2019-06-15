@@ -1,15 +1,19 @@
 implementing a complete GUI toolkit is a huge lot of work;
 existing ones (like GTK) are single threaded, thus we can't create actors from them;
-so for data structures containing widgets:
+so for data structures containing widgets we have to:
 , use "RefCell", where you want mutability;
 , use "Rc" to create references;
-and in actors use "glib::source::idle_add" to run a function in the main thread;
+now although we can access actors from GTK main thread,
+  we can't access GTK widgets (and structure containing them), from actors;
+we can avoid using actors altogether;
+  this is the simpler approach but the application will be single threaded;
+however there is a trick to access non_send data like widgets, in other threads:
+  "https://github.com/Phaiax/gtk-rs-state"
 
 "https://gtk-rs.org/docs/gtk/"
 "https://gtk-rs.org/docs/sourceview/"
 "https://mmstick.github.io/gtkrs-tutorials/introduction.html"
 "https://github.com/gtk-rs/examples/tree/master/src/bin"
-"https://developer.gnome.org/SaveWindowState/"
 "https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
 "https://github.com/teejee2008/polo/tree/master/src/Gtk"
 "https://github.com/teejee2008/polo/tree/master/src/Utility"
