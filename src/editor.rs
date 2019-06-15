@@ -1,8 +1,5 @@
 use std::collections::HashMap;
-use may_actor::Actor;
-
 use std::{rc::Rc, cell::RefCell};
-use main::do_in_main;
 use gtk::{self, prelude::*};
 use gdk::enums::key;
 use sourceview::{self as editor, prelude::*};

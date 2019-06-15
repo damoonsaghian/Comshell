@@ -1,20 +1,7 @@
 use std::collections::HashMap;
-use may_actor::Actor;
-
 use std::{rc::Rc, cell::RefCell};
 use gtk::{self, prelude::*};
 use gdk::enums::key;
-
-// run the given function, in the main thread;
-pub fn do_in_main<F>(func: F)
-  where F: FnOnce()
-{
-  use glib::source;
-  source::idle_add(|| {
-    func();
-    source::Continue(false)
-  });
-}
 
 pub struct Directory {}
 
@@ -40,9 +27,9 @@ fn main() {
 
   let normal_mode = true;
   use project::Project;
-  let open_projects: Actor<HashMap<String, Project>> =
-    Actor::new(HashMap::new());
-  let projects_list = ProjectsList::new();
+  let open_projects: Rc<RefCell<HashMap<String, Project>>> =
+    Rc::new(RefCell::new(HashMap::new()));
+  let projects_list = Rc::new(ProjectsList::new());
   let main_view = gtk::Stack::new();
 
   // show projects list
@@ -59,22 +46,43 @@ fn main() {
   statusbar_info.set_margin_start(2);
   statusbar_info.set_margin_end(2);
 
+  /*
   // update the date shown in statusbar_info, every (full) minute;
-  ::timer::Timer.new().schedule(::chrono::Local::now(), Some(::std::time::Duration.new(60, 0)),
-    move || {
-      use chrono::prelude::*;
-      let now = Local::now();
-      let (is_pm, hour) = now.hour12();
-      let date = format!("{year}-{month:02}-{day:02} {weekday:?} {hour:02}:{minute:02}{am_pm}",
-        year = now.year(), month = now.month(), day = now.day(), weekday = now.weekday(),
-        hour = hour, minute = now.minute(), am_pm = if is_pm {"pm"} else {"am"});
-      // let date = now.format("%F %a %I:%M%P").to_string();
-      let statusbar_info_clone = statusbar_info.clone();
-      do_in_main_thread(move || {
-        statusbar_info.set_text(&date);
-      });
-    }
-  );
+  let statusbar_info_clone = statusbar_info.clone();
+
+  move || {
+    use chrono::prelude::*;
+    let now = Local::now();
+    let (is_pm, hour) = now.hour12();
+    let date = format!("{year}-{month:02}-{day:02} {weekday:?} {hour:02}:{minute:02}{am_pm}",
+      year = now.year(), month = now.month(), day = now.day(), weekday = now.weekday(),
+      hour = hour, minute = now.minute(), am_pm = if is_pm {"pm"} else {"am"});
+    // let date = now.format("%F %a %I:%M%P").to_string();
+    statusbar_info_clone.set_text(&date);
+  }
+
+  function updateDateTime() {
+    const now = new Date(new Date()
+      .toLocaleString("en-US", {timeZone: atom.config.get('comshell.timeZone')})
+    );
+
+    setTimeout(updateDateTime, (60 - now.getSeconds()) * 1000);
+
+    const weekDay = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][now.getDay()];
+    const hour = now.getHours();
+    const hour12 = hour == 0 ? 12 : hour > 12 ? hour - 12 : hour;
+    const minute = now.getMinutes();
+    const minute2digits = minute > 9 ? minute : '0' + minute;
+    const dayPeriod = hour > 11 ? 'PM' : 'AM';
+    dateTimeElement.textContent =
+      now.getFullYear() +'/'+ (now.getMonth()+1) +'/'+ now.getDate() +' '+
+      weekDay +' '+ dayPeriod +' '+ hour12 +':'+ minute2digits;
+  }
+
+  // update date after computer wakes up from sleep;
+  require('electron').remote.powerMonitor.on('resume', () => updateDateTime())
+  updateDateTime();
+  */
 
   // this is only for testing;
   use webkit2gtk::{self as webkit, WebViewExt, WebContextExt};
@@ -100,9 +108,6 @@ fn main() {
     window.show_all();
     window.maximize();
   }
-
-  // and in other threads:
-  // do_in_main_thread(move || { open_projects.borrow_mut().insert(_, _); });
 
   gtk::main();
 }
