@@ -66,3 +66,15 @@ proportional font for code:
 "http://input.fontbureau.com/info/"
 two spaces -> elastic blocks
 "http://nickgravgaard.com/elastic-tabstops/"
+
+= GTK
+implementing a complete GUI toolkit is a huge lot of work;
+existing ones (like GTK) are single threaded, thus we can't create actors from them;
+so for data structures containing widgets we have to:
+, use "RefCell", where you want mutability;
+, use "Rc" to create references;
+now although we can access actors from GTK main loop,
+  we can't access GTK widgets (and structure containing them), from actors;
+so we either must write traditional single threaded code, without actors,
+  or use a trick to access non_send data, in other threads:
+  "https://github.com/Phaiax/gtk-rs-state";

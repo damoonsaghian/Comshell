@@ -1,0 +1,13 @@
+we can use Atom text editor to create a prototype of Comshell;
+
+; sudo pacman -S atom sway xorg-server-xwayland
+
+; nano ~/.bash_profile
+  sway
+; mkdir -p ~/.config/sway
+; nano ~/.config/sway/config
+  default_border none
+  focus_follows_mouse no
+  exec --no-startup-id "atom --wait; swaymsg exit"
+; cp Atom/* ~/.atom/
+set your time_zone in "~/.atom/config.cson";
