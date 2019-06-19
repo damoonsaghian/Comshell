@@ -16,5 +16,35 @@ atom-dock.left .tab-bar {
 	display: none;
 }
 
+.scrollbars-visible-always {
+ ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+
+    &-track {
+      border-radius: 0px;
+      background-color: #dddddd !important;
+    }
+
+    &-thumb {
+      border: 0px;
+      border-radius: 0px;
+      background-clip: content-box !important;
+      background-color: #aaaaaa !important;
+    }
+
+    &-button:single-button {
+      display: block;
+      width: 5px;
+      height: 5px;
+      background-color: #aaaaaa;
+    }
+  }
+}
+
+.scrollbar-corner, .horizontal-scrollbar {
+  display: none;
+}
+
 // "http://bluegalaxy.info/codewalk/2018/05/24/atom-enable-style-editor-scrollbars/"
 // "https://discuss.atom.io/t/change-the-color-and-width-of-editors-sidebar/18545"

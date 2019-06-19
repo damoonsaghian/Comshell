@@ -103,33 +103,6 @@ atom.commands.add('atom-text-editor', 'comshell:space', () => {
 atom.commands.add('atom-text-editor', 'comshell:comma', () => {
 })
 
-// "https://github.com/alexfu/atom-replace-pane"
-
-// "https://github.com/sh8/web-lookup/blob/master/lib/web-lookup.coffee"
-//   "https://github.com/sh8/web-lookup/blob/master/lib/web-lookup-view.coffee"
-// "https://github.com/skandasoft/browser-plus/blob/master/package.json"
-//   "https://github.com/skandasoft/browser-plus/tree/master/lib"
-// "https://github.com/skandasoft/browser-plus-open-new-window"
-// "https://github.com/nju33/atom-pane-browser"
-// "https://github.com/sean-codes/atom-browser"
-// "https://atom.io/packages/Navigate"
-
-// "https://atom.io/packages/simple-git"
-// "https://atom.io/packages/git-plus"
-
-// "https://github.com/atom/settings-view/blob/master/lib/package-manager.coffee"
-
-// modal key bindings:
-// "https://github.com/Kesin11/atom-vim-like-tab/#keymap"
-
-// "https://atom.io/packages/structure-view"
-
-// "https://atom.io/packages/quick-file-browser"
-// "https://atom.io/packages/atom-video"
-
-// "https://atom.io/packages/plain-simple"
-// "https://medium.com/hacking-atom/tweak-your-atom-s-init-script-without-reloading-atom-with-a-declarative-module-8b1c0f208663"
-
 /* importing from a package (probably a bad idea)
 atom.packages.activatePackage("tree-view").then((pkg) => {
   if (pkg && pkg.mainModule && pkg.mainModule.treeView) {
