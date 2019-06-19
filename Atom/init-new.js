@@ -24,9 +24,7 @@ atom.enablePersistence = false;
 // { 'project name': projectPane }
 const projectPanes = {};
 
-function storeProjectBuffers(projectName) {
-  const projectPane = projectPanes[projectName];
-  if (!projectPane) return;
+function storeBuffer(buffer, projectName) {
 
   const data = projectPane.getItems().filter(item => atom.workspace.isTextEditor(item))
     .map(editor =>
@@ -42,14 +40,15 @@ function storeProjectBuffers(projectName) {
   });
 }
 
-const projectsWithChangedBuffers = new Set();
+// [buffer, projectName]
+const changedBuffers = new Set();
 setInterval(() => {
-  projectsWithChangedBuffers.forEach(projectName => storeProjectBuffers(projectName));
-  projectsWithChangedBuffers.clear();
+  changedBuffers.forEach(([buffer, projectName]) => storeBuffer(buffer, projectName));
+  changedBuffers.clear();
 }, 15000);
 atom.window.addEventListener('beforeunload', (_) => {
-  projectsWithChangedBuffers.forEach(projectName => storeProjectBuffers(projectName));
-  projectsWithChangedBuffers.clear();
+  changedBuffers.forEach(([buffer, projectName]) => storeBuffer(buffer, projectName));
+  changedBuffers.clear();
 });
 
 function restoreBuffers(projectName) {
@@ -101,56 +100,76 @@ function storeProjectPane(projectName) {
   });
 }
 
-const projectsWithChangedEditors = new Set();
+const projectsWithChangedPane = new Set();
 setInterval(() => {
-  projectsWithChangedEditors.forEach(projectName => storeEditors(projectName));
-  projectsWithChangedEditors.clear();
+  projectsWithChangedPane.forEach(projectName => storeProjectPane(projectName));
+  projectsWithChangedPane.clear();
 }, 15000);
 atom.window.addEventListener('beforeunload', (_) => {
-  projectsWithChangedEditors.forEach(projectName => storeEditors(projectName));
-  projectsWithChangedEditors.clear();
+  projectsWithChangedPane.forEach(projectName => storeProjectPane(projectName));
+  projectsWithChangedPane.clear();
 });
 
-function restoreProjectPane(projectName) {
+function openProjectPane(projectName) {
   restoreBuffers(projectName);
 
   const storePath = path.join(projectsDir, projectName, '.cache/atom-pane');
   let data;
   try { data = fs.readFileSync(storePath) }
-  catch (_) { atom.workspace.paneForURI('atom://tree-view').activate(); return }
+  catch (_) { data = 'null' }
 
   let serializedPane;
   try { serializedPane = JSON.parse(data) }
-  catch (err) { console.error(err); return }
+  catch (err) {
+    console.error(err);
+    serializedPane = null;
+  }
 
-  let projectPane = require('atom').Pane.deserialize(serializedPane, atom);
+  let projectPane;
+  if (serializedPane) {
+    projectPane = require('atom').Pane.deserialize(serializedPane, atom);
+  } else {
+    projectPane = new (require('atom').Pane)(atom);
+  }
+
+  // add "projectPane" to workspace;
   let activePane = atom.workspace.getCenter().getActivePane();
   activePane.parent.insertChildAfter(activePane, projectPane);
 
-  projectPane.activate();
-  projectPane.onWillDestroy(() => {
-    delete projectPanes[projectName];
-    atom.project.setPaths([]);
-  });
   projectPanes[projectName] = projectPane;
+  projectPane.activate();
 
   // if there is no item in projectPane, focus tree-view;
   if (projectPane.getItems().length == 0) {
     atom.workspace.paneForURI('atom://tree-view').activate();
   }
 
-  projectPane.onDidMoveItem(_ => projectsWithChangedEditors.add(projectName));
-  projectPane.onDidRemoveItem(_ => projectsWithChangedEditors.add(projectName));
-  projectPane.onDidAddItem(_ => projectsWithChangedEditors.add(projectName));
+  projectPane.onWillDestroy(() => {
+    storeProjectPane(projectName);
+    delete projectPanes[projectName];
+    // if there is no item in activePane, focus tree-view;
+    let activePane = atom.workspace.getCenter().getActivePane();
+    if (activePane.getItems().length == 0) {
+      atom.workspace.paneForURI('atom://tree-view').activate();
+    }
+  });
+
+  projectPane.onDidMoveItem((_) => projectsWithChangedPane.add(projectName));
+  projectPane.onDidRemoveItem((_) => projectsWithChangedPane.add(projectName));
+  projectPane.onDidAddItem((_) => projectsWithChangedPane.add(projectName));
+
+  projectPane.onWillDestroyItem(({item}) => {
+    if (item instanceof require('atom').TextEditor) {
+      storeBuffer(projectName);
+    }
+  });
 
   projectPane.observeItems(item => {
-    projectsWithChangedEditors.add(projectName);
-    if (item instanceof require('tom').TextEditor) {
-      editor.onDidDestroy(() => {
-        projectsWithChangedEditors.add(projectName);
+    if (item instanceof require('atom').TextEditor) {
+      item.onDidDestroy(() => {
         projectsWithChangedBuffers.add(projectName);
       });
-      editor.onDidChangeCursorPosition(_ => projectsWithChangedEditors.add(projectName));
+      editor.onDidChangeCursorPosition(_ => projectsWithChangedPane.add(projectName));
 
       const buffer = editor.getBuffer();
       buffer.onDidStopChanging(() => projectsWithChangedBuffers.add(projectName));
@@ -176,26 +195,21 @@ class ProjectsList {
       didConfirmSelection: (projectName) => {
         this.selectList.reset();
         this.modalPanel.hide();
-        const projectPath = path.join(projectsDir, projectName);
-        const projectPane = projectPanes[projectName];
-
         atom.project.setPaths([path.join(projectsDir, projectName)]);
 
+        const projectPane = projectPanes[projectName];
         if (!projectPane) {
-          restoreProjectPane(projectName);
+          openProjectPane(projectName);
         } else {
           // hide all panes, show only the selected project pane, and activate it;
           atom.workspace.getCenter().getPanes().forEach(pane => {
             const view = atom.views.getView(pane);
             view.style.display = 'none';
           });
-          {
-            const view = atom.views.getView(projectPane);
-            view.style.display = '';
-          }
+          const view = atom.views.getView(projectPane);
+          view.style.display = '';
           projectPane.activate();
         }
-
       },
 
       didCancelSelection: () => {
