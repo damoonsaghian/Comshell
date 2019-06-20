@@ -18,27 +18,29 @@ atom-dock.left .tab-bar {
 
 .scrollbars-visible-always {
  ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
+    width: 1px;
+    height: 1px;
 
     &-track {
       border-radius: 0px;
-      background-color: #dddddd !important;
+      //background-color: #dddddd !important;
+      background: repeating-linear-gradient(
+        #555555, #555555 10px, #dddddd 10px, #dddddd 12px) !important;
     }
 
     &-thumb {
       border: 0px;
       border-radius: 0px;
       background-clip: content-box !important;
-      background-color: #aaaaaa !important;
+      background-color: #dddddd !important;
     }
 
-    &-button:single-button {
-      display: block;
-      width: 5px;
-      height: 5px;
-      background-color: #aaaaaa;
-    }
+    //&-button:single-button {
+    //  display: block;
+    //  width: 5px;
+    //  height: 5px;
+    //  background-color: #aaaaaa;
+    //}
   }
 }
 
