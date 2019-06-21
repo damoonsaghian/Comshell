@@ -21,7 +21,7 @@ fs.stat(projectsDir, (err, stats) => {
 
 atom.enablePersistence = false;
 
-// { 'project name': projectPane }
+// { 'project name': projectPane, ... }
 const projectPanes = {};
 
 function storeBuffer(buffer, projectName) {
@@ -37,28 +37,29 @@ function storeBuffer(buffer, projectName) {
   });
 }
 
-// [buffer, projectName]
+// elements of the form: [buffer, projectName]
 const changedBuffers = new Set();
 setInterval(() => {
   changedBuffers.forEach(([buffer, projectName]) => storeBuffer(buffer, projectName));
   changedBuffers.clear();
 }, 15000);
-atom.window.addEventListener('beforeunload', (_) => {
+atom.window.addEventListener('beforeunload', _ => {
   changedBuffers.forEach(([buffer, projectName]) => storeBuffer(buffer, projectName));
   changedBuffers.clear();
 });
 
 function restoreBuffers(projectName) {
-  const storePath = path.join(projectsDir, projectName, '.cache/atom-buffers/');
-  let data;
-  try { data = fs.readFileSync(storePath) }
-  catch (_) { return }
+  const storeDir = path.join(projectsDir, projectName, '.cache/atom-buffers');
+  fs.readdirSync(storeDir)
+  .foreach(storePath => {
+    let data;
+    try { data = fs.readFileSync(storePath) }
+    catch (_) { return }
 
-  let serializedBuffers;
-  try { serializedBuffers = JSON.parse(data) }
-  catch (err) { console.error(err); return }
+    let serializedBuffer;
+    try { serializedBuffer = JSON.parse(data) }
+    catch (err) { console.error(err); return }
 
-  serializedBuffers.forEach(serializedBuffer => {
     if (serializedBuffer.shouldDestroyOnFileDelete == null) {
       serializedBuffer.shouldDestroyOnFileDelete =
         () => atom.config.get('core.closeDeletedFileTabs');
@@ -69,15 +70,16 @@ function restoreBuffers(projectName) {
     serializedBuffer.mustExist = serializedBuffer.digestWhenLastPersisted !== false;
 
     require('atom').TextBuffer.deserialize(serializedBuffer)
-      .then(buffer => {
-        atom.project.grammarRegistry.maintainLanguageMode(buffer);
-        atom.project.subscribeToBuffer(buffer);
-      })
-      .catch(err => {
-        delete atom.project.loadPromisesByPath[uri];
-        console.error(err);
-      });
+    .then(buffer => {
+      atom.project.grammarRegistry.maintainLanguageMode(buffer);
+      atom.project.subscribeToBuffer(buffer);
+    })
+    .catch(err => {
+      delete atom.project.loadPromisesByPath[uri];
+      console.error(err);
+    });
   });
+  return promise;
 }
 
 function storeProjectPane(projectName) {
@@ -102,14 +104,12 @@ setInterval(() => {
   projectsWithChangedPane.forEach(projectName => storeProjectPane(projectName));
   projectsWithChangedPane.clear();
 }, 15000);
-atom.window.addEventListener('beforeunload', (_) => {
+atom.window.addEventListener('beforeunload', _ => {
   projectsWithChangedPane.forEach(projectName => storeProjectPane(projectName));
   projectsWithChangedPane.clear();
 });
 
 function openProjectPane(projectName) {
-  restoreBuffers(projectName);
-
   const storePath = path.join(projectsDir, projectName, '.cache/atom-pane');
   let data;
   try { data = fs.readFileSync(storePath) }
@@ -210,7 +210,8 @@ class ProjectsList {
 
         const projectPane = projectPanes[projectName];
         if (!projectPane) {
-          openProjectPane(projectName);
+          restoreBuffers(projectName)
+          .then(_ => openProjectPane(projectName));
         } else {
           // hide all panes, show only the selected project pane, and activate it;
           atom.workspace.getCenter().getPanes().forEach(pane => {
