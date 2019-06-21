@@ -25,12 +25,9 @@ atom.enablePersistence = false;
 const projectPanes = {};
 
 function storeBuffer(buffer, projectName) {
-
-  const data = projectPane.getItems().filter(item => atom.workspace.isTextEditor(item))
-    .map(editor =>
-      JSON.stringify(editor.getBuffer().serialize())
-    );
-  const storePath = path.join(projectsDir, projectName, '.cache/state/buffers');
+  const data = JSON.stringify(buffer.serialize())
+  const storePath = path.join(projectsDir, projectName, '.cache/state/buffers',
+    buffer.getPath().replace(/\//g, '#'));
   fs.writeFile(storePath, data, (err) => {
     if (err) fs.mkdir(path.dirname(storePath), { recursive: true }, (err) => {
       if (err) { console.error(err) } else {
@@ -87,7 +84,7 @@ function storeProjectPane(projectName) {
   const projectPane = projectPanes[projectName];
   if (!projectPane) return;
 
-  const serializedPane = ;
+  const serializedPane = projectPane.serialize();
 
   const data = JSON.stringify(serializedPane);
   const storePath = path.join(projectsDir, projectName, '.cache/atom-pane');
@@ -147,6 +144,12 @@ function openProjectPane(projectName) {
   projectPane.onWillDestroy(() => {
     storeProjectPane(projectName);
     delete projectPanes[projectName];
+  });
+
+  projectPane.onDidMoveItem(_ => projectsWithChangedPane.add(projectName));
+  projectPane.onDidAddItem(_ => projectsWithChangedPane.add(projectName));
+  projectPane.onDidRemoveItem(({item}) => {
+    projectsWithChangedPane.add(projectName);
     // if there is no item in activePane, focus tree-view;
     let activePane = atom.workspace.getCenter().getActivePane();
     if (activePane.getItems().length == 0) {
@@ -154,27 +157,35 @@ function openProjectPane(projectName) {
     }
   });
 
-  projectPane.onDidMoveItem((_) => projectsWithChangedPane.add(projectName));
-  projectPane.onDidRemoveItem((_) => projectsWithChangedPane.add(projectName));
-  projectPane.onDidAddItem((_) => projectsWithChangedPane.add(projectName));
-
-  projectPane.onWillDestroyItem(({item}) => {
-    if (item instanceof require('atom').TextEditor) {
-      storeBuffer(projectName);
-    }
-  });
-
   projectPane.observeItems(item => {
     if (item instanceof require('atom').TextEditor) {
-      item.onDidDestroy(() => {
-        projectsWithChangedBuffers.add(projectName);
-      });
-      editor.onDidChangeCursorPosition(_ => projectsWithChangedPane.add(projectName));
+      item.onDidChangeCursorPosition(
+        _ => projectsWithChangedPane.add(projectName)
+      );
 
-      const buffer = editor.getBuffer();
-      buffer.onDidStopChanging(() => projectsWithChangedBuffers.add(projectName));
-      // not sure if this is necessary; does saving imply changing?
-      buffer.onDidSave((_) => projectsWithChangedBuffers.add(projectName));
+      const buffer = item.getBuffer();
+      const disposable1 = buffer.onDidStopChanging(
+        () => changedBuffers.add([buffer, projectName])
+      );
+      // if saving imply changing, this is not necessary;
+      const disposable2 = buffer.onDidSave(
+        _ => changedBuffers.add([buffer, projectName])
+      );
+
+      const disposable3 = buffer.onDidDestroy(
+        () => {
+          // remove the file which stored the buffer state;
+          const storePath = path.join(projectsDir, projectName, '.cache/state/buffers',
+            item.getPath().replace(/\//g, '#'));
+          fs.unlink(storePath, err => { if (err) console.error(err); });
+        }
+      );
+
+      item.onDidDestroy(() => {
+        disposable1.dispose();
+        disposable2.dispose();
+        disposable3.dispose();
+      });
     }
   });
 }

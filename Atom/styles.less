@@ -17,30 +17,23 @@ atom-dock.left .tab-bar {
 }
 
 .scrollbars-visible-always {
- ::-webkit-scrollbar {
-    width: 1px;
-    height: 1px;
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
 
     &-track {
+      border: 3px solid transparent !important;
       border-radius: 0px;
-      //background-color: #dddddd !important;
-      background: repeating-linear-gradient(
-        #555555, #555555 10px, #dddddd 10px, #dddddd 12px) !important;
+      background-clip: content-box !important;
+      background-color: #4285F4 !important;
     }
 
     &-thumb {
-      border: 0px;
+      border: 3px solid transparent !important;
       border-radius: 0px;
       background-clip: content-box !important;
-      background-color: #dddddd !important;
+      background-color: @syntax-indent-guide-color !important;
     }
-
-    //&-button:single-button {
-    //  display: block;
-    //  width: 5px;
-    //  height: 5px;
-    //  background-color: #aaaaaa;
-    //}
   }
 }
 
