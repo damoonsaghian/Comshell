@@ -49,37 +49,53 @@ atom.window.addEventListener('beforeunload', _ => {
 });
 
 function restoreBuffers(projectName) {
-  const storeDir = path.join(projectsDir, projectName, '.cache/atom-buffers');
-  fs.readdirSync(storeDir)
-  .foreach(storePath => {
-    let data;
-    try { data = fs.readFileSync(storePath) }
-    catch (_) { return }
+  function loadBuffer(storePath) {
+    return new Promise((resolve, reject) => {
+      fs.readFile(storePath, (err, data) => {
+        if (err) { console.error(err); reject(''); return }
 
-    let serializedBuffer;
-    try { serializedBuffer = JSON.parse(data) }
-    catch (err) { console.error(err); return }
+        let serializedBuffer;
+        try { serializedBuffer = JSON.parse(data) }
+        catch (err) { console.error(err); reject(''); return }
 
-    if (serializedBuffer.shouldDestroyOnFileDelete == null) {
-      serializedBuffer.shouldDestroyOnFileDelete =
-        () => atom.config.get('core.closeDeletedFileTabs');
-    }
-    // use a little guilty knowledge of the way TextBuffers are serialized;
-    // this allows TextBuffers that have never been saved (but have filePaths) to be deserialized,
-    //   but prevents TextBuffers backed by files that have been deleted from being saved;
-    serializedBuffer.mustExist = serializedBuffer.digestWhenLastPersisted !== false;
+        if (serializedBuffer.shouldDestroyOnFileDelete == null) {
+          serializedBuffer.shouldDestroyOnFileDelete =
+            () => atom.config.get('core.closeDeletedFileTabs');
+        }
+        // use a little guilty knowledge of the way TextBuffers are serialized;
+        // this allows TextBuffers that have never been saved (but have filePaths) to be deserialized,
+        //   but prevents TextBuffers backed by files that have been deleted from being saved;
+        serializedBuffer.mustExist = serializedBuffer.digestWhenLastPersisted !== false;
 
-    require('atom').TextBuffer.deserialize(serializedBuffer)
-    .then(buffer => {
-      atom.project.grammarRegistry.maintainLanguageMode(buffer);
-      atom.project.subscribeToBuffer(buffer);
-    })
-    .catch(err => {
-      delete atom.project.loadPromisesByPath[uri];
-      console.error(err);
+        require('atom').TextBuffer.deserialize(serializedBuffer)
+        .then(buffer => {
+          atom.project.grammarRegistry.maintainLanguageMode(buffer);
+          atom.project.subscribeToBuffer(buffer);
+          resolve(true);
+        })
+        .catch(err => {
+          console.error(err);
+          reject('');
+        });
+      });
     });
+  }
+
+  return new Promise((resolve, _) => {
+    const storeDir = path.join(projectsDir, projectName, '.cache/atom-buffers');
+    fs.readdir(storeDir, (err, fileNames) => {
+      const storePaths = fileNames.map(
+        fileName => path.join(storeDir, fileName)
+      );
+
+      const bufferLoadedPromises = [];
+      storePaths.foreach(storePath => {
+        bufferLoadedPromise.push(loadBuffer(storePath))
+      });
+
+      Promise.allSettled(bufferLoadedPromises).then(_ => resolve(true));
+    })
   });
-  return promise;
 }
 
 function storeProjectPane(projectName) {
@@ -109,85 +125,89 @@ atom.window.addEventListener('beforeunload', _ => {
   projectsWithChangedPane.clear();
 });
 
+
 function openProjectPane(projectName) {
   const storePath = path.join(projectsDir, projectName, '.cache/atom-pane');
-  let data;
-  try { data = fs.readFileSync(storePath) }
-  catch (_) { data = 'null' }
+  fs.readfile(storePath, (err, data) => {
+    if (err) { console.error(err); return; }
 
-  let serializedPane;
-  try { serializedPane = JSON.parse(data) }
-  catch (err) {
-    console.error(err);
-    serializedPane = null;
-  }
+    let serializedPane;
+    try { serializedPane = JSON.parse(data) }
+    catch (err) {
+      console.error(err);
+      serializedPane = null;
+    }
 
-  let projectPane;
-  if (serializedPane) {
-    projectPane = require('atom').Pane.deserialize(serializedPane, atom);
-  } else {
-    projectPane = new (require('atom').Pane)(atom);
-  }
+    let projectPane;
+    if (serializedPane) {
+      projectPane = require('atom').Pane.deserialize(serializedPane, atom);
+    } else {
+      projectPane = new (require('atom').Pane)(atom);
+    }
 
-  // add "projectPane" to workspace;
-  let activePane = atom.workspace.getCenter().getActivePane();
-  activePane.parent.insertChildAfter(activePane, projectPane);
-
-  projectPanes[projectName] = projectPane;
-  projectPane.activate();
-
-  // if there is no item in projectPane, focus tree-view;
-  if (projectPane.getItems().length == 0) {
-    atom.workspace.paneForURI('atom://tree-view').activate();
-  }
-
-  projectPane.onWillDestroy(() => {
-    storeProjectPane(projectName);
-    delete projectPanes[projectName];
-  });
-
-  projectPane.onDidMoveItem(_ => projectsWithChangedPane.add(projectName));
-  projectPane.onDidAddItem(_ => projectsWithChangedPane.add(projectName));
-  projectPane.onDidRemoveItem(({item}) => {
-    projectsWithChangedPane.add(projectName);
-    // if there is no item in activePane, focus tree-view;
+    // add "projectPane" to workspace;
     let activePane = atom.workspace.getCenter().getActivePane();
-    if (activePane.getItems().length == 0) {
+    activePane.parent.insertChildAfter(activePane, projectPane);
+
+    projectPanes[projectName] = projectPane;
+    projectPane.activate();
+
+    // if there is no item in projectPane, focus tree-view;
+    if (projectPane.getItems().length == 0) {
       atom.workspace.paneForURI('atom://tree-view').activate();
     }
-  });
 
-  projectPane.observeItems(item => {
-    if (item instanceof require('atom').TextEditor) {
-      item.onDidChangeCursorPosition(
-        _ => projectsWithChangedPane.add(projectName)
-      );
+    function projectPaneAddHandlers(projectPane, projectName) {
+      projectPane.onWillDestroy(() => {
+        storeProjectPane(projectName);
+        delete projectPanes[projectName];
+      });
 
-      const buffer = item.getBuffer();
-      const disposable1 = buffer.onDidStopChanging(
-        () => changedBuffers.add([buffer, projectName])
-      );
-      // if saving imply changing, this is not necessary;
-      const disposable2 = buffer.onDidSave(
-        _ => changedBuffers.add([buffer, projectName])
-      );
-
-      const disposable3 = buffer.onDidDestroy(
-        () => {
-          // remove the file which stored the buffer state;
-          const storePath = path.join(projectsDir, projectName, '.cache/state/buffers',
-            item.getPath().replace(/\//g, '#'));
-          fs.unlink(storePath, err => { if (err) console.error(err); });
+      projectPane.onDidMoveItem(_ => projectsWithChangedPane.add(projectName));
+      projectPane.onDidAddItem(_ => projectsWithChangedPane.add(projectName));
+      projectPane.onDidRemoveItem(({item}) => {
+        projectsWithChangedPane.add(projectName);
+        // if there is no item in activePane, focus tree-view;
+        let activePane = atom.workspace.getCenter().getActivePane();
+        if (activePane.getItems().length == 0) {
+          atom.workspace.paneForURI('atom://tree-view').activate();
         }
-      );
+      });
 
-      item.onDidDestroy(() => {
-        disposable1.dispose();
-        disposable2.dispose();
-        disposable3.dispose();
+      projectPane.observeItems(item => {
+        if (item instanceof require('atom').TextEditor) {
+          item.onDidChangeCursorPosition(
+            _ => projectsWithChangedPane.add(projectName)
+          );
+
+          const buffer = item.getBuffer();
+          const disposable1 = buffer.onDidStopChanging(
+            () => changedBuffers.add([buffer, projectName])
+          );
+          // if saving imply changing, this is not necessary;
+          const disposable2 = buffer.onDidSave(
+            _ => changedBuffers.add([buffer, projectName])
+          );
+
+          const disposable3 = buffer.onDidDestroy(
+            () => {
+              // remove the file which stored the buffer state;
+              const storePath = path.join(projectsDir, projectName, '.cache/state/buffers',
+                item.getPath().replace(/\//g, '#'));
+              fs.unlink(storePath, err => { if (err) console.error(err); });
+            }
+          );
+
+          item.onDidDestroy(() => {
+            disposable1.dispose();
+            disposable2.dispose();
+            disposable3.dispose();
+          });
+        }
       });
     }
-  });
+    projectPaneAddHandlers(projectPane, projectName);
+  })
 }
 
 class ProjectsList {
@@ -231,16 +251,16 @@ class ProjectsList {
       }
     });
 
-    this.modalPanel = atom.workspace.addModalPanel({ item: this.selectList, visible: false});
+    this.modalPanel = atom.workspace.addModalPanel({ item: this.selectList, visible: false });
   }
 
   show() {
-    fs.readdir(projectsDir, (err, fileNames) => {
+    fs.readdir(projectsDir, { withFileTypes: true }, (err, dirents) => {
       if (err) { alert(err.message); return }
 
-      const projectNames = fileNames.filter(
-        fileName => fs.statSync(path.join(projectsDir, fileName)).isDirectory()
-      );
+      const projectNames = dirents
+      .filter(dirent => dirent.isDirectory())
+      .map(dirent => dirent.name);
       const currentProjectPath = atom.project.getPaths()[0];
       const currentProjectName = currentProjectPath ?
         path.relative(projectsDir, currentProjectPath) : null;
@@ -250,10 +270,10 @@ class ProjectsList {
         initialSelectionIndex:
           currentProjectName ? projectNames.indexOf(currentProjectName) : 0
       });
-    });
 
-    this.modalPanel.show();
-    this.selectList.focus();
+      this.modalPanel.show();
+      this.selectList.focus();
+    });
   }
 
   createNewProject() {}
