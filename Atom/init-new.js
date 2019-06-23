@@ -26,13 +26,12 @@ const projectPanes = {};
 
 function storeBuffer(buffer, projectName) {
   const data = JSON.stringify(buffer.serialize())
-  const storePath = path.join(projectsDir, projectName, '.cache/state/buffers',
-    buffer.getPath().replace(/\//g, '#'));
+  const storePath = path.join(projectsDir, projectName, '.cache/atom-buffers', buffer.id);
+
   fs.writeFile(storePath, data, (err) => {
     if (err) fs.mkdir(path.dirname(storePath), { recursive: true }, (err) => {
-      if (err) { console.error(err) } else {
-        fs.writeFile(storePath, data, (err) => { if (err) console.error(err); })
-      }
+      if (err) console.error(err);
+      fs.writeFile(storePath, data, (err) => { if (err) console.error(err); })
     });
   });
 }
@@ -89,7 +88,7 @@ function restoreBuffers(projectName) {
 
       const bufferLoadedPromises = [];
       storePaths.forEach(storePath => {
-        bufferLoadedPromise.push(loadBuffer(storePath))
+        bufferLoadedPromises.push(loadBuffer(storePath))
       });
 
       Promise.all(bufferLoadedPromises).then(_ => resolve(true));
@@ -107,9 +106,8 @@ function storeProjectPane(projectName) {
   const storePath = path.join(projectsDir, projectName, '.cache/atom-pane');
   fs.writeFile(storePath, data, (err) => {
     if (err) fs.mkdir(path.dirname(storePath), { recursive: true }, (err) => {
-      if (err) { console.error(err) } else {
-        fs.writeFile(storePath, data, (err) => { if (err) console.error(err); })
-      }
+      if (err) console.error(err);
+      fs.writeFile(storePath, data, (err) => { if (err) console.error(err); })
     });
   });
 }
@@ -184,6 +182,10 @@ function openProjectPane(projectName) {
           );
 
           const buffer = item.getBuffer();
+          const bufferId = buffer.id;
+
+          storeBuffer(buffer, projectName);
+
           const disposable1 = buffer.onDidStopChanging(
             () => changedBuffers.add([buffer, projectName])
           );
@@ -192,14 +194,11 @@ function openProjectPane(projectName) {
             _ => changedBuffers.add([buffer, projectName])
           );
 
-          const disposable3 = buffer.onDidDestroy(
-            () => {
-              // remove the file which stored the buffer state;
-              const storePath = path.join(projectsDir, projectName, '.cache/state/buffers',
-                item.getPath().replace(/\//g, '#'));
-              fs.unlink(storePath, err => { if (err) console.error(err); });
-            }
-          );
+          const disposable3 = buffer.onDidDestroy(() => {
+            // remove the file which stored the buffer state;
+            const storePath = path.join(projectsDir, projectName, '.cache/atom-buffers', bufferId);
+            //fs.unlink(storePath, err => { if (err) console.error(err); });
+          });
 
           item.onDidDestroy(() => {
             disposable1.dispose();
