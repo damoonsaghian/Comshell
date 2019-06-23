@@ -62,15 +62,14 @@ function restoreBuffers(projectName) {
           serializedBuffer.shouldDestroyOnFileDelete =
             () => atom.config.get('core.closeDeletedFileTabs');
         }
-        // use a little guilty knowledge of the way TextBuffers are serialized;
-        // this allows TextBuffers that have never been saved (but have filePaths) to be deserialized,
-        //   but prevents TextBuffers backed by files that have been deleted from being saved;
+        // use a little guilty knowledge of the way a "TextBuffer" is serialized;
+        // this allows a "TextBuffer" that has never been saved (but has a "filePath")
+        //   to be deserialized;
+        // but prevents a "TextBuffer" backed by a file that has been deleted from being saved;
         serializedBuffer.mustExist = serializedBuffer.digestWhenLastPersisted !== false;
 
         require('atom').TextBuffer.deserialize(serializedBuffer)
         .then(buffer => {
-          atom.project.grammarRegistry.maintainLanguageMode(buffer);
-          atom.project.subscribeToBuffer(buffer);
           resolve(true);
         })
         .catch(err => {
