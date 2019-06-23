@@ -50,13 +50,13 @@ atom.window.addEventListener('beforeunload', _ => {
 
 function restoreBuffers(projectName) {
   function loadBuffer(storePath) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _) => {
       fs.readFile(storePath, (err, data) => {
-        if (err) { console.error(err); reject(''); return }
+        if (err) { console.error(err); resolve(true); return }
 
         let serializedBuffer;
         try { serializedBuffer = JSON.parse(data) }
-        catch (err) { console.error(err); reject(''); return }
+        catch (err) { console.error(err); resolve(true); return }
 
         if (serializedBuffer.shouldDestroyOnFileDelete == null) {
           serializedBuffer.shouldDestroyOnFileDelete =
@@ -74,7 +74,7 @@ function restoreBuffers(projectName) {
         })
         .catch(err => {
           console.error(err);
-          reject('');
+          resolve(true);
         });
       });
     });
@@ -83,16 +83,16 @@ function restoreBuffers(projectName) {
   return new Promise((resolve, _) => {
     const storeDir = path.join(projectsDir, projectName, '.cache/atom-buffers');
     fs.readdir(storeDir, (err, fileNames) => {
-      const storePaths = fileNames.map(
+      const storePaths = (fileNames || []).map(
         fileName => path.join(storeDir, fileName)
       );
 
       const bufferLoadedPromises = [];
-      storePaths.foreach(storePath => {
+      storePaths.forEach(storePath => {
         bufferLoadedPromise.push(loadBuffer(storePath))
       });
 
-      Promise.allSettled(bufferLoadedPromises).then(_ => resolve(true));
+      Promise.all(bufferLoadedPromises).then(_ => resolve(true));
     })
   });
 }
@@ -124,37 +124,41 @@ atom.window.addEventListener('beforeunload', _ => {
   projectsWithChangedPane.clear();
 });
 
-
 function openProjectPane(projectName) {
   const storePath = path.join(projectsDir, projectName, '.cache/atom-pane');
-  fs.readfile(storePath, (err, data) => {
-    if (err) { console.error(err); return; }
-
+  fs.readFile(storePath, (err, data) => {
     let serializedPane;
-    try { serializedPane = JSON.parse(data) }
+    try { serializedPane = JSON.parse(err ? null : data) }
     catch (err) {
       console.error(err);
       serializedPane = null;
     }
 
+    const activePane = atom.workspace.getCenter().getActivePane();
+
     let projectPane;
     if (serializedPane) {
-      projectPane = require('atom').Pane.deserialize(serializedPane, atom);
+      projectPane = activePane.constructor.deserialize(serializedPane, atom);
     } else {
-      projectPane = new (require('atom').Pane)(atom);
+      projectPane = new (activePane.constructor)({
+        applicationDelegate: activePane.applicationDelegate,
+        notificationManager: activePane.notificationManager,
+        deserializerManager: activePane.deserializerManager,
+        config: activePane.config,
+        viewRegistry: activePane.viewRegistry
+      });
     }
 
     // add "projectPane" to workspace;
-    let activePane = atom.workspace.getCenter().getActivePane();
-    activePane.parent.insertChildAfter(activePane, projectPane);
+    activePane.parent.replaceChild(activePane, projectPane);
 
     projectPanes[projectName] = projectPane;
     projectPane.activate();
 
     // if there is no item in projectPane, focus tree-view;
-    if (projectPane.getItems().length == 0) {
-      atom.workspace.paneForURI('atom://tree-view').activate();
-    }
+    //if (projectPane.getItems().length == 0) {
+    //  atom.workspace.paneForURI('atom://tree-view').activate();
+    //}
 
     function projectPaneAddHandlers(projectPane, projectName) {
       projectPane.onWillDestroy(() => {
@@ -167,7 +171,7 @@ function openProjectPane(projectName) {
       projectPane.onDidRemoveItem(({item}) => {
         projectsWithChangedPane.add(projectName);
         // if there is no item in activePane, focus tree-view;
-        let activePane = atom.workspace.getCenter().getActivePane();
+        const activePane = atom.workspace.getCenter().getActivePane();
         if (activePane.getItems().length == 0) {
           atom.workspace.paneForURI('atom://tree-view').activate();
         }
@@ -231,14 +235,18 @@ class ProjectsList {
         if (!projectPane) {
           restoreBuffers(projectName)
           .then(_ => openProjectPane(projectName));
-        } else {
-          // hide all panes, show only the selected project pane, and activate it;
-          atom.workspace.getCenter().getPanes().forEach(pane => {
-            const view = atom.views.getView(pane);
-            view.style.display = 'none';
-          });
-          const view = atom.views.getView(projectPane);
-          view.style.display = '';
+        }
+        // hide all panes;
+        //atom.workspace.getCenter().getPanes().forEach(pane => {
+        //  const view = atom.views.getView(pane);
+        //  view.style.display = 'none';
+        //});
+        // show the selected project pane, and activate it;
+        if (projectPane) {
+          //const view = atom.views.getView(projectPane);
+          //view.style.display = '';
+          const activePane = atom.workspace.getCenter().getActivePane();
+          activePane.parent.replaceChild(activePane, projectPane);
           projectPane.activate();
         }
       },
