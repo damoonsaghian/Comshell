@@ -24,8 +24,11 @@ atom.enablePersistence = false;
 // { 'project name': projectPane, ... }
 const projectPanes = {};
 
-function storeBuffer(buffer, projectName) {
-  const data = JSON.stringify(buffer.serialize());
+function storeBuffer(buffer, projectName, isUnloading) {
+  const data = JSON.stringify(buffer.serialize({
+    markerLayers: isUnloading,
+    history: isUnloading
+  }));
   const storePath = path.join(projectsDir, projectName, '.cache/atom-buffers', buffer.id);
 
   fs.writeFile(storePath, data, (err) => {
@@ -45,13 +48,9 @@ function storeBuffer(buffer, projectName) {
 // elements of the form: [buffer, projectName]
 const changedBuffers = new Set();
 setInterval(() => {
-  changedBuffers.forEach(([buffer, projectName]) => storeBuffer(buffer, projectName));
+  changedBuffers.forEach(([buffer, projectName]) => storeBuffer(buffer, projectName, false));
   changedBuffers.clear();
 }, 15000);
-atom.window.addEventListener('beforeunload', _ => {
-  changedBuffers.forEach(([buffer, projectName]) => storeBuffer(buffer, projectName));
-  changedBuffers.clear();
-});
 
 function restoreBuffers(projectName) {
   function loadBuffer(storePath) {
@@ -142,10 +141,15 @@ setInterval(() => {
   projectsWithChangedPane.forEach(projectName => storeProjectPane(projectName));
   projectsWithChangedPane.clear();
 }, 15000);
-atom.window.addEventListener('beforeunload', _ => {
+
+atom.commands.add('atom-workspace', 'comshell:store-and-quit', () => {
+  changedBuffers.forEach(([buffer, projectName]) => storeBuffer(buffer, projectName, true));
+  changedBuffers.clear();
   projectsWithChangedPane.forEach(projectName => storeProjectPane(projectName));
   projectsWithChangedPane.clear();
-});
+  require('electron').remote.app.quit();
+})
+
 
 function openProjectPane(projectName) {
   const storePath = path.join(projectsDir, projectName, '.cache/atom-pane');
@@ -185,7 +189,6 @@ function openProjectPane(projectName) {
 
     function projectPaneAddHandlers(projectPane, projectName) {
       projectPane.onWillDestroy(() => {
-        storeProjectPane(projectName);
         delete projectPanes[projectName];
       });
 
@@ -208,7 +211,7 @@ function openProjectPane(projectName) {
 
           const buffer = item.getBuffer();
 
-          storeBuffer(buffer, projectName);
+          storeBuffer(buffer, projectName, false);
 
           const disposable1 = buffer.onDidStopChanging(
             () => changedBuffers.add([buffer, projectName])
