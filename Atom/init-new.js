@@ -25,7 +25,7 @@ atom.enablePersistence = false;
 const projectPanes = {};
 
 function storeBuffer(buffer, projectName) {
-  const data = JSON.stringify(buffer.serialize())
+  const data = JSON.stringify(buffer.serialize());
   const storePath = path.join(projectsDir, projectName, '.cache/atom-buffers', buffer.id);
 
   fs.writeFile(storePath, data, (err) => {
@@ -75,6 +75,7 @@ function restoreBuffers(projectName) {
 
         require('atom').TextBuffer.deserialize(serializedBuffer)
         .then(buffer => {
+          atom.project.buffers.push(buffer);
           atom.project.grammarRegistry.maintainLanguageMode(buffer);
           atom.project.subscribeToBuffer(buffer);
           resolve(true);
