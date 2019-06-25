@@ -24,33 +24,35 @@ atom.enablePersistence = false;
 // { 'project name': projectPane, ... }
 const projectPanes = {};
 
-function storeBuffer(buffer, projectName, isUnloading) {
-  const data = JSON.stringify(buffer.serialize({
-    markerLayers: isUnloading,
-    history: isUnloading
-  }));
+function storeBuffer(buffer, projectName) {
+  const data = JSON.stringify(buffer.serialize({ markerLayers: true, history: true }));
   const storePath = path.join(projectsDir, projectName, '.cache/atom-buffers', buffer.id);
+  const storeDir = path.dirname(storePath);
 
   fs.writeFile(storePath, data, (err) => {
-    if (err) fs.mkdir(path.dirname(storePath), { recursive: true }, (err) => {
-      // HACK: cause the version of NodeJS packed with Electron,
-      //   does bot support "recursive" option yet;
-      if (err) {
-        fs.mkdirSync(path.dirname(path.dirname(storePath)), { recursive: true });
-        fs.mkdirSync(path.dirname(storePath), { recursive: true });
-      }
+    if (err) {
+      try { fs.unlinkSync(storeDir) } catch (_) {}
+      try { fs.unlinkSync(path.dirname(storeDir)) } catch (_) {}
 
-      fs.writeFile(storePath, data, (err) => { if (err) console.error(err); })
-    });
+      fs.mkdir(storeDir, { recursive: true }, (err) => {
+        // HACK: cause "recursive" does not work yet;
+        if (err) {
+          try { fs.mkdirSync(path.dirname(storeDir), { recursive: true }) } catch (_) {}
+          try { fs.mkdirSync(storeDir, { recursive: true }) } catch (_) {}
+        }
+
+        fs.writeFile(storePath, data, (err) => { if (err) console.error(err); })
+      });
+    }
   });
 }
 
 // elements of the form: [buffer, projectName]
 const changedBuffers = new Set();
 setInterval(() => {
-  changedBuffers.forEach(([buffer, projectName]) => storeBuffer(buffer, projectName, false));
+  changedBuffers.forEach(([buffer, projectName]) => storeBuffer(buffer, projectName));
   changedBuffers.clear();
-}, 15000);
+}, 500);
 
 function restoreBuffers(projectName) {
   function loadBuffer(storePath) {
@@ -109,10 +111,11 @@ function storeProjectPane(projectName) {
   if (!projectPane) return;
 
   const serializedPane = projectPane.serialize();
-
   const data = JSON.stringify(serializedPane);
   const storePath = path.join(projectsDir, projectName, '.cache/atom-pane');
+
   fs.writeFile(storePath, data, (err) => {
+    try { fs.unlinkSync(path.dirname(storePath)) } catch (_) {}
     if (err) fs.mkdir(path.dirname(storePath), { recursive: true }, (err) => {
       if (err) console.error(err);
       fs.writeFile(storePath, data, (err) => { if (err) console.error(err); })
@@ -140,16 +143,7 @@ const projectsWithChangedPane = new Set();
 setInterval(() => {
   projectsWithChangedPane.forEach(projectName => storeProjectPane(projectName));
   projectsWithChangedPane.clear();
-}, 15000);
-
-atom.commands.add('atom-workspace', 'comshell:store-and-quit', () => {
-  changedBuffers.forEach(([buffer, projectName]) => storeBuffer(buffer, projectName, true));
-  changedBuffers.clear();
-  projectsWithChangedPane.forEach(projectName => storeProjectPane(projectName));
-  projectsWithChangedPane.clear();
-  require('electron').remote.app.quit();
-})
-
+}, 500);
 
 function openProjectPane(projectName) {
   const storePath = path.join(projectsDir, projectName, '.cache/atom-pane');
@@ -205,13 +199,13 @@ function openProjectPane(projectName) {
 
       projectPane.observeItems(item => {
         if (item instanceof require('atom').TextEditor) {
-          item.onDidChangeCursorPosition(
-            _ => projectsWithChangedPane.add(projectName)
-          );
-
           const buffer = item.getBuffer();
+          storeBuffer(buffer, projectName);
 
-          storeBuffer(buffer, projectName, false);
+          item.onDidChangeCursorPosition(_ => {
+            projectsWithChangedPane.add(projectName);
+            changedBuffers.add([buffer, projectName]);
+          });
 
           const disposable1 = buffer.onDidStopChanging(
             () => changedBuffers.add([buffer, projectName])

@@ -1,7 +1,6 @@
 'atom-workspace':
   'alt': 'comshell:projects-list'
   'ctrl-tab': 'tree-view:toggle-focus'
-  'ctrl-q': 'comshell:store-and-quit'
 
 'atom-text-editor':
   'ctrl-down': 'editor:move-to-beginning-of-next-paragraph'
