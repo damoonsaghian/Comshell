@@ -25,7 +25,7 @@ atom.enablePersistence = false;
 const projectPanes = {};
 
 function storeBuffer(buffer, projectName) {
-  const data = JSON.stringify(buffer.serialize({ markerLayers: true, history: true }));
+  const data = JSON.stringify(buffer.serialize());
   const storePath = path.join(projectsDir, projectName, '.cache/atom-buffers', buffer.id);
   const storeDir = path.dirname(storePath);
 
@@ -49,10 +49,6 @@ function storeBuffer(buffer, projectName) {
 
 // elements of the form: [buffer, projectName]
 const changedBuffers = new Set();
-setInterval(() => {
-  changedBuffers.forEach(([buffer, projectName]) => storeBuffer(buffer, projectName));
-  changedBuffers.clear();
-}, 500);
 
 function restoreBuffers(projectName) {
   function loadBuffer(storePath) {
@@ -140,10 +136,6 @@ function storeProjectPane(projectName) {
 }
 
 const projectsWithChangedPane = new Set();
-setInterval(() => {
-  projectsWithChangedPane.forEach(projectName => storeProjectPane(projectName));
-  projectsWithChangedPane.clear();
-}, 500);
 
 function openProjectPane(projectName) {
   const storePath = path.join(projectsDir, projectName, '.cache/atom-pane');
@@ -225,6 +217,25 @@ function openProjectPane(projectName) {
     projectPaneAddHandlers(projectPane, projectName);
   })
 }
+
+const saveState = global.require('underscore-plus').debounce(() => {
+  atom.window.requestIdleCallback(() => {
+    changedBuffers.forEach(([buffer, projectName]) => storeBuffer(buffer, projectName));
+    changedBuffers.clear();
+    projectsWithChangedPane.forEach(projectName => storeProjectPane(projectName));
+    projectsWithChangedPane.clear();
+  });
+}, 1000);
+
+atom.document.addEventListener('mousedown', saveState, true);
+atom.document.addEventListener('keydown', saveState, true);
+atom.disposables.add(
+  new (require('atom').Disposable)(() => {
+    atom.document.removeEventListener('mousedown', saveState, true);
+    atom.document.removeEventListener('keydown', saveState, true);
+  })
+);
+
 
 class ProjectsList {
   constructor() {
