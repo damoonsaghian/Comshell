@@ -71,14 +71,16 @@ function restoreBuffers(projectName) {
         serializedBuffer.mustExist = serializedBuffer.digestWhenLastPersisted !== false;
 
         require('atom').TextBuffer.deserialize(serializedBuffer)
+        .catch(_ => {
+          atom.project.retiredBufferIDs.add(serializedBuffer.id);
+          atom.project.retiredBufferPaths.add(serializedBuffer.filePath);
+          resolve(true);
+          return null;
+        })
         .then(buffer => {
           atom.project.buffers.push(buffer);
           atom.project.grammarRegistry.maintainLanguageMode(buffer);
           atom.project.subscribeToBuffer(buffer);
-          resolve(true);
-        })
-        .catch(err => {
-          console.error(err);
           resolve(true);
         });
       });
@@ -236,7 +238,6 @@ atom.disposables.add(
   })
 );
 
-
 class ProjectsList {
   constructor() {
     this.selectList = new SelectList({
@@ -259,16 +260,7 @@ class ProjectsList {
         if (!projectPane) {
           restoreBuffers(projectName)
           .then(_ => openProjectPane(projectName));
-        }
-        // hide all panes;
-        //atom.workspace.getCenter().getPanes().forEach(pane => {
-        //  const view = atom.views.getView(pane);
-        //  view.style.display = 'none';
-        //});
-        // show the selected project pane, and activate it;
-        if (projectPane) {
-          //const view = atom.views.getView(projectPane);
-          //view.style.display = '';
+        } else {
           const activePane = atom.workspace.getCenter().getActivePane();
           activePane.parent.replaceChild(activePane, projectPane);
           projectPane.activate();
