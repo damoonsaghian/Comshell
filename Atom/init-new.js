@@ -53,7 +53,7 @@ const changedBuffers = new Set();
 function restoreBuffers(projectName) {
   function loadBuffer(storePath) {
     return new Promise((resolve, _) => {
-      fs.readFile(storePath, (err, data) => {
+      fs.readFile(storePath, {encoding: 'utf8'}, (err, data) => {
         if (err) { console.error(err); resolve(true); return }
 
         let serializedBuffer;
@@ -141,7 +141,7 @@ const projectsWithChangedPane = new Set();
 
 function openProjectPane(projectName) {
   const storePath = path.join(projectsDir, projectName, '.cache/atom-pane');
-  fs.readFile(storePath, (err, data) => {
+  fs.readFile(storePath, {encoding: 'utf8'}, (err, data) => {
     let serializedPane;
     try { serializedPane = JSON.parse(err ? null : data) }
     catch (err) {
@@ -181,7 +181,11 @@ function openProjectPane(projectName) {
       });
 
       projectPane.onDidMoveItem(_ => projectsWithChangedPane.add(projectName));
-      projectPane.onDidAddItem(_ => projectsWithChangedPane.add(projectName));
+      projectPane.onDidAddItem(({item}) => {
+        if (item instanceof require('atom').TextEditor)
+          storeBuffer(item.getBuffer(), projectName);
+        projectsWithChangedPane.add(projectName);
+      });
       projectPane.onDidRemoveItem(({item}) => {
         projectsWithChangedPane.add(projectName);
         // if there is no item in activePane, focus tree-view;
@@ -194,7 +198,6 @@ function openProjectPane(projectName) {
       projectPane.observeItems(item => {
         if (item instanceof require('atom').TextEditor) {
           const buffer = item.getBuffer();
-          storeBuffer(buffer, projectName);
 
           item.onDidChangeCursorPosition(_ => {
             projectsWithChangedPane.add(projectName);
