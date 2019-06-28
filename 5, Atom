@@ -1,21 +1,10 @@
 we can use Atom text editor to create a prototype of Comshell;
 
 one pane per project;
-only the active project's pane is displayed, others will be hidden;
+only the active project's pane is displayed;
 state of each project pane is stored/restored to/from ".cache/atom-pane";
 state of buffers in each project pane is stored/restored to/from
- files in ".cache/atom-buffers/" directory;
-name of the file storing a buffer's state,
- is made from path, replacing path seperators (ie "/") with "#";
+  files in ".cache/atom-buffers/" directory;
 
-; sudo pacman -S atom sway xorg-server-xwayland
-
-; nano ~/.bash_profile
-  sway
-; mkdir -p ~/.config/sway
-; nano ~/.config/sway/config
-  default_border none
-  focus_follows_mouse no
-  exec --no-startup-id "atom --wait; swaymsg exit"
 ; cp Atom/* ~/.atom/
 set your time_zone in "~/.atom/config.cson";

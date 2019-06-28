@@ -73,7 +73,7 @@ now you can even reuse packages previously downloaded on current system,
 ; arch-chroot /mnt
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
   networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip rust gcc \
-  ttf-hack noto-fonts
+  sway xorg-server-xwayland ttf-hack noto-fonts alacritty mpv chromium atom
 
 install boot_loader:
 ; grub-install --target=i386-pc /dev/sdx
@@ -128,33 +128,14 @@ mount drives when a new block device is created;
     fi
   done&
 
+; nano ~/.config/gtk-3.0/settings.ini
+  [Settings]
+  gtk-font-name = Sans
 ; mkdir -p ~/.config/fontconfig
-; nano ~/.config/fontconfig/fonts.conf
-  <?xml version='1.0'?>
-  <!DOCTYPE fontconfig SYSTEM 'fonts.dtd'>
-  <fontconfig>
-    <selectfont>
-      <rejectfont>
-        <pattern><patelt name="family" ><string>NotoNastaliqUrdu</string></patelt></pattern>
-        <pattern><patelt name="family" ><string>NotoKufiArabic</string></patelt></pattern>
-        <pattern><patelt name="family" ><string>NotoNaskhArabic</string></patelt></pattern>
-        <pattern><patelt name="family" ><string>NotoNaskhArabicUI</string></patelt></pattern>
-      </rejectfont>
-    </selectfont>
-    <alias>
-      <family>serif</family>
-      <prefer><family>NotoSerif</family></prefer>
-    </alias>
-    <alias>
-      <family>sans-serif</family>
-      <prefer><family>NotoSans</family></prefer>
-    </alias>
-    <alias>
-      <family>sans</family>
-      <prefer><family>NotoSans</family></prefer>
-    </alias>
-    <alias>
-      <family>monospace</family>
-      <prefer><family>Hack</family></prefer>
-    </alias>
-  </fontconfig>
+; cp Linux/fonts.conf ~/.config/fontconfig/fonts.conf
+
+
+; nano ~/.bash_profile
+  sway
+; mkdir -p ~/.config/sway
+; cp Linux/sway.config ~/.config/sway/config
