@@ -73,7 +73,7 @@ now you can even reuse packages previously downloaded on current system,
 ; arch-chroot /mnt
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
   networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip rust gcc \
-  sway xorg-server-xwayland ttf-hack noto-fonts alacritty mpv chromium atom
+  sway xorg-server-xwayland ttf-hack noto-fonts materia-gtk-theme rofi sakura chromium atom
 
 install boot_loader:
 ; grub-install --target=i386-pc /dev/sdx
@@ -120,11 +120,21 @@ so if you like you can do this:
 ; mkdir -p ~/.config/sway
 ; cp Linux/sway.config ~/.config/sway/config
 
-; mkdir -p ~/.config/alacritty
-; cp Linux/alacritty.yml ~/.config/alacritty/alacritty.yml
-
+; mkdir -p ~/.config/gtk-3.0
 ; nano ~/.config/gtk-3.0/settings.ini
   [Settings]
+  gtk-theme-name = Materia-light-compact
   gtk-font-name = Sans
+
 ; mkdir -p ~/.config/fontconfig
 ; cp Linux/fonts.conf ~/.config/fontconfig/fonts.conf
+
+; mkdir -p ~/.config/sakura
+; cp Linux/sakura.conf ~/.config/sakura
+
+in Chromium settings:
+, continue running background apps when Chromium is closed;
+, use system title bar and borders;
+, continue where you left off;
+
+; reboot
