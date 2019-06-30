@@ -128,8 +128,3 @@ so if you like you can do this:
   gtk-font-name = Sans
 ; mkdir -p ~/.config/fontconfig
 ; cp Linux/fonts.conf ~/.config/fontconfig/fonts.conf
-
-in Chromium settings:
-, use system title bar and borders;
-, continue where you left off;
-, continue running background apps when Chromium is closed;
