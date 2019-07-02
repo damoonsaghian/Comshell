@@ -1,5 +1,6 @@
 'atom-workspace':
-  'alt': 'comshell:projects-list'
+  'alt-enter': 'comshell:projects-list'
+  'alt': 'do-nothing'
   'ctrl-tab': 'tree-view:toggle-focus'
 
 'atom-text-editor':
