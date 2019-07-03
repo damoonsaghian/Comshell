@@ -1,0 +1,10 @@
+we can use Atom text editor to create a prototype of Comshell;
+
+one pane per project;
+only the active project's pane is displayed;
+state of each project pane is stored/restored to/from ".cache/atom-pane";
+state of buffers in each project pane is stored/restored to/from
+  files in ".cache/atom-buffers/" directory;
+
+; cp Atom/* ~/.atom/
+set your time_zone in "~/.atom/config.cson";
