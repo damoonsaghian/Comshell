@@ -22,7 +22,7 @@ now you can even reuse packages previously downloaded on current system,
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
   networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip rust gcc \
   sway xorg-server-xwayland ttf-hack noto-fonts atom \
-  rofi lxterminal chromium materia-gtk-theme
+  sakura chromium materia-gtk-theme
 
 install boot_loader:
 ; grub-install --target=i386-pc /dev/sdx
@@ -78,8 +78,8 @@ so if you like you can do this:
 ; mkdir -p ~/.config/fontconfig
 ; cp Linux/fonts.conf ~/.config/fontconfig/fonts.conf
 
-; mkdir -p ~/.config/lxterminal
-; cp Linux/lxterminal.conf ~/.config/lxterminal
+; mkdir -p ~/.config/sakura
+; cp Linux/sakura.conf ~/.config/sakura
 
 in Chromium settings:
 , continue running background apps when Chromium is closed;
