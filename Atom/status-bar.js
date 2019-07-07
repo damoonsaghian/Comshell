@@ -16,7 +16,7 @@ function showDateTime(statusBar) {
 
   function updateDateTime(repeat) {
     const now = new Date(new Date()
-      .toLocaleString("en-US", {timeZone: atom.config.get('comshell.timeZone')})
+      .toLocaleString("en-US", { timeZone: process.env.TZ })
     );
     if (repeat) setTimeout(() => updateDateTime(true), (60 - now.getSeconds()) * 1000);
 

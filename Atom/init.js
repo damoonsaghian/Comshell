@@ -307,7 +307,7 @@ class ProjectsList {
 }
 
 const projectsList = new ProjectsList();
-if (!atom.project.getPaths()[0]) projectsList.show();
+projectsList.show();
 
 atom.commands.add('atom-workspace', {
   'comshell:projects-list': () => {
