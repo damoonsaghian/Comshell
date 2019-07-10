@@ -1,6 +1,0 @@
-colors:
-  primary:
-    background: '0x555555'
-    foreground: '0xffffff'
-font:
-  size: 10.5
