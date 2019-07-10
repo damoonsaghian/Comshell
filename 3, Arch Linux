@@ -22,7 +22,7 @@ now you can even reuse packages previously downloaded on current system,
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
   networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip rust gcc \
   sway xorg-server-xwayland ttf-hack noto-fonts atom \
-  alacritty chromium materia-gtk-theme
+  sakura chromium materia-gtk-theme
 
 install boot_loader:
 ; grub-install --target=i386-pc /dev/sdx
@@ -79,8 +79,8 @@ set your timezone in "area/location" format;
 ; mkdir -p ~/.config/fontconfig
 ; cp Linux/fonts.conf ~/.config/fontconfig/fonts.conf
 
-; mkdir -p ~/.config/alacritty
-; cp Linux/alacritty.yml ~/.config/alacritty
+; mkdir -p ~/.config/sakura
+; cp Linux/sakura.conf ~/.config/sakura/sakura.conf
 
 in Chromium settings:
 , continue running background apps when Chromium is closed;
