@@ -1,4 +1,8 @@
 Arch Linux help us to setup and maintain a Linux system; it's simple and effective;
+by doing the following instructions you'll end up with a minimum system,
+  which boots up to an Atom editor, and in addition you can press:
+  , "Alt+Tab" to show/hide a Chromium browser window;
+  , "Alt+`" to show/hide a Terminal window;
 
 first boot to an existing Arch Linux (the live image,
   or an already installed Arch Linux with "arch-install-scripts" package installed);
@@ -21,8 +25,8 @@ now you can even reuse packages previously downloaded on current system,
 ; arch-chroot /mnt
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
   networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip rust gcc \
-  sway xorg-server-xwayland ttf-hack noto-fonts atom \
-  sakura chromium materia-gtk-theme
+  sway xorg-server-xwayland ttf-hack noto-fonts materia-gtk-theme \
+  sakura chromium atom
 
 install boot_loader:
 ; grub-install --target=i386-pc /dev/sdx
@@ -65,7 +69,7 @@ so if you like you can do this:
 ; pactl set-sink-volume @DEFAULT_SINK@ 100%
 
 ; cp Linux/bash_profile ~/.bash_profile
-set your timezone in "area/location" format;
+replace "UTC" with your timezone in "area/location" format;
 
 ; mkdir -p ~/.config/sway
 ; cp Linux/sway.config ~/.config/sway/config
@@ -75,6 +79,7 @@ set your timezone in "area/location" format;
   [Settings]
   gtk-theme-name = Materia-light-compact
   gtk-font-name = Sans
+; cp Linux/gtk.css ~/.config/gtk-3.0/gtk.css
 
 ; mkdir -p ~/.config/fontconfig
 ; cp Linux/fonts.conf ~/.config/fontconfig/fonts.conf
@@ -82,9 +87,11 @@ set your timezone in "area/location" format;
 ; mkdir -p ~/.config/sakura
 ; cp Linux/sakura.conf ~/.config/sakura/sakura.conf
 
+; cp Linux/Atom/* ~/.atom/
+
+; reboot
+
 in Chromium settings:
 , continue running background apps when Chromium is closed;
 , use system title bar and borders;
 , continue where you left off;
-
-; reboot

@@ -1,0 +1,23 @@
+implementing a complete GUI toolkit is a huge lot of work;
+existing ones (like GTK) are single threaded, thus we can't create actors from them;
+so for data structures containing widgets we have to:
+, use "RefCell", where you want mutability;
+, use "Rc" to create references;
+now although we can access actors from GTK main loop,
+  we can't access GTK widgets (and structure containing them), from actors;
+so we either must write traditional single threaded code, without actors,
+  or use a trick to access non_send data, in other threads:
+  "https://github.com/Phaiax/gtk-rs-state";
+
+considering these difficulties, i think it's better to put Rust aside for now,
+  and use Gjs to build a prototype of Comshell;
+"https://gitlab.gnome.org/GNOME/gjs"
+
+; sudo pacman -S gjs gtk3 gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
+
+"https://github.com/teejee2008/polo"
+"https://github.com/UberWriter/uberwriter"
+"https://github.com/zim-desktop-wiki/zim-desktop-wiki"
+"https://gitlab.gnome.org/World/eolie"
+"https://gitlab.gnome.org/GNOME/pitivi"
+"https://www.archlinux.org/packages/community/any/gaupol/"
