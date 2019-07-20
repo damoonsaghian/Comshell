@@ -1,0 +1,47 @@
+implementing a complete GUI toolkit is a huge lot of work;
+existing ones (like GTK) are single threaded, thus we can't create actors from them;
+so although we can access actors from GTK main loop,
+  we can't access GTK widgets (and structure containing them), from actors;
+thus we are forced back to traditional single threaded code, without actors;
+in fact there is a trick to access non_send data, in other threads:
+  "https://github.com/Phaiax/gtk-rs-state",
+  but i don't think it's suitable to structure the whole program on it;
+
+so we will use special structs annotated by "#[derive(Clone)]", and made of:
+, Gobjects
+, other special structs
+, Rc<RefCell> of normal Rust structs
+
+"https://gtk-rs.org/docs/gtk/"
+"https://gtk-rs.org/docs/sourceview/"
+"https://mmstick.github.io/gtkrs-tutorials/introduction.html"
+"https://github.com/gtk-rs/examples/tree/master/src/bin"
+"https://gitlab.gnome.org/GNOME/fractal"
+"https://github.com/fengalin/media-toc"
+
+"https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
+"https://github.com/teejee2008/polo"
+"https://github.com/UberWriter/uberwriter"
+"https://github.com/zim-desktop-wiki/zim-desktop-wiki"
+"https://github.com/karlch/vimiv"
+"https://www.archlinux.org/packages/extra/any/meld/"
+"https://www.archlinux.org/packages/community/any/lollypop/"
+"https://www.archlinux.org/packages/community/any/quodlibet/"
+"https://gitlab.gnome.org/GNOME/pitivi"
+"https://www.archlinux.org/packages/community/any/gaupol/"
+
+; sudo pacman -S gtksourceview3 webkit2gtk gst-plugins-{base,good,bad} gst-libav \
+  materia-gtk-theme
+
+; mkdir -p ~/.config/gtk-3.0
+; nano ~/.config/gtk-3.0/settings.ini
+  [Settings]
+  gtk-theme-name = Materia-light-compact
+  gtk-font-name = Sans
+; gsettings set org.gnome.desktop.interface gtk-theme Materia-light-compact
+; gsettings set org.gnome.desktop.interface font-name Sans
+; cp gtk.css ~/.config/gtk-3.0/
+
+; cargo build --release
+; mkdir ~/.bin
+; sudo cp target/release/comshell /usr/local/bin/
