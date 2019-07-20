@@ -40,7 +40,7 @@ nonetheless a regular user is necessary, because
 
 automatic login:
 ; mkdir /etc/systemd/system/getty@tty1.service.d
-; cp Linux/override.conf /etc/systemd/system/getty@tty1.service.d/
+; cp override.conf /etc/systemd/system/getty@tty1.service.d/
 
 in "/etc/locale.gen" uncomment "en_US.UTF-8 UTF-8";
 ; locale-gen
@@ -61,7 +61,11 @@ so if you like you can do this:
 ; pactl set-sink-mute @DEFAULT_SINK@ 0
 ; pactl set-sink-volume @DEFAULT_SINK@ 100%
 
+; mkdir -p ~/.config/sway
+; cp sway.config ~/.config/sway/config
+; cp bash_profile ~/.bash_profile
+
 ; mkdir -p ~/.config/fontconfig
-; cp Linux/fonts.conf ~/.config/fontconfig/
+; cp fonts.conf ~/.config/fontconfig/
 
 ; reboot
