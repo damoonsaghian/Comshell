@@ -18,7 +18,7 @@ now you can even reuse packages previously downloaded on current system,
 ; pacstrap /mnt pacman
 ; arch-chroot /mnt
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
-  networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip rust gcc \
+  networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip pony-stable \
   sway xorg-server-xwayland ttf-hack noto-fonts
 
 install boot_loader:
@@ -60,10 +60,6 @@ some audio devices can send and_or receive volume control signals;
 so if you like you can do this:
 ; pactl set-sink-mute @DEFAULT_SINK@ 0
 ; pactl set-sink-volume @DEFAULT_SINK@ 100%
-
-; mkdir -p ~/.config/sway
-; cp sway.config ~/.config/sway/config
-; cp bash_profile ~/.bash_profile
 
 ; mkdir -p ~/.config/fontconfig
 ; cp fonts.conf ~/.config/fontconfig/
