@@ -32,9 +32,6 @@ cpu runs a sequence of simple computations, called instruction codes, one by one
 
 compilers are special programs that generate instruction codes,
   from a program written in a structured and human readable language;
-Rust is a programming language which provides zero cost abstractions,
-  and memory safety without garbage collection;
-  thus there is absolutely no reason to write new software in C/C++;
 
 programs usually do not run directly on computer hardware;
 instead they run on a more sophisticated software machine (a virtual machine) called the kernel;
@@ -43,7 +40,6 @@ but in that case, we have to rewrite all the required libraries, on bare metal;
 anyway, having an operating system, makes developing and testing new programs much easier;
 
 Linux is a highly developed, constantly evolving, open_source kernel;
-"https://dominuscarnufex.github.io/cours/rs-kernel/en.html"
 in Linux (and other Unix based operating systems) most things appear in the file system;
 i think the reason is to make it possible to do lots of things using shell scripts,
   instead of a proper programming language;

@@ -1,0 +1,24 @@
+sharing mutable data,
+  ie having a mutable reference to some data, while it is shared using other references,
+  is the root of many complexities;
+"https://manishearth.github.io/blog/2015/05/17/the-problem-with-shared-mutability/"
+
+to prevent sharing mutable data we can:
+1, abandon aliasing altogether, and move instead, like in Rust;
+2, control aliasing, like in Pony;
+
+= type system
+types show us what we can do with the data, ie which operations are valid;
+
+the class hierarchy design, eg in Java, is problematic;
+  "http://ptgmedia.pearsoncmg.com/images/020163371x/items/item33.html"
+also the problem of covariance for generic types, has its root in this problem;
+  "https://en.wikipedia.org/wiki/Wildcard_(Java)"
+i think this problem is also the motivation for dynamic typing (another bad design);
+the right way as done in Rust and Pony:
+, concrete types (like final classes in Java) can be instantiated, but cannot have subtypes;
+, abstract types (like abstract classes in Java) cannot be instantiated, but can have subtypes;
+
+= machine learning
+actors can contain parameters which can be adjusted gradually, based on received messages;
+  this can be used to implement learning capabilities;
