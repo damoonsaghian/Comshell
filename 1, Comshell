@@ -22,7 +22,6 @@ for those who neither can use all their fingers, nor can talk,
 , two commas --> ;
 , ";" followed by comma --> .
 , comma followed by "c" followed by space --> : followed by space
-, comma followed by "n" followed by comma --> ::
 , comma followed by "psi" followed by space --> ψ followed by space
 , "ab_cd" followed by two underscores --> AbCd
 , "AbCd" (ie if the first letter is capital)

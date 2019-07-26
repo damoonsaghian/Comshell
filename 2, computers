@@ -45,5 +45,5 @@ i think the reason is to make it possible to do lots of things using shell scrip
   instead of a proper programming language;
 while i can understand the convenience it provides, i don't think it's good design;
 
-using Arch Linux we can setup and maintain a Linux system; it's simple and effective;
+using Arch Linux we can setup and maintain a Linux system;
 see "./Linux/1"

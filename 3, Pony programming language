@@ -7,6 +7,13 @@ to prevent sharing mutable data we can:
 1, abandon aliasing altogether, and move instead, like in Rust;
 2, control aliasing, like in Pony;
 
+i think the second approach is more consistent:
+  , in Rust "Copy" types don't move;
+  , also the necessity to have slicing is actually due to move semantics;
+also Rust other complexities like str/String;
+but the main reason that i prefer Pony over Rust is that in Rust we can't have field mutability;
+  ie in Rust we can't mutate individual fields while the whole object is immutable;
+
 = type system
 types show us what we can do with the data, ie which operations are valid;
 
