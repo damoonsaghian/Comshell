@@ -1,14 +1,7 @@
-local lgi = require 'lgi'
-local gtk = lgi.Gtk
-local gdk = lgi.Gdk
-
-local utils = require 'utils'
-local class = utils.class
-
-local Directory = class()
+require 'globals'
 
 local ProjectsList = class {
-  paths = [], -- list of strings
+  paths = {}, -- list of strings
   model = gtk.ListStore(),
   view = gtk.TreeView(),
 
