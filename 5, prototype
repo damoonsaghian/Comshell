@@ -1,6 +1,6 @@
 implementing a complete GUI toolkit is a huge lot of work;
 existing ones (like GTK) are single threaded;
-so although we can access actors from GTK main loop,
+so although we can access actors from GTK thread,
   we can't access GTK widgets (and structure containing them), from actors;
 thus we are forced back to traditional single threaded code, without actors;
 in addition, there is still no GTK bindings for Pony;
