@@ -1,9 +1,10 @@
 local lgi = require 'lgi'
-
-glib = lgi.GLib
-gio = lgi.Gio
-gtk = lgi.Gtk
-gdk = lgi.Gdk
+Glib = lgi.GLib
+Gio = lgi.Gio
+Gdk = lgi.Gdk
+Gtk = lgi.Gtk
+Editor = lgi.GtkSource
+Webkit = lgi.WebKit2
 
 function class(new_class)
   new_class.__index = new_class

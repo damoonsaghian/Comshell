@@ -1,10 +1,3 @@
-local lgi = require 'lgi'
-local gtk = lgi.Gtk
-local gdk = lgi.Gdk
-
-local utils = require 'utils'
-local class = utils.class
-
 -- for gallery view: gtk.FlowBox, gtk.Scrollable
 -- https://gitlab.gnome.org/GNOME/shotwell/tree/master/src
 -- https://gitlab.gnome.org/GNOME/gnome-music
@@ -19,6 +12,4 @@ local class = utils.class
 --   "https://riptutorial.com/gtk3/example/24777/embed-a-video-in-a-gtk-window-in-python3"
 --   "https://wiki.gnome.org/Projects/Vala/GStreamerSample"
 
-local Gallery = class {}
-
-return Gallery
+Gallery = class {}

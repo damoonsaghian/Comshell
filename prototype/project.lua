@@ -1,14 +1,7 @@
-local lgi = require 'lgi'
-local gtk = lgi.Gtk
-local gdk = lgi.Gdk
-
-local utils = require 'utils'
-local class = utils.class
-
-local Gallery = require 'gallery'
-local Editor = require 'editor'
-local FilesTree = require 'files_tree'
-local WebBrowser = require 'web_browser'
+require 'gallery'
+require 'editor'
+require 'files_tree'
+require 'web_browser'
 
 local View = class {
   item = nil, -- Gallery or Editor
@@ -16,11 +9,11 @@ local View = class {
   floating_layer = nil, -- gtk.Container
 }
 
-local Project = class {
+Project = class {
   self.views = nil, -- {View}
   self.notebook = nil, -- gtk.NoteBook
   self.web_browsers = nil, -- { "url" = WebBrowser }
-  self.external_projects = self.external_projects -- { "url" = Project }
+  self.external_projects = nil -- { "url" = Project }
 
 go_to_chapter = function(chapter_path)
 end
@@ -31,4 +24,3 @@ end
 next_chapter = function()
 end
 }
-return Project

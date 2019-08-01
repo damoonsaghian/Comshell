@@ -2,8 +2,8 @@ require 'globals'
 
 local ProjectsList = class {
   paths = {}, -- list of strings
-  model = gtk.ListStore(),
-  view = gtk.TreeView(),
+  model = Gtk.ListStore(),
+  view = Gtk.TreeView(),
 
   go_to_project = function(self, project_path)
   end
@@ -11,40 +11,40 @@ local ProjectsList = class {
 
 local normal_mode = true
 
-local Project = require 'project'
+require 'project'
 local open_projects = {} -- { "project_name" = Project }
 local projects = {};
-local main_view = gtk.Stack();
+local main_view = Gtk.Stack();
 
 -- show projects list
-local statusbar_message = gtk.Label {
+local statusbar_message = Gtk.Label {
   label = "",
   single_line_mode = true,
-  halign = gtk.Align.Start,
+  halign = Gtk.Align.Start,
   margin_start = 2,
   margin_end =2
 }
-local statusbar_info = gtk.Label {
+local statusbar_info = Gtk.Label {
   label = "",
   single_line_mode = true,
-  halign = gtk.Align.End,
+  halign = Gtk.Align.End,
   margin_start = 2,
   margin_end = 2
 }
 
 -- update the date shown in statusbar_info, every (full) minute;
--- (gtk.Label, Bool) -> gtk.Continue
+-- (Gtk.Label, Bool) -> Gtk.Continue
 function update_date(statusbar_info , redo)
   local now -- =
 
   if redo then
-    gtk.timeout_add_seconds((60 - now.second()), function() update_date(statusbar_info, true) end)
+    Gtk.timeout_add_seconds((60 - now.second()), function() update_date(statusbar_info, true) end)
   end
 
   local date -- "%F %a %p %I:%M"
   statusbar_info.set_text(date)
 
-  gtk.Continue(false)
+  Gtk.Continue(false)
 end
 updateDateTime(statusbar_info, true)
 -- update date after computer wakes up from sleep;
@@ -52,30 +52,27 @@ updateDateTime(statusbar_info, true)
 -- https://bbs.archlinux.org/viewtopic.php?id=238749
 
 -- this is only for testing;
-local webkit = lgi.WebKit2
-local view = webkit.WebView {}
+local view = Webkit.WebView {}
 view.load_uri("http://www.google.com/")
 main_view.add_named(view, "webview")
 -- now connect the widgets, through intermidiate containers;
 do
-  local statusbar = gtk.Box.new(gtk.Orientation.HORIZONTAL, 0)
-  statusbar.pack_start(statusbar_message, true, true, 0)
-  statusbar.pack_start(status_bar_info, false, false, 0)
-  local root_box = gtk.Box.new(gtk.Orientation.VERTICAL, 0)
-  root_box.pack_end(statusbar, false, false, 0)
-  root_box.pack_end(gtk.Separator.new(gtk.Orientation.HORIZONTAL), false, false, 0)
-  root_box.pack_end(main_view, true, true, 0)
-  let window = gtk.Window.new(gtk.WindowType.Toplevel)
-  window.connect_delete_event(function()
-    gtk.main_quit()
-    gtk.Inhibit(false)
-  end)
-  window.add(root_box)
-  window.show_all()
-  window.maximize()
+  local statusbar = Gtk.HBox()
+  statusbar:pack_start(statusbar_message, true, true, 0)
+  statusbar:pack_start(status_bar_info, false, false, 0)
+  local root_box = Gtk.VBox()
+  root_box:pack_end(statusbar, false, false, 0)
+  root_box:pack_end(Gtk.Separator(Gtk.Orientation.HORIZONTAL), false, false, 0)
+  root_box:pack_end(main_view, true, true, 0)
+  local window = Gtk.Window {
+    on_destroy = Gtk.main_quit
+  }
+  window:add(root_box)
+  window:show_all()
+  window:maximize()
 end
 
-gtk.main()
+Gtk.main()
 
 -[[
 # mount drives when a new block device is created;
