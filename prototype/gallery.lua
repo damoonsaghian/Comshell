@@ -12,4 +12,4 @@
 --   "https://riptutorial.com/gtk3/example/24777/embed-a-video-in-a-gtk-window-in-python3"
 --   "https://wiki.gnome.org/Projects/Vala/GStreamerSample"
 
-Gallery = class {}
+Gallery = class()

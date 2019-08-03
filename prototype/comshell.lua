@@ -1,20 +1,21 @@
 require 'globals'
 
-local ProjectsList = class {
-  paths = {}, -- list of strings
-  model = Gtk.ListStore(),
-  view = Gtk.TreeView(),
+local ProjectsList = class()
+function ProjectList:init(defaults)
+  self.paths = defaults.paths and {} -- list of strings
+  self.model = Gtk.ListStore()
+  self.view = Gtk.TreeView()
+end
 
-  go_to_project = function(self, project_path)
-  end
-}
+function ProjectList:go_to_project(project_path)
+end
 
 local normal_mode = true
 
 require 'project'
 local open_projects = {} -- { "project_name" = Project }
-local projects = {};
-local main_view = Gtk.Stack();
+local projects = {}
+local main_view = Gtk.Stack()
 
 -- show projects list
 local statusbar_message = Gtk.Label {
@@ -32,29 +33,17 @@ local statusbar_info = Gtk.Label {
   margin_end = 2
 }
 
--- update the date shown in statusbar_info, every (full) minute;
--- (Gtk.Label, Bool) -> Gtk.Continue
-function update_date(statusbar_info , redo)
-  local now -- =
-
-  if redo then
-    Gtk.timeout_add_seconds((60 - now.second()), function() update_date(statusbar_info, true) end)
-  end
-
-  local date -- "%F %a %p %I:%M"
-  statusbar_info.set_text(date)
-
-  Gtk.Continue(false)
-end
-updateDateTime(statusbar_info, true)
--- update date after computer wakes up from sleep;
--- https://askubuntu.com/questions/183516/how-do-i-detect-when-my-system-wakes-up-from-suspend-via-dbus-or-similar-in-a-py
--- https://bbs.archlinux.org/viewtopic.php?id=238749
+GnomeDesktop.WallClock().on_notify:connect(function(_, pspec)
+  assert(pspec.name == 'clock')
+  local date = Glib.DateTime.new_now_local().format("%F %a %p %I:%M")
+  statusbar_info:set_text(date)
+end, 'clock')
 
 -- this is only for testing;
 local view = Webkit.WebView {}
-view.load_uri("http://www.google.com/")
-main_view.add_named(view, "webview")
+view:load_uri("http://www.google.com/")
+main_view:add_named(view, "webview")
+
 -- now connect the widgets, through intermidiate containers;
 do
   local statusbar = Gtk.HBox()

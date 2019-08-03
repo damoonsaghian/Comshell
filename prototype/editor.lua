@@ -1,18 +1,19 @@
-Editor = class {
-  buffer = nil, -- editor.Buffer
-  view = nil, -- editor.View
+Editor = class()
+function Editor:init(defaults)
+  self.buffer = Editor.Buffer()
+  self.view = editor.View()
+end
 
-  prev_page = function(self)
-  end,
+function Editor:prev_page()
+end
 
-  next_page = function(self)
-  end,
+function Editor:next_page()
+end
 
-  prev_item = function(self)
-  end,
+function Editor:prev_item()
+end
 
-  next_item = function(self)
-  end
-}
+function Editor:next_item()
+end
 
 -- gspell

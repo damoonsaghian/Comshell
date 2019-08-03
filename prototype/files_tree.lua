@@ -16,4 +16,4 @@ stdbuf -oL -- udevadm monitor --udev -s block | while read -r -- _ _ event devpa
 done&
 -]]
 
-FilesTree = class {}
+FilesTree = class()

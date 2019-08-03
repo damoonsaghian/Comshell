@@ -3,24 +3,26 @@ require 'editor'
 require 'files_tree'
 require 'web_browser'
 
-local View = class {
-  item = nil, -- Gallery or Editor
-  files_tree = nil, -- FilesTree
-  floating_layer = nil, -- gtk.Container
-}
-
-Project = class {
-  self.views = nil, -- {View}
-  self.notebook = nil, -- gtk.NoteBook
-  self.web_browsers = nil, -- { "url" = WebBrowser }
-  self.external_projects = nil -- { "url" = Project }
-
-go_to_chapter = function(chapter_path)
+local View = class()
+function View:init(defaults)
+  self.item = defaults.item -- Gallery or Editor
+  self.files_tree = defaults.files_tree -- FilesTree
+  self.floating_layer = Gtk.Container()
 end
 
-prev_chapter = function()
+Project = class()
+function Project:init(defaults)
+  self.views = {} -- {View}
+  self.notebook = Gtk.NoteBook()
+  self.web_browsers = {} -- { "url" = WebBrowser }
+  self.external_projects = {} -- { "url" = Project }
 end
 
-next_chapter = function()
+function Projecy:go_to_chapter(chapter_path)
 end
-}
+
+function Projecy:prev_chapter()
+end
+
+function Projecy:next_chapter()
+end
