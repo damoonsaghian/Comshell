@@ -19,7 +19,7 @@ now you can even reuse packages previously downloaded on current system,
 ; arch-chroot /mnt
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
   networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip pony-stable \
-  sway xorg-server-xwayland ttf-hack noto-fonts
+  sway xorg-server-xwayland ttf-hack noto-fonts noto-fonts-emoji
 
 install boot_loader:
 ; grub-install --target=i386-pc /dev/sdx
@@ -29,14 +29,13 @@ install boot_loader:
 ; nano /boot/grub/grub.cfg
   set timeout = 0
 
-create user:
+; passwd
 ; useradd -m -G wheel user1
-; passwd -d user1
+; passwd user1
 ; EDITOR=nano visudo
   %wheel ALL=(ALL) ALL
-actually, "sudo" without password has no security advantage over just logging in as root;
-nonetheless a regular user is necessary, because
-  some programs (like PulseAudio) wouldn't work normally when run as root;
+a regular user is necessary,
+  because some programs (like PulseAudio) wouldn't work normally when run as root;
 
 automatic login:
 ; mkdir /etc/systemd/system/getty@tty1.service.d
