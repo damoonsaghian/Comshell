@@ -29,9 +29,9 @@ install boot_loader:
 ; nano /boot/grub/grub.cfg
   set timeout = 0
 
-; passwd
+create user:
 ; useradd -m -G wheel user1
-; passwd user1
+; passwd -d user1
 ; EDITOR=nano visudo
   %wheel ALL=(ALL) ALL
 a regular user is necessary,
