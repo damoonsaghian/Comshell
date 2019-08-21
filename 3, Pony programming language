@@ -24,7 +24,7 @@ instead it controls them using reference capabilities:
 Pony is a really well designed programming language;
 "https://www.ponylang.io/"
 
-type in Pony: TypeName capability alias/not
+type in Pony: TypeName capability ephemeral
 
                   |        RW         |          R        |        ...        |
 -------------------------------------------------------------------------------
@@ -36,9 +36,11 @@ local alias: RW   |        ref        |         box       |        tag        |
 -------------------------------------------------------------------------------
                   | global alias: ... |  global alias: R  | global alias: RW  |
 
-the first column allow mutability, cause other actors can't write;
+the first column allows mutability, cause other actors can't write;
 the second column needs immutability, cause other actors can read;
 the last column is opaque (no read/write is allowed), cause other actors can read or write;
+
+"https://github.com/ponylang/ponyc/tree/master/examples"
 
 actors can contain parameters which can be adjusted gradually, based on received messages;
   this can be used to implement learning capabilities;

@@ -12,7 +12,7 @@ but the problem is the form_factor:
 detection of voice commands is a relatively simple process (compared to general speech recognition),
   because we only need to match against a relatively small set of commands;
 a headset with near range microphone can be used, to exclude far away sound sources;
-  also it is better to put battery and Bluetooth of the headset in a separate unit,
+  also it is better to put battery and transmitter of the headset in a separate unit,
     that can be put in the pocket;
   this makes the headset lighter and safer;
 for those who neither can use all their fingers, nor can talk,

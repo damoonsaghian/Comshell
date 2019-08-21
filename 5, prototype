@@ -10,9 +10,9 @@ so i think it's better to first build a prototype of Comshell, using LGI;
 "https://github.com/pavouk/lgi/tree/master/docs"
 "https://github.com/pavouk/lgi/tree/master/samples"
 
-"https://python-gtk-3-tutorial.readthedocs.io/en/latest/introduction.html"
-"https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
 "https://developer.gnome.org/gnome-devel-demos/stable/js.html.en"
+"https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
+"https://python-gtk-3-tutorial.readthedocs.io/en/latest/treeview.html"
 
 "https://github.com/teejee2008/polo"
 "https://github.com/UberWriter/uberwriter"
@@ -23,11 +23,12 @@ so i think it's better to first build a prototype of Comshell, using LGI;
 "https://www.archlinux.org/packages/community/any/quodlibet/"
 "https://gitlab.gnome.org/GNOME/pitivi"
 "https://www.archlinux.org/packages/community/any/gaupol/"
+"https://gitlab.gnome.org/World/OpenPaperwork/paperwork"
 
 "https://gjs-docs.gnome.org/"
 "https://developer.gnome.org/references"
 
-; sudo pacman -S lua-lgi gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav \
+; pkexec pacman -S lua-lgi gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav \
   gnome-desktop materia-gtk-theme
 
 ; mkdir -p ~/.config/gtk-3.0
