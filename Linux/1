@@ -20,7 +20,7 @@ now you can even reuse packages previously downloaded on current system,
 ; pacstrap /mnt pacman
 ; arch-chroot /mnt
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
-  networkmanager pulseaudio-alsa udisks2 nano man-db unzip pony-stable \
+  networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip pony-stable \
   sway ttf-hack noto-fonts noto-fonts-emoji
 
 install boot_loader:
@@ -34,6 +34,8 @@ install boot_loader:
 ; useradd -m -G wheel user1
 ; passwd user1
 ; passwd
+; EDITOR=nano visudo
+  %wheel ALL=(ALL) ALL NOPASSWD: ALL
 
 automatic login:
 ; mkdir /etc/systemd/system/getty@tty1.service.d
