@@ -1,3 +1,5 @@
+Alpine Linux
+
 first boot to an existing Arch Linux (the live image,
   or an already installed Arch Linux with "arch-install-scripts" package installed);
 ; timedatectl set-ntp true
@@ -18,8 +20,8 @@ now you can even reuse packages previously downloaded on current system,
 ; pacstrap /mnt pacman
 ; arch-chroot /mnt
 ; pacman -S grub sed intel-ucode linux systemd-sysvcompat logrotate \
-  networkmanager pulseaudio-alsa udisks2 sudo nano man-db unzip pony-stable \
-  sway xorg-server-xwayland ttf-hack noto-fonts noto-fonts-emoji
+  networkmanager pulseaudio-alsa udisks2 nano man-db unzip pony-stable \
+  sway ttf-hack noto-fonts noto-fonts-emoji
 
 install boot_loader:
 ; grub-install --target=i386-pc /dev/sdx
@@ -29,17 +31,20 @@ install boot_loader:
 ; nano /boot/grub/grub.cfg
   set timeout = 0
 
-create user:
 ; useradd -m -G wheel user1
-; passwd -d user1
-; EDITOR=nano visudo
-  %wheel ALL=(ALL) ALL
-a regular user is necessary,
-  because some programs (like PulseAudio) wouldn't work normally when run as root;
+; passwd user1
+; passwd
 
 automatic login:
 ; mkdir /etc/systemd/system/getty@tty1.service.d
 ; cp override.conf /etc/systemd/system/getty@tty1.service.d/
+note that to prevent physical attacks, you have to disable automatic login;
+also you have to:
+, lock BIOS
+, lock computer case
+, watch out for hardware keyloggers, shoulder surfing ...
+
+; cp polkit.js /etc/polkit-1/rules.d/49-nopasswd_global.rules
 
 in "/etc/locale.gen" uncomment "en_US.UTF-8 UTF-8";
 ; locale-gen
