@@ -28,7 +28,7 @@ so i think it's better to first build a prototype of Comshell, using LGI;
 "https://gjs-docs.gnome.org/"
 "https://developer.gnome.org/references"
 
-; pkexec pacman -S lua-lgi gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav \
+; sudo pacman -S lua-lgi gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav \
   gnome-desktop materia-gtk-theme
 
 ; mkdir -p ~/.config/gtk-3.0
