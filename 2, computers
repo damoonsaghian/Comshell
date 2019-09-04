@@ -33,6 +33,35 @@ cpu runs a sequence of simple computations, called instruction codes, one by one
 compilers are special programs that generate instruction codes,
   from a program written in a structured and human readable language;
 
+there is always possibility of backdoors for closed source CPU,
+  especially if the boot firmware is also closed source;
+recently introduction of "secure execution environment" makes this situation even worse;
+since for implementing it some vendors, like Intel and AMD,
+  expand their closed source firmware, to a full_blown always_running mini operating system,
+  with full access to the whole system (including memory and network);
+furthermore they make it practically impossible for users to disable it;
+this mess of a design cries out for hidden and quite sophisticated backdoors;
+"https://www.fsf.org/blogs/licensing/intel-me-and-why-we-should-get-rid-of-me"
+"https://libreboot.org/faq.html#intel"
+"https://en.wikipedia.org/wiki/Intel_Management_Engine"
+"https://blog.invisiblethings.org/papers/2015/x86_harmful.pdf"
+
+so what are the alternatives:
+RISC-V: no appropriate hardware available yet;
+PowerPc: no appropriate hardware available yet;
+MIPS: bad old design (relative to other alternatives, not X86),
+  no appropriate hardware available yet;
+ARM: closed source, but with much better design than X86,
+  and can have open source firmware (Bareboot, U-Boot, EDK2),
+  but i couldn't find an appropriate hardware;
+  a decent hardware based on Qualcomm/Adreno would be pretty good;
+an ideal system would have:
+, powerful enough CPU, and a GPU with open source driver;
+, at least 4GB DDR4;
+, Barbox/U-Boot based boot firmware which finds the connected disks,
+  and then tries to load a Linux kernel or a boot_loader,
+  by looking for a config file in the partitions;
+
 programs usually do not run directly on computer hardware;
 instead they run on a more sophisticated software machine (a virtual machine) called the kernel;
 in theory we can live without a kernel (an idea sometimes called a library operating system);

@@ -8,7 +8,13 @@ so i think it's better to first build a prototype of Comshell, using LGI;
 
 "https://github.com/pavouk/lgi"
 "https://github.com/pavouk/lgi/tree/master/docs"
-"https://github.com/pavouk/lgi/tree/master/samples"
+"https://github.com/pavouk/lgi/blob/master/samples/giostream.lua"
+"https://github.com/pavouk/lgi/blob/master/samples/repobrowser.lua" (treeview)
+"https://github.com/pavouk/lgi/blob/master/samples/console.lua" (sourceview)
+"https://github.com/pavouk/lgi/blob/master/samples/gstplaystream.lua"
+"https://github.com/pavouk/lgi/blob/master/samples/gstvideo.lua"
+"https://github.com/pavouk/lgi/blob/master/samples/goocanvas.lua"
+"https://github.com/pavouk/lgi/tree/master/samples/gtk-demo"
 
 "https://developer.gnome.org/gnome-devel-demos/stable/js.html.en"
 "https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
@@ -26,9 +32,10 @@ so i think it's better to first build a prototype of Comshell, using LGI;
 "https://gitlab.gnome.org/World/OpenPaperwork/paperwork"
 
 "https://gjs-docs.gnome.org/"
+"https://lazka.github.io/pgi-docs/"
 "https://developer.gnome.org/references"
 
-; sudo pacman -S lua-lgi gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav \
+; pkexec pacman -S lua-lgi gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav \
   gnome-desktop materia-gtk-theme
 
 ; mkdir -p ~/.config/gtk-3.0
