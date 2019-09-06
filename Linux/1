@@ -1,25 +1,28 @@
 first boot to an existing Arch Linux (the live image, or an already installed Arch Linux,
-  with "arch-install-scripts" package installed, and logged in as root);
+  with "arch-install-scripts" package installed, and a root terminal);
 ; timedatectl set-ntp true
 
-list disks using "fdisk -l"; then use "fdisk /dev/sdx" to create 3 partitions:
-  , +1M BIOS boot (partition type code: 4)
-  , +550M EFI System (partition tye code: 1)
-  , and the rest for Linux filesystem
-  (first enter "g" command to create a GPT partition table,
-    then enter "n" to add a new partition, and change its type using "t" command;
-    at the end enter "w" to write and exit;)
+we need 3 partitions:
+, +1M BIOS boot partition(partition type code: 4)
+, +550M EFI system partition (partition type code: 1)
+, and the rest for Linux system partition (the default partition type)
+list disks using "fdisk -l", then use "fdisk /dev/sdx" to create the partitions:
+, enter "g" command to create a GPT partition table;
+, enter "n" to add a new partition;
+, enter "t" to set the partition type
+, enter "w" to write and exit;
 format the partitions:
-  ; mkfs.fat -F32 /dev/sdx2; mkfs.ext4 /dev/sdx3
+; mkfs.fat -F32 /dev/sdx2; mkfs.ext4 /dev/sdx3
 
 ; mount /dev/sdx3 /mnt
 now you can even reuse packages previously downloaded on current system,
   by copying them to "/mnt/var/cache/pacman/pkg";
 ; pacstrap /mnt pacman
 ; arch-chroot /mnt
-; pacman -S grub sed intel-ucode amd-ucode linux systemd-sysvcompat logrotate \
-  networkmanager pulseaudio-alsa udisks2 nano man-db unzip pony-stable \
-  sway ttf-hack noto-fonts noto-fonts-emoji materia-gtk-theme
+; pacman -S grub sed intel-ucode amd-ucode linux-lts systemd-sysvcompat \
+  networkmanager pulseaudio-alsa udisks2 logrotate man-db nano tor unzip pony-stable \
+  gdm ttf-hack noto-fonts noto-fonts-emoji materia-gtk-theme \
+  gnome-terminal nautilus gedit mpv ffmpegthumbnailer moc xorg-server-xwayland chromium atom
 
 install boot_loader:
 ; grub-install --target=i386-pc /dev/sdx
