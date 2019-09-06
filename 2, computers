@@ -52,15 +52,11 @@ PowerPc: no appropriate hardware available yet;
 MIPS: bad old design (relative to other alternatives, not X86),
   no appropriate hardware available yet;
 ARM: closed source, but with much better design than X86,
-  and can have open source firmware (Bareboot, U-Boot, EDK2),
-  but i couldn't find an appropriate hardware;
+  and can have open source firmware (like EDK2 which is an open source UEFI implementation),
+  but so far i couldn't find an appropriate hardware;
   a decent hardware based on Qualcomm/Adreno would be pretty good;
-an ideal system would have:
-, powerful enough CPU, and a GPU with open source driver;
-, at least 4GB DDR4;
-, Barbox/U-Boot based boot firmware which finds the connected disks,
-  and then tries to load a Linux kernel or a boot_loader,
-  by looking for a config file in the partitions;
+an ideal system would have powerful enough CPU, and a GPU with open source driver,
+  at least 4GB DDR4, and EDK2 boot firmware;
 
 programs usually do not run directly on computer hardware;
 instead they run on a more sophisticated software machine (a virtual machine) called the kernel;
