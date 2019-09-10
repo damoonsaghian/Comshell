@@ -1,0 +1,49 @@
+the problem with concurrency is sharing mutable data;
+ie having a mutable reference to some data, while it is shared using other references,
+to prevent sharing mutable data, we can:
+, abandon mutability like in Haskell; but since mutability is needed in some cases (IO),
+  a complicated mechanism (Monads) is implemented to do that;
+, abandon aliasing like in Rust, and copy, move, or borrow instead;
+  actually this also allows Rust to eliminate the need for garbage collection;
+  but since aliasing is needed in some cases (asynchronous calls),
+    we have to reintroduce aliasing again, and adding more complexities;
+
+the absence of garbage collection in Rust may seem interesting at first;
+but in fact those situations which can be borrow checked statically,
+  without the need for complicated lifetimes,
+  can be detected by the compiler without concerning the programmer;
+Rust has other complexities too, like str/String;
+but one serious problem in the design of Rust is that in Rust we can't have field mutability;
+  ie in Rust we can't reassign to individual fields while the whole object is immutable;
+
+the best approach to deal with mutable data shared concurrently, is the one used in Pony;
+it doesn't abandon aliasing nor mutability;
+instead it controls them using reference capabilities:
+, share only immutable date;
+, exchange only isolated data;
+Pony is a really well designed programming language;
+"https://www.ponylang.io/"
+
+type in Pony: TypeName capability ephemeral
+
+                  |        RW         |          R        |        ...        |
+-------------------------------------------------------------------------------
+local alias: ...  |        iso        |         ...       |        ...        |
+-------------------------------------------------------------------------------
+local alias: R    |        trn        |         val       |        ...        |
+-------------------------------------------------------------------------------
+local alias: RW   |        ref        |         box       |        tag        |
+-------------------------------------------------------------------------------
+                  | global alias: ... |  global alias: R  | global alias: RW  |
+
+the first column allows mutability, cause other actors can't write;
+the second column needs immutability, cause other actors can read;
+the last column is opaque (no read/write is allowed), cause other actors can read or write;
+
+"https://tutorial.ponylang.io/"
+"https://github.com/ponylang/ponyc/tree/master/examples"
+"https://stdlib.ponylang.io/"
+"https://github.com/ponylang/pony-stable"
+
+actors can contain parameters which can be adjusted gradually, based on received messages;
+  this can be used to implement learning capabilities;

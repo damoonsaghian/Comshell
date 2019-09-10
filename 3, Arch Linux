@@ -1,0 +1,52 @@
+Arch Linux helps us to setup and maintain a Linux system;
+first boot to an existing Arch Linux, which can be the live image,
+  or an already installed one, with "arch-install-scripts" package installed,
+  and a root terminal (just call "su" in a normal user's terminal);
+
+to ensure the system clock is accurate:
+; timedatectl set-ntp true
+
+we need 2 partitions:
+, +550M EFI system partition (partition type code: 1)
+, and the rest for Linux system partition (the default partition type)
+list disks using "fdisk -l", then use "fdisk /dev/sdx" to create the partitions:
+, enter "g" command to create a GPT partition table;
+, enter "n" to add a new partition;
+, enter "t" to set the partition type
+, enter "w" to write and exit;
+format the partitions:
+; mkfs.fat -F32 /dev/sdx1; mkfs.ext4 /dev/sdx2
+
+; mount /dev/sdx2 /mnt
+; mkdir /mnt/boot; mount /dev/sda1 /mnt/boot
+; mkdir /mnt/etc; genfstab -U /mnt >> /mnt/etc/fstab
+
+now you can even reuse packages previously downloaded on current system,
+  by copying them to "/mnt/var/cache/pacman/pkg";
+; pacstrap /mnt pacman
+
+; arch-chroot /mnt
+; pacman -S linux-lts systemd-sysvcompat intel-ucode \
+  networkmanager pulseaudio-alsa udisks2 logrotate man-db nano unzip pony-stable
+
+install "systemd-boot" bootloader:
+; sh systemd-boot.sh /dev/sdx2
+
+; useradd -m -G wheel user1
+; passwd user1
+; passwd
+
+; echo -e "\n\nen_US.UTF-8 UTF-8" >> /etc/locale.gen
+; locale-gen
+; echo -e "LANG=en_US.UTF-8" > /etc/locale.conf
+
+; systemctl enable systemd-timesyncd.service
+; systemctl enable NetworkManager.service
+; exit
+; reboot
+
+some audio devices can send and_or receive volume control signals;
+  PulseAudio mutes and silences these device, by default;
+so if you like you can do this:
+; pactl set-sink-mute @DEFAULT_SINK@ 0
+; pactl set-sink-volume @DEFAULT_SINK@ 100%

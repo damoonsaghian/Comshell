@@ -56,7 +56,7 @@ ARM: closed source, but with much better design than X86,
   but so far i couldn't find an appropriate hardware;
   a decent hardware based on Qualcomm/Adreno would be pretty good;
 an ideal system would have powerful enough CPU, and a GPU with open source driver,
-  at least 4GB DDR4, and EDK2 boot firmware;
+  8GB DDR4, and EDK2 boot firmware;
 
 programs usually do not run directly on computer hardware;
 instead they run on a more sophisticated software machine (a virtual machine) called the kernel;
@@ -69,5 +69,3 @@ in Linux (and other Unix based operating systems) most things appear in the file
 i think the reason is to make it possible to do lots of things using shell scripts,
   instead of a proper programming language;
 while i can understand the convenience it provides, i don't think it's good design;
-
-to setup and maintain a Linux system, see "./Linux/1";
