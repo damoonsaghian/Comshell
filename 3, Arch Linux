@@ -1,6 +1,6 @@
 Arch Linux helps us to setup and maintain a Linux system;
 first boot to an existing Arch Linux, which can be the live image,
-  or an already installed one, with "arch-install-scripts" package installed,
+  or an already installed one, with "arch-install-scripts" and "exfat-utils" packages installed,
   and a root terminal (just call "su" in a normal user's terminal);
 
 to ensure the system clock is accurate:
@@ -50,3 +50,6 @@ some audio devices can send and_or receive volume control signals;
 so if you like you can do this:
 ; pactl set-sink-mute @DEFAULT_SINK@ 0
 ; pactl set-sink-volume @DEFAULT_SINK@ 100%
+
+"https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
+"https://wiki.archlinux.org/index.php/Systemd/Timers"
