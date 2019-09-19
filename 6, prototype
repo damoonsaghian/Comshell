@@ -4,13 +4,7 @@ so although we can access actors from GTK thread,
   we can't access GTK widgets (and structure containing them), from actors;
 thus we are forced back to traditional single threaded code, without actors;
 in addition, there is still no GTK bindings for Pony;
-so i think it's better to first build a prototype of Comshell, using GJS and GorillaScript;
-
-"http://ckknight.github.io/gorillascript/"
-"https://github.com/kkirby/gorillascript"
-; pacman -S npm
-; npm install -g @gorillascript/gorillascript
-; gorilla -c -o js/ *.gs
+so i think it's better to first build a prototype of Comshell, using GJS;
 
 "https://gitlab.gnome.org/GNOME/gjs/tree/master/examples"
 "https://developer.gnome.org/gnome-devel-demos/stable/js.html.en"
@@ -39,7 +33,7 @@ so i think it's better to first build a prototype of Comshell, using GJS and Gor
 ; pacman -S gdm materia-gtk-theme ttf-hack noto-fonts noto-fonts-emoji \
   gjs gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav gnome-desktop
 ; mkdir /usr/local/etc/comshell-proto
-; cp -r prototype/js/ /usr/local/share/comshell-proto/
+; cp -r prototype/*.js /usr/local/share/comshell-proto/
 ; exit
 
 ; mkdir -p ~/.config/fontconfig
