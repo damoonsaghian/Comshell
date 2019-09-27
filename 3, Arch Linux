@@ -43,7 +43,6 @@ find UUID of the root partition, and use it in the next step:
   initrd /intel-ucode.img
   initrd /initramfs-linux-lts.img
   options root=UUID=<UUID> rw
-
   title Arch Linux (fallback)
   linux /vmlinuz-linux-lts
   initrd /intel-ucode.img
@@ -74,12 +73,6 @@ automatically update "systemd-boot" every time "systemd" package is upgraded:
 ; systemctl enable NetworkManager.service
 ; exit
 ; reboot
-
-some audio devices can send and_or receive volume control signals;
-  PulseAudio mutes and silences these device, by default;
-so if you like you can do this:
-; pactl set-sink-mute @DEFAULT_SINK@ 0
-; pactl set-sink-volume @DEFAULT_SINK@ 100%
 
 "https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
 "https://wiki.archlinux.org/index.php/Systemd/Timers"
