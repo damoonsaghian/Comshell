@@ -4,12 +4,9 @@ so although we can access actors from GTK thread,
   we can't access GTK widgets (and structure containing them), from actors;
 thus we are forced back to traditional single threaded code, without actors;
 in addition, there is still no GTK bindings for Pony;
-so i think it's better to first build a prototype of Comshell, using GJS;
+so i think it's better to first build a prototype of Comshell, using LGI;
 
-"https://gitlab.gnome.org/GNOME/gjs/tree/master/examples"
-"https://developer.gnome.org/gnome-devel-demos/stable/js.html.en"
-"https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
-"https://python-gtk-3-tutorial.readthedocs.io/en/latest/treeview.html"
+"https://github.com/pavouk/lgi/tree/master/docs"
 "https://github.com/pavouk/lgi/blob/master/samples/repobrowser.lua" (treeview)
 "https://github.com/pavouk/lgi/blob/master/samples/giostream.lua"
 "https://github.com/pavouk/lgi/blob/master/samples/console.lua" (sourceview)
@@ -17,6 +14,10 @@ so i think it's better to first build a prototype of Comshell, using GJS;
 "https://github.com/pavouk/lgi/blob/master/samples/gstvideo.lua"
 "https://github.com/pavouk/lgi/blob/master/samples/goocanvas.lua"
 "https://github.com/pavouk/lgi/tree/master/samples/gtk-demo"
+
+"https://developer.gnome.org/gnome-devel-demos/stable/js.html.en"
+"https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
+"https://python-gtk-3-tutorial.readthedocs.io/en/latest/treeview.html"
 
 "https://github.com/teejee2008/polo"
 "https://github.com/UberWriter/uberwriter"
@@ -28,29 +29,20 @@ so i think it's better to first build a prototype of Comshell, using GJS;
 
 "https://gjs-docs.gnome.org/"
 "https://lazka.github.io/pgi-docs/"
+"https://developer.gnome.org/references"
 
 ; su
 ; pacman -S gdm materia-gtk-theme ttf-hack noto-fonts noto-fonts-emoji \
-  gjs gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav gnome-desktop
-; mkdir /usr/local/etc/comshell-proto
-; cp -r prototype/*.js /usr/local/share/comshell-proto/
-; exit
-
-; mkdir -p ~/.config/fontconfig
-; cp prototype/etc/fonts.conf ~/.config/fontconfig/
-
-; mkdir -p ~/.config/gtk-3.0
-; echo -e "[Settings]\ngtk-theme-name = Materia-light-compact\ngtk-font-name = Sans\n" > \
-  ~/.config/gtk-3.0/settings.ini
-; gsettings set org.gnome.desktop.interface gtk-theme Materia-light-compact
-; gsettings set org.gnome.desktop.interface font-name Sans
-; cp prototype/etc/gtk.css ~/.config/gtk-3.0/
-
+  lua-lgi gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav gnome-desktop
 ; systemctl enable gdm.service
 automatic login:
-; echo -e "[daemon]\nAutomaticLogin=user1\nAutomaticLoginEnable=True\n" > /etc/gdm/custom.conf
+; nano /etc/gdm/custom.conf
+  [daemon]
+  AutomaticLogin=user1
+  AutomaticLoginEnable=True
+; exit
 
-to protect the computer from physical attacks, you have to disable automatic login,
+actually, to protect the computer from physical attacks, you have to disable automatic login,
   and lock the session when you leave the computer;
 in addition you have to:
 , somehow prevent tampering with hardware;
@@ -59,14 +51,21 @@ in addition you have to:
 these can make physical attacks more difficult, but not impossible;
 physical access to a computer is root access, given enough time and resources;
 
+; mkdir -p ~/.config/fontconfig
+; cp prototype/etc/fonts.conf ~/.config/fontconfig/
+
+; mkdir -p ~/.config/gtk-3.0
+; gsettings set org.gnome.desktop.interface gtk-theme Materia-light-compact
+; gsettings set org.gnome.desktop.interface font-name Sans
+; cp prototype/etc/gtk.css ~/.config/gtk-3.0/
+
 ; mkdir -p ~/.local/share/gnome-shell
 ; su
-lock user's extension directory (for security reasons);
+lock extension directory of the user (for security reasons);
 ; mkdir /home/user1/.local/share/gnome-shell/extensions
 ; touch /home/user1/.local/share/gnome-shell/extensions/0
 ; cp -r prototype/gnome-shell-improved/ /usr/local/share/gnome-shell/extensions/
-; exit
 
-in "gnome-shell-improved":
-, remove status bar;
-, spawn "gjs /usr/local/etc/comshell-proto/comshell.js"
+; mkdir /usr/local/etc/comshell-proto
+; cp -r prototype/*.lua /usr/local/share/comshell-proto/
+; exit

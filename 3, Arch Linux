@@ -9,16 +9,16 @@ to ensure the system clock is accurate:
 we need 2 partitions:
 , +550M EFI system partition (partition type code: 1)
 , and the rest for Linux system partition (the default partition type)
-list disks using "fdisk -l", then use "fdisk /dev/sdx" to create the partitions:
+list disks using "fdisk -l", then use "fdisk /dev/<device_name>" to create the partitions:
 , enter "g" command to create a GPT partition table;
 , enter "n" to add a new partition;
 , enter "t" to set the partition type
 , enter "w" to write and exit;
 format the partitions:
-; mkfs.fat -F32 /dev/sdx1; mkfs.ext4 /dev/sdx2
+; mkfs.fat -F32 /dev/<partition1>; mkfs.ext4 /dev/<partition2>
 
-; mount /dev/sdx2 /mnt
-; mkdir /mnt/boot; mount /dev/sda1 /mnt/boot
+; mount /dev/<partition2> /mnt
+; mkdir /mnt/boot; mount /dev/<partition1> /mnt/boot
 ; mkdir /mnt/etc; genfstab -U /mnt >> /mnt/etc/fstab
 
 now you can even reuse packages previously downloaded on current system,
@@ -27,16 +27,46 @@ now you can even reuse packages previously downloaded on current system,
 
 ; arch-chroot /mnt
 ; pacman -S linux-lts systemd-sysvcompat intel-ucode \
-  networkmanager pulseaudio-alsa udisks2 logrotate man-db nano unzip pony-stable
+  networkmanager pulseaudio-alsa udisks2 sed logrotate man-db nano unzip pony-stable
 
 install "systemd-boot" bootloader:
-; sh systemd-boot.sh /dev/sdx2
+; bootctl --path=/boot install
+; mkdir -p /boot/loader/entries
+; nano /boot/loader/loader.conf
+  default arch+
+  editor no
+find UUID of the root partition, and use it in the next step:
+; blkid -s UUID -o value /dev/<partition2>
+; nano /boot/loader/entries/arch.conf
+  title Arch Linux
+  linux /vmlinuz-linux-lts
+  initrd /intel-ucode.img
+  initrd /initramfs-linux-lts.img
+  options root=UUID=<UUID> rw
+
+  title Arch Linux (fallback)
+  linux /vmlinuz-linux-lts
+  initrd /intel-ucode.img
+  initrd /initramfs-linux-lts-fallback.img
+  options root=UUID=<UUID> rw
+automatically update "systemd-boot" every time "systemd" package is upgraded:
+; mkdir -p /etc/pacman.d/hooks
+; nano /etc/pacman.d/hooks/100-systemd-boot.hook
+  [Trigger]
+  Type = Package
+  Operation = Upgrade
+  Target = systemd
+  [Action]
+  Description = Updating systemd-boot
+  When = PostTransaction
+  Exec = /usr/bin/bootctl update
 
 ; useradd -m -G wheel user1
 ; passwd user1
 ; passwd
 
-; echo -e "\n\nen_US.UTF-8 UTF-8" >> /etc/locale.gen
+; nano /etc/locale.gen
+  uncomment "en_US.UTF-8 UTF-8"
 ; locale-gen
 ; echo -e "LANG=en_US.UTF-8" > /etc/locale.conf
 
