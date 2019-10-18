@@ -1,68 +1,35 @@
 Arch Linux helps us to setup and maintain a Linux system;
-first boot to an existing Arch Linux, which can be the live image,
-  or an already installed one, with "arch-install-scripts" and "exfat-utils" packages installed,
-  and a root terminal (just call "su" in a normal user's terminal);
+first boot to an Arch Linux live image;
+live image can be useful in the future for repairing a damaged system; so keep it;
 
 to ensure the system clock is accurate:
 ; timedatectl set-ntp true
 
-we need 2 partitions:
-, +550M EFI system partition (partition type code: 1)
-, and the rest for Linux system partition (the default partition type)
-list disks using "fdisk -l", then use "fdisk /dev/<device_name>" to create the partitions:
-, enter "g" command to create a GPT partition table;
-, enter "n" to add a new partition;
-, enter "t" to set the partition type
-, enter "w" to write and exit;
-format the partitions:
+list available block devices using "lsblk", then use "parted" to create the partitions:
+; parted /dev/<device> mklabel gpt mkpart P1 fat32 0% 260MiB mkpart P2 260MiB 100% set 1 esp on
 ; mkfs.fat -F32 /dev/<partition1>; mkfs.ext4 /dev/<partition2>
-
 ; mount /dev/<partition2> /mnt
-; mkdir /mnt/boot; mount /dev/<partition1> /mnt/boot
-; mkdir /mnt/etc; genfstab -U /mnt >> /mnt/etc/fstab
 
-now you can even reuse packages previously downloaded on current system,
-  by copying them to "/mnt/var/cache/pacman/pkg";
-; pacstrap /mnt pacman
+; pacstrap /mnt refind-efi intel-ucode amd-ucode \
+  base dracut linux linux-firmware e2fsprogs systemd-sysvcompat pacman \
+  networkmanager pulseaudio-alsa udisks2 man-db nano unzip
 
 ; arch-chroot /mnt
-; pacman -S linux-lts systemd-sysvcompat intel-ucode \
-  networkmanager pulseaudio-alsa udisks2 sed logrotate man-db nano unzip pony-stable
 
-install "systemd-boot" bootloader:
-; bootctl --path=/boot install
-; mkdir -p /boot/loader/entries
-; nano /boot/loader/loader.conf
-  default arch+
-  editor no
-find UUID of the root partition, and use it in the next step:
-; blkid -s UUID -o value /dev/<partition2>
-; nano /boot/loader/entries/arch.conf
-  title Arch Linux
-  linux /vmlinuz-linux-lts
-  initrd /intel-ucode.img
-  initrd /initramfs-linux-lts.img
-  options root=UUID=<UUID> rw
-  title Arch Linux (fallback)
-  linux /vmlinuz-linux-lts
-  initrd /intel-ucode.img
-  initrd /initramfs-linux-lts-fallback.img
-  options root=UUID=<UUID> rw
-automatically update "systemd-boot" every time "systemd" package is upgraded:
+; refind-install --usedefault /dev/<partition1>
+find UUID of ESP:
+; blkid /dev/<partition1>
+automatically update Grub every time "grub" package is upgraded:
 ; mkdir -p /etc/pacman.d/hooks
-; nano /etc/pacman.d/hooks/100-systemd-boot.hook
+; nano /etc/pacman.d/hooks/100-refind-efi.hook
   [Trigger]
   Type = Package
   Operation = Upgrade
-  Target = systemd
+  Target = refind-efi
   [Action]
-  Description = Updating systemd-boot
+  Description = Updating refind-efi
   When = PostTransaction
-  Exec = /usr/bin/bootctl update
-
-; useradd -m -G wheel user1
-; passwd user1
-; passwd
+  Exec = /usr/bin/refind-install --usedefault /dev/disk/by-uuid/<ESP-UUID>
 
 ; nano /etc/locale.gen
   uncomment "en_US.UTF-8 UTF-8"
@@ -71,8 +38,13 @@ automatically update "systemd-boot" every time "systemd" package is upgraded:
 
 ; systemctl enable systemd-timesyncd.service
 ; systemctl enable NetworkManager.service
-; exit
-; reboot
 
 "https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
 "https://wiki.archlinux.org/index.php/Systemd/Timers"
+
+; useradd -m -G wheel user1
+; passwd user1
+; passwd
+
+; exit
+; reboot

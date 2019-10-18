@@ -1,0 +1,39 @@
+"https://github.com/boydm/scenic"
+"https://www.membraneframework.org/"
+"https://dnlserrano.dev/2019/03/10/elixir-nifs.html"
+"https://bitbucket.org/chromiumembedded/cef"
+
+; su
+; pacman -S gdm ttf-hack noto-fonts noto-fonts-emoji ffmpeg
+; systemctl enable gdm.service
+automatic login:
+; nano /etc/gdm/custom.conf
+  [daemon]
+  AutomaticLogin=user1
+  AutomaticLoginEnable=True
+; exit
+
+; gsettings set org.gnome.desktop.screensaver lock-enabled 'false'
+
+actually, to protect the computer from physical attacks, you have to disable automatic login,
+  and lock the session when you leave the computer;
+in addition you have to:
+, somehow prevent tampering with hardware;
+, disable boot from USB (and other external ports);
+, protect boot firmware by a password;
+these can make physical attacks more difficult, but not impossible;
+physical access to a computer is root access, given enough time and resources;
+
+; mkdir -p ~/.config/fontconfig
+; cp etc/fonts.conf ~/.config/fontconfig/
+
+; mkdir -p ~/.local/share/gnome-shell
+; su
+lock extension directory of the user (for security reasons);
+; mkdir /home/user1/.local/share/gnome-shell/extensions
+; touch /home/user1/.local/share/gnome-shell/extensions/0
+; cp -r etc/gnome-shell-improved/ /usr/local/share/gnome-shell/extensions/
+
+; mkdir /usr/local/etc/comshell-proto
+; cp -r comshell/ /usr/local/share/
+; exit
