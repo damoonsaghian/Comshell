@@ -1,6 +1,5 @@
-"https://github.com/boydm/scenic"
-"https://www.membraneframework.org/"
-"https://dnlserrano.dev/2019/03/10/elixir-nifs.html"
+simple retained GUI library in C with Wayland support (like SDL2);
+FFMPEG
 "https://bitbucket.org/chromiumembedded/cef"
 
 ; su
@@ -34,6 +33,5 @@ lock extension directory of the user (for security reasons);
 ; touch /home/user1/.local/share/gnome-shell/extensions/0
 ; cp -r etc/gnome-shell-improved/ /usr/local/share/gnome-shell/extensions/
 
-; mkdir /usr/local/etc/comshell-proto
-; cp -r comshell/ /usr/local/share/
+copy Comshell executable to /usr/local/bin/
 ; exit
