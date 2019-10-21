@@ -1,0 +1,53 @@
+scrollbar {
+  margin: 3px;
+  border: 0px;
+  border-radius: 0px;
+  background-color: #4285F4;
+}
+scrollbar.top scrollbar.bottom scrollbar.left scrollbar.right {
+  border-bottom: 0px;
+  border-top: 0px;
+  border-right: 0px;
+  border-left: 0px;
+}
+
+scrollbar slider {
+  min-width: 2px;
+  min-height: 2px;
+  margin: 0px;
+  border: 0px;
+  border-radius: 0px;
+  background-color: #bbbbbb;
+}
+scrollbar slider:hover {
+  background-color: #bbbbbb;
+}
+scrollbar slider:active {
+  background-color: #bbbbbb;
+}
+
+scrollbar.overlay-indicator:not(.dragging):not(.hovering) slider {
+  min-width: 2px;
+  min-height: 2px;
+  margin: 0px;
+  border: 0px;
+}
+
+/*
+gradient + animation -> cursor
+"https://developer.gnome.org/gtk3/stable/chap-css-properties.html"
+gtk cursor-aspect-ratio style property;
+in "~/.config/gtk-3.0/gtk.css":
+* {
+  -GtkTextView-error-underline-color: #FC4138;
+  -gtk-outline-radius: 2px;
+  -GtkWidget-cursor-aspect-ratio: 1;
+  -GtkTextView-cursor_aspect_ratio: 1;
+  -EelEditableLabe-cursor_aspect_ratio: 1;
+  -GtkWidget-focus-line-width: 3;
+}
+draw arrow at cursor position in TextView in GTK3:
+  "https://gist.github.com/musiKk/2266946"
+"https://superuser.com/questions/1365329/how-do-i-make-the-focus-rectangle-in-gtk3-more-prominent"
+"https://github.com/xi/gtk-theme-clearcodes/tree/master/gtk-3.0"
+*/
