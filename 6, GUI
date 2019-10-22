@@ -1,0 +1,20 @@
+implementing a complete GUI toolkit is a huge lot of work;
+existing ones (like GTK) are single threaded;
+so although we can access actors from GTK thread,
+  we can't access GTK widgets (and structure containing them), from actors;
+so GTK widgets must be wrapped as actors;
+we send them messages, and they run their code in GTK main loop using "g_idle_add";
+"https://developer.gnome.org/glib/2.60/glib-The-Main-Event-Loop.html#g-idle-add"
+
+"https://developer.gnome.org/gnome-devel-demos/stable/py.html.en"
+"https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
+"https://python-gtk-3-tutorial.readthedocs.io/en/latest/treeview.html"
+"https://github.com/teejee2008/polo"
+"https://github.com/UberWriter/uberwriter"
+"https://github.com/zim-desktop-wiki/zim-desktop-wiki"
+"https://www.archlinux.org/packages/extra/any/meld/"
+"https://github.com/karlch/vimiv"
+"https://gitlab.gnome.org/GNOME/pitivi"
+"https://www.archlinux.org/packages/community/any/gaupol/"
+
+"https://developer.gnome.org/references"

@@ -36,27 +36,31 @@ compilers are special programs that generate instruction codes,
 there is always possibility of backdoors for closed source CPU,
   especially if the boot firmware is also closed source;
 recently introduction of "secure execution environment" makes this situation even worse;
-since for implementing it some vendors, like Intel and AMD,
-  expand their closed source firmware, to a full_blown always_running mini operating system,
+it's a closed source, full_blown, always_running mini operating system,
   with full access to the whole system (including memory and network);
-furthermore they make it practically impossible for users to disable it;
+furthermore they have made it practically impossible for users to disable it;
 this mess of a design cries out for hidden and quite sophisticated backdoors;
 "https://www.fsf.org/blogs/licensing/intel-me-and-why-we-should-get-rid-of-me"
 "https://libreboot.org/faq.html#intel"
 "https://en.wikipedia.org/wiki/Intel_Management_Engine"
 "https://blog.invisiblethings.org/papers/2015/x86_harmful.pdf"
 
-so what are the alternatives:
-RISC-V: no appropriate hardware available yet;
-PowerPc: no appropriate hardware available yet;
-MIPS: bad old design (relative to other alternatives, not X86),
-  no appropriate hardware available yet;
-ARM: closed source, but with much better design than X86,
-  and can have open source firmware (like EDK2 which is an open source UEFI implementation),
-  but so far i couldn't find an appropriate hardware;
-  a decent hardware based on Qualcomm/Adreno would be pretty good;
-an ideal system would have powerful enough CPU, and a GPU with open source driver,
-  8GB DDR4, and EDK2 boot firmware;
+on X86 architecture we can have open source boot_loader, and GPU drivers,
+  using Intel with Coreboot+EDK2 "https://github.com/system76/firmware-open";
+  though there sill will be closed source parts (Intel FSP);
+but there is no easy way to get rid of Intel ME (or AMD PSP);
+though there are hacks for disabling (but not completely remove) Intel ME:
+  "https://puri.sm/posts/deep-dive-into-intel-me-disablement/"
+
+ARM architecture is closed source too, but we can have open source GPU driver (Qualcomm/Adreno),
+  and EDK2 bootloader;
+ARM TrustZone can host an open source operating system;
+
+open source CPU:
+, RISC-V: no adequate hardware available yet;
+, PowerPc: no adequate hardware available yet;
+, MIPS: bad old design (relative to other alternatives, not X86),
+  no suitable hardware available yet;
 
 programs usually do not run directly on computer hardware;
 instead they run on a more sophisticated software machine (a virtual machine) called the kernel;

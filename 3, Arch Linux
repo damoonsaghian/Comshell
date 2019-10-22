@@ -12,7 +12,9 @@ list available block devices using "lsblk", then use "parted" to create the part
 
 ; pacstrap /mnt refind-efi intel-ucode amd-ucode \
   base dracut linux linux-firmware e2fsprogs systemd-sysvcompat pacman \
-  networkmanager pulseaudio-alsa udisks2 man-db nano unzip
+  networkmanager pulseaudio-alsa udisks2 man-db nano unzip \
+  gdm materia-gtk-theme ttf-hack noto-fonts noto-fonts-emoji \
+  gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav gnome-desktop
 
 ; arch-chroot /mnt
 
@@ -46,5 +48,33 @@ automatically update Grub every time "grub" package is upgraded:
 ; passwd user1
 ; passwd
 
+; systemctl enable gdm.service
+automatic login:
+; nano /etc/gdm/custom.conf
+  [daemon]
+  AutomaticLogin=user1
+  AutomaticLoginEnable=True
+actually, to protect the computer from physical attacks, you have to disable automatic login,
+  and lock the session when you leave the computer;
+in addition you have to:
+, somehow prevent tampering with hardware;
+, disable boot from USB (and other external ports);
+, protect boot firmware by a password;
+these can make physical attacks more difficult, but not impossible;
+physical access to a computer is root access, given enough time and resources;
+
+; mkdir -p /usr/local/share/gnome-shell/extensions
+; cp -r etc/gnome-shell-reduced/ /usr/local/share/gnome-shell/extensions/
+
 ; exit
 ; reboot
+
+; gsettings set org.gnome.desktop.screensaver lock-enabled 'false'
+
+; mkdir -p ~/.config/fontconfig
+; cp etc/fonts.conf ~/.config/fontconfig/
+
+; mkdir -p ~/.config/gtk-3.0
+; gsettings set org.gnome.desktop.interface gtk-theme Materia-light-compact
+; gsettings set org.gnome.desktop.interface font-name Sans
+; cp etc/gtk.css ~/.config/gtk-3.0/
