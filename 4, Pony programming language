@@ -37,6 +37,10 @@ the first column allows mutability, cause other actors can't write;
 the second column needs immutability, cause other actors can read;
 the last column is opaque (no read/write is allowed), cause other actors can read or write;
 
+improvements for Pony language:
+, remove the need for "where" in named arguments;
+, remove the need to write the primes in arg names, when calling a constructor;
+
 "https://tutorial.ponylang.io/"
 "https://github.com/ponylang/ponyc/tree/master/examples"
 "https://stdlib.ponylang.io/"

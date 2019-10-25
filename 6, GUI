@@ -3,8 +3,10 @@ existing ones (like GTK) are single threaded;
 so although we can access actors from GTK thread,
   we can't access GTK widgets (and structure containing them), from actors;
 so GTK widgets must be wrapped as actors;
-we send them messages, and they run their code in GTK main loop using "g_idle_add";
+we send them messages, and they run the actual code in GTK main loop using "g_idle_add";
 "https://developer.gnome.org/glib/2.60/glib-The-Main-Event-Loop.html#g-idle-add"
+
+eventually we can even create a multi threaded GUI framework, underneath the same API;
 
 "https://developer.gnome.org/gnome-devel-demos/stable/py.html.en"
 "https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"

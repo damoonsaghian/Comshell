@@ -46,15 +46,16 @@ this mess of a design cries out for hidden and quite sophisticated backdoors;
 "https://blog.invisiblethings.org/papers/2015/x86_harmful.pdf"
 
 on X86 architecture we can have open source boot_loader, and GPU drivers,
-  using Intel with Coreboot+EDK2 "https://github.com/system76/firmware-open";
+  using Intel with Coreboot+Grub2 for example;
   though there sill will be closed source parts (Intel FSP);
 but there is no easy way to get rid of Intel ME (or AMD PSP);
-though there are hacks for disabling (but not completely remove) Intel ME:
+though there are some hacks for disabling (but not completely remove) Intel ME:
   "https://puri.sm/posts/deep-dive-into-intel-me-disablement/"
 
 ARM architecture is closed source too, but we can have open source GPU driver (Qualcomm/Adreno),
-  and EDK2 bootloader;
-ARM TrustZone can host an open source operating system;
+  and Coreboot+Grub2 bootloader;
+ARM TrustZone can host an open source operating system too, apparently;
+"https://news.ycombinator.com/item?id=17783357"
 
 open source CPU:
 , RISC-V: no adequate hardware available yet;

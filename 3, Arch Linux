@@ -1,45 +1,56 @@
 Arch Linux helps us to setup and maintain a Linux system;
-first boot to an Arch Linux live image;
-live image can be useful in the future for repairing a damaged system; so keep it;
-
+boot Arch Linux live environment;
 to ensure the system clock is accurate:
 ; timedatectl set-ntp true
 
-list available block devices using "lsblk", then use "parted" to create the partitions:
+list available block devices using "lsblk", then:
 ; parted /dev/<device> mklabel gpt mkpart P1 fat32 0% 260MiB mkpart P2 260MiB 100% set 1 esp on
 ; mkfs.fat -F32 /dev/<partition1>; mkfs.ext4 /dev/<partition2>
 ; mount /dev/<partition2> /mnt
+; mkdir -p /mnt/boot/efi; mount /dev/<partition1> /mnt/boot/efi
+; mkdir /mnt/etc; genfstab -U /mnt >> /mnt/etc/fstab
 
-; pacstrap /mnt refind-efi intel-ucode amd-ucode \
-  base dracut linux linux-firmware e2fsprogs systemd-sysvcompat pacman \
-  networkmanager pulseaudio-alsa udisks2 man-db nano unzip \
-  gdm materia-gtk-theme ttf-hack noto-fonts noto-fonts-emoji \
-  gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav gnome-desktop
+if you need to connect to a WIFI network:
+; iwctl
+  device list
+  station <device> get-networks
+  station <device> connect <SSID>
 
+; pacstrap /mnt grub intel-ucode amd-ucode dracut linux linux-firmware base \
+  man-db nano e2fsprogs udisks2 pulseaudio-alsa networkmanager \
+  gdm gvfs materia-gtk-theme ttf-hack noto-fonts noto-fonts-emoji \
+  gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
 ; arch-chroot /mnt
 
-; refind-install --usedefault /dev/<partition1>
-find UUID of ESP:
-; blkid /dev/<partition1>
+; grub-install --target=x86_64-efi --efi-directory=/boot/efi --removable
+; nano /etc/default/grub
+  GRUB_TIMEOUT=0
+  GRUB_DISABLE_OS_PROBER=true
+; nano /etc/grub.d/40_custom
+  set superusers=""
+; nano /etc/grub.d/10_linux
+  CLASS="--class gnu-linux --class gnu --class os --unrestricted"
+; grub-mkconfig -o /boot/grub/grub.cfg
+
 automatically update Grub every time "grub" package is upgraded:
 ; mkdir -p /etc/pacman.d/hooks
-; nano /etc/pacman.d/hooks/100-refind-efi.hook
+; nano /etc/pacman.d/hooks/100-grub.hook
   [Trigger]
   Type = Package
   Operation = Upgrade
-  Target = refind-efi
+  Target = grub
   [Action]
-  Description = Updating refind-efi
+  Description = Updating grub
   When = PostTransaction
-  Exec = /usr/bin/refind-install --usedefault /dev/disk/by-uuid/<ESP-UUID>
+  Exec = /usr/bin/grub-install --target=x86_64-efi --efi-directory=/boot/efi --removable
 
 ; nano /etc/locale.gen
   uncomment "en_US.UTF-8 UTF-8"
 ; locale-gen
 ; echo -e "LANG=en_US.UTF-8" > /etc/locale.conf
 
-; systemctl enable systemd-timesyncd.service
-; systemctl enable NetworkManager.service
+; systemctl enable systemd-timesyncd
+; systemctl enable NetworkManager
 
 "https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
 "https://wiki.archlinux.org/index.php/Systemd/Timers"
@@ -48,7 +59,7 @@ automatically update Grub every time "grub" package is upgraded:
 ; passwd user1
 ; passwd
 
-; systemctl enable gdm.service
+; systemctl enable gdm
 automatic login:
 ; nano /etc/gdm/custom.conf
   [daemon]
@@ -78,3 +89,11 @@ physical access to a computer is root access, given enough time and resources;
 ; gsettings set org.gnome.desktop.interface gtk-theme Materia-light-compact
 ; gsettings set org.gnome.desktop.interface font-name Sans
 ; cp etc/gtk.css ~/.config/gtk-3.0/
+
+if you want to connect to a WIFI network:
+; nmcli dev wifi
+; nmcli --ask dev wifi con <ssid>
+to disconnect WIFI:
+; nmcli con down id <ssid>
+to turn WIFI off:
+; nmcli radio wifi off
