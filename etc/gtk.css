@@ -34,6 +34,8 @@ scrollbar.overlay-indicator:not(.dragging):not(.hovering) slider {
 }
 
 /*
+sectioned tabs and stack-switchers
+
 gradient + animation -> cursor
 "https://developer.gnome.org/gtk3/stable/chap-css-properties.html"
 gtk cursor-aspect-ratio style property;
