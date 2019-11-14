@@ -1,28 +1,27 @@
 Arch Linux helps us to setup and maintain a Linux system;
+
 boot Arch Linux live environment;
 to ensure the system clock is accurate:
 ; timedatectl set-ntp true
-
-list available block devices using "lsblk", then:
-; parted /dev/<device> mklabel gpt mkpart P1 fat32 0% 260MiB mkpart P2 260MiB 100% set 1 esp on
-; mkfs.fat -F32 /dev/<partition1>; mkfs.ext4 /dev/<partition2>
-; mount /dev/<partition2> /mnt
-; mkdir -p /mnt/boot/efi; mount /dev/<partition1> /mnt/boot/efi
-; mkdir /mnt/etc; genfstab -U /mnt >> /mnt/etc/fstab
-
 if you need to connect to a WIFI network:
 ; iwctl
   device list
   station <device> get-networks
   station <device> connect <SSID>
 
+list available block devices using "lsblk", then:
+; printf "label: gpt\n,260MiB,U,*\n;" | sfdisk /dev/<device>
+; mkfs.fat -F32 /dev/<partition1>; mkfs.btrfs /dev/<partition2>
+; mount /dev/<partition2> /mnt
+; mkdir -p /mnt/boot/efi; mount /dev/<partition1> /mnt/boot/efi
+; mkdir /mnt/etc; genfstab -U /mnt >> /mnt/etc/fstab
+
 ; pacstrap /mnt grub intel-ucode amd-ucode dracut linux linux-firmware base \
-  man-db nano e2fsprogs udisks2 pulseaudio-alsa networkmanager \
-  gdm gvfs materia-gtk-theme ttf-hack noto-fonts noto-fonts-emoji \
-  gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
+  man-db nano unzip btrfs-progs e2fsprogs dosfstools udisks2 pulseaudio-alsa networkmanager \
+  gdm sakura gvfs materia-gtk-theme ttf-hack noto-fonts \
+  pony-stable gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
 ; arch-chroot /mnt
 
-; grub-install --target=x86_64-efi --efi-directory=/boot/efi --removable
 ; nano /etc/default/grub
   GRUB_TIMEOUT=0
   GRUB_DISABLE_OS_PROBER=true
@@ -32,6 +31,8 @@ if you need to connect to a WIFI network:
   CLASS="--class gnu-linux --class gnu --class os --unrestricted"
 ; grub-mkconfig -o /boot/grub/grub.cfg
 
+; grub-mkstandalone -O x86_64-efi -o "/boot/efi/EFI/BOOT/BOOTX64.EFI" \
+  "boot/grub/grub.cfg=/boot/grub/grub.cfg"
 automatically update Grub every time "grub" package is upgraded:
 ; mkdir -p /etc/pacman.d/hooks
 ; nano /etc/pacman.d/hooks/100-grub.hook
@@ -42,12 +43,20 @@ automatically update Grub every time "grub" package is upgraded:
   [Action]
   Description = Updating grub
   When = PostTransaction
-  Exec = /usr/bin/grub-install --target=x86_64-efi --efi-directory=/boot/efi --removable
+  Exec = /usr/bin/grub-mkstandalone -O x86_64-efi -o "/boot/efi/EFI/BOOT/BOOTX64.EFI" "boot/grub/grub.cfg=/boot/grub/grub.cfg"
 
 ; nano /etc/locale.gen
   uncomment "en_US.UTF-8 UTF-8"
 ; locale-gen
 ; echo -e "LANG=en_US.UTF-8" > /etc/locale.conf
+
+automatic time_zone:
+; nano /etc/NetworkManager/dispatcher.d/09-timezone
+  #!/bin/sh
+  if [ "$2" = "connectivity-change" ] && [ -z "$VPN_IP_IFACE" ]; then
+    timedatectl set-timezone "$(curl --fail http://ip-api.com/line/?fields=timezone)"
+  fi
+; chmod 755 /etc/NetworkManager/dispatcher.d/09-timezone
 
 ; systemctl enable systemd-timesyncd
 ; systemctl enable NetworkManager
@@ -56,6 +65,7 @@ automatically update Grub every time "grub" package is upgraded:
 "https://wiki.archlinux.org/index.php/Systemd/Timers"
 
 ; useradd -m -G wheel user1
+set a password for the user, and a different one for root;
 ; passwd user1
 ; passwd
 
@@ -72,15 +82,22 @@ in addition you have to:
 , disable boot from USB (and other external ports);
 , protect boot firmware by a password;
 these can make physical attacks more difficult, but not impossible;
-physical access to a computer is root access, given enough time and resources;
-
-; mkdir -p /usr/local/share/gnome-shell/extensions
-; cp -r etc/gnome-shell-reduced/ /usr/local/share/gnome-shell/extensions/
+keep in mind that physical access to a computer is root access, given enough time and resources;
 
 ; exit
 ; reboot
 
-; gsettings set org.gnome.desktop.screensaver lock-enabled 'false'
+open Sakura terminal emulator, "cd" to this project directory, and do the following:
+
+if you want to connect to a WIFI network:
+; nmcli dev wifi
+; nmcli --ask dev wifi con <ssid>
+to disconnect from a WIFI network:
+; nmcli con down id <ssid>
+to disable WIFI:
+; nmcli radio wifi off
+
+; cp etc/bashrc ~/.bashrc
 
 ; mkdir -p ~/.config/fontconfig
 ; cp etc/fonts.conf ~/.config/fontconfig/
@@ -90,10 +107,8 @@ physical access to a computer is root access, given enough time and resources;
 ; gsettings set org.gnome.desktop.interface font-name Sans
 ; cp etc/gtk.css ~/.config/gtk-3.0/
 
-if you want to connect to a WIFI network:
-; nmcli dev wifi
-; nmcli --ask dev wifi con <ssid>
-to disconnect WIFI:
-; nmcli con down id <ssid>
-to turn WIFI off:
-; nmcli radio wifi off
+; mkdir -p /usr/local/share/gnome-shell/extensions
+; cp -r etc/gnome-shell-improved/ /usr/local/share/gnome-shell/extensions/
+; gsettings set org.gnome.desktop.screensaver lock-enabled 'false'
+
+logout, and login;
