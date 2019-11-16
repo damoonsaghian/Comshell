@@ -1,4 +1,9 @@
-Arch Linux helps us to setup and maintain a Linux system;
+using Arch Linux we can easily setup and maintain a Linux system;
+the following shows how to setup a basic graphical environment,
+  with Atom editor, Chromium browser which you can toggle using "alt-tab",
+  and Sakura terminal which you can toggle using "alt-`" ("alt-tab" hides terminal too);
+in addition, we can add scripts to GnomeShell, to open various graphical applications,
+  each in its own workspace ("alt-space" brings you back to main workspace);
 
 boot Arch Linux live environment;
 to ensure the system clock is accurate:
@@ -9,73 +14,25 @@ if you need to connect to a WIFI network:
   station <device> get-networks
   station <device> connect <SSID>
 
-list available block devices using "lsblk", then:
+list available block devices using "lsblk", then on the intended block device,
+  create the needed partitions, format and mount them:
 ; printf "label: gpt\n,260MiB,U,*\n;" | sfdisk /dev/<device>
 ; mkfs.fat -F32 /dev/<partition1>; mkfs.btrfs /dev/<partition2>
 ; mount /dev/<partition2> /mnt
 ; mkdir -p /mnt/boot/efi; mount /dev/<partition1> /mnt/boot/efi
 ; mkdir /mnt/etc; genfstab -U /mnt >> /mnt/etc/fstab
 
-; pacstrap /mnt grub intel-ucode amd-ucode dracut linux linux-firmware base \
-  man-db nano unzip btrfs-progs e2fsprogs dosfstools udisks2 pulseaudio-alsa networkmanager \
-  gdm sakura gvfs materia-gtk-theme ttf-hack noto-fonts \
-  pony-stable gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
+; pacstrap /mnt base
 ; arch-chroot /mnt
+; curl --proto '=https' -sSf https://raw.githubusercontent.com/damoonsaghian/Comshell/master/etc/arch-install.sh | sh
+; exit; reboot
 
-; nano /etc/default/grub
-  GRUB_TIMEOUT=0
-  GRUB_DISABLE_OS_PROBER=true
-; nano /etc/grub.d/40_custom
-  set superusers=""
-; nano /etc/grub.d/10_linux
-  CLASS="--class gnu-linux --class gnu --class os --unrestricted"
-; grub-mkconfig -o /boot/grub/grub.cfg
+the above script requests you to provide passwords for "user1" and "root";
+"root" is needed for exceptional situations where there is no graphical environment,
+  and thus "pkexec" does not work (probably due to a bug), and you must use "su";
 
-; grub-mkstandalone -O x86_64-efi -o "/boot/efi/EFI/BOOT/BOOTX64.EFI" \
-  "boot/grub/grub.cfg=/boot/grub/grub.cfg"
-automatically update Grub every time "grub" package is upgraded:
-; mkdir -p /etc/pacman.d/hooks
-; nano /etc/pacman.d/hooks/100-grub.hook
-  [Trigger]
-  Type = Package
-  Operation = Upgrade
-  Target = grub
-  [Action]
-  Description = Updating grub
-  When = PostTransaction
-  Exec = /usr/bin/grub-mkstandalone -O x86_64-efi -o "/boot/efi/EFI/BOOT/BOOTX64.EFI" "boot/grub/grub.cfg=/boot/grub/grub.cfg"
-
-; nano /etc/locale.gen
-  uncomment "en_US.UTF-8 UTF-8"
-; locale-gen
-; echo -e "LANG=en_US.UTF-8" > /etc/locale.conf
-
-automatic time_zone:
-; nano /etc/NetworkManager/dispatcher.d/09-timezone
-  #!/bin/sh
-  if [ "$2" = "connectivity-change" ] && [ -z "$VPN_IP_IFACE" ]; then
-    timedatectl set-timezone "$(curl --fail http://ip-api.com/line/?fields=timezone)"
-  fi
-; chmod 755 /etc/NetworkManager/dispatcher.d/09-timezone
-
-; systemctl enable systemd-timesyncd
-; systemctl enable NetworkManager
-
-"https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
-"https://wiki.archlinux.org/index.php/Systemd/Timers"
-
-; useradd -m -G wheel user1
-set a password for the user, and a different one for root;
-; passwd user1
-; passwd
-
-; systemctl enable gdm
-automatic login:
-; nano /etc/gdm/custom.conf
-  [daemon]
-  AutomaticLogin=user1
-  AutomaticLoginEnable=True
-actually, to protect the computer from physical attacks, you have to disable automatic login,
+the script sets the "user1" for automatic login;
+but to protect the computer from physical attacks, you have to disable automatic login,
   and lock the session when you leave the computer;
 in addition you have to:
 , somehow prevent tampering with hardware;
@@ -84,12 +41,10 @@ in addition you have to:
 these can make physical attacks more difficult, but not impossible;
 keep in mind that physical access to a computer is root access, given enough time and resources;
 
-; exit
-; reboot
+after booting into the installed Arch Linux, you will be in
+  a customized GnomeShell environment, with Sakura terminal open;
 
-open Sakura terminal emulator, "cd" to this project directory, and do the following:
-
-if you want to connect to a WIFI network:
+to connect to a WIFI network:
 ; nmcli dev wifi
 ; nmcli --ask dev wifi con <ssid>
 to disconnect from a WIFI network:
@@ -97,18 +52,10 @@ to disconnect from a WIFI network:
 to disable WIFI:
 ; nmcli radio wifi off
 
-; cp etc/bashrc ~/.bashrc
+; pkexec pacman -S xorg-server-xwayland atom chromium aria2 moc mpv
 
-; mkdir -p ~/.config/fontconfig
-; cp etc/fonts.conf ~/.config/fontconfig/
-
-; mkdir -p ~/.config/gtk-3.0
-; gsettings set org.gnome.desktop.interface gtk-theme Materia-light-compact
-; gsettings set org.gnome.desktop.interface font-name Sans
 ; cp etc/gtk.css ~/.config/gtk-3.0/
 
-; mkdir -p /usr/local/share/gnome-shell/extensions
-; cp -r etc/gnome-shell-improved/ /usr/local/share/gnome-shell/extensions/
-; gsettings set org.gnome.desktop.screensaver lock-enabled 'false'
-
-logout, and login;
+; cp etc/atom/* ~/.atom/
+; mkdir -p ~/.config/autostart
+; cp /usr/share/applications/atom.desktop ~/.config/autostart/
