@@ -40,11 +40,15 @@ the last column is opaque (no read/write is allowed), cause other actors can rea
 improvements for Pony language:
 , remove the need for "where" in named arguments;
 , remove the need to write the primes in arg names, when calling a constructor;
+, named tuples: (a = x, b = y)
+, hash tables: ["a", x; "b", y] or [a = x; b = y]
 
 "https://tutorial.ponylang.io/"
 "https://github.com/ponylang/ponyc/tree/master/examples"
 "https://stdlib.ponylang.io/"
 "https://github.com/ponylang/pony-stable"
+
+wit Pony we can get rid of a global event loop;
 
 actors can contain parameters which can be adjusted gradually, based on received messages;
   this can be used to implement learning capabilities;

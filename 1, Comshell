@@ -2,6 +2,8 @@
 command based user interfaces (using keyboard, voice, gesture) are
   faster, more convenient and more powerful
   than pointer based user interfaces (using mouse, touch, pen);
+with simple uniform GUI, there is no need for a pointer based user interface;
+
 touch interfaces can still be useful in simple limited applications;
 also for some special artistic applications, pen input remains the only choice;
 touch interface may seem very convenient at first sight,
@@ -47,10 +49,20 @@ we can have views of different locations in a project (even of the same file) in
 text files will be opened in a text editor;
 directories containing a file named ".gallery" will be opened in a view showing thumbnails;
 
+files and directories with names starting with a dot, will be hidden;
+".cache" directory inside a project is for files we don't want to share or backup;
+
 non_local projects, web pages, PDF documents, etc,
   accessed from links inside the main project, will be opened in a floating layer;
+web pages:
+, move caret between visual objects (ignoring structural objects);
+, or use hinting for text input and other widgets, text and other elements like images and videos;
+
 projects in external disks (inside a root directory named "projects"),
   can be accessed from a floating list view;
+
+at the bottom, there is a status_bar showing messages at the left, and system status at the right;
+system status: CPU and RAM usage, network, year-month-day week_day AM/PM hour:minute
 
 modal key_bindings;
 modes (like normal mode and insert mode) must be visually distinctive;
@@ -64,3 +76,7 @@ in normal mode we can:
 , undo, redo
 , find
 , enter insert mode;
+
+double space: creating tables
+auto_completion is done (after typing "space") only where there must be a predefined name;
+list of available names will be displayed in a list at the right;

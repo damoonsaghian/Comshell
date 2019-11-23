@@ -22,3 +22,5 @@ eventually we can even create a multi threaded GUI framework, underneath the sam
 "https://developer.gnome.org/references"
 
 ; pkexec pacman -S pony-stable gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
+
+poppler-glib goffice goocanvas
