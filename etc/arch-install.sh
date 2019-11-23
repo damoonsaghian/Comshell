@@ -113,4 +113,4 @@ echo '{
 }' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/metadata.json
 curl --proto '=https' -sSf \
   https://github.com/damoonsaghian/Comshell/raw/master/etc/extension.js >
-  /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
+  /usr/local/share/gnome-shell/extensions/gnome-shell-improved/extension.js
