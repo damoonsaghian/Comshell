@@ -1,6 +1,7 @@
-pacman -S grub intel-ucode amd-ucode dracut linux linux-firmware \
-  man-db nano unzip btrfs-progs e2fsprogs dosfstools udisks2 pulseaudio-alsa networkmanager \
-  gdm sakura gvfs materia-gtk-theme ttf-hack noto-fonts
+pacman -S grub intel-ucode amd-ucode linux linux-firmware \
+  btrfs-progs e2fsprogs dosfstools udisks2 pulseaudio-alsa networkmanager \
+  sudo nano man-db unzip \
+  sway sakura gvfs materia-gtk-theme ttf-hack noto-fonts
 
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
 printf '\nset superusers=""\n' >> /etc/grub.d/40_custom
@@ -39,9 +40,25 @@ systemctl enable NetworkManager
 # https://wiki.archlinux.org/index.php/Systemd/Timers
 
 echo '
+Defaults requiretty
+%wheel ALL=(ALL) ALL
+' >> /etc/sudoers
+
+echo '
+if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
+  sway&
+fi
+' >> /etc/skel/.bash_profile
+
+echo '
 PS1="\[$(tput setab 6)\]\[$(tput setaf 0)\]\w >\[$(tput sgr0)\] "
 unset HISTFILE
+alias mount="udisksctl mount -b"
+alias umount="udisksctl unmount -b"
 ' >> /etc/skel/.bashrc
+
+mkdir -p /etc/skel/.config/sway
+cp sway /etc/skel/.config/sway/config
 
 mkdir -p /etc/skel/.config/sakura
 echo '[sakura]
@@ -62,12 +79,12 @@ useradd -m -G wheel user1
 passwd user1
 passwd
 
-systemctl enable gdm
 # automatic login:
-echo '[daemon]
-AutomaticLogin=user1
-AutomaticLoginEnable=True
-' > /etc/gdm/custom.conf
+mkdir /etc/systemd/system/getty@tty1.service.d
+echo '[Service]
+ExecStart=
+ExecStart=-/usr/bin/agetty --autologin user1 --noclear %I $TERM
+' > /etc/systemd/system/getty@tty1.service.d/override.conf
 
 echo '<?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
@@ -98,19 +115,3 @@ echo '<?xml version="1.0"?>
   </alias>
 </fontconfig>
 ' > /etc/fonts/local.conf
-
-echo "[org/gnome/desktop/interface]
-gtk-theme = 'Materia-light-compact'
-font-name = 'Sans'
-[org/gnome/desktop/screensaver]
-lock-enabled = 'false'
-" > /etc/dconf/db/local.d/1
-dconf update
-
-mkdir -p /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
-echo '{
-  "uuid": "gnome-shell-improved"
-}' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/metadata.json
-curl --proto '=https' -sSf \
-  https://github.com/damoonsaghian/Comshell/raw/master/etc/extension.js >
-  /usr/local/share/gnome-shell/extensions/gnome-shell-improved/extension.js
