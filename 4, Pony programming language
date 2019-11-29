@@ -48,7 +48,7 @@ improvements for Pony language:
 "https://stdlib.ponylang.io/"
 "https://github.com/ponylang/pony-stable"
 
-wit Pony we can get rid of a global event loop;
+with Pony we can get rid of a global event loop;
 
 actors can contain parameters which can be adjusted gradually, based on received messages;
   this can be used to implement learning capabilities;

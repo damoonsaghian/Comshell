@@ -1,9 +1,9 @@
 using Arch Linux we can easily setup and maintain a Linux system;
 the following shows how to setup a basic graphical environment,
-  with Atom editor, Chromium browser which you can toggle using "alt-tab",
-  and Sakura terminal which you can toggle using "alt-`" ("alt-tab" hides terminal too);
-in addition, we can add scripts to GnomeShell, to open various graphical applications,
-  each in its own workspace ("alt-space" brings you back to main workspace);
+  with Atom editor and Chromium browser, which you can toggle in between with "alt-tab";
+also there is a terminal which you can show with "alt-`" and hide with "alt-tab";
+in addition, we can write scripts, to open various graphical applications,
+  each in its own workspace ("alt-space" brings you back to the workspace with Atom editor);
 
 boot Arch Linux live environment;
 to ensure the system clock is accurate:
@@ -26,9 +26,10 @@ list available block devices using "lsblk", then on the intended block device,
 
 ; pacstrap /mnt base
 ; arch-chroot /mnt
-; export archinstall=$( curl --proto '=https' -sSf https://raw.githubusercontent.com/damoonsaghian/Comshell/master/etc/arch-install.sh )
-first study the script, and then run it:
-; sh "$archinstall"
+; curl --proto '=https' -sSf -o #1 \
+  https://raw.githubusercontent.com/damoonsaghian/Comshell/master/etc/{arch-install.sh,sway}
+study the downloaded files, and then:
+; sh arch-install.sh
 ; exit; reboot
 
 the above script sets the "user1" for automatic login;
@@ -41,9 +42,7 @@ in addition you have to:
 these can make physical attacks more difficult, but not impossible;
 keep in mind that physical access to a computer is root access, given enough time and resources;
 
-after booting into the installed Arch Linux, you will be presented by
-  a customized GnomeShell environment, and a terminal window;
-
+after booting into the installed Arch Linux, you will see a terminal window;
 to connect to a WIFI network:
 ; nmcli dev wifi
 ; nmcli --ask dev wifi con <ssid>
@@ -52,16 +51,20 @@ to disconnect from a WIFI network:
 to disable WIFI:
 ; nmcli radio wifi off
 
-note that due to a bug, "pkexec" does not work with the fallback Polkit agent,
-  which is the only one available, in Linux console (ie when GnomeShell is not running);
-there is a workaround though (it requires "ctrl+c" to stop):
-; pkttyagent -p $(echo $$) | pkexec ...
-or you can just use "su" instead;
+; sudo pacman -S xorg-server-xwayland atom chromium aria2 moc mpv
 
-; pkexec pacman -S xorg-server-xwayland atom chromium aria2 moc mpv
-
+; mkdir -p ~/.config/gtk-3.0
 ; cp etc/gtk.css ~/.config/gtk-3.0/
+; printf '[Settings]\ngtk-theme-name = Materia-light-compact\ngtk-font-name = Sans' >
+  ~/.config/gtk-3.0/settings.ini
+; gsettings set org.gnome.desktop.interface gtk-theme Materia-light-compact
+; gsettings set org.gnome.desktop.interface font-name Sans
 
 ; cp etc/atom/* ~/.atom/
 ; mkdir -p ~/.config/autostart
 ; cp /usr/share/applications/atom.desktop ~/.config/autostart/
+
+in Chromium settings:
+, enable "use system title bar and borders";
+, enable "continue where you left off";
+, disable "continue running background apps when Chromium is closed";
