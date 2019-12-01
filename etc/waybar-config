@@ -1,0 +1,66 @@
+{
+  "layer": "top",
+  "position": "bottom",
+  "modules-left": ["custom/notifications"],
+  "modules-right": ["custom/internet", "network", "memory", "cpu", "battery", "clock"],
+
+  "custom/notifications": {
+    "format": "{}",
+    "interval": 3,
+    // show the notifications placed in "/var/local/notifications/*" and
+    //   "~/.config/notifications/*";
+    "exec": "",
+    "tooltip": false
+  },
+
+  "custom/internet": {
+    "format": "{}",
+    "interval": 10,
+    "exec": "ping -q -w1 -c1 www.google.com &>/dev/null || echo !",
+    "tooltip": false
+  },
+
+  "network": {
+    "format-wifi": " {signalStrength}%",
+    "format-ethernet": "",
+    "format-linked": "!",
+    "format-disconnected": "X",
+    "interval": 5,
+    "tooltip": false
+  },
+
+  "memory": {
+    "format": " {percentage:2}%",
+    "states": {
+      "warning": 85,
+      "critical": 95
+    },
+    "interval": 3,
+    "tooltip": false
+  },
+
+  "cpu": {
+    "format": " {usage:2}%",
+    "states": {
+      "warning": 90,
+      "critical": 95
+    },
+    "interval": 3,
+    "tooltip": false
+  },
+
+  "battery": {
+    "format": "{icon} {capacity}%",
+    "format-icons": ["", "", "", "", ""],
+    "states": {
+      "warning": 10,
+      "critical": 5
+    },
+    "tooltip": false
+  },
+
+  "clock": {
+    "format": "{:%F %a %p %I:%M}",
+    "tooltip": false
+  }
+}
