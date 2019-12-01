@@ -26,8 +26,8 @@ list available block devices using "lsblk", then on the intended block device,
 
 ; pacstrap /mnt base
 ; arch-chroot /mnt
-; curl --proto '=https' -sSf -o #1 \
-  https://raw.githubusercontent.com/damoonsaghian/Comshell/master/etc/{arch-install.sh,sway}
+; export url=https://raw.githubusercontent.com/damoonsaghian/Comshell/master/etc/
+; curl --proto '=https' -sSf -o #1 "$url"{arch-install.sh,sway-config,waybar-config,waybar.css}
 study the downloaded files, and then:
 ; sh arch-install.sh
 ; exit; reboot
