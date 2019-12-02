@@ -6,7 +6,6 @@
 
   "custom/notifications": {
     "format": "{}",
-    "interval": 3,
     // show the notifications placed in "/var/local/notifications/*" and
     //   "~/.config/notifications/*";
     "exec": "",

@@ -55,7 +55,7 @@ fi
 ' >> /etc/skel/.bash_profile
 
 echo '
-PS1="\[$(tput setab 6)\]\[$(tput setaf 0)\]\w >\[$(tput sgr0)\] "
+PS1="\[$(tput setab 6)\]\[$(tput setaf 0)\]\w\[$(tput sgr0)\]\[$(tput setaf 6)\]\[$(tput sgr0)\] "
 unset HISTFILE
 alias mount="udisksctl mount -b"
 alias umount="udisksctl unmount -b"

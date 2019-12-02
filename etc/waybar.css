@@ -5,15 +5,13 @@
 window#waybar {
   background-color: #222222;
   color: #ffffff;
-  border-top: 1px solid #444444;
-  transition-property: background-color;
-  transition-duration: .5s;
+  border-top: 1px solid #777777;
 }
 
 #custom-notifications, #memory, #cpu, #battery, #clock {
 	background-color: #222222;
   color: #ffffff;
-  border-top: 1px solid #444444;
+  border-top: 1px solid #777777;
   padding: 0 5px;
 }
 #memory, #cpu, #battery { min-width: 40px; }
@@ -22,7 +20,7 @@ window#waybar {
 #network {
   background-color: #222222;
   color: #ffffff;
-  border-top: 1px solid #444444;
+  border-top: 1px solid #777777;
   padding: 0 0 0 5px;
 }
 #network.linked { color: #f5ec3c; }
@@ -30,7 +28,7 @@ window#waybar {
 #custom-internet {
   background-color: #222222;
   color: #f53c3c;
-  border-top: 1px solid #444444;
+  border-top: 1px solid #777777;
   padding: 0 5px 0 0;
 }
 
@@ -40,7 +38,7 @@ window#waybar {
 }
 
 @keyframes blink {
-  to { color: #000000; }
+  to { color: #ffffff; }
 }
 #cpu.critical, #memory.critical, #battery.critical:not(.charging) {
   color: #f53c3c;
