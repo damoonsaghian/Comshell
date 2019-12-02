@@ -2,7 +2,7 @@
   "layer": "top",
   "position": "bottom",
   "modules-left": ["custom/notifications"],
-  "modules-right": ["custom/internet", "network", "memory", "cpu", "battery", "clock"],
+  "modules-right": ["network", "custom/internet", "memory", "cpu", "battery", "clock"],
 
   "custom/notifications": {
     "format": "{}",
@@ -13,24 +13,24 @@
     "tooltip": false
   },
 
-  "custom/internet": {
-    "format": "{}",
-    "interval": 10,
-    "exec": "ping -q -w1 -c1 www.google.com &>/dev/null || echo !",
-    "tooltip": false
-  },
-
   "network": {
-    "format-wifi": " {signalStrength}%",
+    "format-wifi": "{signalStrength}%",
     "format-ethernet": "",
-    "format-linked": "!",
-    "format-disconnected": "X",
+    "format-linked": "",
+    "format-disconnected": "",
     "interval": 5,
     "tooltip": false
   },
 
+  "custom/internet": {
+    "format": "{}",
+    "interval": 10,
+    "exec": "ping -q -w1 -c1 www.google.com &>/dev/null && echo ' ' || echo !",
+    "tooltip": false
+  },
+
   "memory": {
-    "format": " {percentage:2}%",
+    "format": "{percentage}%",
     "states": {
       "warning": 85,
       "critical": 95
@@ -40,7 +40,7 @@
   },
 
   "cpu": {
-    "format": " {usage:2}%",
+    "format": "{usage}%",
     "states": {
       "warning": 90,
       "critical": 95
@@ -50,7 +50,7 @@
   },
 
   "battery": {
-    "format": "{icon} {capacity}%",
+    "format": "{icon}{capacity}%",
     "format-icons": ["", "", "", "", ""],
     "states": {
       "warning": 10,

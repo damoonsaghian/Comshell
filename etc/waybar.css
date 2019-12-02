@@ -3,34 +3,42 @@
   font-family: monospace;
 }
 window#waybar {
-  background-color: #444444;
+  background-color: #222222;
   color: #ffffff;
-  border-top: 1px solid #777777;
+  border-top: 1px solid #444444;
   transition-property: background-color;
   transition-duration: .5s;
 }
+
 #custom-notifications, #memory, #cpu, #battery, #clock {
 	background-color: #222222;
   color: #ffffff;
-  padding: 0 10px;
-  margin: 0 1px;
+  border-top: 1px solid #444444;
+  padding: 0 5px;
 }
-#custom-internet {
-  background-color: #222222;
-  color: #f53c3c;
-  padding: 0 0 0 10px;
-  margin: 0 0 0 1px;
-}
+#memory, #cpu, #battery { min-width: 40px; }
+#clock { min-width: 170px; }
+
 #network {
   background-color: #222222;
   color: #ffffff;
-  padding: 0 10px 0 0;
-  margin: 0 1px 0 0;
+  border-top: 1px solid #444444;
+  padding: 0 0 0 5px;
 }
+#network.linked { color: #f5ec3c; }
+
+#custom-internet {
+  background-color: #222222;
+  color: #f53c3c;
+  border-top: 1px solid #444444;
+  padding: 0 5px 0 0;
+}
+
 #network.disconnected, #network.linked,
 #memory.warning, #cpu.warning, #battery.warning:not(.charging) {
   color: #f53c3c;
 }
+
 @keyframes blink {
   to { color: #000000; }
 }
@@ -42,4 +50,5 @@ window#waybar {
   animation-iteration-count: infinite;
   animation-direction: alternate;
 }
+
 #battery.charging { color: #f5ec3c; }
