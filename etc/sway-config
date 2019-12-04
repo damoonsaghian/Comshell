@@ -12,45 +12,28 @@ client.focused_inactive #000000 #000000 #000000 #222222   #222222
 client.unfocused        #000000 #000000 #000000 #aaaaaa   #aaaaaa
 client.urgent           #000000 #000000 #000000 #aaaaaa   #aaaaaa
 
-for_window [workspace=atom app_id="^(?!atom$)" window_role=normal] \
-  resize set 90 ppt 90 ppt, move position center
-for_window [workspace=atom class="^(?!Atom$)" window_role=normal] \
-  resize set 90 ppt 90 ppt, move position center
-mode atom {
-  bindsym Mod1+Tab workspace chromium; exec "pgrep -f '^\S*chromium$' >/dev/null \
-    || ( swaymsg [workspace=atom floating] kill; chromium; )"; \
-    mode chromium
-  bindsym Mod1+grave
-}
+for_window [app_id=sakura tiling] floating enable; \
+  exec swaymsg "[app_id=sakura] resize set 60 ppt 90 ppt, move position center"
+for_window [app_id='^(?!sakura$)' tiling] splitv, layout stacking
 
-for_window [workspace=chromium app_id="^(?!chromium$)" window_role=normal] \
-  resize set 90 ppt 90 ppt, move position center
-for_window [workspace=chromium class="^(?!Chromium$)" window_role=normal] \
-  resize set 90 ppt 90 ppt, move position center
-mode chromium {
-  bindsym Mod1+Tab \
-    mode atom
-  bindsym Mod1+grave workspace
-}
+bindsym Mod1+Tab focus left; \
+  exec swaymsg "[app_id=sakura] move scratchpad"; \
+  exec swaymsg "[workspace=__focused__ app_id='^(?!sakura$)' floating] kill"
+bindsym Mod1+grave [app_id=sakura] scratchpad show; \
+  exec "pgrep '^sakura$' >/dev/null || sakura"
+bindsym Mod1+space workspace atom; \
+  exec swaymsg "[app_id=sakura] move scratchpad"; \
+  exec swaymsg "[workspace=atom app_id='^(?!sakura$)' floating] kill"; \
+  exec "pgrep '^atom$' >/dev/null || ( swaymsg focus parent; atom; )"; \
+  exec "pgrep -f '^\S*chromium$' >/dev/null || ( swaymsg focus parent; chromium; )"
 
-for_window [workspace=terminal app_id="^(?!sakura$)" window_role=normal] \
-  resize set 90 ppt 90 ppt, move position center
-for_window [workspace=terminal class="^(?!Sakura$)" window_role=normal] \
-  resize set 90 ppt 90 ppt, move position center
-mode terminal {
-  bindsym Mod1+Tab workspace back_and_forth
-  bindsym Mod1+grave
-}
-
-workspace atom
-mode atom
-exec atom
-
-bindsym Mod1+space workspace atom; exec "pgrep '^atom$' >/dev/null \
-  || ( swaymsg [workspace=atom] kill; atom; )"
 bindsym Mod1+Escape kill
 bindsym Mod1+Shift+s exec "sleep 0.5; systemctl suspend"
 
 bar {
   swaybar_command waybar
 }
+
+workspace atom
+exec "swaymsg focus parent; chromium"
+exec "swaymsg focus parent; atom"

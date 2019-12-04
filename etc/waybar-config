@@ -8,6 +8,7 @@
     "format": "{}",
     // show the notifications placed in "/var/local/notifications/*" and
     //   "~/.config/notifications/*";
+    // https://github.com/Alexays/Waybar/wiki/Module:-Custom#pacman
     "exec": "",
     "tooltip": false
   },

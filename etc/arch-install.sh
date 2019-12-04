@@ -1,7 +1,7 @@
 pacman -S grub intel-ucode amd-ucode linux linux-firmware \
   btrfs-progs e2fsprogs dosfstools udisks2 pulseaudio-alsa networkmanager \
   sudo nano man-db unzip \
-  sway waybar sakura gvfs materia-gtk-theme ttf-hack noto-fonts otf-font-awesome
+  sway waybar sakura materia-gtk-theme ttf-hack noto-fonts otf-font-awesome
 
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
 printf '\nset superusers=""\n' >> /etc/grub.d/40_custom
