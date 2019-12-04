@@ -14,18 +14,17 @@ client.urgent           #000000 #000000 #000000 #aaaaaa   #aaaaaa
 
 for_window [app_id=sakura tiling] floating enable; \
   exec swaymsg "[app_id=sakura] resize set 60 ppt 90 ppt, move position center"
-for_window [app_id='^(?!sakura$)' tiling] splitv, layout stacking
 
 bindsym Mod1+Tab focus left; \
   exec swaymsg "[app_id=sakura] move scratchpad"; \
   exec swaymsg "[workspace=__focused__ app_id='^(?!sakura$)' floating] kill"
-bindsym Mod1+grave [app_id=sakura] scratchpad show; \
+bindsym Mod1+grave [app_id=sakura] move scratchpad, scratchpad show; \
   exec "pgrep '^sakura$' >/dev/null || sakura"
 bindsym Mod1+space workspace atom; \
   exec swaymsg "[app_id=sakura] move scratchpad"; \
   exec swaymsg "[workspace=atom app_id='^(?!sakura$)' floating] kill"; \
-  exec "pgrep '^atom$' >/dev/null || ( swaymsg focus parent; atom; )"; \
-  exec "pgrep -f '^\S*chromium$' >/dev/null || ( swaymsg focus parent; chromium; )"
+  exec "pgrep '^atom$' >/dev/null || atom"; \
+  exec "pgrep -f '^\S*chromium$' >/dev/null || chromium"
 
 bindsym Mod1+Escape kill
 bindsym Mod1+Shift+s exec "sleep 0.5; systemctl suspend"
@@ -35,5 +34,5 @@ bar {
 }
 
 workspace atom
-exec "swaymsg focus parent; chromium"
-exec "swaymsg focus parent; atom"
+exec chromium
+exec atom
