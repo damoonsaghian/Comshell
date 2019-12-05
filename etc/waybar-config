@@ -14,7 +14,7 @@
   },
 
   "network": {
-    "format-wifi": "{signalStrength}%",
+    "format-wifi": " {signalStrength:02}%",
     "format-ethernet": "",
     "format-linked": "",
     "format-disconnected": "",
@@ -22,25 +22,18 @@
     "tooltip": false
   },
 
-  "custom/internet": {
-    "format": "{}",
-    "interval": 10,
-    "exec": "ping -q -w1 -c1 www.google.com &>/dev/null && echo ' ' || echo !",
-    "tooltip": false
-  },
-
   "memory": {
-    "format": "{percentage}%",
+    "format": " {percentage:02}%",
     "states": {
       "warning": 85,
       "critical": 95
     },
-    "interval": 3,
+    "interval": 5,
     "tooltip": false
   },
 
   "cpu": {
-    "format": "{usage}%",
+    "format": " {usage:02}%",
     "states": {
       "warning": 90,
       "critical": 95
@@ -50,7 +43,7 @@
   },
 
   "battery": {
-    "format": "{icon}{capacity}%",
+    "format": "{icon} {capacity:02}%",
     "format-icons": ["", "", "", "", ""],
     "states": {
       "warning": 10,

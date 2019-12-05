@@ -8,32 +8,26 @@ window#waybar {
   border-top: 1px solid #555555;
 }
 
-#custom-notifications, #memory, #cpu, #battery, #clock {
+#custom-notifications, #network, #memory, #cpu, #battery, #clock {
 	background-color: #222222;
   color: #ffffff;
   border-top: 1px solid #555555;
-  padding: 0 5px;
-}
-#memory, #cpu, #battery { min-width: 40px; }
-#clock { min-width: 170px; }
 
-#network {
-  background-color: #222222;
-  color: #ffffff;
-  border-top: 1px solid #555555;
-  padding: 0 0 0 5px;
 }
-#network.linked { color: #f5ec3c; }
-
-#custom-internet {
-  background-color: #222222;
-  color: #f53c3c;
-  border-top: 1px solid #555555;
-  padding: 0 5px 0 0;
+#custom-notifications { padding: 0 10px 0 5px; }
+#network, #memory, #cpu, #battery {
+  border-left: 1px solid #aaaaaa;
+  padding: 0 10px;
+}
+#clock {
+  border-left: 1px solid #aaaaaa;
+  padding: 0 5px 0 10px;
 }
 
-#network.disconnected, #network.linked,
-#memory.warning, #cpu.warning, #battery.warning:not(.charging) {
+
+#network.linked, #battery.charging { color: #f5ec3c; }
+
+#network.disconnected, #memory.warning, #cpu.warning, #battery.warning:not(.charging) {
   color: #f53c3c;
 }
 
@@ -48,5 +42,3 @@ window#waybar {
   animation-iteration-count: infinite;
   animation-direction: alternate;
 }
-
-#battery.charging { color: #f5ec3c; }

@@ -12,27 +12,21 @@ client.focused_inactive #000000 #000000 #000000 #222222   #222222
 client.unfocused        #000000 #000000 #000000 #aaaaaa   #aaaaaa
 client.urgent           #000000 #000000 #000000 #aaaaaa   #aaaaaa
 
-for_window [app_id=sakura tiling] floating enable; \
-  exec swaymsg "[app_id=sakura] resize set 60 ppt 90 ppt, move position center"
-
-bindsym Mod1+Tab focus left; \
-  exec swaymsg "[app_id=sakura] move scratchpad"; \
-  exec swaymsg "[workspace=__focused__ app_id='^(?!sakura$)' floating] kill"
-bindsym Mod1+grave [app_id=sakura] move scratchpad, scratchpad show; \
-  exec "pgrep '^sakura$' >/dev/null || sakura"
-bindsym Mod1+space workspace atom; \
-  exec swaymsg "[app_id=sakura] move scratchpad"; \
-  exec swaymsg "[workspace=atom app_id='^(?!sakura$)' floating] kill"; \
-  exec "pgrep '^atom$' >/dev/null || atom"; \
-  exec "pgrep -f '^\S*chromium$' >/dev/null || chromium"
+bindsym --release Alt_L workspace atom; exec \
+  "pgrep '^atom$' >/dev/null || ( swaymsg [workspace=atom] kill; atom; )"
+bindsym --release Alt_R workspace atom; exec \
+  "pgrep '^atom$' >/dev/null || ( swaymsg [workspace=atom] kill; atom; )"
+bindsym Mod1+Tab workspace chromium; exec \
+  "pgrep -f '^\S*chromium$' >/dev/null || ( swaymsg [workspace=chromium] kill; chromium; )"
+bindsym Mod1+grave workspace sakura; exec \
+  "pgrep '^sakura$' >/dev/null || ( swaymsg [workspace=sakura] kill; sakura; )"
 
 bindsym Mod1+Escape kill
-bindsym Mod1+Shift+s exec "sleep 0.5; systemctl suspend"
+bindsym Mod1+Shift+z exec "sleep 0.5; systemctl suspend"
+
+workspace atom
+exec atom
 
 bar {
   swaybar_command waybar
 }
-
-workspace atom
-exec chromium
-exec atom
