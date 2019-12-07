@@ -4,7 +4,7 @@ default_border pixel 1
 default_floating_border pixel 1
 hide_edge_borders --i3 smart
 titlebar_border_thickness 4
-titlebar_padding 2 2
+titlebar_padding 5 5
 font pango:monospace 0
 # class                 border  backgr. text    indicator child_border
 client.focused          #000000 #4285F4 #4285F4 #222222   #222222
@@ -14,17 +14,15 @@ client.urgent           #000000 #777777 #777777 #aaaaaa   #aaaaaa
 
 bar swaybar_command waybar
 
-bindsym Mod1+Left focus left
-bindsym Mod1+Right focus right
-bindsym Mod1+Down workspace sakura; exec sakura
+bindsym Mod1+Prior focus left
+bindsym Mod1+Next focus right
+bindsym Mod1+Return exec sakura
 bindsym Mod1+Escape kill
 bindsym Mod1+Shift+z exec "sleep 0.5; systemctl suspend"
 
-bindsym --release Alt_L workspace atom; exec \
+bindsym Mod1+Tab workspace atom; exec \
   "pgrep '^atom$' >/dev/null || ( swaymsg [workspace=atom] kill; atom; )"
-bindsym --release Alt_R workspace atom; exec \
-  "pgrep '^atom$' >/dev/null || ( swaymsg [workspace=atom] kill; atom; )"
-bindsym Mod1+Tab workspace chromium; exec \
+bindsym Mod1+q workspace chromium; exec \
   "pgrep -f '^\S*chromium$' >/dev/null || ( swaymsg [workspace=chromium] kill; chromium; )"
 
 workspace atom
