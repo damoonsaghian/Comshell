@@ -59,6 +59,8 @@ PS1="\[$(tput setab 6)\]\[$(tput setaf 0)\]\w\[$(tput sgr0)\]\[$(tput setaf 6)\]
 unset HISTFILE
 alias mount="udisksctl mount -b"
 alias umount="udisksctl unmount -b"
+alias reboot="( swaymsg [title=.] kill; sleep 0.5; systemctl reboot ) & disown"
+alias poweroff="( swaymsg [title=.] kill; sleep 0.5; systemctl poweroff ) & disown"
 ' >> /etc/skel/.bashrc
 
 mkdir -p /etc/skel/.config/sway
