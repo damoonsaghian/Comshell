@@ -20,9 +20,11 @@ bindsym Mod1+Return exec sakura
 bindsym Mod1+Escape kill
 bindsym Mod1+Shift+z exec "sleep 0.5; systemctl suspend"
 
-bindsym Mod1+Tab workspace atom; exec \
+bindsym --release Alt_L workspace atom; exec \
   "pgrep '^atom$' >/dev/null || ( swaymsg [workspace=atom] kill; atom; )"
-bindsym Mod1+q workspace chromium; exec \
+bindsym --release Alt_R workspace atom; exec \
+  "pgrep '^atom$' >/dev/null || ( swaymsg [workspace=atom] kill; atom; )"
+bindsym Mod1+Tab workspace chromium; exec \
   "pgrep -f '^\S*chromium$' >/dev/null || ( swaymsg [workspace=chromium] kill; chromium; )"
 
 workspace atom
