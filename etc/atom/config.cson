@@ -1,10 +1,14 @@
 "*":
   core:
     autoHideMenuBar: true
+    disabledPackages: [
+      "encoding-selector"
+      "grammar-selector"
+      "line-ending-selector"
+      "welcome"
+    ]
     ignoredNames: [
       ".*"
-      "target"
-      "Cargo.lock"
     ]
     openEmptyEditorOnStart: false
     telemetryConsent: "no"
@@ -18,12 +22,6 @@
     softWrap: true
     softWrapAtPreferredLineLength: true
     softWrapHangingIndent: 2
-  "exception-reporting":
-    userId: "f250b590-9d4c-4e12-90a7-4bb08a9e8dad"
-  "status-bar":
-    isVisible: false
   "tree-view":
     hideIgnoredNames: true
     sortFoldersBeforeFiles: false
-  welcome:
-    showOnStartup: false

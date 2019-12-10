@@ -7,4 +7,5 @@ atom.workspace.observeTextEditors(editor => {
     atom.textEditors.setGrammarOverride(editor, 'text.plain');
 });
 
+require('./status-bar');
 require('./tree-view');

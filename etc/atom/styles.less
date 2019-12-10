@@ -1,3 +1,15 @@
+.status-bar {
+  .file-info,
+  .cursor-position,
+  .selection-count,
+  .git-view,
+  .github-StatusBarTileController {
+    display: none;
+  };
+  height: 20px;
+  line-height: 20px;
+}
+
 .atom-dock-toggle-button-visible {
   display: none;
 }
@@ -9,7 +21,6 @@ atom-dock.left .tab-bar {
 .scrollbars-visible-always {
   ::-webkit-scrollbar {
     width: 8px;
-    height: 8px;
 
     &-track {
       border: 3px solid transparent !important;
@@ -19,6 +30,7 @@ atom-dock.left .tab-bar {
     }
 
     &-thumb {
+      height: 30px;
       border: 3px solid transparent !important;
       border-radius: 0px;
       background-clip: padding-box !important;
