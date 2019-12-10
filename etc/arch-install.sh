@@ -1,7 +1,6 @@
 pacman -S grub intel-ucode amd-ucode linux linux-firmware \
   btrfs-progs e2fsprogs dosfstools udisks2 pulseaudio-alsa networkmanager \
-  sudo nano man-db unzip \
-  sway waybar sakura materia-gtk-theme ttf-hack noto-fonts otf-font-awesome
+  sudo nano man-db unzip sway sakura materia-gtk-theme ttf-hack noto-fonts
 
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
 printf '\nset superusers=""\n' >> /etc/grub.d/40_custom
@@ -37,12 +36,6 @@ chmod 755 /etc/NetworkManager/dispatcher.d/09-timezone
 systemctl enable systemd-timesyncd
 systemctl enable NetworkManager
 
-# https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html
-# https://wiki.archlinux.org/index.php/Systemd/Timers
-# download updates as scheduled;
-# put " reboot to update" in "pacman" notification file "/var/local/notifications/pacman";
-# before reboot/poweroff install the updates, then delete the notification file;
-
 echo '
 Defaults requiretty
 %wheel ALL=(ALL) ALL
@@ -65,10 +58,6 @@ alias poweroff="( swaymsg [title=.] kill; sleep 0.5; systemctl poweroff ) & diso
 
 mkdir -p /etc/skel/.config/sway
 cp sway-config /etc/skel/.config/sway/config
-
-mkdir -p /etc/skel/.config/waybar
-cp waybar-config /etc/skel/.config/waybar/config
-cp waybar.css /etc/skel/.config/waybar/style.css
 
 mkdir -p /etc/skel/.config/sakura
 echo '[sakura]
