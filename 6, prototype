@@ -1,0 +1,39 @@
+implementing a complete GUI toolkit is a huge lot of work;
+existing ones (like GTK) are single threaded;
+this means that although we can access actors from GTK thread,
+  we can't access GTK objects (and data structures containing them), from actors;
+thus we are forced back to traditional single threaded code, without actors;
+in addition, there is still no GTK bindings for Pony;
+so i think it's better to first build a prototype of Comshell, using LGI;
+
+"https://github.com/pavouk/lgi/tree/master/docs"
+"https://github.com/pavouk/lgi/blob/master/samples/repobrowser.lua" (treeview)
+"https://github.com/pavouk/lgi/blob/master/samples/giostream.lua"
+"https://github.com/pavouk/lgi/blob/master/samples/console.lua" (sourceview)
+"https://github.com/pavouk/lgi/blob/master/samples/gstplaystream.lua"
+"https://github.com/pavouk/lgi/blob/master/samples/gstvideo.lua"
+"https://github.com/pavouk/lgi/blob/master/samples/goocanvas.lua"
+"https://github.com/pavouk/lgi/tree/master/samples/gtk-demo"
+
+"https://developer.gnome.org/gnome-devel-demos/stable/py.html.en"
+"https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
+"https://python-gtk-3-tutorial.readthedocs.io/en/latest/treeview.html"
+"https://github.com/teejee2008/polo"
+"https://github.com/UberWriter/uberwriter"
+"https://github.com/zim-desktop-wiki/zim-desktop-wiki"
+"https://www.archlinux.org/packages/extra/any/meld/"
+"https://github.com/karlch/vimiv"
+"https://gitlab.gnome.org/GNOME/pitivi"
+"https://www.archlinux.org/packages/community/any/gaupol/"
+
+"https://gjs-docs.gnome.org/"
+"https://lazka.github.io/pgi-docs/"
+"https://developer.gnome.org/references"
+
+; pkexec pacman -S lua-lgi \
+  gnome-desktop gvfs gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
+
+poppler-glib goffice goocanvas
+
+; sudo mkdir /usr/local/comshell-proto
+; sudo cp -r prototype/* /usr/local/comshell-proto/

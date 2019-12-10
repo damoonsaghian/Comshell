@@ -27,7 +27,7 @@ list available block devices using "lsblk", then on the intended block device,
 ; pacstrap /mnt base
 ; arch-chroot /mnt
 ; export url=https://raw.githubusercontent.com/damoonsaghian/Comshell/master/etc/
-; curl --proto '=https' -sSf -o #1 "$url"{arch-install.sh,sway-config,waybar-config,waybar.css}
+; curl --proto '=https' -sSf -o #1 "$url"{arch-install.sh,sway-config}
 study the downloaded files, and then:
 ; sh arch-install.sh
 ; exit; reboot
@@ -51,8 +51,6 @@ to disconnect from a WIFI network:
 to disable WIFI:
 ; nmcli radio wifi off
 
-; sudo pacman -S xorg-server-xwayland atom chromium aria2 moc mpv
-
 ; mkdir -p ~/.config/gtk-3.0
 ; cp etc/gtk.css ~/.config/gtk-3.0/
 ; printf '[Settings]\ngtk-theme-name = Materia-light-compact\ngtk-font-name = Sans' >
@@ -60,9 +58,9 @@ to disable WIFI:
 ; gsettings set org.gnome.desktop.interface gtk-theme Materia-light-compact
 ; gsettings set org.gnome.desktop.interface font-name Sans
 
+; sudo pacman -S xorg-server-xwayland atom chromium aria2 moc mpv
+
 ; cp etc/atom/* ~/.atom/
-; mkdir -p ~/.config/autostart
-; cp /usr/share/applications/atom.desktop ~/.config/autostart/
 
 in Chromium settings:
 , enable "use system title bar and borders";
