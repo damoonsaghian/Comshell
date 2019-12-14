@@ -6,6 +6,7 @@
       "grammar-selector"
       "line-ending-selector"
       "welcome"
+      "status-bar"
     ]
     ignoredNames: [
       ".*"
