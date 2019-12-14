@@ -1,0 +1,44 @@
+* {
+  font-size: 14px;
+  font-family: monospace;
+}
+window#waybar {
+  background-color: #222222;
+  color: #ffffff;
+  border-top: 1px solid #555555;
+}
+
+#custom-notifications, #network, #memory, #cpu, #battery, #clock {
+	background-color: #222222;
+  color: #ffffff;
+  border-top: 1px solid #555555;
+
+}
+#custom-notifications { padding: 0 10px 0 5px; }
+#network, #memory, #cpu, #battery {
+  border-left: 1px solid #aaaaaa;
+  padding: 0 10px;
+}
+#clock {
+  border-left: 1px solid #aaaaaa;
+  padding: 0 5px 0 10px;
+}
+
+
+#network.linked, #battery.charging { color: #f5ec3c; }
+
+#network.disconnected, #memory.warning, #cpu.warning, #battery.warning:not(.charging) {
+  color: #f53c3c;
+}
+
+@keyframes blink {
+  to { color: #ffffff; }
+}
+#cpu.critical, #memory.critical, #battery.critical:not(.charging) {
+  color: #f53c3c;
+  animation-name: blink;
+  animation-duration: 0.5s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
