@@ -60,12 +60,11 @@ do
   root_box:pack_end(statusbar, false, false, 0)
   root_box:pack_end(gtk.Separator(gtk.Orientation.HORIZONTAL), false, false, 0)
   root_box:pack_end(main_view, true, true, 0)
-  local window = gtk.Window {
-    on_destroy = gtk.main_quit
-  }
+  local window = gtk.Window()
+  window.on_destroy:connect(gtk.main_quit)
   window:add(root_box)
   window:show_all()
-  window:maximize()
+  window:fullscreen()
 end
 
 gtk.main()
