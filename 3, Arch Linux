@@ -42,7 +42,8 @@ in addition you have to:
 these can make physical attacks more difficult, but not impossible;
 keep in mind that physical access to a computer is root access, given enough time and resources;
 
-after booting into the installed Arch Linux, you will see a terminal window;
+after booting into the installed Arch Linux, you will see a blank screen;
+  press "Alt+`" to open a terminal window;
 to connect to a WIFI network:
 ; nmcli dev wifi
 ; nmcli --ask dev wifi con <ssid>
@@ -58,7 +59,11 @@ to disable WIFI:
 ; gsettings set org.gnome.desktop.interface gtk-theme Materia-light-compact
 ; gsettings set org.gnome.desktop.interface font-name Sans
 
-; sudo pacman -S xorg-server-xwayland atom chromium aria2 moc mpv
+; sudo pacman -S waybar otf-font-awesome xorg-server-xwayland atom chromium aria2 moc mpv
+
+; mkdir ~/.config/waybar
+; cp etc/waybar-config ~/.config/waybar/config
+; cp etc/waybar-style.css ~/.config/waybar/style.css
 
 ; cp etc/atom/* ~/.atom/
 
