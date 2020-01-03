@@ -9,21 +9,22 @@ import "editor"
 import "files_tree"
 import "web_browser"
 
-View =
-  __init__ = defaults ->
-  @item = defaults.item # Gallery or Editor
-  @files_tree = defaults.files_tree # FilesTree
-  @floating_layer = gtk.Container!
+#:: (Either Gallery Editor) FilesTree -> View
+View = subclass object where
+  __init__ = self item files_tree ->
+    self.item = item
+    self.files_tree = files_tree
+    self.floating_layer = gtk.Container!
 
-Project =
-  __init__ = defaults ->
-  self.views :: list View = dict!
-  self.notebook = gtk.NoteBook!
-  self.web_browsers :: dict string WebBrowser = dict!
-  self.external_projects :: dict string Project = dict!
+Project = subclass object where
+  __init__ = self ->
+    self.views = [] #:: [View]
+    self.notebook = gtk.NoteBook!
+    self.web_browsers = dict! #:: dict string WebBrowser
+    self.external_projects = dict! #:: dict string Project
 
-  go_to_chapter = chapter_path ->
+  go_to_chapter = self chapter_path ->
 
-  prev_chapter = ->
+  prev_chapter = self ->
 
-  next_chapter = ->
+  next_chapter = self ->

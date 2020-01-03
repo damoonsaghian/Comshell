@@ -5,6 +5,6 @@ gdk = gi.Gdk
 gtk = gi.Gtk
 webkit = gi.WebKit2
 
-WebBrowser =
+WebBrowser = subclass object where
 
 # "https://gitlab.gnome.org/World/eolie"

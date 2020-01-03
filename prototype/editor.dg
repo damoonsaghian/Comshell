@@ -5,17 +5,17 @@ gdk = gi.Gdk
 gtk = gi.Gtk
 geditor = gi.GtkSource
 
-Editor =
-  __init__ = defaults ->
-    @buffer = gditor.Buffer()
-    @view = geditor.View()
+Editor = subclass object where
+  __init__ = self ->
+    self.buffer = gditor.Buffer()
+    self.view = geditor.View()
 
-  prev_page = ->
+  prev_page = self ->
 
-  next_page = ->
+  next_page = self ->
 
-  prev_item = ->
+  prev_item = self ->
 
-  next_item = ->
+  next_item = self ->
 
 # gspell

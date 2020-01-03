@@ -21,4 +21,4 @@ gtk = gi.Gtk
 #   fi
 # done&
 
-FilesTree =
+FilesTree = subclass object where

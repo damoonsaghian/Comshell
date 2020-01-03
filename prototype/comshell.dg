@@ -5,14 +5,14 @@ gdk = gi.Gdk
 gtk = gi.Gtk
 geditor = gi.GtkSource
 
+#:: ProjectsList [str]
 ProjectsList = subclass object where
-  #:: paths: [str]
-  __init__ = paths: [] ~>
-    @paths = defaults.paths
-    @model = gtk.ListStore!
-    @view = gtk.TreeView!
+  __init__ = self paths: [] ->
+    self.paths = defaults.paths
+    self.model = gtk.ListStore!
+    self.view = gtk.TreeView!
 
-  go_to_project = project_path ~>
+  go_to_project = self project_path ->
 
 normal_mode = True
 
@@ -40,9 +40,9 @@ statusbar_info = gtk.Label
   margin_end: 2
   halign: gtk.Align.END
 
-gi.GnomeDesktop.WallClock().on_notify["clock"].connect
-  -> date = glib.DateTime.new_now_local().format "%F %a %p %I:%M"
-    statusbar_info.set_text date
+gi.GnomeDesktop.WallClock().on_notify["clock"].connect $ ->
+  date = glib.DateTime.new_now_local().format "%F %a %p %I:%M"
+  statusbar_info.set_text date
 
 # https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html
 # https://wiki.archlinux.org/index.php/Systemd/Timers
