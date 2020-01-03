@@ -18,6 +18,7 @@
       "one-light-syntax"
     ]
   editor:
+    fontFamily: "Hack"
     preferredLineLength: 100
     showIndentGuide: true
     softWrap: true
