@@ -1,0 +1,21 @@
+gi = import "/gi/repository" pure
+glib = gi.GLib
+gio = gi.Gio
+gdk = gi.Gdk
+gtk = gi.Gtk
+geditor = gi.GtkSource
+
+Editor =
+  __init__ = defaults ->
+    @buffer = gditor.Buffer()
+    @view = geditor.View()
+
+  prev_page = ->
+
+  next_page = ->
+
+  prev_item = ->
+
+  next_item = ->
+
+# gspell

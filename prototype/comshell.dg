@@ -1,0 +1,76 @@
+gi = import "/gi/repository" pure
+glib = gi.GLib
+gio = gi.Gio
+gdk = gi.Gdk
+gtk = gi.Gtk
+geditor = gi.GtkSource
+
+ProjectsList = subclass object where
+  #:: paths: [str]
+  __init__ = paths: [] ~>
+    @paths = defaults.paths
+    @model = gtk.ListStore!
+    @view = gtk.TreeView!
+
+  go_to_project = project_path ~>
+
+normal_mode = True
+
+import "project"
+open_projects = dict! #:: dict str Project
+projects = dict!
+
+main_view = gtk.Stack!
+main_view.set_hexpand True
+main_view.set_vexpand True
+
+# show projects list
+
+statusbar_message = gtk.Label
+  label: ""
+  single_line_mode: True
+  margin_start: 2
+  margin_end: 2
+  halign: gtk.Align.START
+
+statusbar_info = gtk.Label
+  label: ""
+  single_line_mode: True
+  margin_start: 2
+  margin_end: 2
+  halign: gtk.Align.END
+
+gi.GnomeDesktop.WallClock().on_notify["clock"].connect
+  -> date = glib.DateTime.new_now_local().format "%F %a %p %I:%M"
+    statusbar_info.set_text date
+
+# https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html
+# https://wiki.archlinux.org/index.php/Systemd/Timers
+# download updates as scheduled;
+# put "reboot to update" in notifications;
+# before reboot/poweroff install the updates, then delete the notification file;
+
+# this is only for testing;
+view = gi.Webkit2.WebView!
+view.load_uri "http://www.google.com/"
+main_view.add_named view "webview"
+
+# now connect the widgets, through intermidiate containers;
+where
+  statusbar = gtk.Grid
+    orientation: gtk.Orientation.HORIZONTAL
+    statusbar_message
+    statusbar_info
+
+  root_box = gtk.Grid
+    orientation: gtk.Orientation.VERTICAL
+    main_view
+    gtk.Separator(gtk.Orientation.HORIZONTAL)
+    statusbar
+
+  window = gtk.Window childs: [root_box]
+  window.on_destroy.connect gtk.main_quit
+  window.show_all!
+  window.fullscreen!
+
+gtk.main!

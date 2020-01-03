@@ -1,0 +1,10 @@
+gi = import "/gi/repository" pure
+glib = gi.GLib
+gio = gi.Gio
+gdk = gi.Gdk
+gtk = gi.Gtk
+webkit = gi.WebKit2
+
+WebBrowser =
+
+# "https://gitlab.gnome.org/World/eolie"

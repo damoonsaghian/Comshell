@@ -1,0 +1,29 @@
+gi = import "/gi/repository" pure
+glib = gi.GLib
+gio = gi.Gio
+gdk = gi.Gdk
+gtk = gi.Gtk
+
+import "gallery"
+import "editor"
+import "files_tree"
+import "web_browser"
+
+View =
+  __init__ = defaults ->
+  @item = defaults.item # Gallery or Editor
+  @files_tree = defaults.files_tree # FilesTree
+  @floating_layer = gtk.Container!
+
+Project =
+  __init__ = defaults ->
+  self.views :: list View = dict!
+  self.notebook = gtk.NoteBook!
+  self.web_browsers :: dict string WebBrowser = dict!
+  self.external_projects :: dict string Project = dict!
+
+  go_to_chapter = chapter_path ->
+
+  prev_chapter = ->
+
+  next_chapter = ->
