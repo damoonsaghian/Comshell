@@ -38,11 +38,12 @@ the last column is opaque (no read/write is allowed), cause other actors can rea
 
 = Swift
 Pony's approach introduces many complexities;
-so i think it's better to choose a well designed language like Swift, and add these to it:
+Swift is a well designed language; it has an "inout" mechanism,
+  which is equivalent to "ref" and "box" in Pony;
+so we only need to add these:
 , actor: can receive messages
 , iso: can be moved
 , const: immutable data
-
 "https://swift.org/"
 "https://gist.github.com/lattner/31ed37682ef1576b16bca1432ea9f782"
 
