@@ -45,6 +45,10 @@ Actim programming language:
 class: to create actors
 struct: to create immutable data
 
+two backends:
+, compiled to Python (single threaded)
+, LLVM
+
 = type system
 types show us what we can do with the data, ie which operations are valid;
 the class hierarchy design, like the one in Java, is problematic;
@@ -62,7 +66,6 @@ tuple: (1, 2)
 named tuple: (a = 1, b = 2)
 array: [1, 2]
 hash table: ["a" => 1, "b" => 2]
-conditional: 1 if a else { x = 1; x + 1 } if b else 3
 
 actors can contain parameters which can be adjusted gradually, based on received messages;
   this can be used to implement learning capabilities;
