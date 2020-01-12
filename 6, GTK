@@ -1,5 +1,6 @@
 implementing a complete GUI toolkit is a huge lot of work;
-"https://github.com/rhx/SwiftGtk"
+"https://pyos.github.io/dg/"
+"https://pygobject.readthedocs.io/en/latest/"
 
 "https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
 "https://github.com/zim-desktop-wiki/zim-desktop-wiki"
@@ -9,7 +10,7 @@ implementing a complete GUI toolkit is a huge lot of work;
 "https://gitlab.gnome.org/GNOME/pitivi"
 "https://www.archlinux.org/packages/community/any/gaupol/"
 
-; sudo pacman -S \
+; sudo pacman -S dg python-gobject\
   gnome-desktop gvfs gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
 
 poppler-glib goffice goocanvas

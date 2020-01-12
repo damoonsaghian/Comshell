@@ -16,7 +16,6 @@ Rust has other complexities too, like str/String;
 but one serious problem in the design of Rust is that in Rust we can't have field mutability;
   ie in Rust we can't reassign to individual fields when the variable is not reassignable;
 
-= Pony
 another approach to deal with mutable data shared concurrently, is the one used in Pony;
 "https://www.ponylang.io/"
 it doesn't abandon aliasing nor mutability;
@@ -36,20 +35,11 @@ the first column allows mutability, cause other actors can't write;
 the second column needs immutability, cause other actors can read;
 the last column is opaque (no read/write is allowed), cause other actors can read or write;
 
-= Swift
 Pony's approach introduces many complexities;
-Swift is a well designed language; it has an "inout" mechanism,
-  which is equivalent to "ref" and "box" in Pony;
-so we only need to add these:
-, actor: can receive messages
-, iso: can be moved
-, const: immutable data
-"https://swift.org/"
-"https://gist.github.com/lattner/31ed37682ef1576b16bca1432ea9f782"
-
-"https://github.com/apple/swift-numerics"
-"https://github.com/tensorflow/swift"
-"https://github.com/Jounce/Surge"
+in fact we only need two kind of data:
+, immutable data which we can have direct access to it;
+, actors which are mutable but we don't have direct access to it;
+  any access must go through the actor's process itself;
 
 = type system
 types show us what we can do with the data, ie which operations are valid;
