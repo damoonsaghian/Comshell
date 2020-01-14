@@ -1,20 +1,13 @@
 the problem with concurrency is sharing mutable data;
-ie having a mutable reference to some data, while it is shared using other references,
+ie having a mutable reference to some data, while it is shared using other references;
 to prevent sharing mutable data, we can:
 , abandon mutability like in Haskell; but since mutability is necessary in some cases,
-  a complicated mechanism (Monads) is implemented;
+  a complicated mechanism (Monads) must be created;
 , abandon aliasing like in Rust, and copy, move, or borrow instead;
   actually this also allows Rust to eliminate the need for garbage collection;
   but since aliasing is needed in some cases (asynchronous calls),
-    we have to reintroduce aliasing again, adding more complexities;
-
-the absence of garbage collection in Rust may seem interesting at first;
-but in fact those situations which can be borrow checked statically,
-  without the need for complicated lifetimes,
-  can be detected by the compiler without concerning the programmer;
-Rust has other complexities too, like str/String;
-but one serious problem in the design of Rust is that in Rust we can't have field mutability;
-  ie in Rust we can't reassign to individual fields when the variable is not reassignable;
+    we have to reintroduce aliasing (and garbage collection) again;
+  so we end up with more complexities, without achieving anything;
 
 another approach to deal with mutable data shared concurrently, is the one used in Pony;
 "https://www.ponylang.io/"
@@ -35,19 +28,21 @@ the first column allows mutability, cause other actors can't write;
 the second column needs immutability, cause other actors can read;
 the last column is opaque (no read/write is allowed), cause other actors can read or write;
 
-Pony's approach introduces many complexities;
+Pony's approach introduces many complexities, especially when dealing with generics;
 in fact we only need two kind of data:
 , immutable data which we can have direct access to it;
 , actors which are mutable but we don't have direct access to it;
   any access must go through the actor's process itself;
 
-Actim programming language:
-class: to create actors
-struct: to create immutable data
-
+Actim programming language
 two backends:
 , compiled to Python (single threaded)
 , LLVM
+"https://github.com/numba/llvmlite"
+"http://numba.pydata.org/"
+
+class: to create actors
+struct: to create immutable data
 
 = type system
 types show us what we can do with the data, ie which operations are valid;
@@ -56,16 +51,20 @@ the class hierarchy design, like the one in Java, is problematic;
 also the problem of covariance for generic types, has its root in this problem;
   "https://en.wikipedia.org/wiki/Wildcard_(Java)"
 i think this problem is also the motivation for dynamic typing (another bad design);
-the right way as done in Rust, Pony and Swift:
+the right way as done in Rust and Pony:
 , concrete types (like final classes in Java) can be instantiated, but cannot have subtypes;
 , abstract types (like abstract classes in Java) cannot be instantiated, but can have subtypes;
 
-declaration: x: T = 1
-function: { (a: T1, b: T2): T3 => a + b }
+x: T = 1
+there is no variable assignment, only field assignment;
+fn f(a: T1, b: T2): T3 => a + b end
 tuple: (1, 2)
 named tuple: (a = 1, b = 2)
 array: [1, 2]
 hash table: ["a" => 1, "b" => 2]
+class Class'name
+  a: T
+  fn init() => self.a = 1
 
 actors can contain parameters which can be adjusted gradually, based on received messages;
   this can be used to implement learning capabilities;

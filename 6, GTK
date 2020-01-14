@@ -1,6 +1,4 @@
-implementing a complete GUI toolkit is a huge lot of work;
-
-; sudo pacman -S python-gobject\
+; sudo pacman -S python-gobject \
   gnome-desktop gvfs gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
 poppler-glib goffice goocanvas
 "https://pygobject.readthedocs.io/en/latest/"

@@ -10,7 +10,7 @@ disadvantages of synchronous circuits:
 , we have to split long operations into several smaller ones,
   which can be performed in successive clock cycles (a technique known as pipelining);
   otherwise the circuit would be slow and inefficient;
-, distributing a high-fan-out, timing-sensitive clock signal can be complicated;
+, distributing a high'fan'out, timing'sensitive clock signal can be complicated;
 , electromagnetic interference at the clock frequency and its harmonics;
 , widely distributed clock signal takes a lot of power,
   and must run whether the circuit is receiving inputs or not;
@@ -36,7 +36,7 @@ compilers are special programs that generate instruction codes,
 there is always possibility of backdoors for closed source CPU,
   especially if the boot firmware is also closed source;
 recently introduction of "secure execution environment" makes this situation even worse;
-it's a closed source, full_blown, always_running mini operating system,
+it's a closed source, full'blown, always'running mini operating system,
   with full access to the whole system (including memory and network);
 furthermore they have made it practically impossible for users to disable it;
 this mess of a design cries out for hidden and quite sophisticated backdoors;
@@ -45,7 +45,7 @@ this mess of a design cries out for hidden and quite sophisticated backdoors;
 "https://en.wikipedia.org/wiki/Intel_Management_Engine"
 "https://blog.invisiblethings.org/papers/2015/x86_harmful.pdf"
 
-on X86 architecture we can have open source boot_loader, and GPU drivers,
+on X86 architecture we can have open source boot'loader, and GPU drivers,
   using Intel with Coreboot+Grub2 for example;
   "https://www.coreboot.org/GRUB2#Scanning_for_grub.cfg_on_local_hard_drives"
   though there sill will be closed source parts (Intel FSP);
@@ -70,7 +70,7 @@ in theory we can live without a kernel (an idea sometimes called a library opera
 but in that case, we have to rewrite all the required libraries, on bare metal;
 anyway, having an operating system, makes developing and testing new programs much easier;
 
-Linux is a highly developed, constantly evolving, open_source kernel;
+Linux is a highly developed, constantly evolving, open'source kernel;
 in Linux (and other Unix based operating systems) most things appear in the file system;
 i think the reason is to make it possible to do lots of things using shell scripts,
   instead of a proper programming language;
