@@ -29,7 +29,8 @@ for those who neither can use all their fingers, nor can talk,
 , comma followed by "c" followed by space -> : (followed by space)
 , comma followed by "psi" followed by comma -> ψ
 , "a" then two apostrophes -> A
-, two apostrophe then "abc" then space or comma -> ABC (followed by space or comma)
+, two apostrophe then "abc" then space, new'line or comma
+  -> ABC (followed by space, new'line or comma)
 "https://github.com/adereth/dactyl-keyboard"
 "https://ergodox-ez.com/pages/change-it-yourself"
 "https://shop.keyboard.io/"

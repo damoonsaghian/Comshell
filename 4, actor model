@@ -53,10 +53,15 @@ the right way as done in Rust and Pony:
 , concrete types (like final classes in Java) can be instantiated, but cannot have subtypes;
 , abstract types (like abstract classes in Java) cannot be instantiated, but can have subtypes;
 
-programs are made of three kind of blocks:
-, start: where program starts;
+Actim files are made of these:
+, use: to import from other files;
+, primitive: for defining custom primitives;
+, func: a function;
 , struct: which can make immutable data;
 , class: which can make actors;
+, traits and interfaces
+
+primitive Bool 'true 'false
 class Class'name
   a: T
   fn init() =>
@@ -65,7 +70,7 @@ class Class'name
 
 note that there is no variable assignment; assignment is only possible in a method like this:
   self.field'name = value
-closure: fn (a: T1, b: T2): T3 => a + b end
+closure: {(a: T1, b: T2): T3 => a + b}
 tuple: (1, 2)
 named tuple: (a = 1, b = 2)
 array: [1, 2]
