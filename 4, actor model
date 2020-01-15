@@ -37,7 +37,7 @@ in fact we only need two kind of data:
 Actim programming language
 two backends:
 , compiled to Python (single threaded)
-, LLVM
+, compiled to Pony
 "https://github.com/numba/llvmlite"
 "http://numba.pydata.org/"
 
@@ -56,7 +56,8 @@ the right way as done in Rust and Pony:
 , abstract types (like abstract classes in Java) cannot be instantiated, but can have subtypes;
 
 x: T = 1
-there is no variable assignment, only field assignment;
+there is no variable assignment; assignment is possible in a method:
+  self.field'name = value
 fn f(a: T1, b: T2): T3 => a + b end
 tuple: (1, 2)
 named tuple: (a = 1, b = 2)
@@ -65,6 +66,8 @@ hash table: ["a" => 1, "b" => 2]
 class Class'name
   a: T
   fn init() => self.a = 1
+struct
+start
 
 actors can contain parameters which can be adjusted gradually, based on received messages;
   this can be used to implement learning capabilities;
