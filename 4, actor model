@@ -36,13 +36,11 @@ in fact we only need two kind of data:
 
 Actim programming language
 two backends:
-, compiled to Python (single threaded)
-, compiled to Pony
-"https://github.com/numba/llvmlite"
-"http://numba.pydata.org/"
-
-class: to create actors
-struct: to create immutable data
+, compiled to Python: this inevitably will be single threaded,
+  but instead we have access to all available API in Python world;
+, compiled to Pony: its obviously easier than dealing directly LLVM;
+  cause everything (actors, garbage collection ...) is already implemented;
+  and frankly Pony is the only sane language i could find on top of LLVM;
 
 = type system
 types show us what we can do with the data, ie which operations are valid;
@@ -55,19 +53,23 @@ the right way as done in Rust and Pony:
 , concrete types (like final classes in Java) can be instantiated, but cannot have subtypes;
 , abstract types (like abstract classes in Java) cannot be instantiated, but can have subtypes;
 
-x: T = 1
-there is no variable assignment; assignment is possible in a method:
+programs are made of three kind of blocks:
+, start: where program starts;
+, struct: which can make immutable data;
+, class: which can make actors;
+class Class'name
+  a: T
+  fn init() =>
+    x: T = 1
+    self.a = 1
+
+note that there is no variable assignment; assignment is only possible in a method like this:
   self.field'name = value
-fn f(a: T1, b: T2): T3 => a + b end
+closure: fn (a: T1, b: T2): T3 => a + b end
 tuple: (1, 2)
 named tuple: (a = 1, b = 2)
 array: [1, 2]
 hash table: ["a" => 1, "b" => 2]
-class Class'name
-  a: T
-  fn init() => self.a = 1
-struct
-start
 
 actors can contain parameters which can be adjusted gradually, based on received messages;
   this can be used to implement learning capabilities;
