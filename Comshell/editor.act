@@ -1,0 +1,23 @@
+use pkg.gi.repository.Glib as glib
+use pkg.gi.repository.Gio as gio
+use pkg.gi.repository.Gdk as gdk
+use pkg.gi.repository.Gtk as gtk
+use pkg.gi.repository.GtkSource as geditor
+
+class Editor
+  buffer: gditor.Buffer
+  view: geditor.View
+
+  fn init() =>
+    self.buffer = gditor.Buffer()
+    self.view = geditor.View()
+
+  fn prev'page() =>
+
+  fn next'page() =>
+
+  fn prev'item() =>
+
+  fn next'item() =>
+
+# gspell
