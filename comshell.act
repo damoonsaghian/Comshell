@@ -1,0 +1,85 @@
+use pkg.gi.repository.Glib as glib
+use pkg.gi.repository.Gio as gio
+use pkg.gi.repository.Gdk as gdk
+use pkg.gi.repository.Gtk as gtk
+use pkg.gi.repository.GtkSource as geditor
+use project
+
+class ProjectsList
+  paths: String
+  model: gtk.ListStore
+  view: gtk.TreeView
+
+  fn init(paths = []) =>
+    self.paths = paths
+    self.model = gtk.ListStore()
+    self.view = gtk.TreeView()
+
+  fn go_to_project (project_path) =>
+
+class Comshell
+  normal_mode: Bool
+  open'projects: Dict[String, Project]
+  projects: Dict[String, project]
+  main'view: gtk.Stack
+
+  fn init() =>
+    self.normal_mode = 'true
+    self.open'projects = []
+    self.projects = []
+    self.main'view = gtk.Stack(hexpand = 'true, vexpand = 'true)
+
+    self.statusbar'message = gtk.Label(
+      label = "",
+      single'line'mode = 'true,
+      margin'start = 2,
+      margin'end = 2,
+      halign = gtk.Align.START)
+
+    self.statusbar'info = gtk.Label(
+      label = "",
+      single'line'mode = 'true,
+      margin'start = 2,
+      margin'end = 2,
+      halign = gtk.Align.END)
+
+func main() =>
+comshell = Comshell()
+
+# show projects list
+
+pkg.gi.repository.GnomeDesktop.WallClock().connect("notify::clock", fn =>
+  date = glib.DateTime.new'now'local().format("%F %a %p %I:%M")
+  comshell.statusbar'info.set'text(date)
+end)
+
+# "https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
+# "https://wiki.archlinux.org/index.php/Systemd/Timers"
+# download updates as scheduled;
+# put "reboot to update" in notifications;
+# before reboot/poweroff install the updates, then delete the notification;
+
+# this is only for testing;
+view = pkg.gi.repository.Webkit2.WebView()
+view.load'uri("http://www.google.com/")
+comshell.main'view.add'named(view, "webview")
+
+# now connect the widgets, through intermidiate containers;
+do
+  statusbar = gtk.Grid(orientation: gtk.Orientation.HORIZONTAL)
+  statusbar.add(comshell.statusbar'message)
+  statusbar.add(comshell.statusbar'info)
+
+  root'box = gtk.Grid(orientation: gtk.Orientation.VERTICAL)
+  root'box(comshell.main'view)
+  root'box(gtk.Separator(gtk.Orientation.HORIZONTAL))
+  root'box(statusbar)
+
+  window = gtk.Window()
+  window.add(root'box)
+  window.connect("destroy", gtk.main'quit)
+  window.show'all()
+  window.fullscreen()
+end
+
+gtk.main()
