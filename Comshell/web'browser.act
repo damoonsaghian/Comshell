@@ -1,9 +1,0 @@
-use pkg.gi.repository.Glib as glib
-use pkg.gi.repository.Gio as gio
-use pkg.gi.repository.Gdk as gdk
-use pkg.gi.repository.Gtk as gtk
-use pkg.gi.repository.WebKit2 as webkit
-
-class Web'browser
-
-# "https://gitlab.gnome.org/World/eolie"
