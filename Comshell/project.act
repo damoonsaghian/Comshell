@@ -1,36 +1,36 @@
-use pkg.gi.repository.Glib as glib
-use pkg.gi.repository.Gio as gio
-use pkg.gi.repository.Gdk as gdk
-use pkg.gi.repository.Gtk as gtk
-use gallery
-use editor
-use files'tree.FilesTree
-use web'browser.Web'browser
+use .gi.repository.Glib as glib
+use .gi.repository.Gio as gio
+use .gi.repository.Gdk as gdk
+use .gi.repository.Gtk as gtk
+use gallery.'gallery
+use editor.'editor
+use files-tree.'files-tree
+use web-browser.'web-browser
 
-class View
-  item: Gallery | Editor
-  files'tree: FilesTree
-  floating'layer:
+class 'view
+  item: 'gallery | 'editor
+  files-tree: 'files-tree
+  floating-layer:
 
-  fn init(item, files'tree) =>
+  fn init(item, files-tree) =>
     self.item = item
-    self.files'tree = files'tree
-    self.floating'layer = gtk.Container()
+    self.files-tree = files-tree
+    self.floating-layer = gtk.'container()
 
-class Project
-  views: Array[View]
-  notebook: gtk.NoteBook
-  web'browsers: Dict[String, Web'browser]
-  external'projects: Dict[String, Project]
+class 'project
+  views: 'array['view]
+  notebook: gtk.'note-book
+  web-browsers: 'dict['string, 'web-browser]
+  external-projects: 'dict['string, 'project]
 
   fn init() =>
     self.views = []
-    self.notebook = gtk.NoteBook()
-    self.web'browsers = []
-    self.external'projects = []
+    self.notebook = gtk.'note-book()
+    self.web-browsers = []
+    self.external-projects = []
 
-  fn go'to'chapter(chapter'path) =>
+  fn go-to-chapter(chapter-path) =>
 
-  fn prev'chapter() =>
+  fn prev-chapter() =>
 
-  fn next'chapter() =>
+  fn next-chapter() =>

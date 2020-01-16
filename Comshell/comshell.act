@@ -1,57 +1,58 @@
-use pkg.gi.repository.Glib as glib
-use pkg.gi.repository.Gio as gio
-use pkg.gi.repository.Gdk as gdk
-use pkg.gi.repository.Gtk as gtk
-use pkg.gi.repository.GtkSource as geditor
+use .gi.repository.Glib as glib
+use .gi.repository.Gio as gio
+use .gi.repository.Gdk as gdk
+use .gi.repository.Gtk as gtk
+use .gi.repository.GtkSource as geditor
 use project
 
-class ProjectsList
-  paths: String
-  model: gtk.ListStore
-  view: gtk.TreeView
+class 'projects-list
+  paths: 'string
+  model: gtk.'list-store
+  view: gtk.'tree-view
 
   fn init(paths = []) =>
     self.paths = paths
-    self.model = gtk.ListStore()
-    self.view = gtk.TreeView()
+    self.model = gtk.'list-store()
+    self.view = gtk.'tree-view()
 
-  fn go_to_project (project_path) =>
+  fn go-to-project (project-path) =>
 
-class Comshell
-  normal_mode: Bool
-  open'projects: Dict[String, Project]
-  projects: Dict[String, project]
-  main'view: gtk.Stack
+class 'comshell
+  normal-mode: 'bool
+  open-projects: 'dict['string, 'project]
+  projects: 'dict['string, 'project]
+  main-view: gtk.'stack
 
   fn init() =>
-    self.normal_mode = 'true
-    self.open'projects = []
+    self.normal-mode = True
+    self.open-projects = []
     self.projects = []
-    self.main'view = gtk.Stack(hexpand = 'true, vexpand = 'true)
+    self.main-view = gtk.'stack(hexpand = True, vexpand = True)
 
-    self.statusbar'message = gtk.Label(
+    self.statusbar-message = gtk.'label(
       label = "",
-      single'line'mode = 'true,
-      margin'start = 2,
-      margin'end = 2,
-      halign = gtk.Align.START)
+      single-line-mode = True,
+      margin-start = 2,
+      margin-end = 2,
+      halign = gtk.'align.START)
 
-    self.statusbar'info = gtk.Label(
+    self.statusbar-info = gtk.'label(
       label = "",
-      single'line'mode = 'true,
-      margin'start = 2,
-      margin'end = 2,
-      halign = gtk.Align.END)
+      single-line-mode = 'true,
+      margin-start = 2,
+      margin-end = 2,
+      halign = gtk.'align.END)
 
 func main() =>
-comshell = Comshell()
+comshell = 'comshell()
 
 # show projects list
 
-pkg.gi.repository.GnomeDesktop.WallClock().connect("notify::clock", fn =>
-  date = glib.DateTime.new'now'local().format("%F %a %p %I:%M")
-  comshell.statusbar'info.set'text(date)
-end)
+use .gi.repository.Gnome-desktop.'wall-clock
+'wall-clock().connect("notify::clock", { =>
+  date = glib.'date-time.new-now-local().format("%F %a %p %I:%M")
+  comshell.statusbar-info.set-text(date)
+})
 
 # "https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
 # "https://wiki.archlinux.org/index.php/Systemd/Timers"
@@ -60,25 +61,26 @@ end)
 # before reboot/poweroff install the updates, then delete the notification;
 
 # this is only for testing;
-view = pkg.gi.repository.Webkit2.WebView()
-view.load'uri("http://www.google.com/")
-comshell.main'view.add'named(view, "webview")
+use .gi.repository.Webkit2.'web-view
+view = 'web-view()
+view.load-uri("http://www.google.com/")
+comshell.main-view.add-named(view, "webview")
 
-# now connect the widgets, through intermidiate containers;
+# now connect the widgets, through intermediate containers;
 do
-  statusbar = gtk.Grid(orientation: gtk.Orientation.HORIZONTAL)
-  statusbar.add(comshell.statusbar'message)
-  statusbar.add(comshell.statusbar'info)
+  statusbar = gtk.'grid(orientation = gtk.'orientation.HORIZONTAL)
+  statusbar.add(comshell.statusbar-message)
+  statusbar.add(comshell.statusbar-info)
 
-  root'box = gtk.Grid(orientation: gtk.Orientation.VERTICAL)
-  root'box(comshell.main'view)
-  root'box(gtk.Separator(gtk.Orientation.HORIZONTAL))
-  root'box(statusbar)
+  root-box = gtk.'grid(orientation = gtk.'orientation.VERTICAL)
+  root-box(comshell.main-view)
+  root-box(gtk.'separator(gtk.'orientation.HORIZONTAL))
+  root-box(statusbar)
 
-  window = gtk.Window()
-  window.add(root'box)
-  window.connect("destroy", gtk.main'quit)
-  window.show'all()
+  window = gtk.'window()
+  window.add(root-box)
+  window.connect("destroy", gtk.main-quit)
+  window.show-all()
   window.fullscreen()
 end
 
