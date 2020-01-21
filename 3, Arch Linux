@@ -71,3 +71,9 @@ in Chromium settings:
 , enable "use system title bar and borders";
 , enable "continue where you left off";
 , disable "continue running background apps when Chromium is closed";
+
+"https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
+"https://wiki.archlinux.org/index.php/Systemd/Timers"
+download updates as scheduled;
+put "reboot to update" in notifications;
+before reboot/poweroff install the updates, then delete the notification;

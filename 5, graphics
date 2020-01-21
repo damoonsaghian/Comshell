@@ -18,7 +18,7 @@ then these rasterized objects will be drawn in the framebuffer,
 rasterizing 3d objects, produces an array of fragments;
   a fragment, besides color, contains a normal and a depth;
 when creating the pixels of the framebuffer from the fragments,
-  the normals are used for lighting, and the depths are used for z'buffer;
+  the normals are used for lighting, and the depths are used for z_buffer;
 
 graphical objects are of 2 kinds:
 , those which we know will remain unchanged the next time we want to draw to the framebuffer;
@@ -27,8 +27,8 @@ graphical objects are of 2 kinds:
   the next time we want to draw to the framebuffer
     (which happens a lot for animations with high frame rate);
   these objects will be drawn directly to the framebuffer;
-(framebuffer uses double buffering and v'sync;)
-note that if an object just moves in x'y plane (without rotation),
+(framebuffer uses double buffering and v_sync;)
+note that if an object just moves in x_y plane (without rotation),
   the cached rasterization is still useful;
   for 2d objects we simply add a constant to the position of all pixels;
   for 3d objects we may additionally want to recompute the lighting of pixels from fragments;
@@ -47,7 +47,7 @@ data structure for graphical objects:
 "https://www.scratchapixel.com"
 "https://www.scratchapixel.com/lessons/3d-basic-rendering/phong-shader-BRDF"
 
-mono'space fonts:
+mono_space fonts:
   wide characters are forced to squeeze;
   narrow characters are forced to stretch;
   uppercase letters look skinny next to lowercase;
