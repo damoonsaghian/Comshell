@@ -7,6 +7,10 @@ the solution:
 "https://docs.rs/fragile/1.0.0/fragile/struct.Fragile.html"
 "https://docs.rs/send_wrapper/0.4.0/send_wrapper/"
 
+in addition to "Arc" and "Actor", we have "Gactor";
+Gactor embeds a Fragile inside, which will be created in GTK main thread (using "idle_add"),
+  and then pulled out (and put inside the Gactor) using a channel;
+
 "https://gtk-rs.org/docs/gtk/"
 "https://gtk-rs.org/docs/sourceview/"
 "https://mmstick.github.io/gtkrs-tutorials/introduction.html"

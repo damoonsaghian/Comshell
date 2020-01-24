@@ -35,11 +35,11 @@ Pony's approach introduces many complexities, especially when dealing with gener
 
 a better approach is done by Rust;
 Rust has overall a better design too;
-this approach even allows Rust to limit the need for garbage collection,
-  only for asynchronous calls;
+this approach even allows Rust to use reference counting, only when it's necessary;
 
-, immutable data: direct access to it, sendable;
-, mutable data: either direct access and not sendable, or no direct access and sendable;
+, immutable data: direct access to it, sendable (Arc<>);
+, mutable data: either direct access and not sendable,
+  or no direct access and sendable (Actor<>);
 
 static data (functions, structs, constants) which is : no problem, copy or share by reference;
 dynamic data:
