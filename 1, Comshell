@@ -27,8 +27,8 @@ for those who neither can use all their fingers, nor can talk,
 , ";" followed by "(" -> [
 , comma followed by "c" followed by space -> : (followed by space)
 , comma followed by "psi" followed by comma -> ψ
-, "ab_c" then two underscores -> AbC
-, "_ab_c" then two underscores -> _ab_c__
+, "_ab_c" then two underscores -> AbC
+, "__ab_c" then two underscores -> __ab_c__
 "https://github.com/adereth/dactyl-keyboard"
 "https://ergodox-ez.com/pages/change-it-yourself"
 "https://shop.keyboard.io/"

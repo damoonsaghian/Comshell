@@ -2,10 +2,10 @@ implementing a complete GUI toolkit is a huge lot of work;
 existing ones (like GTK) are single threaded, thus we can't create actors from them;
 so although we can access actors from GTK main loop,
   we can't access GTK widgets (and structure containing them), from actors;
-thus we are forced back to traditional single threaded code, without actors;
-in fact there is a trick to access non_send data, in other threads:
-  "https://github.com/Phaiax/gtk-rs-state",
-  but i don't think it's suitable for structuring the whole program;
+the solution:
+"https://gtk-rs.org/docs/glib/source/fn.idle_add.html"
+"https://docs.rs/fragile/1.0.0/fragile/struct.Fragile.html"
+"https://docs.rs/send_wrapper/0.4.0/send_wrapper/"
 
 "https://gtk-rs.org/docs/gtk/"
 "https://gtk-rs.org/docs/sourceview/"
