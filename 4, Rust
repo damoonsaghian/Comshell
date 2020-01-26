@@ -15,26 +15,12 @@ to prevent sharing mutable data, we can abandon mutability like in Haskell;
 
 an approach to deal with mutable data shared concurrently, is the one used in Pony;
 "https://www.ponylang.io/"
-it doesn't abandon aliasing nor mutability;
-instead it controls them using reference capabilities;
-
-                  |        RW         |          R        |        ...        |
--------------------------------------------------------------------------------
-local alias: ...  |        iso        |         ...       |        ...        |
--------------------------------------------------------------------------------
-local alias: R    |        trn        |         val       |        ...        |
--------------------------------------------------------------------------------
-local alias: RW   |        ref        |         box       |        tag        |
--------------------------------------------------------------------------------
-                  | global alias: ... |  global alias: R  | global alias: RW  |
-
-the first column allows mutability, cause other actors can't write;
-the second column needs immutability, cause other actors can read;
-the last column is opaque (no read/write is allowed), cause other actors can read or write;
+it doesn't abandon aliasing nor mutability,
+  instead it controls them using reference capabilities;
 Pony's approach introduces many complexities, especially when dealing with generics;
 
-a better approach is done by Rust, which has overall a better design too;
-Pony_like actors can be done in Rust using "may_actor" crate:
+a better approach is done by Rust, a language which overall has a better design too;
+Pony_like actors can be done in Rust using "may_actor":
 "https://crates.io/crates/may_actor"
 but Rust has it's own genius solution called "async/await",
   which even allows Rust to eliminate the need for garbage collection;
