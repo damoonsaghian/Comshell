@@ -33,13 +33,12 @@ the second column needs immutability, cause other actors can read;
 the last column is opaque (no read/write is allowed), cause other actors can read or write;
 Pony's approach introduces many complexities, especially when dealing with generics;
 
-a better approach is done by Rust;
-Rust has overall a better design too;
-this approach even allows Rust to use reference counting, only when it's necessary;
-
-, immutable data: direct access to it, sendable (Arc<>);
-, mutable data: either direct access and not sendable,
-  or no direct access and sendable (Actor<>);
+a better approach is done by Rust, which has overall a better design too;
+Pony_like actors can be done in Rust using "may_actor" crate:
+"https://crates.io/crates/may_actor"
+but Rust has it's own genius solution called "async/await",
+  which even allows Rust to eliminate the need for garbage collection;
+"https://rust-lang.github.io/async-book/"
 
 static data (functions, structs, constants) which is : no problem, copy or share by reference;
 dynamic data:
@@ -53,10 +52,6 @@ dynamic data:
   or dynamically at runtime, by putting it inside a RefCell
     (or its multi_threaded counterparts: Mutex or RwLock);
   note that if runtime read_write_lock pattern fails, the program will panic;
-
-"&mut" must be used only for the receiver in methods;
-in other places mutability must be controlled using "Rc<RefCell<>>" and actors;
-"https://crates.io/crates/may_actor"
 
 a type is "Copy" if all the data it owns is part of its stack representation;
   in other words if a copy of its stack representation doesn't violate memory safety;
@@ -160,7 +155,3 @@ note that if we put a generic type parameter in the return type of a function,
 
 "https://crates.io/crates/serde"
 "https://github.com/ron-rs/ron"
-
-= machine learning
-actors can contain parameters which can be adjusted gradually, based on received messages;
-  this can be used to implement learning capabilities;
