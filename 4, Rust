@@ -22,11 +22,16 @@ Pony's approach introduces many complexities, especially when dealing with gener
 a better approach is done by Rust, a language which overall has a better design too;
 Pony_like actors can be done in Rust using "may_actor":
 "https://crates.io/crates/may_actor"
-but Rust has it's own genius solution called "async/await",
-  which even allows Rust to eliminate the need for garbage collection;
-"https://rust-lang.github.io/async-book/"
+this approach even allows Rust to limit reference counting,
+  to situations where it's absolutely necessary;
 
-static data (functions, structs, constants) which is : no problem, copy or share by reference;
+, immutable data will be wrapped in "Arc", and we have direct access to it;
+, mutable data will be wrapped in "Actor" and we can access it only through the actor itself;
+
+it's better to use "&mut" only for the receiver in methods;
+and anywhere else use actors to control mutability;
+
+static data (functions, structs, constants): no problem, copy or share by reference;
 dynamic data:
 , if data is small we usually put it on stack;
   so we don't share it across the program, we copy it;
@@ -141,3 +146,7 @@ note that if we put a generic type parameter in the return type of a function,
 
 "https://crates.io/crates/serde"
 "https://github.com/ron-rs/ron"
+
+= machine learning
+actors can contain parameters which can be adjusted gradually, based on received messages;
+  this can be used to implement learning capabilities;

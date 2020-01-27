@@ -8,6 +8,7 @@ license = "Unlicense"
 edition = "2018"
 
 [dependencies]
+may_actor = "0.2.2"
 chrono = "0.4.6"
 gio = { version = "0.7.0", features = ["v2_60"] }
 gdk = { version = "0.11.0", features = ["v3_24"] }
