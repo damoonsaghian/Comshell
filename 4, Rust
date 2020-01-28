@@ -1,29 +1,29 @@
 Rust makes bad programming hard, and good programming fun;
-Rust does not hide (inherent) complexity, in fact it bolds it, so we can see it, and avoid it;
+Rust does not hide inherent complexity, in fact it bolds it, so we can see it, and avoid it;
 by inherent complexity i mean a complexity which can not be abstracted away completely;
   ie if we try to hide it, it will re_emerge somewhere else;
 in fact, hiding inherent complexity usually leads to choosing the wrong approach;
 
 sharing mutable data,
   ie having a mutable reference to some data, while it is shared using other references,
-  is the root of many (inherent) complexities;
+  is the root of many inherent complexities;
 "https://manishearth.github.io/blog/2015/05/17/the-problem-with-shared-mutability/"
-the basic problem with concurrent programming is sharing mutable data;
+the basic problem in concurrent programming is sharing mutable data;
 
 to prevent sharing mutable data, we can abandon mutability like in Haskell;
-  but since mutability is necessary any way, a complicated mechanism (Monads) must be created;
+but since mutability is necessary any way, it introduces a complicated mechanism (Monads);
 
-an approach to deal with mutable data shared concurrently, is the one used in Pony;
+another approach to deal with mutable data shared concurrently, is the one used in Pony;
 "https://www.ponylang.io/"
 it doesn't abandon aliasing nor mutability,
   instead it controls them using reference capabilities;
 Pony's approach introduces many complexities, especially when dealing with generics;
 
 a better approach is done by Rust, a language which overall has a better design too;
-Pony_like actors can be done in Rust using "may_actor":
-"https://crates.io/crates/may_actor"
 this approach even allows Rust to limit reference counting,
   to situations where it's absolutely necessary;
+Pony_like actors can be done in Rust using "may_actor";
+"https://crates.io/crates/may_actor"
 
 , immutable data will be wrapped in "Arc", and we have direct access to it;
 , mutable data will be wrapped in "Actor" and we can access it only through the actor itself;
@@ -37,16 +37,11 @@ dynamic data:
   so we don't share it across the program, we copy it;
 , if data is big we put it on heap and make references to it;
   if data is immutable we just have to manage its lifetime,
-    either statically (using "&"), or dynamically (using "Rc" or "Arc")
+    either statically (using "&"), or dynamically (using "Arc")
   but if data is mutable we have to check if the read_write_lock pattern is fulfilled,
-  either statically (when sharing refs using "&" and "&mut"),
-  or dynamically at runtime, by putting it inside a RefCell
-    (or its multi_threaded counterparts: Mutex or RwLock);
-  note that if runtime read_write_lock pattern fails, the program will panic;
-
-a type is "Copy" if all the data it owns is part of its stack representation;
-  in other words if a copy of its stack representation doesn't violate memory safety;
-"&T" and raw pointers are "Copy", "&mut T" isn't "Copy" (it's "Move");
+    using "&mut" or "Actor";
+  "Mutex" or "RwLock" check read_write_lock pattern at runtime,
+    and make the program to panic, if it's failed;
 
 in Rust any resource have exactly one owner which takes care of its resource deallocation;
 owners can share their data by lending them to references;
@@ -55,7 +50,7 @@ furthermore lifetime of a mutable reference must not overlap with other referenc
 "http://blog.skylight.io/rust-means-never-having-to-close-a-socket/"
 
 owner can:
-, access and mutate resource;
+, access and mutate the resource;
 , lend the resource to a reference;
 , hand over ownership (move), or deallocate resource;
 but during a lend, owner can't:
@@ -64,13 +59,13 @@ but during a lend, owner can't:
 , hand over ownership (move), or deallocate resource;
 and during a mutable lend, owner can't even access the resource;
 
-references (shared references) can:
+immutable (and thus sharable) references can:
 , access borrowed resource;
 , immutably lend resource to other references;
-mutable reference (exclusive reference) can:
+mutable (and thus exclusive) reference can:
 , access and mutate resource;
 , mutably lend resource to another reference;
-  they can immutably lend resource, but then they can mutate it;
+, immutably lend resource, but during this lending, they can't mutate it;
   just like when an owner immutably lends its resource;
 
 during shared borrow (immutable borrow) no one owns the data;
@@ -82,7 +77,7 @@ s: String -> &s: &String -> &s[..]: &str
 v: Vec<T> -> &v: &Vec<T> -> &v[..]: &[T]
 &str and &[T] are slices; str and [T] are unsized types;
 slicing is like borrowing from an unsized type;
-since the the slice contains the size, the lending type itself doesn't need to have a definite size;
+since the slice contains the size, the lending type itself doesn't need to have a definite size;
 
 x = a[i] -> this is possible if the elements of "a" are copy
   (cause moving out of collections is not possible);
@@ -91,7 +86,7 @@ x = a[i..j] -> this is always invalid;
 x = &a[i..j] -> slicing;
 
 auto ref/deref for self in method calls:
-  insert as many * or & as necessary to get it right;
+  compiler inserts as many * or & as necessary to get it right;
 because in method calls name and context of a method call is almost always sufficient
   to infer the move/borrow semantics;
 
@@ -103,10 +98,12 @@ examples:
   &&i32 -> &i32 because &i32: Deref<Target=i32>
   &String -> &str because String: Deref<Target=str>
   &Vec<T> -> &[T] because Vec<T>: Deref<Target=[T]>
+  &Arc<T> -> &T because Arc<T>: Deref<Target=T>
 "https://github.com/rust-lang/rfcs/blob/master/text/0241-deref-conversions.md"
 
 = type system
 types show us what we can do with the data, ie which operations are valid;
+
 the class hierarchy design, like the one in Java, is problematic;
   "http://ptgmedia.pearsoncmg.com/images/020163371x/items/item33.html"
 also the problem of covariance for generic types, has its root in this problem;
