@@ -10,6 +10,11 @@ sharing mutable data,
 "https://manishearth.github.io/blog/2015/05/17/the-problem-with-shared-mutability/"
 the basic problem in concurrent programming is sharing mutable data;
 
+a data race happens when these three behaviors occur:
+, two or more pointers access the same data at the same time;
+, at least one of the pointers is being used to write to the data;
+, there’s no mechanism being used to synchronize access to the data;
+
 to prevent sharing mutable data, we can abandon mutability like in Haskell;
 but since mutability is necessary any way, it introduces a complicated mechanism (Monads);
 

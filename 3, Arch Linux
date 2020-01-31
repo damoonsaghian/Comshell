@@ -1,9 +1,16 @@
 using Arch Linux we can easily setup and maintain a Linux system;
-the following shows how to setup a basic graphical environment,
-  with Atom editor and Chromium browser, which you can toggle in between with "alt-tab";
-also there is a terminal which you can show with "alt-`" and hide with "alt-tab";
-in addition, we can write scripts, to open various graphical applications,
-  each in its own workspace ("alt-space" brings you back to the workspace with Atom editor);
+the following shows how to setup a basic graphical environment, using GnomeShell,
+  with Atom editor and Chromium browser (each in their own workspace),
+  which you can toggle in between with "alt-tab";
+there is a command prompt which you can open with "alt-`";
+there are two kinds of commands:
+, single word commands: go to a workspace with the same name as the command,
+  if there is no open window, run the command;
+  "alt-tab" brings you back to the workspace containing Atom editor;
+, a command containing spaces: run the command and show the output;
+  pressing "alt-tab" closes the prompt, but if the command is still running,
+  it will be visible as an icon in the notification area,
+  and you can bring it back by pressing "alt-`" repeatedly;
 
 boot Arch Linux live environment;
 to ensure the system clock is accurate:
@@ -27,7 +34,7 @@ list available block devices using "lsblk", then on the intended block device,
 ; pacstrap /mnt base
 ; arch-chroot /mnt
 ; export url=https://raw.githubusercontent.com/damoonsaghian/Comshell/master/etc/
-; curl --proto '=https' -sSf -o #1 "$url"{arch-install.sh,sway-config}
+; curl --proto '=https' -sSf -o #1 "$url"{arch-install.sh,extension.js}
 study the downloaded files, and then:
 ; sh arch-install.sh
 ; exit; reboot
@@ -42,8 +49,8 @@ in addition you have to:
 these can make physical attacks more difficult, but not impossible;
 keep in mind that physical access to a computer is root access, given enough time and resources;
 
-after booting into the installed Arch Linux, you will see a blank screen;
-  press "Alt+`" to open a terminal window;
+after booting into the installed Arch Linux, press "Alt+`" to open the command prompt;
+
 to connect to a WIFI network:
 ; nmcli dev wifi
 ; nmcli --ask dev wifi con <ssid>
@@ -59,13 +66,11 @@ to disable WIFI:
 ; gsettings set org.gnome.desktop.interface gtk-theme Materia-light-compact
 ; gsettings set org.gnome.desktop.interface font-name Sans
 
-; sudo pacman -S waybar otf-font-awesome xorg-server-xwayland atom chromium aria2 moc mpv
-
-; mkdir ~/.config/waybar
-; cp etc/waybar-config ~/.config/waybar/config
-; cp etc/waybar-style.css ~/.config/waybar/style.css
+; sudo pacman -S xorg-server-xwayland atom chromium aria2 moc mpv
 
 ; cp etc/atom/* ~/.atom/
+; mkdir -p ~/.config/autostart
+; cp /usr/share/applications/atom.desktop ~/.config/autostart/
 
 in Chromium settings:
 , enable "use system title bar and borders";
@@ -77,3 +82,9 @@ in Chromium settings:
 download updates as scheduled;
 put "reboot to update" in notifications;
 before reboot/poweroff install the updates, then delete the notification;
+
+note that due to a bug, "pkexec" does not work with the fallback Polkit agent,
+  which is the only one available, in Linux console (ie when GnomeShell is not running);
+there is a workaround though (it requires "ctrl+c" to stop):
+; pkttyagent -p $(echo $$) | pkexec ...
+or you can just use "su" instead;
