@@ -1,6 +1,6 @@
 pacman -S grub intel-ucode amd-ucode linux linux-firmware \
   btrfs-progs e2fsprogs dosfstools udisks2 pulseaudio-alsa networkmanager \
-  sudo nano man-db unzip sway sakura materia-gtk-theme ttf-hack noto-fonts
+  nano man-db unzip gdm alacrity gvfs materia-gtk-theme ttf-hack noto-fonts
 
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
 printf '\nset superusers=""\n' >> /etc/grub.d/40_custom
@@ -37,17 +37,6 @@ systemctl enable systemd-timesyncd
 systemctl enable NetworkManager
 
 echo '
-Defaults requiretty
-%wheel ALL=(ALL) ALL
-' >> /etc/sudoers
-
-echo '
-if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
-  sway&
-fi
-' >> /etc/skel/.bash_profile
-
-echo '
 PS1="\[$(tput setab 6)\]\[$(tput setaf 0)\]\w\[$(tput sgr0)\]\[$(tput setaf 6)\]\[$(tput sgr0)\] "
 unset HISTFILE
 alias mount="udisksctl mount -b"
@@ -56,34 +45,20 @@ alias reboot="( swaymsg [title=.] kill; sleep 0.5; systemctl reboot ) & disown"
 alias poweroff="( swaymsg [title=.] kill; sleep 0.5; systemctl poweroff ) & disown"
 ' >> /etc/skel/.bashrc
 
-mkdir -p /etc/skel/.config/sway
-cp sway-config /etc/skel/.config/sway/config
-
-mkdir -p /etc/skel/.config/sakura
-echo '[sakura]
-colorset1_fore=rgb(255,255,255)
-colorset1_back=rgba(55,55,55,0.98)
-colorset1_curs=rgb(255,255,255)
-palette=solarized_light
-font=Monospace 10.5
-blinking_cursor=Yes
-add_tab_accelerator=4
-del_tab_accelerator=4
-search_accelerator=4
-prev_tab_key=Prior
-next_tab_key=Next
-' > /etc/skel/.config/sakura/sakura.conf
+#mkdir -p /etc/skel/.config/alacrity
+#echo '
+#' > /etc/skel/.config/alacrity/alacrity.conf
 
 useradd -m -G wheel user1
 passwd user1
 passwd
 
+systemctl enable gdm
 # automatic login:
-mkdir /etc/systemd/system/getty@tty1.service.d
-echo '[Service]
-ExecStart=
-ExecStart=-/usr/bin/agetty --autologin user1 --noclear %I $TERM
-' > /etc/systemd/system/getty@tty1.service.d/override.conf
+echo '[daemon]
+AutomaticLogin=user1
+AutomaticLoginEnable=True
+' > /etc/gdm/custom.conf
 
 echo '<?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
@@ -114,3 +89,20 @@ echo '<?xml version="1.0"?>
   </alias>
 </fontconfig>
 ' > /etc/fonts/local.conf
+
+#echo "[org/gnome/desktop/interface]
+#gtk-theme = 'Materia-light-compact'
+#font-name = 'Sans'
+#[org/gnome/desktop/screensaver]
+#lock-enabled = 'false'
+#" > /etc/dconf/db/local.d/1
+#dconf update
+
+# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/desktop_migration_and_administration_guide/custom-default-values-system-settings
+# https://wiki.gnome.org/Projects/GnomeShell/Extensions
+# https://wiki.gnome.org/Projects/GnomeShell/Extensions/Writing
+mkdir -p /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
+echo '{
+  "uuid": "gnome-shell-improved"
+}' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/metadata.json
+cp ./extension.js /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
