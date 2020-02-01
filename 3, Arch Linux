@@ -36,17 +36,21 @@ study the downloaded files, and then:
 ; sh arch-install.sh
 ; exit; reboot
 
-the above script sets the "user1" for automatic login;
+after booting into the installed Arch Linux, press "Alt+space" to open a terminal;
+
+you can set "user1" for automatic login:
+; nano /etc/gdm/custom.conf
+  [daemon]
+  AutomaticLogin=user1
+  AutomaticLoginEnable=True
 but to protect the computer from physical attacks, you have to disable automatic login,
   and lock the session when you leave the computer;
 in addition you have to:
 , somehow prevent tampering with hardware;
 , disable boot from USB (and other external ports);
 , protect boot firmware by a password;
-these can make physical attacks more difficult, but not impossible;
-keep in mind that physical access to a computer is root access, given enough time and resources;
-
-after booting into the installed Arch Linux, press "Alt+space" to open a terminal;
+these can make physical attacks more difficult, but keep in mind that
+  physical access to a computer is root access, given enough time and resources;
 
 to connect to a WIFI network:
 ; nmcli dev wifi
