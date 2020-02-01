@@ -2,15 +2,12 @@ using Arch Linux we can easily setup and maintain a Linux system;
 the following shows how to setup a basic graphical environment, using GnomeShell,
   with Atom editor and Chromium browser (each in their own workspace),
   which you can toggle in between with "alt-tab";
-there is a command prompt which you can open with "alt-`";
-there are two kinds of commands:
-, single word commands: go to a workspace with the same name as the command,
-  if there is no open window, run the command;
-  "alt-tab" brings you back to the workspace containing Atom editor;
-, a command containing spaces: run the command and show the output;
-  pressing "alt-tab" closes the prompt, but if the command is still running,
+"alt-space" opens a terminal;
+pressing "alt-tab" closes the terminal, but if the command is still running,
   it will be visible as an icon in the notification area,
-  and you can bring it back by pressing "alt-`" repeatedly;
+  and you can bring it back by pressing "alt-space" repeatedly;
+besides we can write scripts to open graphical applications in their own workspaces;
+"alt-tab" brings you back to the workspace containing Atom editor;
 
 boot Arch Linux live environment;
 to ensure the system clock is accurate:
@@ -49,7 +46,7 @@ in addition you have to:
 these can make physical attacks more difficult, but not impossible;
 keep in mind that physical access to a computer is root access, given enough time and resources;
 
-after booting into the installed Arch Linux, press "Alt+`" to open the command prompt;
+after booting into the installed Arch Linux, press "Alt+space" to open a terminal;
 
 to connect to a WIFI network:
 ; nmcli dev wifi
