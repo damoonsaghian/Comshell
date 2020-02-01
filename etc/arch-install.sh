@@ -1,6 +1,6 @@
 pacman -S grub intel-ucode amd-ucode linux linux-firmware \
   btrfs-progs e2fsprogs dosfstools udisks2 pulseaudio-alsa networkmanager \
-  nano man-db unzip gdm alacrity gvfs materia-gtk-theme ttf-hack noto-fonts
+  nano man-db unzip gdm gvfs materia-gtk-theme ttf-hack noto-fonts
 
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
 printf '\nset superusers=""\n' >> /etc/grub.d/40_custom
@@ -45,20 +45,9 @@ alias reboot="( swaymsg [title=.] kill; sleep 0.5; systemctl reboot ) & disown"
 alias poweroff="( swaymsg [title=.] kill; sleep 0.5; systemctl poweroff ) & disown"
 ' >> /etc/skel/.bashrc
 
-#mkdir -p /etc/skel/.config/alacrity
-#echo '
-#' > /etc/skel/.config/alacrity/alacrity.conf
-
 useradd -m -G wheel user1
 passwd user1
 passwd
-
-systemctl enable gdm
-# automatic login:
-echo '[daemon]
-AutomaticLogin=user1
-AutomaticLoginEnable=True
-' > /etc/gdm/custom.conf
 
 echo '<?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
@@ -99,10 +88,10 @@ echo '<?xml version="1.0"?>
 #dconf update
 
 # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/desktop_migration_and_administration_guide/custom-default-values-system-settings
-# https://wiki.gnome.org/Projects/GnomeShell/Extensions
-# https://wiki.gnome.org/Projects/GnomeShell/Extensions/Writing
 mkdir -p /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
 echo '{
   "uuid": "gnome-shell-improved"
 }' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/metadata.json
 cp ./extension.js /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
+
+systemctl enable gdm
