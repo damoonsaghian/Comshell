@@ -21,4 +21,8 @@ https://github.com/hedayaty/NetSpeed
 https://github.com/Ory0n/Resource_Monitor/
 https://github.com/corecoding/Vitals
 https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet
+https://extensions.gnome.org/extension/1509/drop-down-terminal-x/
+https://extensions.gnome.org/extension/442/drop-down-terminal/
 */
+
+// light-locker-command -l
