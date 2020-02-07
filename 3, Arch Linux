@@ -6,7 +6,7 @@ the following shows how to setup a basic graphical environment, using GnomeShell
 pressing "alt-tab" closes the terminal, but if the command is still running,
   it will be visible as an icon in the notification area,
   and you can bring it back by pressing "alt-space" repeatedly;
-besides we can write scripts to open graphical applications in their own workspaces;
+"alt-`" shows available (graphical) applications, and opens them in their own workspaces;
 "alt-tab" brings you back to the workspace containing Atom editor;
 
 boot Arch Linux live environment;
@@ -19,7 +19,7 @@ if you need to connect to a WIFI network:
   station <device> connect <SSID>
 
 list available block devices using "lsblk", then on the intended block device,
-  create the needed partitions, then format and mount them:
+  create the needed partitions, and finally format and mount them:
 ; printf "label: gpt\n,260MiB,U,*\n;" | sfdisk /dev/<device>
 ; mkfs.fat -F32 /dev/<partition1>; mkfs.btrfs /dev/<partition2>
 ; mount /dev/<partition2> /mnt
@@ -31,28 +31,12 @@ list available block devices using "lsblk", then on the intended block device,
 ; pacstrap /mnt base
 ; arch-chroot /mnt
 ; export url=https://raw.githubusercontent.com/damoonsaghian/Comshell/master/etc/
-; curl --proto '=https' -sSf -o #1 "$url"{arch-install.sh,extension.js}
+; curl --proto '=https' -sSf -o #1 "$url"{arch-install.sh,extension.js,gtk.css}
 study the downloaded files, and then:
 ; sh arch-install.sh
 ; exit; reboot
 
 after booting into the installed Arch Linux, press "Alt+space" to open a terminal;
-
-you can set "user1" for automatic login:
-; nano /etc/lightdm/lightdm.conf
-  [Seat:*]
-  autologin-user=user1
-; groupadd -r autologin
-; gpasswd -a user1 autologin
-and disable lock on suspend by adding "--no-lock-on-suspend" when invoking "light-locker";
-but to protect the computer from physical attacks, you have to disable automatic login,
-  and lock the session when you leave the computer;
-in addition you have to:
-, somehow prevent tampering with hardware;
-, disable boot from USB (and other external ports);
-, protect boot firmware by a password;
-these can make physical attacks more difficult, but keep in mind that
-  physical access to a computer is root access, given enough time and resources;
 
 to connect to a WIFI network:
 ; nmcli dev wifi
@@ -62,29 +46,33 @@ to disconnect from a WIFI network:
 to disable WIFI:
 ; nmcli radio wifi off
 
-; mkdir -p ~/.config/gtk-3.0
-; cp etc/gtk.css ~/.config/gtk-3.0/
-; printf '[Settings]\ngtk-theme-name = Materia-light-compact\ngtk-font-name = Sans' >
-  ~/.config/gtk-3.0/settings.ini
-; gsettings set org.gnome.desktop.interface gtk-theme Materia-light-compact
-; gsettings set org.gnome.desktop.interface font-name Sans
-
 ; sudo pacman -S xorg-server-xwayland atom chromium aria2 moc mpv
-
-; cp etc/atom/* ~/.atom/
-; mkdir -p ~/.config/autostart
-; cp /usr/share/applications/atom.desktop ~/.config/autostart/
 
 in Chromium settings:
 , enable "use system title bar and borders";
 , enable "continue where you left off";
 , disable "continue running background apps when Chromium is closed";
 
-"https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
-"https://wiki.archlinux.org/index.php/Systemd/Timers"
-download updates as scheduled;
-put "reboot to update" in notifications;
-before reboot/poweroff install the updates, then delete the notification;
+; cp etc/atom/* ~/.atom/
+; mkdir -p ~/.config/autostart
+; cp /usr/share/applications/atom.desktop ~/.config/autostart/
+
+you can set "user1" for automatic login:
+; nano /etc/lightdm/lightdm.conf.d/50-myconfig.conf
+  autologin-user=user1
+; groupadd -r autologin
+; gpasswd -a user1 autologin
+and disable lock on suspend and after screensaver:
+; gsettings set apps.light-locker lock-on-suspend false
+; gsettings set apps.light-locker lock-after-screensaver 0
+but to protect the computer from physical attacks, you have to disable automatic login,
+  and lock the session when you leave the computer;
+in addition you have to:
+, somehow prevent tampering with hardware;
+, disable boot from USB (and other external ports);
+, protect boot firmware by a password;
+these can make physical attacks more difficult, but keep in mind that
+  physical access to a computer is root access, given enough time and resources;
 
 note that due to a bug, "pkexec" does not work with the fallback Polkit agent,
   which is the only one available, in Linux console (ie when GnomeShell is not running);

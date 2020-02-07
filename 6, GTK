@@ -16,7 +16,7 @@ Gactor embeds a Fragile inside, which will be created in GTK main thread (using 
 "https://gitlab.gnome.org/GNOME/fractal"
 "https://github.com/fengalin/media-toc"
 
-; sudo pacman -S gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav gvfs
+; sudo pacman -S gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
 
 poppler-glib goffice goocanvas
 
