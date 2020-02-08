@@ -26,3 +26,10 @@ https://extensions.gnome.org/extension/442/drop-down-terminal/
 */
 
 // light-locker-command -l
+
+const main = imports.ui.main;
+
+function enable() {
+  let date_time = new
+  main.panel.addToStatusArea('DateTime', date_time);
+}

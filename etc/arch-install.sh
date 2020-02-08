@@ -28,34 +28,26 @@ Exec = /usr/bin/grub-mkstandalone -O x86_64-efi -o \"/boot/efi/EFI/BOOT/BOOTX64.
 
 # "https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
 # "https://wiki.archlinux.org/index.php/Systemd/Timers"
-# download updates as scheduled;
+# install updates as scheduled;
 # put "reboot to update" in notifications;
-# before reboot/poweroff install the updates, then delete the notification;
-# https://kubic.opensuse.org/blog/2018-04-04-transactionalupdates/
-# https://github.com/openSUSE/transactional-update
 
 systemctl enable systemd-timesyncd
 systemctl enable NetworkManager
-systemctl enable lightdm
 
+systemctl enable lightdm
 mkdir -p /etc/lightdm/lightdm.conf.d/
 echo '
-[Seat:*]
-allow-guest=false
-user-session=gnome
-autologin-session=gnome
+[LightDM]
+sessions-directory=/usr/share/wayland-sessions
 ' > /etc/lightdm/lightdm.conf.d/50-myconfig.conf
-
 mkdir -p /etc/lightdm/lightdm-gtk-greeter.conf.d/
 echo '
 [greeter]
-hide-user-image = true
-panel-position = bottom
-clock-format = %F %a %p %I:%M
-indicators = ~spacer;~power;~clock
+hide-user-image=true
+indicators=
 ' > /etc/lightdm/lightdm-gtk-greeter.conf.d/50-myconfig.conf
-# https://git.launchpad.net/lightdm-gtk-greeter/tree/data/sample-lightdm-gtk-greeter.css
 
+# since Gnome does not use the autostart file provided by "light-locker" package itself:
 mkdir -p /etc/skel/.config/autostart
 echo '[Desktop Entry]
 Type=Application
@@ -64,11 +56,8 @@ Exec=light-locker
 NoDisplay=true
 ' > /etc/skel/.config/autostart/light-locker.desktop
 
-# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/desktop_migration_and_administration_guide/custom-default-values-system-settings
-echo '
-' > /usr/share/glib-2.0/schemas/19_mysettings.gschema.override
-glib-compile-schemas /usr/share/glib-2.0/schemas
-
+# https://help.gnome.org/admin/system-admin-guide/stable/dconf-custom-default-values.html.en
+# https://help.gnome.org/admin/system-admin-guide/stable/dconf-lockdown.html.en
 mkdir -p /etc/dconf/db/local.d/locks
 echo '
 ' > /etc/dconf/db/local.d/locks/00_mylocks
