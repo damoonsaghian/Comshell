@@ -46,7 +46,7 @@ to disconnect from a WIFI network:
 to disable WIFI:
 ; nmcli radio wifi off
 
-; sudo pacman -S xorg-server-xwayland atom chromium aria2 moc mpv
+; pkexec pacman -S xorg-server-xwayland atom chromium aria2 moc mpv
 
 in Chromium settings:
 , enable "use system title bar and borders";
