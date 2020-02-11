@@ -56,17 +56,45 @@ Exec=light-locker
 NoDisplay=true
 ' > /etc/skel/.config/autostart/light-locker.desktop
 
-# https://help.gnome.org/admin/system-admin-guide/stable/dconf-custom-default-values.html.en
-# https://help.gnome.org/admin/system-admin-guide/stable/dconf-lockdown.html.en
+# to customize dconf default values:
+mkdir -p /etc/dconf/profile
+echo 'user-db:user
+system-db:local
+' > /etc/dconf/profile/user
+
+mkdir -p /etc/dconf/db/local.d
+echo "
+[org/gnome/desktop/datetime]
+automatic-timezone=true
+[org.gnome.desktop.interface]
+document-font-name='sans 10.5'
+font-name='sans 10.5'
+monospace-font-name='monospace 10.5'
+gtk-theme='Materia-light-compact'
+overlay-scrolling=false
+[org/gnome/shell]
+disable-user-extensions=true
+disable-extension-version-validation=true
+enabled-extensions=['gnome-shell-improved']
+" > /etc/dconf/db/local.d/00-mykeyfile
 mkdir -p /etc/dconf/db/local.d/locks
 echo '
+/org/gnome/shell/disable-user-extensions
 ' > /etc/dconf/db/local.d/locks/00_mylocks
 dconf update
 
 mkdir -p /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
 echo '{
-  "uuid": "gnome-shell-improved"
+  "uuid": "gnome-shell-improved",
+  "name": "GnomeShellImproved",
+  "description": "GnomeShell improved",
+  "shell-version": []
 }' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/metadata.json
+echo '
+.popup-menu.panel-menu {
+    margin-bottom: 0;
+}
+' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/stylesheet.css
 cp ./extension.js /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
 
 echo '<?xml version="1.0"?>
@@ -98,12 +126,6 @@ echo '<?xml version="1.0"?>
   </alias>
 </fontconfig>
 ' > /etc/fonts/local.conf
-
-echo "[org/gnome/desktop/interface]
-gtk-theme = 'Materia-light-compact'
-font-name = 'Sans'
-" > /etc/dconf/db/local.d/1
-dconf update
 
 mkdir -p /etc/skel/.config/gtk-3.0
 cp ./gtk.css /etc/skel/.config/gtk-3.0/

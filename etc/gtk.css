@@ -12,12 +12,26 @@ scrollbar.top scrollbar.bottom scrollbar.left scrollbar.right {
 }
 
 scrollbar slider {
-  min-width: 2px;
-  min-height: 30px;
   margin: 0px;
   border: 0px;
   border-radius: 0px;
   background-color: #bbbbbb;
+}
+scrollbar.top slider {
+  min-width: 30px;
+  min-height: 2px;
+}
+scrollbar.bottom slider {
+  min-width: 30px;
+  min-height: 2px;
+}
+scrollbar.left slider {
+  min-width: 2px;
+  min-height: 30px;
+}
+scrollbar.right slider {
+  min-width: 2px;
+  min-height: 30px;
 }
 scrollbar slider:hover {
   background-color: #bbbbbb;

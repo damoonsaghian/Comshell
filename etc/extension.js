@@ -1,3 +1,5 @@
+'use strict';
+
 /*
 https://wiki.archlinux.org/index.php/GNOME
 https://wiki.gnome.org/Projects/GnomeShell/CheatSheet
@@ -27,9 +29,38 @@ https://extensions.gnome.org/extension/442/drop-down-terminal/
 
 // light-locker-command -l
 
-const main = imports.ui.main;
+const gio = imports.gi.Gio;
+const st = imports.gi.St;
 
-function enable() {
-  let date_time = new
-  main.panel.addToStatusArea('DateTime', date_time);
+const main = imports.ui.main;
+const panelBox = main.layoutManager.panelBox;
+const meta = imports.gi.Meta;
+
+// remove rounded corners;
+main.panel._leftCorner.actor.set_style("-panel-corner-radius: 0px");
+main.panel._rightCorner.actor.set_style("-panel-corner-radius: 0px");
+
+function movePanelToBottom() {
+  const monitor = main.layoutManager.primaryMonitor;
+  if (this.rightPanelBarrier) {
+    this.rightPanelBarrier.destroy();
+  }
+  this.rightPanelBarrier = new meta.Barrier({
+    display: global.display,
+    x1: monitor.width,
+    x2: monitor.width,
+    y1: monitor.height - panelBox.height,
+    y2: monitor.height,
+    directions: meta.BarrierDirection.NEGATIVE_Y
+  });
+  // TODO: find a way to replace the rightPanelBarrier instead of destroying
+  main.layoutManager._rightPanelBarrier.destroy();
+  panelBox.set_anchor_point(0, (-1)*(monitor.height - panelBox.height));
 }
+main.layoutManager.connect("monitors-changed", movePanelToBottom);
+panelBox.connect("notify::height", movePanelToBottom);
+movePanelToBottom();
+main.panel.actor.add_style_class_name("popup-menu");
+
+let date_time = new st.Label();
+main.panel.addToStatusArea('date_time', date_time);
