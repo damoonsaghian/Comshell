@@ -64,6 +64,8 @@ system-db:local
 
 mkdir -p /etc/dconf/db/local.d
 echo "
+[org.gnome.system.location]
+enabled=true
 [org/gnome/desktop/datetime]
 automatic-timezone=true
 [org.gnome.desktop.wm.preferences]

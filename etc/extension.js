@@ -2,16 +2,9 @@
 
 /*
 https://wiki.gnome.org/Projects/GnomeShell/Extensions/Writing
-https://blog.fpmurphy.com/2011/11/updating-gnome-shell-extensions-to-work-with-gnome-3-2.html
-https://www.bidon.ca/fr/random/2017-02-25-customizing-gnome-shell-3-20
-https://github.com/home-sweet-gnome/dash-to-panel
-https://github.com/KEIII/gnome-shell-panel-date-format
-https://github.com/Daniel-Khodabakhsh/datetime-format
 https://github.com/omid/Persian-Calendar-for-Gnome-Shell
 https://extensions.gnome.org/extension/1010/archlinux-updates-indicator/
-https://developer.gnome.org/shell/stable/
-https://gitlab.gnome.org/GNOME/gnome-shell-extensions/tree/master/extensions/window-list
-https://gitlab.gnome.org/GNOME/gnome-shell-extensions/tree/master/extensions/user-theme
+https://gitlab.gnome.org/GNOME/gnome-shell-extensions/tree/master/extensions
 https://github.com/hedayaty/NetSpeed
 https://github.com/Ory0n/Resource_Monitor/
 https://github.com/corecoding/Vitals
@@ -64,6 +57,24 @@ function init() {
   movePanelToBottom();
   main.panel.actor.add_style_class_name("popup-menu");
 
-  let date_time = new st.Label();
-  main.panel.addToStatusArea('date_time', date_time);
+  // destroy dateMenu and appMenu;
+
+  // date and time
+  dateTime = new St.Label({ y_align: Clutter.ActorAlign.CENTER });
+  const wallClock = new imports.gi.GnomeDesktop.WallClock();
+  wallClock.connect('notify::clock', function() {
+    const
+    dateTime.set_text();
+  });
+  // remove arrow icon;
+  main.ui.panel._indicators.get_children().forEach(child => {
+    if (child.has_style_class_name("popup-menu-arrow"))
+      main.ui.panel._indicators.remove_child(child);
+  });
+  main.ui.panel._indicators.add_child(dateTime);
+
+  // dots in the middle of panel, if there are multiple windows;
+
+  let notifications = new st.Label();
+  main.panel.addToStatusArea('notifications', notifications, 0, 'left');
 }
