@@ -68,14 +68,15 @@ echo "
 enabled=true
 [org/gnome/desktop/datetime]
 automatic-timezone=true
-[org.gnome.desktop.wm.preferences]
+[org/gnome/desktop/wm/preferences]
 button-layout=''
-[org.gnome.desktop.interface]
+[org/gnome/desktop/interface]
 document-font-name='sans 10.5'
 font-name='sans 10.5'
 monospace-font-name='monospace 10.5'
 gtk-theme='Materia-light-compact'
 overlay-scrolling=false
+enable-hot-corners=false
 [org/gnome/shell]
 disable-extension-version-validation=true
 enabled-extensions=['gnome-shell-improved']

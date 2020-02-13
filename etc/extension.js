@@ -1,28 +1,11 @@
 'use strict';
 
-/*
-https://wiki.gnome.org/Projects/GnomeShell/Extensions/Writing
-https://github.com/omid/Persian-Calendar-for-Gnome-Shell
-https://extensions.gnome.org/extension/1010/archlinux-updates-indicator/
-https://gitlab.gnome.org/GNOME/gnome-shell-extensions/tree/master/extensions
-https://github.com/hedayaty/NetSpeed
-https://github.com/Ory0n/Resource_Monitor/
-https://github.com/corecoding/Vitals
-https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet
-https://extensions.gnome.org/extension/1509/drop-down-terminal-x/
-https://extensions.gnome.org/extension/442/drop-down-terminal/
-*/
-
-// light-locker-command -l
-
-const gio = imports.gi.Gio;
-const st = imports.gi.St;
-
 const main = imports.ui.main;
-const panelBox = main.layoutManager.panelBox;
+const st = imports.gi.St;
 const meta = imports.gi.Meta;
 
 function init() {
+  // maximize main windows;
   global.display.connect('window-created', (_display, win) => {
     if (win.can_maximize()) {
       win.maximize(meta.MaximizeFlags.HORIZONTAL | meta.MaximizeFlags.VERTICAL)
@@ -35,6 +18,8 @@ function init() {
   main.panel._leftCorner.actor.set_style("-panel-corner-radius: 0px");
   main.panel._rightCorner.actor.set_style("-panel-corner-radius: 0px");
 
+  // move status_bar to bottom;
+  const panelBox = main.layoutManager.panelBox;
   function movePanelToBottom() {
     const monitor = main.layoutManager.primaryMonitor;
     if (this.rightPanelBarrier) {
@@ -57,10 +42,19 @@ function init() {
   movePanelToBottom();
   main.panel.actor.add_style_class_name("popup-menu");
 
-  // destroy dateMenu and appMenu;
+  // destroy dateMenu, activities and appMenu;
+  main.panel._centerBox.remove_actor(main.panel._dateMenu.actor);
+  main.panel._dateMenu.actor.hide();
+  main.panel.statusArea.dateMenu.actor.hide();
+  main.panel._activitiesButton.actor.hide();
+  main.panel.statusArea.activities.container.hide();
+  main.panel.statusArea.appMenu.actor.hide();
+  main.panel.statusArea.appMenu.actor.connect("show",
+    () => main.panel.statusArea.appMenu.actor.hide()
+  );
 
   // date and time
-  dateTime = new St.Label({ y_align: Clutter.ActorAlign.CENTER });
+  dateTime = new st.Label({ y_align: Clutter.ActorAlign.CENTER });
   const wallClock = new imports.gi.GnomeDesktop.WallClock();
   wallClock.connect('notify::clock', function() {
     const
@@ -77,4 +71,19 @@ function init() {
 
   let notifications = new st.Label();
   main.panel.addToStatusArea('notifications', notifications, 0, 'left');
+
+  // "alt-f1": lock the session using "light-locker-command -l";
 }
+
+/*
+https://wiki.gnome.org/Projects/GnomeShell/Extensions/Writing
+https://github.com/omid/Persian-Calendar-for-Gnome-Shell
+https://extensions.gnome.org/extension/1010/archlinux-updates-indicator/
+https://gitlab.gnome.org/GNOME/gnome-shell-extensions/tree/master/extensions
+https://github.com/hedayaty/NetSpeed
+https://github.com/Ory0n/Resource_Monitor/
+https://github.com/corecoding/Vitals
+https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet
+https://extensions.gnome.org/extension/1509/drop-down-terminal-x/
+https://extensions.gnome.org/extension/442/drop-down-terminal/
+*/
