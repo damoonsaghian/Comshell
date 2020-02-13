@@ -66,6 +66,8 @@ mkdir -p /etc/dconf/db/local.d
 echo "
 [org/gnome/desktop/datetime]
 automatic-timezone=true
+[org.gnome.desktop.wm.preferences]
+button-layout=''
 [org.gnome.desktop.interface]
 document-font-name='sans 10.5'
 font-name='sans 10.5'
@@ -73,14 +75,9 @@ monospace-font-name='monospace 10.5'
 gtk-theme='Materia-light-compact'
 overlay-scrolling=false
 [org/gnome/shell]
-disable-user-extensions=true
 disable-extension-version-validation=true
 enabled-extensions=['gnome-shell-improved']
 " > /etc/dconf/db/local.d/00-mykeyfile
-mkdir -p /etc/dconf/db/local.d/locks
-echo '
-/org/gnome/shell/disable-user-extensions
-' > /etc/dconf/db/local.d/locks/00_mylocks
 dconf update
 
 mkdir -p /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
@@ -96,6 +93,11 @@ echo '
 }
 ' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/stylesheet.css
 cp ./extension.js /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
+
+mkdir -p /etc/skel/.config/gtk-3.0
+cp ./gtk.css /etc/skel/.config/gtk-3.0/
+mkdir -p /etc/skel/.config/gtk-4.0
+cp ./gtk.css /etc/skel/.config/gtk-4.0/
 
 echo '<?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
@@ -126,11 +128,6 @@ echo '<?xml version="1.0"?>
   </alias>
 </fontconfig>
 ' > /etc/fonts/local.conf
-
-mkdir -p /etc/skel/.config/gtk-3.0
-cp ./gtk.css /etc/skel/.config/gtk-3.0/
-mkdir -p /etc/skel/.config/gtk-4.0
-cp ./gtk.css /etc/skel/.config/gtk-4.0/
 
 echo '
 PS1="\[$(tput setab 6)\]\[$(tput setaf 0)\]\w\[$(tput sgr0)\]\[$(tput setaf 6)\]\[$(tput sgr0)\] "
