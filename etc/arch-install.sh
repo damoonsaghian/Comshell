@@ -91,9 +91,6 @@ echo '{
   "shell-version": []
 }' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/metadata.json
 echo '
-.popup-menu.panel-menu {
-    margin-bottom: 0;
-}
 ' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/stylesheet.css
 cp ./extension.js /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
 
