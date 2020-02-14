@@ -68,12 +68,19 @@ function init() {
     aggregateMenu._indicators.add_child(dateTimeIndicator);
   }
 
-  // put messageTray at the left of the status_bar;
-  main.panel.addToStatusArea('notifications', main.messageTray, 0, 'left');
+  // create a notification area, at the left side of the status_bar;
+  // https://developer.gnome.org/gio/stable/GNotification.html
+  // https://wiki.gnome.org/HowDoI/GNotification
+  // https://github.com/Selenium-H/Notification-Center
+  {
+    const notifications = new st.Label({ y_align: Clutter.ActorAlign.CENTER });
+    main.panel.addToStatusArea('notifications', notifications, 0, 'left');
+  }
 
-  // dots in the middle of panel, if there are multiple windows;
+  // little circles in the middle of panel, if there are multiple windows;
 
   // "alt-f1": lock the session using "light-locker-command -l";
+  main.wm.addKeybinding();
 }
 
 /*

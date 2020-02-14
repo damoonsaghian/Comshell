@@ -77,6 +77,8 @@ monospace-font-name='monospace 10.5'
 gtk-theme='Materia-light-compact'
 overlay-scrolling=false
 enable-hot-corners=false
+[org/gnome/desktop/notifications]
+show-banners=false
 [org/gnome/shell]
 disable-extension-version-validation=true
 enabled-extensions=['gnome-shell-improved']
