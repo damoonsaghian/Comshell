@@ -2,10 +2,8 @@ using Arch Linux we can easily setup and maintain a Linux system;
 the following shows how to setup a basic graphical environment, using GnomeShell,
   with Atom editor and Chromium browser (each in their own workspace),
   which you can toggle in between with "alt-tab";
-"alt-space" opens a terminal;
-pressing "alt-tab" closes the terminal, but if the command is still running,
-  it will be visible as an icon in the notification area,
-  and you can bring it back by pressing "alt-space" repeatedly;
+"alt-space" brings up "mc" file manager;
+to open a new terminal window containg "mc", press "alt-space" again;
 "alt-`" shows available (graphical) applications, and opens them in their own workspaces;
 "alt-tab" brings you back to the workspace containing Atom editor;
 
