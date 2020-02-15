@@ -2,6 +2,7 @@
 
 const main = imports.ui.main;
 const st = imports.gi.St;
+const clutter = imports.gi.Clutter;
 const meta = imports.gi.Meta;
 
 function init() {
@@ -18,7 +19,10 @@ function init() {
   main.panel._leftCorner.actor.set_style("-panel-corner-radius: 0px");
   main.panel._rightCorner.actor.set_style("-panel-corner-radius: 0px");
 
-  // move status_bar to bottom;
+  // move notification banners to the bottom;
+  main.messageTray._bannerBin.set_y_align(clutter.ActorAlign.END);
+
+  // move status_bar to the bottom;
   {
     const panelBox = main.layoutManager.panelBox;
     function movePanelToBottom() {
@@ -49,7 +53,7 @@ function init() {
 
   // create a dateTimeIndicator and add it to aggregateMenu;
   {
-    const dateTimeIndicator = new st.Label({ y_align: Clutter.ActorAlign.CENTER });
+    const dateTimeIndicator = new st.Label({ y_align: clutter.ActorAlign.CENTER });
     const DateTime = imports.gi.GLib.DateTime;
     const wallClock = new imports.gi.GnomeDesktop.WallClock();
     wallClock.connect('notify::clock', function() {
@@ -68,14 +72,10 @@ function init() {
     aggregateMenu._indicators.add_child(dateTimeIndicator);
   }
 
-  // create a notification area, at the left side of the status_bar;
-  // https://developer.gnome.org/gio/stable/GNotification.html
-  // https://wiki.gnome.org/HowDoI/GNotification
-  // https://github.com/Selenium-H/Notification-Center
-  {
-    const notifications = new st.Label({ y_align: Clutter.ActorAlign.CENTER });
-    main.panel.addToStatusArea('notifications', notifications, 0, 'left');
-  }
+  // install ArchLinux updates as scheduled;
+  // a red indicator appears to notify the user that for system to update, it needs a reboot;
+
+  // an indicator which shows that there are some removable disks which are mounted;
 
   // little circles in the middle of panel, if there are multiple windows;
 

@@ -5,7 +5,7 @@ printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
 pacman -S grub intel-ucode amd-ucode linux linux-firmware \
   btrfs-progs e2fsprogs dosfstools unzip nano man-db pulseaudio-alsa networkmanager \
   ttf-hack noto-fonts materia-gtk-theme gvfs \
-  lightdm-gtk-greeter xorg-server light-locker gnome-shell
+  lightdm-gtk-greeter xorg-server light-locker gnome-shell alacritty mc
 
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
 printf '\nset superusers=""\n' >> /etc/grub.d/40_custom
@@ -25,11 +25,6 @@ Description = Updating grub
 When = PostTransaction
 Exec = /usr/bin/grub-mkstandalone -O x86_64-efi -o \"/boot/efi/EFI/BOOT/BOOTX64.EFI\" \"boot/grub/grub.cfg=/boot/grub/grub.cfg\"
 ' > /etc/pacman.d/hooks/100-grub.hook
-
-# "https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
-# "https://wiki.archlinux.org/index.php/Systemd/Timers"
-# install updates as scheduled;
-# put "reboot to update" in notifications;
 
 systemctl enable systemd-timesyncd
 systemctl enable NetworkManager
