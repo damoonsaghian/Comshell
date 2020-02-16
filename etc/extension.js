@@ -50,34 +50,48 @@ function init() {
   main.panel.statusArea.activities.destroy();
   main.panel.statusArea.appMenu.destroy();
   main.panel.statusArea.dateMenu.destroy();
+  main.panel.statusArea.dwellClick.destroy();
+  main.panel.statusArea.a11y.destroy();
+  main.panel.statusArea.keyboard.destroy();
+  main.panel.statusArea.aggregateMenu.destroy();
 
-  // create a dateTimeIndicator and add it to aggregateMenu;
+  // right side of status_bar;
   {
+    const rightBox = new st.BoxLayout({ style_class: 'panel-status-indicators-box' });
+    main.panel.addToStatusArea("status_right", rightBox, 0, "right");
+
     const dateTimeIndicator = new st.Label({ y_align: clutter.ActorAlign.CENTER });
-    const DateTime = imports.gi.GLib.DateTime;
     const wallClock = new imports.gi.GnomeDesktop.WallClock();
     wallClock.connect('notify::clock', function() {
-      const now = DateTime.new_now_local();
+      const now = imports.gi.GLib.DateTime.new_now_local();
       const now_formated = now ? now.format("%F %a %p %I:%M") : "";
       dateTimeIndicator.set_text(now_formated);
     });
-
-    const aggregateMenu = main.ui.panel.statusArea.aggregateMenu;
-    // first remove the power and arrow icons;
-    aggregateMenu._indicators.remove_child(aggregateMenu._power);
-    aggregateMenu._indicators.get_children().forEach(child => {
-      if (child.has_style_class_name("popup-menu-arrow"))
-        aggregateMenu._indicators.remove_child(child);
-    });
-    aggregateMenu._indicators.add_child(dateTimeIndicator);
+    rightBox.add_child(dateTimeIndicator);
   }
 
-  // install ArchLinux updates as scheduled;
-  // a red indicator appears to notify the user that for system to update, it needs a reboot;
+  // left side of status_bar;
+  {
+    const leftBox = new st.BoxLayout({ style_class: 'panel-status-indicators-box' });
+    main.panel.addToStatusArea("status_left", leftBox, 0, "left");
 
-  // an indicator which shows that there are some removable disks which are mounted;
+    const status = imports.ui.status;
+    leftBox.add_child(status.network.NMApplet());
+    leftBox.add_child(status.thunderbolt.Indicator());
+    leftBox.add_child(status.remoteAccess.RemoteAccessApplet());
+    leftBox.add_child(status.screencast.Indicator());
+    leftBox.add_child(status.brightness.Indicator());
+    leftBox.add_child(status.volume.Indicator());
 
-  // little circles in the middle of panel, if there are multiple windows;
+    // install ArchLinux updates as scheduled;
+    // a red indicator appears to notify the user that for system to update, it needs a reboot;
+
+    // an indicator which shows that there are some removable disks which are mounted;
+  }
+
+  {
+    // little circles in the center of the panel, if there are multiple windows;
+  }
 
   // "alt-f1": lock the session using "light-locker-command -l";
   main.wm.addKeybinding();
