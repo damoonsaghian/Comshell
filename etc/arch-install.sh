@@ -5,7 +5,7 @@ printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
 pacman -S grub intel-ucode amd-ucode linux linux-firmware \
   btrfs-progs e2fsprogs dosfstools unzip nano man-db pulseaudio-alsa networkmanager \
   ttf-hack noto-fonts materia-gtk-theme gvfs \
-  lightdm-gtk-greeter xorg-server light-locker gnome-shell alacritty mc
+  lightdm-gtk-greeter xorg-server light-locker gnome-shell alacritty
 
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
 printf '\nset superusers=""\n' >> /etc/grub.d/40_custom

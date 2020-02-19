@@ -60,6 +60,17 @@ function init() {
     const rightBox = new st.BoxLayout({ style_class: 'panel-status-indicators-box' });
     main.panel.addToStatusArea("status_right", rightBox, 0, "right");
 
+    // install ArchLinux updates as scheduled;
+    // a red indicator appears to notify the user that for system to update, it needs a reboot;
+
+    // an indicator which shows that there are some removable disks which are mounted;
+
+    const status = imports.ui.status;
+    leftBox.add_child(status.screencast.Indicator());
+    rightBox.add_child(status.location.Indicator());
+    leftBox.add_child(status.remoteAccess.RemoteAccessApplet());
+    leftBox.add_child(status.rfkill.Indicator());
+
     const dateTimeIndicator = new st.Label({ y_align: clutter.ActorAlign.CENTER });
     const wallClock = new imports.gi.GnomeDesktop.WallClock();
     wallClock.connect('notify::clock', function() {
@@ -72,21 +83,26 @@ function init() {
 
   // left side of status_bar;
   {
-    const leftBox = new st.BoxLayout({ style_class: 'panel-status-indicators-box' });
+    const leftBox = new st.BoxLayout({ style_class: "panel-status-indicators-box" });
     main.panel.addToStatusArea("status_left", leftBox, 0, "left");
 
     const status = imports.ui.status;
     leftBox.add_child(status.network.NMApplet());
-    leftBox.add_child(status.thunderbolt.Indicator());
-    leftBox.add_child(status.remoteAccess.RemoteAccessApplet());
-    leftBox.add_child(status.screencast.Indicator());
-    leftBox.add_child(status.brightness.Indicator());
     leftBox.add_child(status.volume.Indicator());
 
-    // install ArchLinux updates as scheduled;
-    // a red indicator appears to notify the user that for system to update, it needs a reboot;
+    const batteryIndicator = status.power.Indicator();
+    // over write "_sync" method, to hide the power icon, if there's no battery;
+    batteryIndicator._sync = function() {
+      status.power.Indicator.prototype._sync.call(this);
+      if (!this._proxy.IsPresent) this.hide();
+    };
+    batteryIndicator._sync();
+    leftBox.add_child(batteryIndicator);
 
-    // an indicator which shows that there are some removable disks which are mounted;
+    // https://github.com/hedayaty/NetSpeed
+    // https://github.com/Ory0n/Resource_Monitor/
+    // https://github.com/corecoding/Vitals
+    // https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet
   }
 
   {
@@ -102,10 +118,4 @@ https://wiki.gnome.org/Projects/GnomeShell/Extensions/Writing
 https://github.com/omid/Persian-Calendar-for-Gnome-Shell
 https://extensions.gnome.org/extension/1010/archlinux-updates-indicator/
 https://gitlab.gnome.org/GNOME/gnome-shell-extensions/tree/master/extensions
-https://github.com/hedayaty/NetSpeed
-https://github.com/Ory0n/Resource_Monitor/
-https://github.com/corecoding/Vitals
-https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet
-https://extensions.gnome.org/extension/1509/drop-down-terminal-x/
-https://extensions.gnome.org/extension/442/drop-down-terminal/
 */
