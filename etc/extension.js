@@ -106,7 +106,12 @@ function init() {
   }
 
   {
-    // little circles in the center of the panel, if there are multiple windows;
+    // little circles in the center of the panel, if there are multiple window_groups;
+    // there is a list of window_groups for each workspace;
+    // when a (main) Atom window or browser window or terminal window appears,
+    //   it will creat a window_group;
+    // when other windows appear, they will be added to
+    //   the head of currently active window_group;
   }
 
   // "alt-f1": lock the session using "light-locker-command -l";
