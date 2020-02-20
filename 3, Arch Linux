@@ -2,9 +2,13 @@ using Arch Linux we can easily setup and maintain a Linux system;
 the following shows how to setup a basic graphical environment, using GnomeShell,
   with Atom editor and a web browser (each in their own workspace),
   which you can toggle in between with "alt-tab";
-press "alt-space" to go to the terminals workspace;
-to open a new terminal window in the terminals workspace, press "alt-space" again;
-"alt-tab" brings you back to the workspace containing Atom editor;
+press "alt-`" to go to the terminals workspace;
+to open a new terminal window in the terminals workspace, press "alt-`" again;
+windows of graphical applications launched from a terminal
+  are made as a child of the terminal window;
+the list of main windows is displayed as little circles in the middle of status_bar;
+  using "alt-space" we can moves between them;
+"alt-tab" always brings you back to the workspace containing Atom editor;
 
 boot Arch Linux live environment;
 to ensure the system clock is accurate:
@@ -33,7 +37,7 @@ study the downloaded files, and then:
 ; sh arch-install.sh
 ; exit; reboot
 
-after booting into the installed Arch Linux, press "alt+space" to open a terminal;
+after booting into the installed Arch Linux, press "alt+`" to open a terminal;
 
 to connect to a WIFI network:
 ; nmcli dev wifi
