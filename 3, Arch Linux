@@ -2,12 +2,12 @@ using Arch Linux we can easily setup and maintain a Linux system;
 the following shows how to setup a basic graphical environment, using GnomeShell,
   with Atom editor and a web browser (each in their own workspace),
   which you can toggle in between with "alt-tab";
-press "alt-`" to go to the terminals workspace;
-to open a new terminal window in the terminals workspace, press "alt-`" again;
+press "alt-`" to go to "terminals" workspace;
+to open a new terminal window in "terminals" workspace, press "alt-`" again;
 windows of graphical applications launched from a terminal
   are made as a child of the terminal window;
-the list of main windows is displayed as little circles in the middle of status_bar;
-  using "alt-space" we can moves between them;
+the list of main windows is displayed as little circles in the middle of the status_bar;
+  using "alt-a" and "alt-s" we can move between them;
 "alt-tab" always brings you back to the workspace containing Atom editor;
 
 boot Arch Linux live environment;
@@ -47,14 +47,7 @@ to disconnect from a WIFI network:
 
 ; pkexec pacman -S xorg-server-xwayland atom chromium aria2 moc mpv
 
-in Chromium settings:
-, enable "use system title bar and borders";
-, enable "continue where you left off";
-, disable "continue running background apps when Chromium is closed";
-
 ; cp etc/atom/* ~/.atom/
-; mkdir -p ~/.config/autostart
-; cp /usr/share/applications/atom.desktop ~/.config/autostart/
 
 you can set "user1" for automatic login:
 ; nano /etc/lightdm/lightdm.conf.d/50-myconfig.conf
