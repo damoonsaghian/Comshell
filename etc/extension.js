@@ -76,6 +76,7 @@ function init() {
     wallClock.connect('notify::clock', function() {
       const now = imports.gi.GLib.DateTime.new_now_local();
       const now_formated = now ? now.format("%F %a %p %I:%M") : "";
+      // https://github.com/omid/Persian-Calendar-for-Gnome-Shell/blob/master/PersianCalendar%40oxygenws.com/PersianDate.js
       dateTimeIndicator.set_text(now_formated);
     });
     rightBox.add_child(dateTimeIndicator);
@@ -106,12 +107,13 @@ function init() {
   }
 
   {
-    // little circles in the center of the panel, if there are multiple window_groups;
-    // there is a list of window_groups for each workspace;
-    // when a (main) Atom window or browser window or terminal window appears,
-    //   it will creat a window_group;
+    // little circles in the center of the panel, if there are multiple windows;
+    // terminals workspace is special;
+    // when a terminal window appears, it will creat a window_group;
     // when other windows appear, they will be added to
     //   the head of currently active window_group;
+
+    // https://gitlab.gnome.org/GNOME/gnome-shell-extensions/tree/master/extensions/window-list
   }
 
   // "alt-f1": lock the session using "light-locker-command -l";
@@ -120,7 +122,6 @@ function init() {
 
 /*
 https://wiki.gnome.org/Projects/GnomeShell/Extensions/Writing
-https://github.com/omid/Persian-Calendar-for-Gnome-Shell
-https://extensions.gnome.org/extension/1010/archlinux-updates-indicator/
+https://gitlab.gnome.org/GNOME/gnome-shell/tree/master/js/ui
 https://gitlab.gnome.org/GNOME/gnome-shell-extensions/tree/master/extensions
 */
