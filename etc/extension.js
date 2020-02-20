@@ -111,14 +111,37 @@ function init() {
     // terminals workspace is special;
     // when a terminal window appears, it will creat a window_group;
     // when other windows appear, they will be added to
-    //   the head of currently active window_group;
+    //   the currently active window_group (at index 0);
 
     // https://gitlab.gnome.org/GNOME/gnome-shell-extensions/tree/master/extensions/window-list
+
+    // list of window_groups in the "terminals" workspace;
+    const winGroupList = [];
+
+    global.display.connect('window-created', (_display, win) => {
+      if (win.get_workspace() == "terminals") {
+        const winGroup = getActiveWinGroup(workspace("terminals"));
+        winGroup.addToStart(win);
+      }
+    });
   }
+
+  // "alt-tab": toggle between "atom" and "browser" workspaces,
+  //   go to "atom" workspace from other workspaces,
+  //   and launch Atom and the browser, if they are not launched already;
+
+  // "alt-'": go to "terminals" workspace,
+  //   and if there is no windows in the "terminals" workspace, open a terminal window;
+  // if we are already inside "terminals" workspace, create a new terminal window;
+
+  // "alt-a"/"alt-s": move to left/right window;
+  // "alt-escape": close window;
 
   // "alt-f1": lock the session using "light-locker-command -l";
   main.wm.addKeybinding();
 }
+
+// go to workspace "atom" and launch Atom editor;
 
 /*
 https://wiki.gnome.org/Projects/GnomeShell/Extensions/Writing
