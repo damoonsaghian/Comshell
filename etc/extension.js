@@ -6,6 +6,10 @@ const clutter = imports.gi.Clutter;
 const meta = imports.gi.Meta;
 
 function init() {
+  main.setThemeStylesheet(
+    "/usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css");
+  main.loadTheme();
+
   // maximize main windows;
   global.display.connect('window-created', (_display, win) => {
     if (win.can_maximize()) {
@@ -14,10 +18,6 @@ function init() {
       win.unmaximize(meta.MaximizeFlags.HORIZONTAL | meta.MaximizeFlags.VERTICAL)
     }
   });
-
-  // remove rounded corners;
-  main.panel._leftCorner.actor.set_style("-panel-corner-radius: 0px");
-  main.panel._rightCorner.actor.set_style("-panel-corner-radius: 0px");
 
   // move notification banners to the bottom;
   main.messageTray._bannerBin.set_y_align(clutter.ActorAlign.END);
@@ -138,6 +138,7 @@ function init() {
   // "alt-escape": close window;
 
   // "alt-f1": lock the session using "light-locker-command -l";
+  // "alt+shift+escape": poweroff/reboot/logout dialog;
   main.wm.addKeybinding();
 }
 

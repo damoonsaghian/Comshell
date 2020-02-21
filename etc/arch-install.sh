@@ -31,13 +31,11 @@ systemctl enable NetworkManager
 
 systemctl enable lightdm
 mkdir -p /etc/lightdm/lightdm.conf.d/
-echo '
-[LightDM]
+echo '[LightDM]
 sessions-directory=/usr/share/wayland-sessions
 ' > /etc/lightdm/lightdm.conf.d/50-myconfig.conf
 mkdir -p /etc/lightdm/lightdm-gtk-greeter.conf.d/
-echo '
-[greeter]
+echo '[greeter]
 hide-user-image=true
 indicators=
 ' > /etc/lightdm/lightdm-gtk-greeter.conf.d/50-myconfig.conf
@@ -58,8 +56,7 @@ system-db:local
 ' > /etc/dconf/profile/user
 
 mkdir -p /etc/dconf/db/local.d
-echo "
-[org/gnome/system/location]
+echo "[org/gnome/system/location]
 enabled=true
 [org/gnome/desktop/datetime]
 automatic-timezone=true
@@ -71,6 +68,7 @@ font-name='sans 10.5'
 monospace-font-name='monospace 10.5'
 gtk-theme='Materia-light-compact'
 overlay-scrolling=false
+cursor-blink-timeout=1000
 enable-hot-corners=false
 [org/gnome/desktop/notifications]
 show-banners=false
@@ -87,8 +85,26 @@ echo '{
   "description": "GnomeShell improved",
   "shell-version": []
 }' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/metadata.json
-echo '
-' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/stylesheet.css
+echo 'stage {
+  font-family: sans;
+  font-size: 10.5pt;
+  font-weight: normal;
+}
+#panel {
+  font-weight: normal;
+  height: 20px;
+  margin-bottom: 0;
+}
+#panel .panel-button {
+  font-weight: normal;
+}
+#panel .panel-corner {
+  -panel-corner-radius: 0;
+  -panel-corner-background-color: transparent;
+  -panel-corner-border-width: 0;
+  -panel-corner-border-color: transparent;
+}
+' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css
 cp ./extension.js /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
 
 mkdir -p /etc/skel/.config/gtk-3.0
