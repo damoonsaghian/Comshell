@@ -1,11 +1,9 @@
-'use strict';
-
 const main = imports.ui.main;
 const st = imports.gi.St;
 const clutter = imports.gi.Clutter;
 const meta = imports.gi.Meta;
 
-function init() {
+function enable() {
   main.setThemeStylesheet(
     "/usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css");
   main.loadTheme();
@@ -38,8 +36,8 @@ function init() {
         y2: monitor.height,
         directions: meta.BarrierDirection.NEGATIVE_Y
       });
-      // TODO: find a way to replace the rightPanelBarrier instead of destroying
-      main.layoutManager._rightPanelBarrier.destroy();
+      if (main.layoutManager._rightPanelBarrier)
+        main.layoutManager._rightPanelBarrier.destroy();
       panelBox.set_anchor_point(0, (-1)*(monitor.height - panelBox.height));
     }
     main.layoutManager.connect("monitors-changed", movePanelToBottom);
@@ -53,45 +51,72 @@ function init() {
   main.panel.statusArea.dwellClick.destroy();
   main.panel.statusArea.a11y.destroy();
   main.panel.statusArea.keyboard.destroy();
-  main.panel.statusArea.aggregateMenu.destroy();
+  main.panel.statusArea.aggregateMenu.container.hide();
 
   // right side of status_bar;
   {
+    const rightButton = new imports.ui.panelMenu.Button(0.0, null, true);
+    main.panel.addToStatusArea("status_right", rightButton, 0, "right");
     const rightBox = new st.BoxLayout({ style_class: 'panel-status-indicators-box' });
-    main.panel.addToStatusArea("status_right", rightBox, 0, "right");
+    rightButton.add_child(rightBox);
 
     // install ArchLinux updates as scheduled;
     // a red indicator appears to notify the user that for system to update, it needs a reboot;
 
     // an indicator which shows that there are some removable disks which are mounted;
 
-    const status = imports.ui.status;
-    leftBox.add_child(status.screencast.Indicator());
-    rightBox.add_child(status.location.Indicator());
-    leftBox.add_child(status.remoteAccess.RemoteAccessApplet());
-    leftBox.add_child(status.rfkill.Indicator());
+    const network = main.panel.statusArea.aggregateMenu._network;
+    network.indicators.remove_actor(network._primaryIndicator);
+    network.indicators.remove_actor(network._vpnIndicator);
+    rightBox.add_child(network._primaryIndicator);
+    rightBox.add_child(network._vpnIndicator);
+    network._vpnIndicator.hide();
+
+    const screencast = main.panel.statusArea.aggregateMenu._screencast;
+    rightBox.add_child(screencast.indicators);
+
+    const location = main.panel.statusArea.aggregateMenu._location;
+    location.indicators.remove_actor(location._indicator);
+    rightBox.add_child(location._indicator);
+    location._indicator.hide();
+
+    const remoteAccess = main.panel.statusArea.aggregateMenu._remoteAccess;
+    remoteAccess.indicators.remove_actor(remoteAccess._indicator);
+    rightBox.add_child(remoteAccess._indicator);
+    remoteAccess._indicator.hide();
+
+    rightBox._rfkill = new status.rfkill.Indicator();
+    rightBox.add_child(rightBox._rfkill);
+    const rfkill = main.panel.statusArea.aggregateMenu._rfkill;
+    rfkill.indicators.remove_actor(rfkill._indicator);
+    rightBox.add_child(rfkill._indicator);
+    rfkill._indicator.hide();
 
     const dateTimeIndicator = new st.Label({ y_align: clutter.ActorAlign.CENTER });
     const wallClock = new imports.gi.GnomeDesktop.WallClock();
-    wallClock.connect('notify::clock', function() {
+    const updateClock = () => {
       const now = imports.gi.GLib.DateTime.new_now_local();
       const now_formated = now ? now.format("%F %a %p %I:%M") : "";
       // https://github.com/omid/Persian-Calendar-for-Gnome-Shell/blob/master/PersianCalendar%40oxygenws.com/PersianDate.js
       dateTimeIndicator.set_text(now_formated);
-    });
+    };
+    updateClock();
+    main.panel.statusArea.dateMenu._clock.connect("notify::clock", updateClock);
     rightBox.add_child(dateTimeIndicator);
   }
 
   // left side of status_bar;
   {
-    const leftBox = new st.BoxLayout({ style_class: "panel-status-indicators-box" });
-    main.panel.addToStatusArea("status_left", leftBox, 0, "left");
+    const leftButton = new imports.ui.panelMenu.Button(0.0, null, true);
+    main.panel.addToStatusArea("status_left", leftButton, 0, "left");
+    const leftBox = new st.BoxLayout({ style_class: 'panel-status-indicators-box' });
+    leftButton.add_child(leftBox);
 
     const status = imports.ui.status;
-    leftBox.add_child(status.network.NMApplet());
-    leftBox.add_child(status.volume.Indicator());
+    leftBox.add_child(new status.network.NMApplet());
+    leftBox.add_child(new status.volume.Indicator());
 
-    const batteryIndicator = status.power.Indicator();
+    const batteryIndicator = new status.power.Indicator();
     // over write "_sync" method, to hide the power icon, if there's no battery;
     batteryIndicator._sync = function() {
       status.power.Indicator.prototype._sync.call(this);

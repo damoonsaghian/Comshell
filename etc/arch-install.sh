@@ -97,6 +97,7 @@ echo 'stage {
 }
 #panel .panel-button {
   font-weight: normal;
+  color: white;
 }
 #panel .panel-corner {
   -panel-corner-radius: 0;
