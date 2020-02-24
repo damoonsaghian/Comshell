@@ -9,13 +9,35 @@ function enable() {
   main.loadTheme();
 
   // maximize main windows;
+  /*
   global.display.connect('window-created', (_display, win) => {
-    if (win.can_maximize()) {
+    if (win.can_maximize() &&
+      win.get_window_type() != (meta.WindowType.DIALOG | meta.WindowType.MODAL_DIALOG))
+    {
       win.maximize(meta.MaximizeFlags.HORIZONTAL | meta.MaximizeFlags.VERTICAL)
     } else {
       win.unmaximize(meta.MaximizeFlags.HORIZONTAL | meta.MaximizeFlags.VERTICAL)
     }
   });
+  */
+
+  // "alt-tab": toggle between "atom" and "browser" workspaces,
+  //   go to "atom" workspace from other workspaces,
+  //   and launch Atom and the browser, if they are not launched already;
+
+  // "alt-'": go to "terminals" workspace,
+  //   and if there is no windows in the "terminals" workspace, open a terminal window;
+  // if we are already inside "terminals" workspace, create a new terminal window;
+
+  // "alt-a"/"alt-s": move to left/right window;
+  // "alt-escape": close window;
+
+  // "alt-f1": lock the session using "light-locker-command -l";
+  // "alt+shift+escape": poweroff/reboot/logout dialog (modalDialog.ModalDialog);
+  // gnome-session-quit --logout --no-prompt
+  // gnome-session-quit --power-off --no-prompt
+  // gnome-session-quit --reboot --no-prompt
+  // main.wm.addKeybinding();
 
   // move notification banners to the bottom;
   main.messageTray._bannerBin.set_y_align(clutter.ActorAlign.END);
@@ -45,6 +67,8 @@ function enable() {
     movePanelToBottom();
   }
 
+  // go to workspace "atom" and launch Atom editor;
+
   main.panel.statusArea.activities.destroy();
   main.panel.statusArea.appMenu.destroy();
   main.panel.statusArea.dateMenu.container.hide();
@@ -57,7 +81,7 @@ function enable() {
   {
     const rightButton = new imports.ui.panelMenu.Button(0.0, null, true);
     main.panel.addToStatusArea("status_right", rightButton, 0, "right");
-    const rightBox = new st.BoxLayout({ style_class: 'panel-status-indicators-box' });
+    const rightBox = new st.BoxLayout({ style_class: "panel-status-indicators-box" });
     rightButton.add_child(rightBox);
 
     // install ArchLinux updates as scheduled;
@@ -96,23 +120,23 @@ function enable() {
     rightBox.add_child(rfkill._indicator);
     rfkill._sync();
 
-    const dateTimeIndicator = new st.Label({ y_align: clutter.ActorAlign.CENTER });
+    const dateTimeLabel = new st.Label({ y_align: clutter.ActorAlign.CENTER });
+    rightBox.add_child(dateTimeLabel);
     const updateClock = () => {
       const now = imports.gi.GLib.DateTime.new_now_local();
       const now_formated = now ? now.format("%F %a %p %I:%M") : "";
       // https://github.com/omid/Persian-Calendar-for-Gnome-Shell/blob/master/PersianCalendar%40oxygenws.com/PersianDate.js
-      dateTimeIndicator.set_text(now_formated);
+      dateTimeLabel.set_text(now_formated);
     };
     updateClock();
     main.panel.statusArea.dateMenu._clock.connect("notify::clock", updateClock);
-    rightBox.add_child(dateTimeIndicator);
   }
 
   // left side of status_bar;
   {
     const leftButton = new imports.ui.panelMenu.Button(0.0, null, true);
     main.panel.addToStatusArea("status_left", leftButton, 0, "left");
-    const leftBox = new st.BoxLayout({ style_class: 'panel-status-indicators-box' });
+    const leftBox = new st.BoxLayout({ style_class: "panel-status-indicators-box" });
     leftButton.add_child(leftBox);
 
     const network = main.panel.statusArea.aggregateMenu._network;
@@ -126,14 +150,17 @@ function enable() {
     leftBox.add_child(volume._primaryIndicator);
 
     const power = main.panel.statusArea.aggregateMenu._power;
-    power.indicators.remove_child(power._primaryIndicator);
+    power.indicators.remove_child(power._indicator);
     power.indicators.remove_child(power._percentageLabel);
-    leftBox.add_child(power._primaryIndicator);
+    leftBox.add_child(power._indicator);
     leftBox.add_child(power._percentageLabel);
     // over_write "_sync" method, to hide the power icon, if there's no battery;
     power._sync = function() {
-      status.power.Indicator.prototype._sync.call(this);
-      if (!this._proxy.IsPresent) this.hide();
+      imports.ui.status.power.Indicator.prototype._sync.call(this);
+      if (!this._proxy.IsPresent) {
+        this._indicator.hide();
+        this._percentageLabel.hide();
+      }
     };
     power._sync();
 
@@ -163,26 +190,7 @@ function enable() {
     });
   }
 
-  // "alt-tab": toggle between "atom" and "browser" workspaces,
-  //   go to "atom" workspace from other workspaces,
-  //   and launch Atom and the browser, if they are not launched already;
-
-  // "alt-'": go to "terminals" workspace,
-  //   and if there is no windows in the "terminals" workspace, open a terminal window;
-  // if we are already inside "terminals" workspace, create a new terminal window;
-
-  // "alt-a"/"alt-s": move to left/right window;
-  // "alt-escape": close window;
-
-  // "alt-f1": lock the session using "light-locker-command -l";
-  // "alt+shift+escape": poweroff/reboot/logout dialog;
-  // gnome-session-quit --logout --no-prompt
-  // gnome-session-quit --power-off --no-prompt
-  // gnome-session-quit --reboot --no-prompt
-  main.wm.addKeybinding();
 }
-
-// go to workspace "atom" and launch Atom editor;
 
 /*
 https://wiki.gnome.org/Projects/GnomeShell/Extensions/Writing

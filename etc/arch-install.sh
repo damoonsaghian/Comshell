@@ -94,10 +94,17 @@ echo 'stage {
   font-weight: normal;
   height: 20px;
   margin-bottom: 0;
+  background-color: #222222;
 }
 #panel .panel-button {
+  -natural-hpadding: 4px;
+  -minimum-hpadding: 4px;
+  font-size: 10pt;
   font-weight: normal;
-  color: white;
+  color: #ffffff;
+}
+#panel .panel-button .system-status-icon {
+  padding: 2px 8px 0 0;
 }
 #panel .panel-corner {
   -panel-corner-radius: 0;
