@@ -47,7 +47,7 @@ function enable() {
 
   main.panel.statusArea.activities.destroy();
   main.panel.statusArea.appMenu.destroy();
-  main.panel.statusArea.dateMenu.destroy();
+  main.panel.statusArea.dateMenu.container.hide();
   main.panel.statusArea.dwellClick.destroy();
   main.panel.statusArea.a11y.destroy();
   main.panel.statusArea.keyboard.destroy();
@@ -65,35 +65,38 @@ function enable() {
 
     // an indicator which shows that there are some removable disks which are mounted;
 
-    const network = main.panel.statusArea.aggregateMenu._network;
-    network.indicators.remove_actor(network._primaryIndicator);
-    network.indicators.remove_actor(network._vpnIndicator);
-    rightBox.add_child(network._primaryIndicator);
-    rightBox.add_child(network._vpnIndicator);
-    network._vpnIndicator.hide();
-
     const screencast = main.panel.statusArea.aggregateMenu._screencast;
-    rightBox.add_child(screencast.indicators);
+    screencast.indicators.remove_child(screencast._indicator);
+    rightBox.add_child(screencast._indicator);
+    screencast._sync();
+    /*
+    // since screencast implementation is simple, an alternative method is:
+    const screencastIcon = new st.Icon({ style_class: "system-status-icon" });
+    rightBox.add_child(screencastIcon);
+    screencastIcon.icon_name = "media-record-symbolic";
+    screencastIcon.add_style_class_name("screencast-indicator");
+    main.screencastService.connect('updated',
+      () => screencastIcon.visible = main.screencastService.isRecording
+    );
+    */
 
     const location = main.panel.statusArea.aggregateMenu._location;
-    location.indicators.remove_actor(location._indicator);
+    location.indicators.remove_child(location._indicator);
     rightBox.add_child(location._indicator);
-    location._indicator.hide();
+    location._syncIndicator();
 
     const remoteAccess = main.panel.statusArea.aggregateMenu._remoteAccess;
-    remoteAccess.indicators.remove_actor(remoteAccess._indicator);
+    remoteAccess._ensureControls();
+    remoteAccess.indicators.remove_child(remoteAccess._indicator);
     rightBox.add_child(remoteAccess._indicator);
-    remoteAccess._indicator.hide();
+    remoteAccess._sync();
 
-    rightBox._rfkill = new status.rfkill.Indicator();
-    rightBox.add_child(rightBox._rfkill);
     const rfkill = main.panel.statusArea.aggregateMenu._rfkill;
-    rfkill.indicators.remove_actor(rfkill._indicator);
+    rfkill.indicators.remove_child(rfkill._indicator);
     rightBox.add_child(rfkill._indicator);
-    rfkill._indicator.hide();
+    rfkill._sync();
 
     const dateTimeIndicator = new st.Label({ y_align: clutter.ActorAlign.CENTER });
-    const wallClock = new imports.gi.GnomeDesktop.WallClock();
     const updateClock = () => {
       const now = imports.gi.GLib.DateTime.new_now_local();
       const now_formated = now ? now.format("%F %a %p %I:%M") : "";
@@ -112,18 +115,27 @@ function enable() {
     const leftBox = new st.BoxLayout({ style_class: 'panel-status-indicators-box' });
     leftButton.add_child(leftBox);
 
-    const status = imports.ui.status;
-    leftBox.add_child(new status.network.NMApplet());
-    leftBox.add_child(new status.volume.Indicator());
+    const network = main.panel.statusArea.aggregateMenu._network;
+    network.indicators.remove_child(network._primaryIndicator);
+    network.indicators.remove_child(network._vpnIndicator);
+    leftBox.add_child(network._primaryIndicator);
+    leftBox.add_child(network._vpnIndicator);
 
-    const batteryIndicator = new status.power.Indicator();
-    // over write "_sync" method, to hide the power icon, if there's no battery;
-    batteryIndicator._sync = function() {
+    const volume = main.panel.statusArea.aggregateMenu._volume;
+    volume.indicators.remove_child(volume._primaryIndicator);
+    leftBox.add_child(volume._primaryIndicator);
+
+    const power = main.panel.statusArea.aggregateMenu._power;
+    power.indicators.remove_child(power._primaryIndicator);
+    power.indicators.remove_child(power._percentageLabel);
+    leftBox.add_child(power._primaryIndicator);
+    leftBox.add_child(power._percentageLabel);
+    // over_write "_sync" method, to hide the power icon, if there's no battery;
+    power._sync = function() {
       status.power.Indicator.prototype._sync.call(this);
       if (!this._proxy.IsPresent) this.hide();
     };
-    batteryIndicator._sync();
-    leftBox.add_child(batteryIndicator);
+    power._sync();
 
     // https://github.com/hedayaty/NetSpeed
     // https://github.com/Ory0n/Resource_Monitor/
@@ -164,6 +176,9 @@ function enable() {
 
   // "alt-f1": lock the session using "light-locker-command -l";
   // "alt+shift+escape": poweroff/reboot/logout dialog;
+  // gnome-session-quit --logout --no-prompt
+  // gnome-session-quit --power-off --no-prompt
+  // gnome-session-quit --reboot --no-prompt
   main.wm.addKeybinding();
 }
 
