@@ -91,20 +91,21 @@ echo 'stage {
   font-weight: normal;
 }
 #panel {
-  font-weight: normal;
-  height: 20px;
+  height: 16px;
   margin-bottom: 0;
   background-color: #222222;
 }
 #panel .panel-button {
   -natural-hpadding: 4px;
   -minimum-hpadding: 4px;
-  font-size: 10pt;
+  padding: 0px 4px 0px 4px;
+  font-family: monospace;
+  font-size: 10.5pt;
   font-weight: normal;
   color: #ffffff;
 }
 #panel .panel-button .system-status-icon {
-  padding: 2px 8px 0 0;
+  padding: 0px 8px 0 0;
 }
 #panel .panel-corner {
   -panel-corner-radius: 0;
