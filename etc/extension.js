@@ -9,7 +9,10 @@ main.setThemeStylesheet(
 main.loadTheme();
 
 // move notification banners to the bottom;
-main.messageTray._bannerBin.set_y_align(clutter.ActorAlign.END);
+{
+  const bannerBin = main.messageTray._bannerBin;
+  if (bannerBin) bannerBin.set_y_align(clutter.ActorAlign.END);
+}
 
 // move status_bar to the bottom;
 {
@@ -27,8 +30,8 @@ main.messageTray._bannerBin.set_y_align(clutter.ActorAlign.END);
       y2: monitor.height,
       directions: meta.BarrierDirection.NEGATIVE_Y
     });
-    if (main.layoutManager._rightPanelBarrier)
-      main.layoutManager._rightPanelBarrier.destroy();
+    const rightPanelBarrier = main.layoutManager._rightPanelBarrier;
+    if (rightPanelBarrier) rightPanelBarrier.destroy();
     panelBox.set_anchor_point(0, (-1)*(monitor.height - panelBox.height));
   }
   main.layoutManager.connect("monitors-changed", movePanelToBottom);
@@ -40,8 +43,6 @@ main.panel.statusArea.activities.destroy();
 main.panel.statusArea.appMenu.destroy();
 main.panel.statusArea.dateMenu.container.hide();
 main.panel.statusArea.aggregateMenu.container.hide();
-
-// go to workspace "atom" and launch Atom editor;
 
 // maximize main windows;
 /*
@@ -56,39 +57,19 @@ global.display.connect('window-created', (_display, win) => {
 });
 */
 
-// "alt-tab": toggle between "atom" and "browser" workspaces,
-//   go to "atom" workspace from other workspaces,
-//   and launch Atom and the browser, if they are not launched already;
-// "alt-'": go to "terminals" workspace,
-//   and if there is no windows in the "terminals" workspace, open a terminal window;
-// if we are already inside "terminals" workspace, create a new terminal window;
-// "alt-a"/"alt-s": move to left/right window;
+// "alt-shift-m": maximize window;
+
 // "alt-escape": close window;
 
 // "alt-f1": lock the session using "light-locker-command -l";
+
 // "alt+shift+escape": poweroff/reboot/logout dialog (modalDialog.ModalDialog);
 // gnome-session-quit --logout --no-prompt
 // gnome-session-quit --power-off --no-prompt
 // gnome-session-quit --reboot --no-prompt
 // main.wm.addKeybinding();
 
-{
-  // little circles in the center of the panel, if there are multiple windows;
-  // terminals workspace is special;
-  // when a terminal window appears, it will creat a window_group;
-  // when other windows appear, they will be added to
-  //   the currently active window_group (at index 0);
-  // https://gitlab.gnome.org/GNOME/gnome-shell-extensions/tree/master/extensions/window-list
-  // list of window_groups in the "terminals" workspace;
-  const winGroupList = [];
-
-  global.display.connect('window-created', (_display, win) => {
-    if (win.get_workspace() == "terminals") {
-      const winGroup = getActiveWinGroup(workspace("terminals"));
-      winGroup.addToStart(win);
-    }
-  });
-}
+// "alt-space": show the list of applications;
 
 // right side of status_bar;
 {
@@ -99,8 +80,6 @@ global.display.connect('window-created', (_display, win) => {
 
   // install ArchLinux updates as scheduled;
   // a red indicator appears to notify the user that for system to update, it needs a reboot;
-
-  // an indicator which shows that there are some removable disks which are mounted;
 
   const screencast = main.panel.statusArea.aggregateMenu._screencast;
   if (screencast && screencast._indicator) {
@@ -134,7 +113,7 @@ global.display.connect('window-created', (_display, win) => {
     remoteAccess._sync();
   }
 
-  const dateTimeLabel = new st.Label({ y_align: clutter.ActorAlign.CENTER });
+  const dateTimeLabel = new st.Label({ y_align: clutter.ActorAlign.END });
   rightBox.add_child(dateTimeLabel);
   const updateClock = () => {
     const now = imports.gi.GLib.DateTime.new_now_local();

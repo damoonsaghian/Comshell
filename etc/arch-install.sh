@@ -4,8 +4,8 @@ printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
 
 pacman -S grub intel-ucode amd-ucode linux linux-firmware \
   btrfs-progs e2fsprogs dosfstools unzip nano man-db pulseaudio-alsa networkmanager \
-  ttf-hack noto-fonts materia-gtk-theme gvfs \
-  lightdm-gtk-greeter xorg-server light-locker gnome-shell alacritty
+  ttf-hack noto-fonts materia-gtk-theme \
+  lightdm-gtk-greeter xorg-server light-locker xorg-server-xwayland gnome-shell sakura
 
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
 printf '\nset superusers=""\n' >> /etc/grub.d/40_custom
@@ -91,14 +91,14 @@ echo 'stage {
   font-weight: normal;
 }
 #panel {
-  height: 16px;
+  height: 18px;
   margin-bottom: 0;
   background-color: #222222;
 }
 #panel .panel-button {
   -natural-hpadding: 4px;
   -minimum-hpadding: 4px;
-  padding: 0px 4px 0px 4px;
+  margin: 1px 0px 0px 0px;
   font-family: monospace;
   font-size: 10.5pt;
   font-weight: normal;
@@ -106,12 +106,6 @@ echo 'stage {
 }
 #panel .panel-button .system-status-icon {
   padding: 0px 8px 0 0;
-}
-#panel .panel-corner {
-  -panel-corner-radius: 0;
-  -panel-corner-background-color: transparent;
-  -panel-corner-border-width: 0;
-  -panel-corner-border-color: transparent;
 }
 ' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css
 cp ./extension.js /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
@@ -150,6 +144,21 @@ echo '<?xml version="1.0"?>
   </alias>
 </fontconfig>
 ' > /etc/fonts/local.conf
+
+mkdir -p /etc/skel/.config/sakura
+echo '[sakura]
+colorset1_fore=rgb(255,255,255)
+colorset1_back=rgb(55,55,55)
+colorset1_curs=rgb(255,255,255)
+palette=solarized_light
+font=Monospace 10.5
+blinking_cursor=Yes
+add_tab_accelerator=4
+del_tab_accelerator=4
+search_accelerator=4
+prev_tab_key=Prior
+next_tab_key=Next
+' > /etc/skel/.config/sakura/sakura.conf
 
 echo '
 PS1="\[$(tput setab 6)\]\[$(tput setaf 0)\]\w\[$(tput sgr0)\]\[$(tput setaf 6)\]\[$(tput sgr0)\] "
