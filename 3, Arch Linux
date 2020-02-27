@@ -1,14 +1,7 @@
 using Arch Linux we can easily setup and maintain a Linux system;
-the following shows how to setup a basic graphical environment, using GnomeShell,
-  with Atom editor and a web browser (each in their own workspace),
-  which you can toggle in between with "alt-tab";
-press "alt-`" to go to "terminals" workspace;
-to open a new terminal window in "terminals" workspace, press "alt-`" again;
-windows of graphical applications launched from a terminal
-  are made as a child of the terminal window;
-the list of main windows is displayed as little circles in the middle of the status_bar;
-  using "alt-a" and "alt-s" we can move between them;
-"alt-tab" always brings you back to the workspace containing Atom editor;
+the following shows how to setup a basic graphical environment, using GnomeShell;
+press "alt-space" to show the list of applications;
+the only application installed by default would be a terminal emulator;
 
 boot Arch Linux live environment;
 to ensure the system clock is accurate:
@@ -37,7 +30,7 @@ study the downloaded files, and then:
 ; sh arch-install.sh
 ; exit; reboot
 
-after booting into the installed Arch Linux, press "alt+`" to open a terminal;
+after booting into the installed Arch Linux, press "alt-space" and launch the terminal;
 
 to connect to a WIFI network:
 ; nmcli dev wifi
@@ -45,18 +38,13 @@ to connect to a WIFI network:
 to disconnect from a WIFI network:
 ; nmcli con down id <ssid>
 
-; pkexec pacman -S xorg-server-xwayland atom chromium aria2 moc mpv
-
-; cp etc/atom/* ~/.atom/
-
 you can set "user1" for automatic login:
-; nano /etc/lightdm/lightdm.conf.d/50-myconfig.conf
+; pkexec nano /etc/lightdm/lightdm.conf.d/50-myconfig.conf
   autologin-user=user1
-; groupadd -r autologin
-; gpasswd -a user1 autologin
-and disable lock on suspend and after screensaver:
-; gsettings set apps.light-locker lock-on-suspend false
-; gsettings set apps.light-locker lock-after-screensaver 0
+; pkexec groupadd -r autologin
+; pkexec gpasswd -a user1 autologin
+and remove the locker:
+; rm ~/.config/autostart/light-locker.desktop
 but to protect the computer from physical attacks, you have to disable automatic login,
   and lock the session when you leave the computer;
 in addition you have to:
