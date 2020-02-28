@@ -1,0 +1,61 @@
+using Arch Linux we can easily setup and maintain a Linux system;
+the following shows how to setup a basic graphical environment, using GnomeShell;
+press "alt-space" to show the list of applications;
+the only application installed by default would be a terminal emulator;
+
+boot Arch Linux live environment;
+to ensure the system clock is accurate:
+; timedatectl set-ntp true
+if you need to connect to a WIFI network:
+; iwctl
+  device list
+  station <device> get-networks
+  station <device> connect <SSID>
+
+list available block devices using "lsblk", then on the intended block device,
+  create the needed partitions, and finally format and mount them:
+; printf "label: gpt\n,260MiB,U,*\n;" | sfdisk /dev/<device>
+; mkfs.fat -F32 /dev/<partition1>; mkfs.btrfs /dev/<partition2>
+; mount /dev/<partition2> /mnt
+; mkdir -p /mnt/boot/efi
+; mount /dev/<partition1> /mnt/boot/efi
+; mkdir /mnt/etc
+; genfstab -U /mnt >> /mnt/etc/fstab
+
+; pacstrap /mnt base
+; arch-chroot /mnt
+; export url=https://raw.githubusercontent.com/damoonsaghian/Comshell/master/ArchLinux/
+; curl --proto '=https' -sSf -o #1 "$url"{arch.sh,extension.js,gtk.css}
+study the downloaded files, and then:
+; sh arch.sh
+; exit; reboot
+
+after booting into the installed Arch Linux, press "alt-space" and launch the terminal;
+
+to connect to a WIFI network:
+; nmcli dev wifi
+; nmcli --ask dev wifi con <ssid>
+to disconnect from a WIFI network:
+; nmcli con down id <ssid>
+
+you can set "user1" for automatic login:
+; pkexec nano /etc/lightdm/lightdm.conf.d/50-myconfig.conf
+  autologin-user=user1
+; pkexec groupadd -r autologin
+; pkexec gpasswd -a user1 autologin
+and remove the locker:
+; rm ~/.config/autostart/light-locker.desktop
+but to protect the computer from physical attacks, you have to disable automatic login,
+  and lock the session when you leave the computer;
+in addition you have to:
+, somehow prevent tampering with hardware;
+, disable boot from USB (and other external ports);
+, protect boot firmware by a password;
+these can make physical attacks more difficult, but keep in mind that
+  physical access to a computer is root access, given enough time and resources;
+
+note that due to a bug, "pkexec" does not work with the fallback Polkit agent,
+  which is the only one available, in Linux console (ie when GnomeShell is not running);
+there is a workaround though (it requires "ctrl+c" to stop):
+; pkttyagent -p $(echo $$) | pkexec ...
+or you can just use "su" instead;

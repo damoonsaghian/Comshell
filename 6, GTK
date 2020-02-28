@@ -31,7 +31,7 @@ poppler-glib goffice goocanvas
 "https://www.archlinux.org/packages/community/any/lollypop/"
 "https://www.archlinux.org/packages/community/any/gaupol/"
 
-; pkexec cp comshell /usr/local/bin
+; pkexec cp comshell /usr/local/bin/
 
 ; printf '[Desktop Entry]\nType=Application\nName=Comshell\nExec=comshell\nStartupNotify=true' >
   ~/.config/autostart/Comshell.desktop
