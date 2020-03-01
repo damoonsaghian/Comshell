@@ -61,8 +61,8 @@ enabled=true
 [org/gnome/desktop/datetime]
 automatic-timezone=true
 [org/gnome/desktop/background]
-primary-color='#555555'
-secondary-color='#555555'
+primary-color='#222222'
+secondary-color='#222222'
 [org/gnome/desktop/interface]
 document-font-name='sans 10.5'
 font-name='sans 10.5'

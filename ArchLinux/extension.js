@@ -136,6 +136,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
   }
 
   // https://github.com/hedayaty/NetSpeed
+  // net usage
 
   const rfkillIcon = new st.Icon({ style_class: "system-status-icon" });
   leftBox.add_child(rfkillIcon);
