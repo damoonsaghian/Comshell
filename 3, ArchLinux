@@ -30,8 +30,6 @@ study the downloaded files, and then:
 ; sh arch.sh
 ; exit; reboot
 
-after booting into the installed Arch Linux, press "alt-space" and launch the terminal;
-
 to connect to a WIFI network:
 ; nmcli dev wifi
 ; nmcli --ask dev wifi con <ssid>
@@ -59,3 +57,37 @@ note that due to a bug, "pkexec" does not work with the fallback Polkit agent,
 there is a workaround though (it requires "ctrl+c" to stop):
 ; pkttyagent -p $(echo $$) | pkexec ...
 or you can just use "su" instead;
+
+= extra applications
+; pkexec pacman -S atom chromium
+; cp etc/atom/* ~/.atom/
+when Atom editor and Chromium browser is installed on the system (and Comshell is not),
+  Atom editor will be launched at startup,
+  and you can switch between Atom and Chromium, using "alt-tab";
+also "alt-tab" on other applications raises Atom editor;
+
+; pkexec pacman -S dolphin ffmpegthumbs mpv pragha
+
+Dolphin:
+general -> previews -> disable "folders", enable "video files"
+confirmations -> enable "move to trash", disable "closing multiple tabs"
+status bar -> disable "zoombar"
+navigation -> open archives
+disable toolbar; hide unnecessary items in the sidebar;
+empty "~/.local/share/RecentDocuments" and make it read_only;
+Ctrl+Up, Ctrl+Enter, Ctrl+r
+
+mpv: when changing file, select it in Dolphin;
+"https://mpv.io/manual/stable/"
+"https://github.com/mpv-player/mpv/wiki/User-Scripts"
+"https://github.com/VideoPlayerCode/mpv-tools/"
+"https://github.com/occivink/mpv-scripts"
+"https://github.com/jonniek/mpv-nextfile"
+"https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua"
+"https://github.com/occivink/mpv-image-viewer"
+"https://gist.github.com/haasn/7919afd765e308fa91cbe19a64631d0f"
+"https://gitlab.com/lvml/mpv-plugin-excerpt"
+"https://github.com/TheAMM/mpv_crop_script"
+"https://gist.github.com/Zehkul/25ea7ae77b30af959be0"
+"https://github.com/rossy/mpv-repl"
+image and video editor;
