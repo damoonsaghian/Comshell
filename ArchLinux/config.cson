@@ -1,0 +1,31 @@
+"*":
+  "bracket-matcher":
+    autocompleteBrackets: false
+  core:
+    autoHideMenuBar: true
+    disabledPackages: [
+      "encoding-selector"
+      "grammar-selector"
+      "line-ending-selector"
+      "welcome"
+      "status-bar"
+    ]
+    ignoredNames: [
+      ".*"
+    ]
+    openEmptyEditorOnStart: false
+    telemetryConsent: "no"
+    themes: [
+      "one-light-ui"
+      "one-light-syntax"
+    ]
+  editor:
+    fontFamily: "Hack"
+    preferredLineLength: 100
+    showIndentGuide: true
+    softWrap: true
+    softWrapAtPreferredLineLength: true
+    softWrapHangingIndent: 2
+  "tree-view":
+    hideIgnoredNames: true
+    sortFoldersBeforeFiles: false
