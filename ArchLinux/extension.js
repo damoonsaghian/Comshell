@@ -8,6 +8,32 @@ main.setThemeStylesheet(
   "/usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css");
 main.loadTheme();
 
+{
+  const overview = main.overview;
+  const viewSelector = overview.viewSelector;
+  // hide "frequent/all" buttons;
+  viewSelector.appDisplay._controls.hide();
+  // switch to "all apps" view;
+  viewSelector.appDisplay._showView(1);
+
+  // show apps instead of windows and workspaces;
+  function showApps() {
+	  overview._dash.actor.hide();
+	  viewSelector.actor.set_x(0);
+	  viewSelector.actor.set_width(0);
+	  viewSelector.actor.queue_redraw();
+    viewSelector.showApps();
+  }
+  overview.connect("showing", showApps);
+}
+
+{
+  // when Atom editor and Chromium browser is installed on the system (and Comshell is not),
+  //   Atom editor will be launched at startup,
+  //   and you can switch between Atom and Chromium, using "alt-tab";
+  // also "alt-tab" on other applications raises Atom editor;
+}
+
 // move notification banners to the bottom;
 {
   const bannerBin = main.messageTray._bannerBin;
@@ -43,25 +69,6 @@ main.panel.statusArea.activities.destroy();
 main.panel.statusArea.appMenu.destroy();
 main.panel.statusArea.dateMenu.container.hide();
 main.panel.statusArea.aggregateMenu.container.hide();
-
-{
-  const overview = main.overview;
-  const viewSelector = overview.viewSelector;
-  // hide "frequent/all" buttons;
-  viewSelector.appDisplay._controls.hide();
-  // switch to "all apps" view;
-  viewSelector.appDisplay._showView(1);
-
-  // show apps instead of windows and workspaces;
-  function showApps() {
-	  overview._dash.actor.hide();
-	  viewSelector.actor.set_x(0);
-	  viewSelector.actor.set_width(0);
-	  viewSelector.actor.queue_redraw();
-    viewSelector.showApps();
-  }
-  overview.connect("showing", showApps);
-}
 
 // right side of status_bar;
 {
