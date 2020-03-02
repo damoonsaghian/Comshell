@@ -68,15 +68,6 @@ also "alt-tab" on other applications raises Atom editor;
 
 ; pkexec pacman -S dolphin ffmpegthumbs mpv pragha
 
-Dolphin:
-general -> previews -> disable "folders", enable "video files"
-confirmations -> enable "move to trash", disable "closing multiple tabs"
-status bar -> disable "zoombar"
-navigation -> open archives
-disable toolbar; hide unnecessary items in the sidebar;
-empty "~/.local/share/RecentDocuments" and make it read_only;
-Ctrl+Up, Ctrl+Enter, Ctrl+r
-
 mpv: when changing file, select it in Dolphin;
 "https://mpv.io/manual/stable/"
 "https://github.com/mpv-player/mpv/wiki/User-Scripts"
