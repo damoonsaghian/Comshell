@@ -8,6 +8,7 @@ main.setThemeStylesheet(
   "/usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css");
 main.loadTheme();
 
+// simplify "overview" such that it just shows the installed apps;
 {
   const overview = main.overview;
   const viewSelector = overview.viewSelector;
@@ -27,11 +28,68 @@ main.loadTheme();
   overview.connect("showing", showApps);
 }
 
+// when Comshell is installed on the system, it will be launched at startup;
+// "alt-tab" on other applications (other than Comshell) will activate Comshell;
+// when Atom editor is installed on the system (and Comshell is not), it be launched at startup;
+// if Chromium browser is installed too, we can switch between Atom and Chromium, using "alt-tab";
+// "alt-tab" on other applications will activate Atom;
+// otherwise Sakura terminal will be launched at startup, and "alt-tab" behaves as usual;
 {
-  // when Atom editor and Chromium browser is installed on the system (and Comshell is not),
-  //   Atom editor will be launched at startup,
-  //   and you can switch between Atom and Chromium, using "alt-tab";
-  // also "alt-tab" on other applications raises Atom editor;
+  const shell = imports.gi.Shell;
+  // a function which gets a "String" and returns a "shell.App" or null;
+  const lookupApp = shell.AppSystem.lookup_app;
+
+  const comshellApp = lookupApp("comshell.desktop");
+  const atomApp = lookupApp("atom.desktop");
+  const sakuraApp = lookupApp("sakura.desktop");
+  if (comshellApp) {
+    comshellApp.activate();
+  } else if (atomApp) {
+    atomApp.activate();
+  } else if (sakuraApp) {
+    sakuraApp.activate();
+  }
+
+  const tracker = shell.WindowTracker.get_default();
+
+  function altTabHandler(_display, metaWindow, _binding) {
+    const comshellApp = lookupApp("comshell.desktop");
+    const atomApp = lookupApp("atom.desktop");
+    const chromiumApp = lookupApp("chromium.desktop");
+
+    if (comshellApp) {
+      const app = tracker.get_window_app(metaWindow);
+      if (app == null && app.is_window_backed()) {
+        comshellApp.activate();
+        return;
+      }
+      const appId = app.get_id();
+      if (appId == "comshell.desktop") {
+        main.wm._startSwitcher(_display, metaWindow, _binding);
+      } else {
+        comshellApp.activate();
+      }
+    } else if (atomApp && chromiumApp)) {
+      const app = tracker.get_window_app(metaWindow);
+      if (app == null && app.is_window_backed()) {
+        atomApp.activate();
+        return;
+      }
+      const appId = app.get_id();
+      if (appId == "atom.desktop") {
+        chromiumApp.activate();
+      } else if (appId == "chromium.desktop") {
+        atomApp.activate();
+      } else {
+        atomApp.activate();
+      }
+    } else {
+      main.wm._startSwitcher(_display, metaWindow, _binding);
+    }
+  }
+
+  main.wm.setCustomKeybindingHandler('switch-applications', shell.ActionMode.NORMAL,
+    altTabHandler);
 }
 
 // move notification banners to the bottom;
