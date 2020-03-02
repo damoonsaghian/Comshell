@@ -37,11 +37,12 @@ main.loadTheme();
 {
   const shell = imports.gi.Shell;
   // a function which gets a "String" and returns a "shell.App" or null;
-  const lookupApp = shell.AppSystem.lookup_app;
+  const appSystem = shell.AppSystem.get_default();
 
-  const comshellApp = lookupApp("comshell.desktop");
-  const atomApp = lookupApp("atom.desktop");
-  const sakuraApp = lookupApp("sakura.desktop");
+  const comshellApp = appSystem.lookup_app("comshell.desktop");
+  const atomApp = appSystem.lookup_app("atom.desktop");
+  const sakuraApp = appSystem.lookup_app("sakura.desktop");
+
   if (comshellApp) {
     comshellApp.activate();
   } else if (atomApp) {
@@ -52,25 +53,27 @@ main.loadTheme();
 
   const tracker = shell.WindowTracker.get_default();
 
-  function altTabHandler(_display, metaWindow, _binding) {
-    const comshellApp = lookupApp("comshell.desktop");
-    const atomApp = lookupApp("atom.desktop");
-    const chromiumApp = lookupApp("chromium.desktop");
+  function altTabHandler(_display, _metaWindow, _binding) {
+    const comshellApp = appSystem.lookup_app("comshell.desktop");
+    const atomApp = appSystem.lookup_app("atom.desktop");
+    const chromiumApp = appSystem.lookup_app("chromium.desktop");
 
     if (comshellApp) {
-      const app = tracker.get_window_app(metaWindow);
+      const currentWindow = global.display.get_focus_window();
+      const app = tracker.get_window_app(currentWindow);
       if (app == null && app.is_window_backed()) {
         comshellApp.activate();
         return;
       }
       const appId = app.get_id();
       if (appId == "comshell.desktop") {
-        main.wm._startSwitcher(_display, metaWindow, _binding);
+        main.wm._startSwitcher(_display, _metaWindow, _binding);
       } else {
         comshellApp.activate();
       }
-    } else if (atomApp && chromiumApp)) {
-      const app = tracker.get_window_app(metaWindow);
+    } else if (atomApp && chromiumApp) {
+      const currentWindow = global.display.get_focus_window();
+      const app = tracker.get_window_app(currentWindow);
       if (app == null && app.is_window_backed()) {
         atomApp.activate();
         return;
@@ -84,7 +87,7 @@ main.loadTheme();
         atomApp.activate();
       }
     } else {
-      main.wm._startSwitcher(_display, metaWindow, _binding);
+      main.wm._startSwitcher(_display, _metaWindow, _binding);
     }
   }
 
