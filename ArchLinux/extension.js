@@ -3,6 +3,7 @@ const main = imports.ui.main;
 const st = imports.gi.St;
 const clutter = imports.gi.Clutter;
 const meta = imports.gi.Meta;
+const shell = imports.gi.Shell;
 
 main.setThemeStylesheet(
   "/usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css");
@@ -35,7 +36,6 @@ main.loadTheme();
 // "alt-tab" on other applications will activate Atom;
 // otherwise Sakura terminal will be launched at startup, and "alt-tab" behaves as usual;
 {
-  const shell = imports.gi.Shell;
   // a function which gets a "String" and returns a "shell.App" or null;
   const appSystem = shell.AppSystem.get_default();
 
@@ -53,7 +53,7 @@ main.loadTheme();
 
   const tracker = shell.WindowTracker.get_default();
 
-  function altTabHandler(_display, _metaWindow, _binding) {
+  function altTabHandler(_display, _window, _binding) {
     const comshellApp = appSystem.lookup_app("comshell.desktop");
     const atomApp = appSystem.lookup_app("atom.desktop");
     const chromiumApp = appSystem.lookup_app("chromium.desktop");
@@ -61,20 +61,21 @@ main.loadTheme();
     if (comshellApp) {
       const currentWindow = global.display.get_focus_window();
       const app = tracker.get_window_app(currentWindow);
-      if (app == null && app.is_window_backed()) {
+      if (app == null || app.is_window_backed()) {
         comshellApp.activate();
         return;
       }
       const appId = app.get_id();
       if (appId == "comshell.desktop") {
-        main.wm._startSwitcher(_display, _metaWindow, _binding);
+        main.wm._startSwitcher(_display, _window, _binding);
       } else {
         comshellApp.activate();
       }
     } else if (atomApp && chromiumApp) {
       const currentWindow = global.display.get_focus_window();
+      if (!currentWindow) atomApp.activate();
       const app = tracker.get_window_app(currentWindow);
-      if (app == null && app.is_window_backed()) {
+      if (app == null || app.is_window_backed()) {
         atomApp.activate();
         return;
       }
@@ -87,12 +88,27 @@ main.loadTheme();
         atomApp.activate();
       }
     } else {
-      main.wm._startSwitcher(_display, _metaWindow, _binding);
+      main.wm._startSwitcher(_display, _window, _binding);
     }
   }
 
   main.wm.setCustomKeybindingHandler('switch-applications', shell.ActionMode.NORMAL,
     altTabHandler);
+}
+
+// open apps in separate workspaces;
+{
+  const activate = shell.App.prototype.activate;
+
+  shell.App.prototype.activate = function() {
+    const appWindows = this.get_windows();
+    if (appWindows && appWindows.length > 0) {
+      appWindows[0].get_workspace().activate(0);
+      return;
+    }
+    global.workspace_manager.append_new_workspace(true, 0);
+    activate.call(this);
+  };
 }
 
 // move notification banners to the bottom;
