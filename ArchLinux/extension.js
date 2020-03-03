@@ -66,23 +66,26 @@ main.loadTheme();
         return;
       }
       const appId = app.get_id();
-      if (appId == "comshell.desktop") {
+      if (appId === "comshell.desktop") {
         main.wm._startSwitcher(_display, _window, _binding);
       } else {
         comshellApp.activate();
       }
     } else if (atomApp && chromiumApp) {
       const currentWindow = global.display.get_focus_window();
-      if (!currentWindow) atomApp.activate();
+      if (!currentWindow) {
+        atomApp.activate();
+        return;
+      }
       const app = tracker.get_window_app(currentWindow);
       if (app == null || app.is_window_backed()) {
         atomApp.activate();
         return;
       }
       const appId = app.get_id();
-      if (appId == "atom.desktop") {
+      if (appId === "atom.desktop") {
         chromiumApp.activate();
-      } else if (appId == "chromium.desktop") {
+      } else if (appId === "chromium.desktop") {
         atomApp.activate();
       } else {
         atomApp.activate();
@@ -92,8 +95,55 @@ main.loadTheme();
     }
   }
 
-  main.wm.setCustomKeybindingHandler('switch-applications', shell.ActionMode.NORMAL,
-    altTabHandler);
+  main.wm.setCustomKeybindingHandler("switch-applications",
+    shell.ActionMode.NORMAL,
+    altTabHandler
+  );
+
+  // activate terminal app; if we are in terminal workspace, open a new terminal window;
+  main.wm.addKeybinding('switch-to-application-1',
+    new imports.gi.Gio.Settings({ schema_id: imports.ui.windowManager.SHELL_KEYBINDINGS_SCHEMA }),
+    meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+    shell.ActionMode.NORMAL | shell.ActionMode.OVERVIEW,
+    () => {
+      const termApp = appSystem.lookup_app("alacritty.desktop");
+      const termWindows = termApp.get_windows();
+      if (termWindows && termWindows.length > 0) {
+        const termWorkspace = termWindows[0].get_workspace();
+        const activeWorkspace = global.workspace_manager.get_active_workspace();
+        if (termWorkspace === activeWorkspace) {
+          termApp.open_new_window(-1);
+          return;
+        }
+      }
+      termApp.activate();
+    }
+  );
+}
+
+// only removes empty workspaces at the end;
+{
+  const prevCheckWorkspaces = main.wm._workspaceTracker._checkWorkspaces;
+
+  const myCheckWorkspaces = function() {
+    let keepAliveWorkspaces = [];
+    let foundNonEmpty = false;
+    for (let i = this._workspaces.length - 1; i >= 0; i--) {
+      if (!foundNonEmpty)
+        foundNonEmpty = this._workspaces[i].list_windows().length > 0;
+      else if (!this._workspaces[i]._keepAliveId)
+        keepAliveWorkspaces.push(this._workspaces[i]);
+    }
+
+    // make sure the original method only removes empty workspaces at the end
+    keepAliveWorkspaces.forEach(ws => (ws._keepAliveId = 1));
+    prevCheckWorkspaces.call(this);
+    keepAliveWorkspaces.forEach(ws => delete ws._keepAliveId);
+
+    return false;
+  }
+
+  main.wm._workspaceTracker._checkWorkspaces = myCheckWorkspaces;
 }
 
 // open apps in separate workspaces;
