@@ -34,6 +34,6 @@ poppler-glib goffice goocanvas
 ; pkexec cp comshell /usr/local/bin/
 
 ; printf '[Desktop Entry]\nType=Application\nName=Comshell\nExec=comshell\nStartupNotify=true' >
-  ~/.config/autostart/Comshell.desktop
-; pkexec cp ~/.config/autostart/Comshell.desktop /etc/skel/.config/autostart/
-; pkexec cp ~/.config/autostart/Comshell.desktop /usr/local/share/applications/
+  ~/.config/autostart/comshell.desktop
+; pkexec cp ~/.config/autostart/comshell.desktop /etc/skel/.config/autostart/
+; pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/

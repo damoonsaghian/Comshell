@@ -1,7 +1,11 @@
 using Arch Linux we can easily setup and maintain a Linux system;
 the following shows how to setup a basic graphical environment, using GnomeShell;
 press "alt-space" to show the list of applications;
-the only application installed by default would be a terminal emulator;
+the only application installed by default would be Termite terminal emulator;
+"alt-`" activates the workspace containing the terminal windows,
+  and if you are already in it, opens a new one;
+you can switch between windows using "alt+a" and "alt+s";
+"alt-tab" activates previously visited workspace;
 
 boot Arch Linux live environment;
 to ensure the system clock is accurate:
@@ -59,14 +63,16 @@ there is a workaround though (it requires "ctrl+c" to stop):
 or you can just use "su" instead;
 
 = extra applications
-; pkexec pacman -S atom chromium
-; cp etc/atom/* ~/.atom/
-when Atom editor and Chromium browser is installed on the system (and Comshell is not),
-  Atom editor will be launched at startup,
-  and you can switch between Atom and Chromium, using "alt-tab";
-also "alt-tab" on other applications raises Atom editor;
+when Atom editor and Firefox browser are installed on the system (and Comshell is not),
+ Atom will be launched at startup instead of Comshell;
+press "ctrl-shift-a" to add project directories to Atom;
+"alt-tab" toggles between Atom and Firefox;
+"alt-tab" on other applications will activate Atom;
 
-; pkexec pacman -S dolphin ffmpegthumbs mpv pragha
+; pkexec pacman -S atom firefox
+; cp etc/atom/* ~/.atom/
+
+; pkexec pacman -S dolphin ffmpegthumbs mpv
 
 mpv: when changing file, select it in Dolphin;
 "https://mpv.io/manual/stable/"
