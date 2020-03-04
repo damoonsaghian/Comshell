@@ -2,7 +2,6 @@
   margin: -200px;
   opacity: 0;
 }
-
 /*
 https://joshtronic.com/2017/07/26/hide-title-bars-in-gnome-shell/
 https://securitronlinux.com/bejiitaswrath/how-to-make-the-title-bars-in-gnome-shell-much-thinner-than-the-default/
@@ -25,51 +24,26 @@ window.ssd headerbar.titlebar button.titlebutton {
 
 scrollbar {
   margin: 3px;
-  border: 0px;
-  border-radius: 0px;
-  background-color: #4285F4;
+  border: 3px;
+  border-radius: 3px;
+  border-color: #ffffff;
+  background-color: #bbbbbb;
 }
+
 scrollbar.top scrollbar.bottom scrollbar.left scrollbar.right {
-  border-bottom: 0px;
-  border-top: 0px;
-  border-right: 0px;
-  border-left: 0px;
+  border-bottom: 3px;
+  border-top: 3px;
+  border-right: 3px;
+  border-left: 3px;
 }
 
 scrollbar slider {
   margin: 0px;
   border: 0px;
-  border-radius: 0px;
-  background-color: #bbbbbb;
-}
-scrollbar.top slider {
-  min-width: 30px;
-  min-height: 2px;
-}
-scrollbar.bottom slider {
-  min-width: 30px;
-  min-height: 2px;
-}
-scrollbar.left slider {
-  min-width: 2px;
-  min-height: 30px;
-}
-scrollbar.right slider {
-  min-width: 2px;
-  min-height: 30px;
-}
-scrollbar slider:hover {
-  background-color: #bbbbbb;
-}
-scrollbar slider:active {
-  background-color: #bbbbbb;
-}
-
-scrollbar.overlay-indicator:not(.dragging):not(.hovering) slider {
-  min-width: 2px;
-  min-height: 2px;
-  margin: 0px;
-  border: 0px;
+  border-radius: 3px;
+  background-color: #777777;
+  min-width: 6px;
+  min-height: 6px;
 }
 
 /*

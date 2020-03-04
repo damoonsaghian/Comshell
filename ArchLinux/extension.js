@@ -41,25 +41,29 @@ shell.App.prototype.activate = function() {
 };
 
 // when Comshell is installed on the system, it will be launched at startup;
+// "alt-tab" on Comshell activates previously visited workspace;
 // "alt-tab" on other applications (other than Comshell) will activate Comshell;
-// when Atom editor is installed on the system (and Comshell is not), it be launched at startup;
-// if Chromium browser is installed too, we can switch between Atom and Chromium, using "alt-tab";
+// when Atom editor and Firefox browser are installed on the system (and Comshell is not),
+//   Atom will be launched at startup instead of Comshell;
+// "alt-tab" toggles between Atom and Firefox;
 // "alt-tab" on other applications will activate Atom;
-// otherwise Sakura terminal will be launched at startup, and "alt-tab" behaves as usual;
+// if Comshell or Atom/Firefox is not installes, Termite will be launched at startup,
+//   and "alt-tab" activates previously visited workspace;
 {
   // a function which gets a "String" and returns a "shell.App" or null;
   const appSystem = shell.AppSystem.get_default();
 
   const comshellApp = appSystem.lookup_app("comshell.desktop");
   const atomApp = appSystem.lookup_app("atom.desktop");
-  const sakuraApp = appSystem.lookup_app("sakura.desktop");
+  const firefoxApp = appSystem.lookup_app("firefox.desktop");
+  const termApp = appSystem.lookup_app("termite.desktop");
 
   if (comshellApp) {
     comshellApp.activate_full(-1, 0);
-  } else if (atomApp) {
+  } else if (atomApp && firefoxApp) {
     atomApp.activate_full(-1, 0);
-  } else if (sakuraApp) {
-    sakuraApp.activate_full(-1, 0);
+  } else if (termApp) {
+    termApp.activate_full(-1, 0);
   }
 
   const tracker = shell.WindowTracker.get_default();
@@ -67,42 +71,42 @@ shell.App.prototype.activate = function() {
   function altTabHandler(_display, _window, _binding) {
     const comshellApp = appSystem.lookup_app("comshell.desktop");
     const atomApp = appSystem.lookup_app("atom.desktop");
-    const chromiumApp = appSystem.lookup_app("chromium.desktop");
+    const firefoxApp = appSystem.lookup_app("firefox.desktop");
 
     if (comshellApp) {
-      const currentWindow = global.display.get_focus_window();
-      const app = tracker.get_window_app(currentWindow);
-      if (app == null || app.is_window_backed()) {
+      const focusedWindow = global.display.get_focus_window();
+      const focusedApp = tracker.get_window_app(focusedWindow);
+      if (focusedApp == null || focusedApp.is_window_backed()) {
         comshellApp.activate();
         return;
       }
-      const appId = app.get_id();
-      if (appId === "comshell.desktop") {
-        main.wm._startSwitcher(_display, _window, _binding);
+      const focusedAppId = focusedApp.get_id();
+      if (focusedAppId === "comshell.desktop") {
+        appSystem.get_running()[1].get_windows()[0].getWorkspace().activate(0);
       } else {
         comshellApp.activate();
       }
-    } else if (atomApp && chromiumApp) {
-      const currentWindow = global.display.get_focus_window();
-      if (!currentWindow) {
+    } else if (atomApp && firefoxApp) {
+      const focusedWindow = global.display.get_focus_window();
+      if (!focusedWindow) {
         atomApp.activate();
         return;
       }
-      const app = tracker.get_window_app(currentWindow);
+      const app = tracker.get_window_app(focusedWindow);
       if (app == null || app.is_window_backed()) {
         atomApp.activate();
         return;
       }
       const appId = app.get_id();
       if (appId === "atom.desktop") {
-        chromiumApp.activate();
+        firefoxApp.activate();
       } else if (appId === "chromium.desktop") {
         atomApp.activate();
       } else {
         atomApp.activate();
       }
     } else {
-      main.wm._startSwitcher(_display, _window, _binding);
+      appSystem.get_running()[1].get_windows()[0].getWorkspace().activate(0);
     }
   }
 
@@ -118,7 +122,6 @@ shell.App.prototype.activate = function() {
     meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
     shell.ActionMode.NORMAL | shell.ActionMode.OVERVIEW,
     () => {
-      const termApp = appSystem.lookup_app("sakura.desktop");
       const termWindows = termApp.get_windows();
       if (termWindows && termWindows.length > 0) {
         const termWorkspace = termWindows[0].get_workspace();
