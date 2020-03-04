@@ -29,6 +29,17 @@ main.loadTheme();
   overview.connect("showing", showApps);
 }
 
+// open apps in separate workspaces;
+shell.App.prototype.activate = function() {
+  const appWindows = this.get_windows();
+  if (appWindows && appWindows.length > 0) {
+    appWindows[0].get_workspace().activate(0);
+    return;
+  }
+  const newWorkspace = global.workspace_manager.append_new_workspace(true, 0);
+  this.activate_full(newWorkspace.index(), 0);
+};
+
 // when Comshell is installed on the system, it will be launched at startup;
 // "alt-tab" on other applications (other than Comshell) will activate Comshell;
 // when Atom editor is installed on the system (and Comshell is not), it be launched at startup;
@@ -44,11 +55,11 @@ main.loadTheme();
   const sakuraApp = appSystem.lookup_app("sakura.desktop");
 
   if (comshellApp) {
-    comshellApp.activate();
+    comshellApp.activate_full(-1, 0);
   } else if (atomApp) {
-    atomApp.activate();
+    atomApp.activate_full(-1, 0);
   } else if (sakuraApp) {
-    sakuraApp.activate();
+    sakuraApp.activate_full(-1, 0);
   }
 
   const tracker = shell.WindowTracker.get_default();
@@ -101,12 +112,13 @@ main.loadTheme();
   );
 
   // activate terminal app; if we are in terminal workspace, open a new terminal window;
-  main.wm.addKeybinding('switch-to-application-1',
+  main.wm.removeKeybinding("switch-to-application-1");
+  main.wm.addKeybinding("switch-to-application-1",
     new imports.gi.Gio.Settings({ schema_id: imports.ui.windowManager.SHELL_KEYBINDINGS_SCHEMA }),
     meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
     shell.ActionMode.NORMAL | shell.ActionMode.OVERVIEW,
     () => {
-      const termApp = appSystem.lookup_app("alacritty.desktop");
+      const termApp = appSystem.lookup_app("sakura.desktop");
       const termWindows = termApp.get_windows();
       if (termWindows && termWindows.length > 0) {
         const termWorkspace = termWindows[0].get_workspace();
@@ -119,46 +131,6 @@ main.loadTheme();
       termApp.activate();
     }
   );
-}
-
-// only removes empty workspaces at the end;
-{
-  const prevCheckWorkspaces = main.wm._workspaceTracker._checkWorkspaces;
-
-  const myCheckWorkspaces = function() {
-    let keepAliveWorkspaces = [];
-    let foundNonEmpty = false;
-    for (let i = this._workspaces.length - 1; i >= 0; i--) {
-      if (!foundNonEmpty)
-        foundNonEmpty = this._workspaces[i].list_windows().length > 0;
-      else if (!this._workspaces[i]._keepAliveId)
-        keepAliveWorkspaces.push(this._workspaces[i]);
-    }
-
-    // make sure the original method only removes empty workspaces at the end
-    keepAliveWorkspaces.forEach(ws => (ws._keepAliveId = 1));
-    prevCheckWorkspaces.call(this);
-    keepAliveWorkspaces.forEach(ws => delete ws._keepAliveId);
-
-    return false;
-  }
-
-  main.wm._workspaceTracker._checkWorkspaces = myCheckWorkspaces;
-}
-
-// open apps in separate workspaces;
-{
-  const activate = shell.App.prototype.activate;
-
-  shell.App.prototype.activate = function() {
-    const appWindows = this.get_windows();
-    if (appWindows && appWindows.length > 0) {
-      appWindows[0].get_workspace().activate(0);
-      return;
-    }
-    global.workspace_manager.append_new_workspace(true, 0);
-    activate.call(this);
-  };
 }
 
 // move notification banners to the bottom;
@@ -192,7 +164,7 @@ main.loadTheme();
   movePanelToBottom();
 }
 
-main.panel.statusArea.activities.destroy();
+main.panel.statusArea.activities.container.hide();
 main.panel.statusArea.appMenu.destroy();
 main.panel.statusArea.dateMenu.container.hide();
 main.panel.statusArea.aggregateMenu.container.hide();
