@@ -36,8 +36,15 @@ shell.App.prototype.activate = function() {
     appWindows[0].get_workspace().activate(0);
     return;
   }
+
   const newWorkspace = global.workspace_manager.append_new_workspace(true, 0);
+  newWorkspace._keepAliveId = 1;
   this.activate_full(newWorkspace.index(), 0);
+
+  this.connect("windows-changed", app => {
+    app.get_windows().map(win => win.change_workspace(newWorkspace));
+    delete newWorkspace._keepAliveId;
+  });
 };
 
 // when Comshell is installed on the system, it will be launched at startup;
