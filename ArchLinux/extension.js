@@ -33,11 +33,12 @@ main.loadTheme();
 shell.App.prototype.activate = function() {
   const appWindows = this.get_windows();
   if (appWindows && appWindows.length > 0) {
-    appWindows[0].get_workspace().activate(0);
+    appWindows[0].get_workspace().activate(global.get_current_time());
     return;
   }
 
-  const newWorkspace = global.workspace_manager.append_new_workspace(true, 0);
+  const newWorkspace = global.workspace_manager
+    .append_new_workspace(true, global.get_current_time());
   newWorkspace._keepAliveId = 1;
   this.activate_full(newWorkspace.index(), 0);
 
