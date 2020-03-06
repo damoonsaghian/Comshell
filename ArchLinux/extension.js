@@ -29,23 +29,10 @@ main.loadTheme();
   overview.connect("showing", showApps);
 }
 
-// open apps in separate workspaces;
+// minimize all windows before activating ann app;
 shell.App.prototype.activate = function() {
-  const appWindows = this.get_windows();
-  if (appWindows && appWindows.length > 0) {
-    appWindows[0].get_workspace().activate(global.get_current_time());
-    return;
-  }
-
-  const newWorkspace = global.workspace_manager
-    .append_new_workspace(true, global.get_current_time());
-  newWorkspace._keepAliveId = 1;
-  this.activate_full(newWorkspace.index(), 0);
-
-  this.connect("windows-changed", app => {
-    app.get_windows().map(win => win.change_workspace(newWorkspace));
-    delete newWorkspace._keepAliveId;
-  });
+  global.get_window_actors().map(winActor => winActor.get_meta_window().minimize())
+  this.activate_full(-1, 0);
 };
 
 // when Comshell is installed on the system, it will be launched at startup;
