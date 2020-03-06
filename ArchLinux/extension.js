@@ -32,6 +32,7 @@ main.loadTheme();
 // minimize all windows before activating ann app;
 shell.App.prototype.activate = function() {
   global.get_window_actors().map(winActor => winActor.get_meta_window().minimize())
+  this.get_windows().map(win => win.unminimize());
   this.activate_full(-1, 0);
 };
 
@@ -77,7 +78,7 @@ shell.App.prototype.activate = function() {
       }
       const focusedAppId = focusedApp.get_id();
       if (focusedAppId === "comshell.desktop") {
-        appSystem.get_running()[1].get_windows()[0].getWorkspace().activate(0);
+        appSystem.get_running()[1].activate();
       } else {
         comshellApp.activate();
       }
@@ -95,13 +96,11 @@ shell.App.prototype.activate = function() {
       const appId = app.get_id();
       if (appId === "atom.desktop") {
         firefoxApp.activate();
-      } else if (appId === "chromium.desktop") {
-        atomApp.activate();
       } else {
         atomApp.activate();
       }
     } else {
-      appSystem.get_running()[1].get_windows()[0].getWorkspace().activate(0);
+      appSystem.get_running()[1].activate();
     }
   }
 
@@ -110,23 +109,29 @@ shell.App.prototype.activate = function() {
     altTabHandler
   );
 
-  // activate terminal app; if we are in terminal workspace, open a new terminal window;
+  // activate terminal app; if a terminal window is already focused, open a new one;
   main.wm.removeKeybinding("switch-to-application-1");
   main.wm.addKeybinding("switch-to-application-1",
     new imports.gi.Gio.Settings({ schema_id: imports.ui.windowManager.SHELL_KEYBINDINGS_SCHEMA }),
     meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
     shell.ActionMode.NORMAL | shell.ActionMode.OVERVIEW,
     () => {
-      const termWindows = termApp.get_windows();
-      if (termWindows && termWindows.length > 0) {
-        const termWorkspace = termWindows[0].get_workspace();
-        const activeWorkspace = global.workspace_manager.get_active_workspace();
-        if (termWorkspace === activeWorkspace) {
-          termApp.open_new_window(-1);
-          return;
-        }
+      const focusedWindow = global.display.get_focus_window();
+      if (!focusedWindow) {
+        termApp.activate();
+        return;
       }
-      termApp.activate();
+      const app = tracker.get_window_app(focusedWindow);
+      if (app == null || app.is_window_backed()) {
+        termApp.activate();
+        return;
+      }
+      const appId = app.get_id();
+      if (appId === "termite.desktop") {
+        termApp.open_new_window(-1);
+      } else {
+        termApp.activate();
+      }
     }
   );
 }

@@ -80,8 +80,10 @@ activate-window-menu=['']
 panel-main-menu=['<Alt>Space']
 switch-group=['']
 switch-group-backward=['']
-cycle-windows=['<Alt>a']
-cycle-windows-backward=['<Alt>s']
+cycle-windows=['']
+cycle-windows-backward=['']
+cycle-group=['<Alt>a']
+cycle-group-backward=['<Alt>s']
 close=['<Alt>Escape']
 toggle-maximized=['<Shift><Alt>Space']
 [org/gnome/shell/keybindings]
@@ -89,6 +91,8 @@ switch-to-application-1=['<Alt>Above_Tab']
 [org/gnome/shell]
 disable-extension-version-validation=true
 enabled-extensions=['gnome-shell-improved']
+[org/gnome/nautilus/preferences]
+fts-enabled=false
 " > /etc/dconf/db/local.d/00-mykeyfile
 dconf update
 
