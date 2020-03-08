@@ -5,7 +5,8 @@ printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
 pacman -S grub intel-ucode amd-ucode linux linux-firmware \
   btrfs-progs e2fsprogs dosfstools unzip nano man-db pulseaudio-alsa networkmanager \
   ttf-hack noto-fonts materia-gtk-theme \
-  lightdm-gtk-greeter xorg-server light-locker xorg-server-xwayland gnome-shell termite
+  lightdm-gtk-greeter xorg-server light-locker gnome-shell gvfs \
+  nvim-qt luakit mpv
 
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
 printf '\nset superusers=""\n' >> /etc/grub.d/40_custom
@@ -60,6 +61,8 @@ echo "[org/gnome/system/location]
 enabled=true
 [org/gnome/desktop/datetime]
 automatic-timezone=true
+[org/gnome/desktop/notifications]
+show-banners=false
 [org/gnome/desktop/background]
 primary-color='#222222'
 secondary-color='#222222'
@@ -71,28 +74,19 @@ gtk-theme='Materia-light-compact'
 overlay-scrolling=false
 cursor-blink-timeout=1000
 enable-hot-corners=false
-[org/gnome/desktop/notifications]
-show-banners=false
 [org/gnome/desktop/wm/preferences]
 button-layout=''
 [org/gnome/desktop/wm/keybindings]
-activate-window-menu=['']
-panel-main-menu=['<Alt>Space']
-switch-group=['']
-switch-group-backward=['']
 cycle-windows=['']
 cycle-windows-backward=['']
-cycle-group=['<Alt>a']
-cycle-group-backward=['<Alt>s']
 close=['<Alt>Escape']
 toggle-maximized=['<Shift><Alt>Space']
+activate-window-menu=['']
 [org/gnome/shell/keybindings]
-switch-to-application-1=['<Alt>Above_Tab']
+toggle-application-view=['<Alt>Space', '<Super>a']
 [org/gnome/shell]
 disable-extension-version-validation=true
 enabled-extensions=['gnome-shell-improved']
-[org/gnome/nautilus/preferences]
-fts-enabled=false
 " > /etc/dconf/db/local.d/00-mykeyfile
 dconf update
 
@@ -107,6 +101,12 @@ echo 'stage {
   font-family: sans;
   font-size: 10.5pt;
   font-weight: normal;
+  color: #ffffff;
+  background-color: #222222;
+}
+#overview {
+  color: #ffffff;
+  background-color: #222222;
 }
 #panel {
   height: 18px;
@@ -128,6 +128,7 @@ echo 'stage {
 ' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css
 cp ./extension.js /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
 
+curl --proto '=https' -sSf -o #1 "$url"gtk.css
 mkdir -p /etc/skel/.config/gtk-3.0
 cp ./gtk.css /etc/skel/.config/gtk-3.0/
 mkdir -p /etc/skel/.config/gtk-4.0
@@ -163,54 +164,9 @@ echo '<?xml version="1.0"?>
 </fontconfig>
 ' > /etc/fonts/local.conf
 
-mkdir -p /etc/skel/.config/termite
-echo '[options]
-font = Monospace 10.5
-size_hints = true
-
-[colors]
-foreground = #ffffff
-background = #333333
-
-# Black, Gray, Silver, White
-color0  = #002b36
-color8  = #657b83
-color7  = #93a1a1
-color15 = #fdf6e3
-# Red
-color1  = #dc322f
-color9  = #dc322f
-# Green
-color2  = #859900
-color10 = #859900
-# Yellow
-color3  = #b58900
-color11 = #b58900
-# Blue
-color4  = #268bd2
-color12 = #268bd2
-# Purple
-color5  = #6c71c4
-color13 = #6c71c4
-# Teal
-color6  = #2aa198
-color14 = #2aa198
-# Extra colors
-color16 = #cb4b16
-color17 = #d33682
-color18 = #073642
-color19 = #586e75
-color20 = #839496
-color21 = #eee8d5
-' > /etc/skel/.config/termite/config
-
 echo '
 PS1="\[$(tput setab 6)\]\[$(tput setaf 0)\]\w\[$(tput sgr0)\]\[$(tput setaf 6)\]\[$(tput sgr0)\] "
 unset HISTFILE
-alias lock="light-locker-command -l"
-alias logout="( gnome-session-quit --logout --no-prompt ) & disown"
-alias poweroff="( gnome-session-quit --power-off --no-prompt; systemctl poweroff ) & disown"
-alias reboot="( gnome-session-quit --reboot --no-prompt; systemctl reboot )  & disown"
 ' >> /etc/skel/.bashrc
 
 useradd -m -G wheel user1

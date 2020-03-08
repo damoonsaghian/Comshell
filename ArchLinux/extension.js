@@ -9,131 +9,50 @@ main.setThemeStylesheet(
   "/usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css");
 main.loadTheme();
 
-// simplify "overview" such that it just shows the installed apps;
+// apps view simplified, and with toggle functionality;
 {
   const overview = main.overview;
   const viewSelector = overview.viewSelector;
-  // hide "frequent/all" buttons;
-  viewSelector.appDisplay._controls.hide();
-  // switch to "all apps" view;
-  viewSelector.appDisplay._showView(1);
 
-  // show apps instead of windows and workspaces;
-  function showApps() {
-	  overview._dash.actor.hide();
-	  viewSelector.actor.set_x(0);
-	  viewSelector.actor.set_width(0);
-	  viewSelector.actor.queue_redraw();
-    viewSelector.showApps();
-  }
-  overview.connect("showing", showApps);
+  try {
+    // switch to "all apps" view;
+    viewSelector.appDisplay._showView(1);
+    // hide "frequent/all" buttons;
+    viewSelector.appDisplay._controls.hide();
+  } finally {}
+
+  main.wm.removeKeybinding("toggle-application-view");
+  main.wm.addKeybinding(
+    "toggle-application-view",
+    new imports.gi.Gio.Settings({ schema_id: imports.ui.windowManager.SHELL_KEYBINDINGS_SCHEMA }),
+    meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+    shell.ActionMode.NORMAL | shell.ActionMode.OVERVIEW,
+    () => {
+      if (overview.isDummy) return;
+      if (overview.visible) overview.hide();
+      else viewSelector.showApps();
+    }
+  );
 }
 
-// minimize all windows before activating ann app;
-shell.App.prototype.activate = function() {
-  global.get_window_actors().map(winActor => winActor.get_meta_window().minimize())
-  this.get_windows().map(win => win.unminimize());
-  this.activate_full(-1, 0);
-};
-
-// when Comshell is installed on the system, it will be launched at startup;
-// "alt-tab" on Comshell activates previously visited workspace;
-// "alt-tab" on other applications (other than Comshell) will activate Comshell;
-// when Atom editor and Firefox browser are installed on the system (and Comshell is not),
-//   Atom will be launched at startup instead of Comshell;
-// "alt-tab" toggles between Atom and Firefox;
-// "alt-tab" on other applications will activate Atom;
-// if Comshell or Atom/Firefox is not installes, Termite will be launched at startup,
-//   and "alt-tab" activates previously visited workspace;
+// Neovim will be launched at startup (if Comshell is not installed);
+// hide web browser and media viewer window actors, when unfocused;
 {
   // a function which gets a "String" and returns a "shell.App" or null;
   const appSystem = shell.AppSystem.get_default();
 
   const comshellApp = appSystem.lookup_app("comshell.desktop");
-  const atomApp = appSystem.lookup_app("atom.desktop");
-  const firefoxApp = appSystem.lookup_app("firefox.desktop");
-  const termApp = appSystem.lookup_app("termite.desktop");
+  const nvimApp = appSystem.lookup_app("nvim-qt.desktop");
 
-  if (comshellApp) {
-    comshellApp.activate_full(-1, 0);
-  } else if (atomApp && firefoxApp) {
-    atomApp.activate_full(-1, 0);
-  } else if (termApp) {
-    termApp.activate_full(-1, 0);
-  }
+  if (comshellApp) comshellApp.activate();
+  else if (nvimApp) nvimApp.activate();
 
   const tracker = shell.WindowTracker.get_default();
 
-  function altTabHandler(_display, _window, _binding) {
-    const comshellApp = appSystem.lookup_app("comshell.desktop");
-    const atomApp = appSystem.lookup_app("atom.desktop");
-    const firefoxApp = appSystem.lookup_app("firefox.desktop");
-
-    if (comshellApp) {
-      const focusedWindow = global.display.get_focus_window();
-      const focusedApp = tracker.get_window_app(focusedWindow);
-      if (focusedApp == null || focusedApp.is_window_backed()) {
-        comshellApp.activate();
-        return;
-      }
-      const focusedAppId = focusedApp.get_id();
-      if (focusedAppId === "comshell.desktop") {
-        appSystem.get_running()[1].activate();
-      } else {
-        comshellApp.activate();
-      }
-    } else if (atomApp && firefoxApp) {
-      const focusedWindow = global.display.get_focus_window();
-      if (!focusedWindow) {
-        atomApp.activate();
-        return;
-      }
-      const app = tracker.get_window_app(focusedWindow);
-      if (app == null || app.is_window_backed()) {
-        atomApp.activate();
-        return;
-      }
-      const appId = app.get_id();
-      if (appId === "atom.desktop") {
-        firefoxApp.activate();
-      } else {
-        atomApp.activate();
-      }
-    } else {
-      appSystem.get_running()[1].activate();
-    }
+  function focusChangeHandler() {
+    const luakitApp = appSystem.lookup_app("luakit.desktop");
+    const mpvApp = appSystem.lookup_app("mpv.desktop");
   }
-
-  main.wm.setCustomKeybindingHandler("switch-applications",
-    shell.ActionMode.NORMAL,
-    altTabHandler
-  );
-
-  // activate terminal app; if a terminal window is already focused, open a new one;
-  main.wm.removeKeybinding("switch-to-application-1");
-  main.wm.addKeybinding("switch-to-application-1",
-    new imports.gi.Gio.Settings({ schema_id: imports.ui.windowManager.SHELL_KEYBINDINGS_SCHEMA }),
-    meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-    shell.ActionMode.NORMAL | shell.ActionMode.OVERVIEW,
-    () => {
-      const focusedWindow = global.display.get_focus_window();
-      if (!focusedWindow) {
-        termApp.activate();
-        return;
-      }
-      const app = tracker.get_window_app(focusedWindow);
-      if (app == null || app.is_window_backed()) {
-        termApp.activate();
-        return;
-      }
-      const appId = app.get_id();
-      if (appId === "termite.desktop") {
-        termApp.open_new_window(-1);
-      } else {
-        termApp.activate();
-      }
-    }
-  );
 }
 
 // move notification banners to the bottom;
