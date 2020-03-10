@@ -9,52 +9,6 @@ main.setThemeStylesheet(
   "/usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css");
 main.loadTheme();
 
-// apps view simplified, and with toggle functionality;
-{
-  const overview = main.overview;
-  const viewSelector = overview.viewSelector;
-
-  try {
-    // switch to "all apps" view;
-    viewSelector.appDisplay._showView(1);
-    // hide "frequent/all" buttons;
-    viewSelector.appDisplay._controls.hide();
-  } finally {}
-
-  main.wm.removeKeybinding("toggle-application-view");
-  main.wm.addKeybinding(
-    "toggle-application-view",
-    new imports.gi.Gio.Settings({ schema_id: imports.ui.windowManager.SHELL_KEYBINDINGS_SCHEMA }),
-    meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-    shell.ActionMode.NORMAL | shell.ActionMode.OVERVIEW,
-    () => {
-      if (overview.isDummy) return;
-      if (overview.visible) overview.hide();
-      else viewSelector.showApps();
-    }
-  );
-}
-
-// Neovim will be launched at startup (if Comshell is not installed);
-// hide web browser and media viewer window actors, when unfocused;
-{
-  // a function which gets a "String" and returns a "shell.App" or null;
-  const appSystem = shell.AppSystem.get_default();
-
-  const comshellApp = appSystem.lookup_app("comshell.desktop");
-  const nvimApp = appSystem.lookup_app("nvim-qt.desktop");
-
-  if (comshellApp) comshellApp.activate();
-  else if (nvimApp) nvimApp.activate();
-
-  const tracker = shell.WindowTracker.get_default();
-
-  function focusChangeHandler() {
-    const luakitApp = appSystem.lookup_app("luakit.desktop");
-    const mpvApp = appSystem.lookup_app("mpv.desktop");
-  }
-}
-
 // move notification banners to the bottom;
 {
   const bannerBin = main.messageTray._bannerBin;
@@ -207,5 +161,39 @@ main.panel.statusArea.aggregateMenu.container.hide();
   // https://github.com/Ory0n/Resource_Monitor/
   // https://github.com/corecoding/Vitals
   // https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet
+}
+
+// apps view simplified, and with toggle functionality;
+{
+  const overview = main.overview;
+  const viewSelector = overview.viewSelector;
+
+  try {
+    // switch to "all apps" view;
+    viewSelector.appDisplay._showView(1);
+    // hide "frequent/all" buttons;
+    viewSelector.appDisplay._controls.hide();
+  } finally {}
+
+  main.wm.removeKeybinding("toggle-application-view");
+  main.wm.addKeybinding(
+    "toggle-application-view",
+    new imports.gi.Gio.Settings({ schema_id: imports.ui.windowManager.SHELL_KEYBINDINGS_SCHEMA }),
+    meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+    shell.ActionMode.NORMAL | shell.ActionMode.OVERVIEW,
+    () => {
+      if (overview.isDummy) return;
+      if (overview.visible) overview.hide();
+      else viewSelector.showApps();
+    }
+  );
+
+  // launched Comshell at startup, and if it's not installed, show apps;
+  const appSystem = shell.AppSystem.get_default();
+  const comshellApp = appSystem.lookup_app("comshell.desktop");
+  const comshellProtoApp = appSystem.lookup_app("comshell_proto.desktop");
+  if (comshellApp) comshellApp.activate();
+  else if (comshellProtoApp) comshellProtoApp.activate();
+  else viewSelector.showApps();
 }
 }
