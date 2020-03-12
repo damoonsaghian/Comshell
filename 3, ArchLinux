@@ -1,10 +1,7 @@
 using Arch Linux we can easily setup and maintain a Linux system;
 the following shows how to setup a basic graphical environment, using GnomeShell;
-press "alt-space" to show the list of applications;
+in the installed system you can press "alt-space" to show the list of applications;
 there you can also do poweroff/restart, logout, suspend, and lock, by typing them;
-
-there is a prototype of Comshell implemented using Neovim, Gjs, Webkit2gtk and Gstreamer;
-it will be launched at startup (if Comshell itself is not present);
 
 boot Arch Linux live environment;
 to ensure the system clock is accurate:
@@ -25,13 +22,23 @@ list available block devices using "lsblk", then on the intended block device,
 ; mkdir /mnt/etc
 ; genfstab -U /mnt >> /mnt/etc/fstab
 
-; pacstrap /mnt base git
+; pacstrap /mnt base
 ; arch-chroot /mnt
-; git clone https://github.com/damoonsaghian/Comshell.git ./Comshell
-; cd Comshell
-ensure that the files in "ArchLinux" and "Comshell_proto" directories aren't malicious, then:
-; sh ArchLinux/install.sh
+; export url=https://raw.githubusercontent.com/damoonsaghian/Comshell/master/ArchLinux/
+; curl --proto '=https' -sSf -o #1 "$url"{install.sh,extension.js}
+ensure the downloaded files aren't malicious, then:
+; sh install.sh
 ; exit; reboot
+
+if Comshell is installed, it will be launched at startup;
+otherwise open terminal app, and do this:
+; pkexec pacman -S git
+; git clone https://github.com/damoonsaghian/Comshell.git ~/projects/Comshell
+; cd ~/projects/Comshell
+; cargo build --release
+; cp .target/release/comshell /usr/local/bin/comshell
+; printf '[Desktop Entry]\nName=Comshell\nExec=comshell\nIcon=comshell\nType=Application' >
+  /usr/local/share/applications/comshell.desktop
 
 to connect to a WIFI network:
 ; nmcli dev wifi
