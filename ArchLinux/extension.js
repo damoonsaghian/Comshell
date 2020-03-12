@@ -72,13 +72,6 @@ main.panel.statusArea.aggregateMenu.container.hide();
   );
   */
 
-  const location = main.panel.statusArea.aggregateMenu._location;
-  if (location && location._indicator) {
-    location.indicators.remove_child(location._indicator);
-    rightBox.add_child(location._indicator);
-    location._syncIndicator();
-  }
-
   const remoteAccess = main.panel.statusArea.aggregateMenu._remoteAccess;
   if (remoteAccess && remoteAccess._indicator) {
     remoteAccess._ensureControls();
@@ -87,7 +80,14 @@ main.panel.statusArea.aggregateMenu.container.hide();
     remoteAccess._sync();
   }
 
-  const dateTimeLabel = new st.Label({ y_align: clutter.ActorAlign.END });
+  const location = main.panel.statusArea.aggregateMenu._location;
+  if (location && location._indicator) {
+    location.indicators.remove_child(location._indicator);
+    rightBox.add_child(location._indicator);
+    location._syncIndicator();
+  }
+
+  const dateTimeLabel = new st.Label({ y_align: clutter.ActorAlign.CENTER });
   rightBox.add_child(dateTimeLabel);
   const updateClock = () => {
     const now = imports.gi.GLib.DateTime.new_now_local();

@@ -5,8 +5,7 @@ printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
 pacman -S grub intel-ucode amd-ucode linux linux-firmware \
   btrfs-progs e2fsprogs dosfstools unzip nano man-db pulseaudio-alsa networkmanager \
   ttf-hack noto-fonts materia-gtk-theme \
-  lightdm-gtk-greeter xorg-server light-locker gnome-shell gvfs lxterminal \
-  neovim webkit2gtk gst-plugins-{base,good,bad} gst-libav
+  lightdm-gtk-greeter xorg-server light-locker gnome-shell gvfs lxterminal
 
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
 printf '\nset superusers=""\n' >> /etc/grub.d/40_custom
@@ -67,6 +66,7 @@ show-banners=false
 primary-color='#222222'
 secondary-color='#222222'
 [org/gnome/desktop/interface]
+overlay-scrolling=false
 document-font-name='sans 10.5'
 font-name='sans 10.5'
 monospace-font-name='monospace 10.5'
@@ -125,12 +125,13 @@ echo 'stage {
   padding: 0px 8px 0 0;
 }
 ' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css
-cp ./ArchLinux/extension.js /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
+cp ./extension.js /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
 
+curl --proto '=https' -sSf -o #1 https://raw.githubusercontent.com/damoonsaghian/Comshell/master/ArchLinux/gtk.css
 mkdir -p /etc/skel/.config/gtk-3.0
-cp ./ArchLinux/gtk.css /etc/skel/.config/gtk-3.0/
+cp ./gtk.css /etc/skel/.config/gtk-3.0/
 mkdir -p /etc/skel/.config/gtk-4.0
-cp ./ArchLinux/gtk.css /etc/skel/.config/gtk-4.0/
+cp ./gtk.css /etc/skel/.config/gtk-4.0/
 
 echo '<?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
@@ -165,8 +166,8 @@ echo '<?xml version="1.0"?>
 echo '[general]
 fontname=Monospace 10.5
 cursorblinks=true
-geometry_columns=120
-geometry_rows=35
+geometry_columns=80
+geometry_rows=25
 hidescrollbar=true
 hidemenubar=true
 hideclosebutton=true
@@ -174,9 +175,8 @@ hidepointer=true
 disablef10=true
 disablealt=true
 disableconfirm=true
-color_preset=Solarized Light
-bgcolor=rgb(253,246,227)
-fgcolor=rgb(101,123,131)
+bgcolor=rgb(55,55,55)
+fgcolor=rgb(255,255,255)
 palette_color_0=rgb(7,54,66)
 palette_color_1=rgb(220,50,47)
 palette_color_2=rgb(133,153,0)
@@ -193,21 +193,16 @@ palette_color_12=rgb(131,148,150)
 palette_color_13=rgb(108,113,196)
 palette_color_14=rgb(147,161,161)
 palette_color_15=rgb(253,246,227)
+color_preset=Solarized Dark
 ' > /etc/skel/.config/lxterminal/lxterminal.conf
 
-mkdir -p /usr/local/share/Comshell_proto
-cp -r ./Comshell_proto/*.js /usr/local/share/Comshell_proto/
-echo '
-[Desktop Entry]
-Name=Comshell_proto
-Exec=gjs /usr/local/share/Comshell_proto/main.js
-Icon=comshell
+echo '[Desktop Entry]
+Name=Terminal
+TryExec=lxterminal
+Exec=lxterminal
+Icon=utilities-terminal
 Type=Application
-StartupNotify=true
-Categories=GNOME;GTK;Utility;TextEditor;Development;
-MimeType=text/plain;
-StartupWMClass=atom
-' > /etc/skel/.local/share/applications/comshell_proto.desktop
+' > /usr/local/share/applications/lxterminal.desktop
 
 echo '
 PS1="\[$(tput setab 4)\]\[$(tput setaf 15)\]\w\[$(tput sgr0)\]\[$(tput setaf 4)\]\[$(tput sgr0)\] "
