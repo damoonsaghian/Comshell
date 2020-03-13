@@ -83,7 +83,7 @@ toggle-maximized=['<Shift><Alt>Space']
 activate-window-menu=['']
 [org/gnome/shell/keybindings]
 toggle-application-view=['<Alt>Space', '<Super>a']
-switch-to-application-1=['<Alt>a']
+switch-to-application-1=['<Alt>Period']
 [org/gnome/shell]
 disable-extension-version-validation=true
 enabled-extensions=['gnome-shell-improved']
@@ -196,14 +196,6 @@ palette_color_14=rgb(147,161,161)
 palette_color_15=rgb(253,246,227)
 color_preset=Solarized Dark
 ' > /etc/skel/.config/lxterminal/lxterminal.conf
-
-echo '[Desktop Entry]
-Name=Terminal
-TryExec=lxterminal
-Exec=lxterminal
-Icon=utilities-terminal
-Type=Application
-' > /usr/local/share/applications/lxterminal.desktop
 
 echo '
 PS1="\[$(tput setab 4)\]\[$(tput setaf 15)\]\w\[$(tput sgr0)\]\[$(tput setaf 4)\]\[$(tput sgr0)\] "
