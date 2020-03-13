@@ -30,16 +30,6 @@ ensure the downloaded files aren't malicious, then:
 ; sh install.sh
 ; exit; reboot
 
-if Comshell is installed, it will be launched at startup;
-otherwise open terminal app, and do this:
-; pkexec pacman -S git
-; git clone https://github.com/damoonsaghian/Comshell.git ~/projects/Comshell
-; cd ~/projects/Comshell
-; cargo build --release
-; cp .target/release/comshell /usr/local/bin/comshell
-; printf '[Desktop Entry]\nName=Comshell\nExec=comshell\nIcon=comshell\nType=Application' >
-  /usr/local/share/applications/comshell.desktop
-
 to connect to a WIFI network:
 ; nmcli dev wifi
 ; nmcli --ask dev wifi con <ssid>
