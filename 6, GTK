@@ -17,8 +17,18 @@ Gactor embeds a Fragile inside, which will be created in GTK main thread (using 
 "https://github.com/fengalin/media-toc"
 
 ; sudo pacman -S gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
-
 poppler-glib goffice goocanvas
+
+; cargo build --release
+; cp .target/release/comshell /usr/local/bin/
+
+; printf '[Desktop Entry]\nName=Comshell\nExec=comshell\nIcon=computer\nType=Application' >
+  /usr/local/share/applications/comshell.desktop
+; cp /usr/local/share/applications/comshell.desktop ~/.config/autostart/
+; pkexec cp /usr/local/share/applications/comshell.desktop /etc/skel/.config/autostart/
+
+= prototype
+first we implement a prototype of Comshell using GJS;
 
 "https://github.com/sebp/PyGObject-Tutorial/tree/master/examples"
 "https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
@@ -34,9 +44,9 @@ poppler-glib goffice goocanvas
 "https://www.archlinux.org/packages/community/any/gaupol/"
 "https://gitlab.gnome.org/World/eolie"
 
-; pkexec cp comshell /usr/local/bin/
+; pkexec cp -r ./Comshell_proto/ /usr/local/share/
 
-; printf '[Desktop Entry]\nType=Application\nName=Comshell\nExec=comshell\nStartupNotify=true' >
-  ~/.config/autostart/comshell.desktop
-; pkexec cp ~/.config/autostart/comshell.desktop /etc/skel/.config/autostart/
-; pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/
+; printf '[Desktop Entry]\nName=Comshell\nExec=comshell\nIcon=computer\nType=Application' >
+  /usr/local/share/applications/comshell.desktop
+; cp /usr/local/share/applications/comshell.desktop ~/.config/autostart/
+; pkexec cp /usr/local/share/applications/comshell.desktop /etc/skel/.config/autostart/
