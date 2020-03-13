@@ -83,6 +83,7 @@ toggle-maximized=['<Shift><Alt>Space']
 activate-window-menu=['']
 [org/gnome/shell/keybindings]
 toggle-application-view=['<Alt>Space', '<Super>a']
+switch-to-application-1=['<Alt>a']
 [org/gnome/shell]
 disable-extension-version-validation=true
 enabled-extensions=['gnome-shell-improved']

@@ -163,11 +163,12 @@ main.panel.statusArea.aggregateMenu.container.hide();
   // https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet
 }
 
-// apps view simplified, and with toggle functionality;
 {
   const overview = main.overview;
   const viewSelector = overview.viewSelector;
+  const windowManager = main.wm;
 
+  // apps view simplified;
   try {
     // switch to "all apps" view;
     viewSelector.appDisplay._showView(1);
@@ -175,8 +176,9 @@ main.panel.statusArea.aggregateMenu.container.hide();
     viewSelector.appDisplay._controls.hide();
   } finally {}
 
-  main.wm.removeKeybinding("toggle-application-view");
-  main.wm.addKeybinding(
+  // apps view with toggle functionality
+  windowManager.removeKeybinding("toggle-application-view");
+  windowManager.addKeybinding(
     "toggle-application-view",
     new imports.gi.Gio.Settings({ schema_id: imports.ui.windowManager.SHELL_KEYBINDINGS_SCHEMA }),
     meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
@@ -188,12 +190,73 @@ main.panel.statusArea.aggregateMenu.container.hide();
     }
   );
 
-  // launched Comshell at startup, and if it's not installed, show apps;
+  // hide apps view when pressing "alt-tab";
+  windowManager.setCustomKeybindingHandler(
+    "switch-applications",
+    shell.ActionMode.NORMAL | shell.ActionMode.OVERVIEW,
+    (display, win, binding) => {
+      if (overview.visible) { overview.hide(); return; }
+      windowManager._startSwitcher(display, win, binding);
+    }
+  );
+
   const appSystem = shell.AppSystem.get_default();
-  const comshellApp = appSystem.lookup_app("comshell.desktop");
-  const comshellProtoApp = appSystem.lookup_app("comshell_proto.desktop");
-  if (comshellApp) comshellApp.activate();
-  else if (comshellProtoApp) comshellProtoApp.activate();
-  else viewSelector.showApps();
+  const windowTracker = shell.WindowTracker.get_default();
+
+  // activate terminal app;
+  windowManager.removeKeybinding("switch-to-application-1");
+  windowManager.addKeybinding(
+    "switch-to-application-1",
+    new imports.gi.Gio.Settings({ schema_id: imports.ui.windowManager.SHELL_KEYBINDINGS_SCHEMA }),
+    meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+    shell.ActionMode.NORMAL | shell.ActionMode.OVERVIEW,
+    (_display, _window, _binding) => {
+      if (overview.visible) overview.hide();
+
+      const termApp = appSystem.lookup_app("lxterminal.desktop");
+
+      const focusedWindow = global.display.get_focus_window();
+      if (!focusedWindow) {
+        termApp.activate();
+        return;
+      }
+      const focusedApp = windowTracker.get_window_app(focusedWindow);
+      if (focusedApp == null || focusedApp.is_window_backed()) {
+        termApp.activate();
+        return;
+      }
+      const focusedAppId = focusedApp.get_id();
+      if (focusedAppId === "lxterminal.desktop") {
+        termApp.open_new_window(-1);
+      } else {
+        termApp.activate();
+      }
+    }
+  );
+
+  // put terminal windows at the end when they are unfocused;
+  global.display.connect("notify::focus-window", () => {
+    const termApp = appSystem.lookup_app("lxterminal.desktop");
+
+    const focusedWindow = global.display.get_focus_window();
+    if (!focusedWindow) {
+      termApp.get_windows().map(win => win.minimize());
+      return;
+    }
+    const focusedApp = windowTracker.get_window_app(focusedWindow);
+    if (focusedApp == null || focusedApp.is_window_backed()) {
+      termApp.get_windows().map(win => win.minimize());
+      return;
+    }
+    const focusedAppId = focusedApp.get_id();
+    if (focusedAppId === "lxterminal.desktop") {
+      termApp.get_windows().reverse().map(win => {
+        if (win.minimized) win.unminimize();
+        else win.focus();
+      });
+    } else {
+      termApp.get_windows().map(win => win.minimize());
+    }
+  });
 }
 }
