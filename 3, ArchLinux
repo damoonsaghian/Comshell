@@ -1,7 +1,8 @@
 using Arch Linux we can easily setup and maintain a Linux system;
 the following shows how to setup a basic graphical environment, using GnomeShell;
 in the installed system you can press "alt-space" to show the list of applications;
-there you can also do poweroff/restart, logout, suspend, and lock, by typing them;
+there you can also do power_off/restart, logout, suspend, and lock, by typing them;
+press "alt-shift-space" to make a window maximized;
 press "alt-." to show the terminal; press "alt-." again to open a new terminal window;
 
 boot Arch Linux live environment;

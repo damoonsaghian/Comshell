@@ -13,7 +13,9 @@ Gactor embeds a Fragile inside, which will be created in GTK main thread (using 
 "https://gtk-rs.org/docs/sourceview/"
 "https://mmstick.github.io/gtkrs-tutorials/introduction.html"
 "https://github.com/gtk-rs/examples/tree/master/src/bin"
-"https://gitlab.gnome.org/GNOME/fractal"
+"https://slomo.pages.freedesktop.org/rustdocs/gstreamer/gstreamer/"
+"https://gitlab.freedesktop.org/gstreamer/gstreamer-rs/tree/master/examples"
+"https://gitlab.freedesktop.org/gstreamer/gstreamer-rs/tree/master/tutorials"
 "https://github.com/fengalin/media-toc"
 
 ; sudo pacman -S gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
@@ -42,11 +44,9 @@ first we implement a prototype of Comshell using GJS;
 "https://www.archlinux.org/packages/community/any/quodlibet/"
 "https://www.archlinux.org/packages/community/any/lollypop/"
 "https://www.archlinux.org/packages/community/any/gaupol/"
-"https://gitlab.gnome.org/World/eolie"
 
 ; pkexec cp -r ./Comshell_proto/ /usr/local/share/
 
-; printf '[Desktop Entry]\nName=Comshell\nExec=comshell\nIcon=computer\nType=Application' >
-  /usr/local/share/applications/comshell.desktop
-; cp /usr/local/share/applications/comshell.desktop ~/.config/autostart/
-; pkexec cp /usr/local/share/applications/comshell.desktop /etc/skel/.config/autostart/
+; printf '[Desktop Entry]\nName=Comshell_proto\nExec=gjs /usr/local/share/Comshell_proto/main.js\nIcon=computer\nType=Application' > /usr/local/share/applications/comshell.desktop
+; cp /usr/local/share/applications/comshell_proto.desktop ~/.config/autostart/
+; pkexec cp /usr/local/share/applications/comshell_proto.desktop /etc/skel/.config/autostart/
