@@ -18,21 +18,6 @@ Gactor embeds a Fragile inside, which will be created in GTK main thread (using 
 "https://gitlab.freedesktop.org/gstreamer/gstreamer-rs/tree/master/tutorials"
 "https://github.com/fengalin/media-toc"
 
-; sudo pacman -S gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
-poppler-glib goffice goocanvas
-
-; cargo build --release
-; cp .target/release/comshell /usr/local/bin/
-
-; printf '[Desktop Entry]\nName=Comshell\nExec=comshell\nIcon=computer\nType=Application' >
-  /usr/local/share/applications/comshell.desktop
-; cp /usr/local/share/applications/comshell.desktop ~/.config/autostart/
-; pkexec cp /usr/local/share/applications/comshell.desktop /etc/skel/.config/autostart/
-
-= prototype
-first we implement a prototype of Comshell using GJS;
-
-"https://github.com/sebp/PyGObject-Tutorial/tree/master/examples"
 "https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
 "http://zetcode.com/gui/pygtk/advancedwidgets/"
 "https://github.com/MeanEYE/Sunflower"
@@ -45,8 +30,13 @@ first we implement a prototype of Comshell using GJS;
 "https://www.archlinux.org/packages/community/any/lollypop/"
 "https://www.archlinux.org/packages/community/any/gaupol/"
 
-; pkexec cp -r ./Comshell_proto/ /usr/local/share/
+; sudo pacman -S gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
+poppler-glib goffice goocanvas
 
-; printf '[Desktop Entry]\nName=Comshell_proto\nExec=gjs /usr/local/share/Comshell_proto/main.js\nIcon=computer\nType=Application' > /usr/local/share/applications/comshell.desktop
-; cp /usr/local/share/applications/comshell_proto.desktop ~/.config/autostart/
-; pkexec cp /usr/local/share/applications/comshell_proto.desktop /etc/skel/.config/autostart/
+; cargo build --release
+; cp .target/release/comshell /usr/local/bin/
+
+; printf '[Desktop Entry]\nName=Comshell\nExec=comshell\nIcon=computer\nType=Application' >
+  /usr/local/share/applications/comshell.desktop
+; cp /usr/local/share/applications/comshell.desktop ~/.config/autostart/
+; pkexec cp /usr/local/share/applications/comshell.desktop /etc/skel/.config/autostart/

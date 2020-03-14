@@ -64,7 +64,7 @@ system status: network, CPU and RAM usage, year-month-day week_day AM/PM hour:mi
 
 modal key_bindings;
 modes (like normal mode and insert mode) must be visually distinctive;
-press "escape" to go back to normal mode;
+press "tab" to go back to normal mode;
 in normal mode we can:
 , move the cursor to the next or previous character or word;
 , move the cursor to the next or previous lines or table cells;
@@ -77,4 +77,3 @@ in normal mode we can:
 
 double space: creating tables
 auto_completion is done (after typing "space") only where there must be a predefined name;
-list of available names will be displayed in a list at the right;
