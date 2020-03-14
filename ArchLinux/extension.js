@@ -211,7 +211,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
     meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
     shell.ActionMode.NORMAL | shell.ActionMode.OVERVIEW,
     (_display, _window, _binding) => {
-      const termApp = appSystem.lookup_app("lxterminal.desktop");
+      const termApp = appSystem.lookup_app("termite.desktop");
 
       if (overview.visible) {
         overview.hide();
@@ -230,7 +230,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
         return;
       }
       const focusedAppId = focusedApp.get_id();
-      if (focusedAppId === "lxterminal.desktop") {
+      if (focusedAppId === "termite.desktop") {
         termApp.open_new_window(-1);
       } else {
         termApp.activate();
@@ -240,7 +240,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
 
   // put terminal windows at the end when they are unfocused;
   global.display.connect("notify::focus-window", () => {
-    const termApp = appSystem.lookup_app("lxterminal.desktop");
+    const termApp = appSystem.lookup_app("termite.desktop");
 
     const focusedWindow = global.display.get_focus_window();
     if (!focusedWindow) {
@@ -253,7 +253,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
       return;
     }
     const focusedAppId = focusedApp.get_id();
-    if (focusedAppId === "lxterminal.desktop") {
+    if (focusedAppId === "termite.desktop") {
       termApp.get_windows().reverse().map(win => {
         if (win.minimized) win.unminimize();
         else win.focus();

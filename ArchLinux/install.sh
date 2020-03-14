@@ -5,7 +5,7 @@ printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
 pacman -S grub intel-ucode amd-ucode linux linux-firmware \
   btrfs-progs e2fsprogs dosfstools unzip nano man-db pulseaudio-alsa networkmanager \
   ttf-hack noto-fonts materia-gtk-theme \
-  lightdm-gtk-greeter xorg-server light-locker gnome-shell gvfs lxterminal
+  lightdm-gtk-greeter xorg-server light-locker gnome-shell gvfs termite
 
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
 printf '\nset superusers=""\n' >> /etc/grub.d/40_custom
@@ -164,44 +164,54 @@ echo '<?xml version="1.0"?>
 </fontconfig>
 ' > /etc/fonts/local.conf
 
-echo '[general]
-fontname=Monospace 10.5
-cursorblinks=true
-geometry_columns=80
-geometry_rows=25
-hidescrollbar=true
-hidemenubar=true
-hideclosebutton=true
-hidepointer=true
-disablef10=true
-disablealt=true
-disableconfirm=true
-bgcolor=rgb(55,55,55)
-fgcolor=rgb(255,255,255)
-palette_color_0=rgb(7,54,66)
-palette_color_1=rgb(220,50,47)
-palette_color_2=rgb(133,153,0)
-palette_color_3=rgb(181,137,0)
-palette_color_4=rgb(38,139,210)
-palette_color_5=rgb(211,54,130)
-palette_color_6=rgb(42,161,152)
-palette_color_7=rgb(238,232,213)
-palette_color_8=rgb(0,43,54)
-palette_color_9=rgb(203,75,22)
-palette_color_10=rgb(88,110,117)
-palette_color_11=rgb(101,123,131)
-palette_color_12=rgb(131,148,150)
-palette_color_13=rgb(108,113,196)
-palette_color_14=rgb(147,161,161)
-palette_color_15=rgb(253,246,227)
-color_preset=Solarized Dark
-' > /etc/skel/.config/lxterminal/lxterminal.conf
+mkdir -p /etc/skel/.config/termite
+echo '[options]
+font = Monospace 10.5
+size_hints = true
+
+[colors]
+foreground = #444444
+background = #eeeeee
+
+# Black, Gray, Silver, White
+color0  = #fafafa
+color8  = #a0a1a7
+color7  = #383a42
+color15 = #090a0b
+# Red
+color1  = #bf8b56
+color9  = #bf8b56
+# Green
+color2  = #50a14f
+color10 = #50a14f
+# Yellow
+color3  = #c18401
+color11 = #c18401
+# Blue
+color4  = #4078f2
+color12 = #4078f2
+# Purple
+color5  = #a626a4
+color13 = #a626a4
+# Teal
+color6  = #0184bc
+color14 = #0184bc
+# Extra colors
+color16 = #d75f00
+color17 = #986801
+color18 = #f0f0f1
+color19 = #e5e5e6
+color20 = #696c77
+color21 = #202227
+' > /etc/skel/.config/termite/config
 
 echo '
-PS1="\[$(tput setab 4)\]\[$(tput setaf 15)\]\w\[$(tput sgr0)\]\[$(tput setaf 4)\]\[$(tput sgr0)\] "
+PS1="\[$(tput setab 6)\]\[$(tput setaf 0)\]\w\[$(tput sgr0)\]\[$(tput setaf 6)\]\[$(tput sgr0)\] "
 unset HISTFILE
 ' >> /etc/skel/.bashrc
 
 useradd -m -G wheel user1
 passwd user1
 passwd
+
+rm ./install.sh ./extension.js ./gtk.css
