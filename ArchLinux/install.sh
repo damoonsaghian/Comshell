@@ -170,8 +170,8 @@ font = Monospace 10.5
 size_hints = true
 
 [colors]
-foreground = #555555
-background = #eeeeee
+foreground = #333333
+background = #ffffff
 
 # Black, Gray, Silver, White
 color0  = #fafafa
