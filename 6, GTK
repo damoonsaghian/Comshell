@@ -1,13 +1,18 @@
 implementing a complete GUI toolkit is a huge lot of work;
 existing ones (like GTK) are single threaded;
-thus we can't access GTK widgets (and structure containing them), from inside actors;
+thus we can't access GTK widgets (and data structures containing them), from inside actors;
 the solution:
 "https://gtk-rs.org/docs/glib/source/fn.idle_add.html"
 "https://docs.rs/fragile/1.0.0/fragile/struct.Fragile.html"
 "https://docs.rs/send_wrapper/0.4.0/send_wrapper/"
-in addition to "Arc" and "Actor", we have "Gactor";
-Gactor embeds a Fragile inside, which will be created in GTK main thread (using "idle_add"),
-  and then received (and put inside the Gactor) using a channel;
+we deal with Gobjects by wraping them in a Gapper";
+Gapper embeds a Fragile inside, which will be created in the GTK main thread (using "idle_add"),
+  and then received (and put inside the Gapper) using a channel;
+Gapper.new gets a closure (instead of a Gobject value);
+  the closure's return type is the type of the specific Gobject;
+
+Arc: immutable;
+Actor: mutable;
 
 "https://gtk-rs.org/docs/gtk/"
 "https://gtk-rs.org/docs/sourceview/"
