@@ -5,10 +5,10 @@ the solution:
 "https://gtk-rs.org/docs/glib/source/fn.idle_add.html"
 "https://docs.rs/fragile/1.0.0/fragile/struct.Fragile.html"
 "https://docs.rs/send_wrapper/0.4.0/send_wrapper/"
-we deal with Gobjects by wraping them in a Gapper";
-Gapper embeds a Fragile inside, which will be created in the GTK main thread (using "idle_add"),
-  and then received (and put inside the Gapper) using a channel;
-Gapper.new gets a closure (instead of a Gobject value);
+we deal with Gobjects by wrapping them in a Gsend;
+Gsend embeds a Fragile inside, which will be created in the GTK main thread (using "idle_add"),
+  and then received (and put inside the Gsend) using a channel;
+Gsend.new gets a closure (instead of a Gobject value);
   the closure's return type is the type of the specific Gobject;
 
 Arc: immutable;
