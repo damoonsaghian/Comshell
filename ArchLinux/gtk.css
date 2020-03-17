@@ -23,20 +23,10 @@ window.ssd headerbar.titlebar button.titlebutton {
 }
 
 decoration {
-  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
 }
 decoration:backdrop {
-  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.5);
-}
-
-.ssd decoration {
-  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.5);
-}
-.csd.popup decoration {
-  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.5);
-}
-.solid-csd decoration {
-  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
 }
 
 scrollbar {

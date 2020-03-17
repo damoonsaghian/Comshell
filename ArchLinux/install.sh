@@ -76,6 +76,10 @@ enable-hot-corners=false
 [org/gnome/desktop/wm/preferences]
 button-layout=''
 [org/gnome/desktop/wm/keybindings]
+switch-group=['<Super>Above_Tab']
+switch-group-backward=['<Shift><Super>Above_Tab']
+cycle-group=['<Alt>Above_Tab']
+cycle-group-backward=['<Shift><Alt>Above_Tab']
 cycle-windows=['']
 cycle-windows-backward=['']
 close=['<Alt>Escape']
@@ -83,7 +87,7 @@ toggle-maximized=['<Shift><Alt>Space']
 activate-window-menu=['']
 [org/gnome/shell/keybindings]
 toggle-application-view=['<Alt>Space', '<Super>a']
-switch-to-application-1=['<Alt>Period']
+switch-to-application-1=['<Alt>Period', '<Alt>Comma']
 [org/gnome/shell]
 disable-extension-version-validation=true
 enabled-extensions=['gnome-shell-improved']
@@ -164,49 +168,27 @@ echo '<?xml version="1.0"?>
 </fontconfig>
 ' > /etc/fonts/local.conf
 
-mkdir -p /etc/skel/.config/termite
-echo '[options]
-font = Monospace 10.5
-size_hints = true
+mkdir -p /etc/skel/.config/sakura
+echo '[sakura]
+colorset1_fore=rgb(55,55,55)
+colorset1_back=rgb(255,255,255)
+colorset1_curs=rgb(55,55,55)
+last_colorset=1
+font=Monospace 10.5
+palette=solarized_light
+' > /etc/skel/.config/sakura/sakura.conf
 
-[colors]
-foreground = #333333
-background = #ffffff
-
-# Black, Gray, Silver, White
-color0  = #fafafa
-color8  = #a0a1a7
-color7  = #383a42
-color15 = #090a0b
-# Red
-color1  = #bf8b56
-color9  = #bf8b56
-# Green
-color2  = #50a14f
-color10 = #50a14f
-# Yellow
-color3  = #c18401
-color11 = #c18401
-# Blue
-color4  = #4078f2
-color12 = #4078f2
-# Purple
-color5  = #a626a4
-color13 = #a626a4
-# Teal
-color6  = #0184bc
-color14 = #0184bc
-# Extra colors
-color16 = #d75f00
-color17 = #986801
-color18 = #f0f0f1
-color19 = #e5e5e6
-color20 = #696c77
-color21 = #202227
-' > /etc/skel/.config/termite/config
+mkdir -p /usr/local/share/applications
+echo '[Desktop Entry]
+Name=Terminal
+Exec=sakura -c 110 -r 30
+Icon=utilities-terminal
+Type=Application
+StartupNotify=true
+' > /usr/local/share/applications/sakura.desktop
 
 echo '
-PS1="\[$(tput setab 6)\]\[$(tput setaf 0)\]\w\[$(tput sgr0)\]\[$(tput setaf 6)\]\[$(tput sgr0)\] "
+PS1="\[$(tput setab 4)\]\[$(tput setaf 15)\]\w\[$(tput sgr0)\]\[$(tput setaf 4)\]\[$(tput sgr0)\] "
 unset HISTFILE
 ' >> /etc/skel/.bashrc
 
