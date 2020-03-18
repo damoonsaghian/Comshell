@@ -120,13 +120,12 @@ the right way as done in Pony and Rust:
 
 note that "x.m()" is method call syntax, which completely differs from "(x.m)()";
 
-in "use" statements:
-, crate_name::...
-, self::local_item::...
-even outside "use" statements, we can build absolute paths using crate names at the beginning;
-  but since it can conflict with a local name, it's better to avoid it, and instead,
-  either insert a "::" at the beginning, before the crate's name,
-  or bring the crate's name into scope using a "use" statement;
+an absolute path starts from a crate root by using a crate name or a literal "crate";
+a relative path starts from the current module and uses
+  "self", "super", or the name of an item in the current module;
+if an in_scope item has the same name as a crate, then we have to resolve the ambiguity:
+, using a leading "::" for a crate name;
+, using a leading "self::" for an in_scope item;
 
 arrays like tuples have fixed size and thus stored on stack;
 but since they are homogeneous (all elements are of the same type),
