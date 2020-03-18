@@ -175,7 +175,6 @@ colorset1_back=rgb(255,255,255)
 colorset1_curs=rgb(55,55,55)
 last_colorset=1
 font=Monospace 10.5
-palette=solarized_light
 ' > /etc/skel/.config/sakura/sakura.conf
 
 mkdir -p /usr/local/share/applications
