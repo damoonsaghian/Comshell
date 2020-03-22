@@ -1,4 +1,4 @@
-function enable() {
+function init() {
 const main = imports.ui.main;
 const st = imports.gi.St;
 const clutter = imports.gi.Clutter;
@@ -9,10 +9,11 @@ main.setThemeStylesheet(
   "/usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css");
 main.loadTheme();
 
-// move notification banners to the bottom;
+// hide notification banners;
 {
   const bannerBin = main.messageTray._bannerBin;
-  if (bannerBin) bannerBin.set_y_align(clutter.ActorAlign.END);
+  //if (bannerBin) bannerBin.set_y_align(clutter.ActorAlign.END);
+  if (bannerBin) bannerBin.hide();
 }
 
 // move status_bar to the bottom;
@@ -40,9 +41,13 @@ main.loadTheme();
   movePanelToBottom();
 }
 
+main.panel.statusArea.activities.container.connect("show", c => c.hide());
 main.panel.statusArea.activities.container.hide();
-main.panel.statusArea.appMenu.destroy();
+main.panel.statusArea.appMenu.container.connect("show", c => c.hide());
+main.panel.statusArea.appMenu.container.hide();
+main.panel.statusArea.dateMenu.container.connect("show", c => c.hide());
 main.panel.statusArea.dateMenu.container.hide();
+main.panel.statusArea.aggregateMenu.container.connect("show", c => c.hide());
 main.panel.statusArea.aggregateMenu.container.hide();
 
 // right side of status_bar;
@@ -256,11 +261,22 @@ main.panel.statusArea.aggregateMenu.container.hide();
     if (focusedAppId === "sakura.desktop") {
       termApp.get_windows().reverse().map(win => {
         if (win.minimized) win.unminimize();
-        else win.focus();
+        else win.focus(0);
       });
     } else {
       termApp.get_windows().map(win => win.minimize());
     }
   });
 }
+
+imports.gi.GLib.spawn_command_line_async("light-locker");
+const systemActions = imports.misc.systemActions.getDefault();
+const systemActionsProto = Object.getPrototypeOf(systemActions);
+systemActionsProto.activateLockScreen =
+  () => imports.gi.GLib.spawn_command_line_async("light-locker-command -l");
+imports.misc.loginManager.canLock = () => true;
+systemActions._updateLockScreen();
 }
+
+function enable() {}
+function disable() {}

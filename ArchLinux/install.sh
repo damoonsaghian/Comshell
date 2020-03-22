@@ -40,15 +40,6 @@ hide-user-image=true
 indicators=
 ' > /etc/lightdm/lightdm-gtk-greeter.conf.d/50-myconfig.conf
 
-# since Gnome does not use the autostart file provided by "light-locker" package itself:
-mkdir -p /etc/skel/.config/autostart
-echo '[Desktop Entry]
-Type=Application
-Name=Screen Locker
-Exec=light-locker
-NoDisplay=true
-' > /etc/skel/.config/autostart/light-locker.desktop
-
 # to customize dconf default values:
 mkdir -p /etc/dconf/profile
 echo 'user-db:user
