@@ -35,7 +35,7 @@ Actor: mutable;
 "https://www.archlinux.org/packages/community/any/lollypop/"
 "https://www.archlinux.org/packages/community/any/gaupol/"
 
-; sudo pacman -S gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
+; pkexec pacman -S gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
 poppler-glib goffice goocanvas
 
 ; cargo build --release

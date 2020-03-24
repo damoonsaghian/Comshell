@@ -2,8 +2,8 @@ using Arch Linux we can easily setup and maintain a Linux system;
 the following shows how to setup a basic graphical environment, using GnomeShell;
 in the installed system you can press "alt-space" to show the list of applications;
 there you can also do power_off/restart, logout, suspend, and lock, by typing them;
-press "alt-shift-space" to make a window maximized;
-press "alt-." to show the terminal; press "alt-." again to open a new terminal window;
+press "alt-m" to make a window maximized;
+press "alt-c" to close the window;
 
 boot Arch Linux live environment;
 to ensure the system clock is accurate:
@@ -43,8 +43,6 @@ you can set "user1" for automatic login:
   autologin-user=user1
 ; pkexec groupadd -r autologin
 ; pkexec gpasswd -a user1 autologin
-and remove the locker:
-; rm ~/.config/autostart/light-locker.desktop
 but to protect the computer from physical attacks, you have to disable automatic login,
   and lock the session when you leave the computer;
 in addition you have to:
@@ -59,3 +57,12 @@ note that due to a bug, "pkexec" does not work with the fallback Polkit agent,
 there is a workaround though (it requires "ctrl+c" to stop):
 ; pkttyagent -p $(echo $$) | pkexec ...
 or you can just use "su" instead;
+
+now we can even have a prototype of Comshell using Emacs;
+there is also a viewer for web and video/images;
+; pkexec pacman -S emacs webkit2gtk gst-plugins-{base,good,bad} gst-libav
+; cp /usr/local/share/applications/emacs.desktop ~/.config/autostart/
+; mkdir -p ~/.emacs.d
+; export url=https://raw.githubusercontent.com/damoonsaghian/Comshell/master/ArchLinux/
+; curl --proto '=https' -sSf -o ~/.emacs.d/init.el "$url"init.el
+; curl --proto '=https' -sSf -o ~/.local/share/view.js "$url"view.js
