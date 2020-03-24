@@ -204,69 +204,6 @@ main.panel.statusArea.aggregateMenu.container.hide();
       windowManager._startSwitcher(display, win, binding);
     }
   );
-
-  const appSystem = shell.AppSystem.get_default();
-  const windowTracker = shell.WindowTracker.get_default();
-
-  // activate terminal app;
-  windowManager.removeKeybinding("switch-to-application-1");
-  windowManager.addKeybinding(
-    "switch-to-application-1",
-    new imports.gi.Gio.Settings({ schema_id: imports.ui.windowManager.SHELL_KEYBINDINGS_SCHEMA }),
-    meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-    shell.ActionMode.NORMAL | shell.ActionMode.OVERVIEW,
-    (_display, _window, _binding) => {
-      const termApp = appSystem.lookup_app("sakura.desktop");
-
-      if (overview.visible) {
-        overview.hide();
-        termApp.activate();
-        return;
-      }
-
-      const focusedWindow = global.display.get_focus_window();
-      if (!focusedWindow) {
-        termApp.activate();
-        return;
-      }
-      const focusedApp = windowTracker.get_window_app(focusedWindow);
-      if (focusedApp == null || focusedApp.is_window_backed()) {
-        termApp.activate();
-        return;
-      }
-      const focusedAppId = focusedApp.get_id();
-      if (focusedAppId === "sakura.desktop") {
-        termApp.open_new_window(-1);
-      } else {
-        termApp.activate();
-      }
-    }
-  );
-
-  // put terminal windows at the end when they are unfocused;
-  global.display.connect("notify::focus-window", () => {
-    const termApp = appSystem.lookup_app("sakura.desktop");
-
-    const focusedWindow = global.display.get_focus_window();
-    if (!focusedWindow) {
-      termApp.get_windows().map(win => win.minimize());
-      return;
-    }
-    const focusedApp = windowTracker.get_window_app(focusedWindow);
-    if (focusedApp == null || focusedApp.is_window_backed()) {
-      termApp.get_windows().map(win => win.minimize());
-      return;
-    }
-    const focusedAppId = focusedApp.get_id();
-    if (focusedAppId === "sakura.desktop") {
-      termApp.get_windows().reverse().map(win => {
-        if (win.minimized) win.unminimize();
-        else win.focus(0);
-      });
-    } else {
-      termApp.get_windows().map(win => win.minimize());
-    }
-  });
 }
 
 imports.gi.GLib.spawn_command_line_async("light-locker");

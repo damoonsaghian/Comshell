@@ -5,7 +5,7 @@ printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
 pacman -S grub intel-ucode amd-ucode linux linux-firmware \
   btrfs-progs e2fsprogs dosfstools unzip nano man-db pulseaudio-alsa networkmanager \
   ttf-hack noto-fonts materia-gtk-theme \
-  lightdm-gtk-greeter xorg-server light-locker gnome-shell gvfs termite
+  lightdm-gtk-greeter xorg-server light-locker gnome-shell gvfs gnome-terminal
 
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
 printf '\nset superusers=""\n' >> /etc/grub.d/40_custom
@@ -67,18 +67,13 @@ enable-hot-corners=false
 [org/gnome/desktop/wm/preferences]
 button-layout=''
 [org/gnome/desktop/wm/keybindings]
-switch-group=['<Super>Above_Tab']
-switch-group-backward=['<Shift><Super>Above_Tab']
-cycle-group=['<Alt>Above_Tab']
-cycle-group-backward=['<Shift><Alt>Above_Tab']
-cycle-windows=['']
-cycle-windows-backward=['']
-close=['<Alt>Escape']
-toggle-maximized=['<Shift><Alt>Space']
+cycle-group=['<Alt>a']
+cycle-group-backward=['<Shift><Alt>a']
+close=['<Alt>c']
+toggle-maximized=['<Alt>m']
 activate-window-menu=['']
 [org/gnome/shell/keybindings]
 toggle-application-view=['<Alt>Space', '<Super>a']
-switch-to-application-1=['<Alt>Period', '<Alt>Comma']
 [org/gnome/shell]
 disable-extension-version-validation=true
 enabled-extensions=['gnome-shell-improved']
@@ -159,24 +154,6 @@ echo '<?xml version="1.0"?>
 </fontconfig>
 ' > /etc/fonts/local.conf
 
-mkdir -p /etc/skel/.config/sakura
-echo '[sakura]
-colorset1_fore=rgb(55,55,55)
-colorset1_back=rgb(255,255,255)
-colorset1_curs=rgb(55,55,55)
-last_colorset=1
-font=Monospace 10.5
-' > /etc/skel/.config/sakura/sakura.conf
-
-mkdir -p /usr/local/share/applications
-echo '[Desktop Entry]
-Name=Terminal
-Exec=sakura -c 110 -r 30
-Icon=utilities-terminal
-Type=Application
-StartupNotify=true
-' > /usr/local/share/applications/sakura.desktop
-
 echo '
 PS1="\[$(tput setab 4)\]\[$(tput setaf 15)\]\w\[$(tput sgr0)\]\[$(tput setaf 4)\]\[$(tput sgr0)\] "
 unset HISTFILE
@@ -186,4 +163,4 @@ useradd -m -G wheel user1
 passwd user1
 passwd
 
-rm ./install.sh ./extension.js ./gtk.css
+rm ./install.sh ./extension.js ./gtk.css ./init.el
