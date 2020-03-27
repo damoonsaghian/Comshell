@@ -45,7 +45,8 @@ list of all files in the project will be displayed in a tree_view at the left;
 we can have views of different locations in a project (even of the same file) in separate tabs;
 
 text files will be opened in a text editor;
-directories containing a file named ".gallery" will be opened in a view showing thumbnails;
+directories containing a ".gallery" file will be opened in a view at the right,
+  showing the list of files;
 
 files and directories with names starting with a dot, will be hidden;
 ".cache" directory inside a project is for files we don't want to share or backup;
