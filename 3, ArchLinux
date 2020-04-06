@@ -58,14 +58,11 @@ there is a workaround though (it requires "ctrl+c" to stop):
 ; pkttyagent -p $(echo $$) | pkexec ...
 or you can just use "su" instead;
 
-now we can even have a prototype of Comshell;
-;sh
-pkexec pacman -S webkit2gtk gst-plugins-{base,good,bad} gst-libav
-printf '[Desktop Entry]\nName=Comshell proto\nExec=gjs /usr/local/share/comshell/main.js\nIcon=computer\nType=Application' > ~/.config/autostart/comshell.desktop
-pkexec cp ~/.config/autostart/comshell.desktop /etc/skel/.config/autostart/
-pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/comshell-p.desktop
-curl --proto '=https' -sSf -o comshell.zip https://github.com/damoonsaghian/Comshell/archive/master.zip
-unzip comshell.zip -d comshell
-pkexec mkdir -p /usr/local/share/comshell
-pkexec cp comshell/prototype/* /usr/local/share/comshell/
-;
+now we can even have a prototype of Comshell using Emacs;
+a separate application is implemented using GJS,
+  to view web pages, pdfs, images and videos, as an overlay window;
+; pkexec pacman -S emacs webkit2gtk poppler-glib gst-plugins-{base,good,bad} gst-libav
+; mkdir -p ~/.emacs.d
+; cd ~/.emacs.d
+; export url=https://raw.githubusercontent.com/damoonsaghian/Comshell/master/ArchLinux/
+; curl --proto '=https' -sSf -o #1 "$url"{init.el,overlay.js}
