@@ -163,4 +163,4 @@ useradd -m -G wheel user1
 passwd user1
 passwd
 
-rm ./install.sh ./extension.js ./gtk.css ./init.el
+rm ./install.sh ./extension.js ./gtk.css
