@@ -23,16 +23,16 @@ window.ssd headerbar.titlebar button.titlebutton {
 }
 
 decoration {
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
 }
 decoration:backdrop {
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-}
-.ssd decoration {
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
 }
-.maximized decoration,
-.fullscreen decoration {
+.ssd decoration {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+.ssd.maximized decoration,
+.ssd.fullscreen decoration {
   box-shadow: 0 0 0 transparent;
 }
 
@@ -61,12 +61,9 @@ scrollbar slider {
 }
 
 /*
-sectioned tabs and stack-switchers
-
 gradient + animation -> cursor
 "https://developer.gnome.org/gtk3/stable/chap-css-properties.html"
 gtk cursor-aspect-ratio style property;
-in "~/.config/gtk-3.0/gtk.css":
 * {
   -GtkTextView-error-underline-color: #FC4138;
   -gtk-outline-radius: 2px;
@@ -77,6 +74,4 @@ in "~/.config/gtk-3.0/gtk.css":
 }
 draw arrow at cursor position in TextView in GTK3:
   "https://gist.github.com/musiKk/2266946"
-"https://superuser.com/questions/1365329/how-do-i-make-the-focus-rectangle-in-gtk3-more-prominent"
-"https://github.com/xi/gtk-theme-clearcodes/tree/master/gtk-3.0"
 */
