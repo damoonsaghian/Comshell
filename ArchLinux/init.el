@@ -5,12 +5,12 @@
 (setq visible-bell t)
 ;;(setq insert-default-directory nil) ;; alternatively we can use double slash mechanism;
 (setq-default major-mode 'text-mode)
+(global-set-key (kbd "C-x k") #'kill-this-buffer)
 (cua-mode 1)
 (setq window-sides-vertical t)
 ;; after deleting a window kill its buffer if it doesn't have any other window;
 
 (setq make-backup-files nil)
-;;(setq create-lockfiles nil)
 ;; automatically recover unsaved files;
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Recover.html
 ;; https://www.emacswiki.org/emacs/AutoSave#toc1
@@ -18,6 +18,7 @@
 ;; auto-save-file-name-transforms
 ;; "^\\(\\.*\\)\\'\\|^target\\'|\\.lock\\'\\|^\\(\\#*\\)\\#\\'"
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Regexps.html
+;; http://www.rexegg.com/
 
 ;; header line instead of modeline;
 (setq-default mode-line-format nil)
@@ -41,26 +42,13 @@
       window-divider-default-right-width 1
       window-divider-default-bottom-width 1)
 (window-divider-mode 1)
-(set-face-attribute 'window-divider nil :foreground "#222222")
+(set-face-attribute 'window-divider nil :foreground "#555555")
 (scroll-bar-mode -1)
 
 ;; never recenter point
-(setq scroll-conservatively 200)
+(setq scroll-conservatively 101)
 ;; move point to top/bottom of buffer before signaling a scrolling error;
 (setq scroll-error-top-bottom t)
-
-(setq blink-cursor-blinks 0)
-(setq-default cursor-in-non-selected-windows nil)
-;; https://github.com/Malabarba/beacon
-
-(add-to-list 'default-frame-alist '(foreground-color . "#222222"))
-(set-face-attribute 'highlight nil :background "LightBlue1")
-(set-face-attribute 'region nil :background "LightBlue1")
-(set-face-attribute 'default nil :height 105)
-(set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
-
-(setq-default indent-tabs-mode nil)
-(setq-default truncate-lines t)
 
 ;; paragraphs
 (setq paragraph-start "\n" paragraph-separate "\n")
@@ -68,21 +56,38 @@
   (interactive)
   (unless (bobp) (left-char))
   (forward-paragraph)
-  (unless (eobp) (progn (forward-paragraph)
-                        (redisplay t)
-                        (backward-paragraph)
-                        (right-char))))
+  (unless (eobp)
+    (forward-paragraph)
+    (redisplay t)
+    (backward-paragraph)
+    (right-char)))
 (global-set-key (kbd "C-<down>") 'next-paragraph)
 (defun previous-paragraph ()
   (interactive)
   (left-char)
   (backward-paragraph)
-  (unless (bobp) (progn (forward-paragraph)
-                        (redisplay t)
-                        (backward-paragraph)
-                        (right-char))))
+  (unless (bobp)
+    (forward-paragraph)
+    (redisplay t)
+    (backward-paragraph)
+    (right-char)))
 (global-set-key (kbd "C-<up>") 'previous-paragraph)
 
+(add-to-list 'default-frame-alist '(foreground-color . "#222222"))
+(set-face-attribute 'highlight nil :background "LightBlue1") ;;"#CCFFFF"
+(set-face-attribute 'region nil :background "LightBlue1")
+(set-face-attribute 'default nil :height 105)
+(set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
+
+(setq blink-cursor-blinks 0)
+(setq-default cursor-in-non-selected-windows nil)
+;; https://github.com/Malabarba/beacon
+
+(setq-default indent-tabs-mode nil)
+(setq-default truncate-lines t)
+
+(add-hook 'prog-mode-hook 'goto-address-mode)
+(add-hook 'text-mode-hook 'goto-address-mode)
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/FFAP.html
 (defun goto-link-at-point ()
   (interactive)
@@ -100,19 +105,25 @@
 (require 'dired)
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
-(setq dired-listing-switches "-l -I \"#*#\" -I \"*.lock\" -I \"target\"")
+(setq dired-listing-switches "-l -I \".#*\" -I \"#*#\" -I \"*.lock\" -I \"target\"")
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
-(define-key dired-mode-map [remap next-line] 'dired-next-line)
-(define-key dired-mode-map [remap previous-line] 'dired-previous-line)
-;; auto refresh dired, but be quiet about it;
-(add-hook 'dired-mode-hook 'auto-revert-mode) ;;(setq global-auto-revert-non-file-buffers t)
-(setq auto-revert-verbose nil)
 ;; remove first line in dired;
 (add-hook 'dired-after-readin-hook
           (lambda () (let ((buffer-read-only))
                        (save-excursion
                          (delete-region (progn (goto-char (point-min)) (point))
                                         (progn (forward-line 1) (point)))))))
+;; make the first line of dired, invisible;
+;;(add-hook
+;; 'dired-after-readin-hook
+;; (lambda ()
+;;   (let ((buffer-read-only))
+;;     (save-excursion
+;;       (set-text-properties 1 (progn (goto-char 1) (forward-line 1) (point))
+;;                            '(invisible t))))))
+;; auto refresh dired, but be quiet about it;
+(add-hook 'dired-mode-hook 'auto-revert-mode) ;;(setq global-auto-revert-non-file-buffers t)
+(setq auto-revert-verbose nil)
 
 ;; https://github.com/Fuco1/dired-hacks#dired-open
 ;; https://www.emacswiki.org/emacs/DiredView
@@ -132,10 +143,17 @@
 ;;   show branch in the header of side window;
 
 (require 'hl-line)
-(unless (eq command-line-args '("emacs"))
-  (add-hook 'dired-mode-hook 'hl-line-mode))
+(add-hook 'dired-mode-hook 'hl-line-mode)
+;;(add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
 
-(defun open-new-view (project-path)
+;; when moving between windows, send point to highlighted line (if there is any);
+(defun my-other-window ()
+  (interactive)
+  (if hl-line-overlay (goto-char (overlay-start hl-line-overlay)))
+  (other-window 1))
+(global-set-key (kbd "C-TAB") #'my-other-window)
+
+(defun project-side-window-open ()
   (let* ((buffer (dired-noselect project-path))
          (window (display-buffer-in-side-window
                   buffer
@@ -146,12 +164,14 @@
     ;; send a message to all servers except "/", to hide their frame;
     ))
 
-(defun open-project (project-dir)
+(defun project-initial-view (project-path)
+  (delete-other-windows)
+  (switch-to-buffer "*scratch*")
+  )
+
+(defun project-open (project-dir)
   (setq-default server-name project-dir)
   (server-start)
-
-  (unless (file-exists-p (expand-file ".cache/emacs.desktop" project-dir))
-    (open-new-view))
 
   (require 'desktop)
   (let ((desktop-file-dir-path (expand-file-name ".cache/" project-dir))
@@ -172,16 +192,19 @@
   (setq-default desktop-path (expand-file ".cache/" project-dir))
   (setq-default desktop-restore-eager 5)
   (setq-default desktop-load-locked-desktop t)
-  (desktop-save-mode 1))
+  (desktop-save-mode 1)
 
-(defun goto-project (project-dir)
+  (when nil ;; first window's buffer is not project-dir
+    (project-initial-view)))
+
+(defun project-activate (project-dir)
   (call-process-shell-command
    (concat
     "emacsclient --socket-name \""
     project-dir
     "\" --eval '(select-frame-set-input-focus (selected-frame))'"
     " || "
-    "emacs --eval '(open-project \"" project-dir "\")'"))
+    "emacs --eval '(project-open \"" project-dir "\")'"))
 
   ;; send point to highlighted line (if there is any);
   (if hl-line-overlay (goto-char (overlay-start hl-line-overlay))))
@@ -192,7 +215,7 @@
     (cond
      ((string-match-p "/projects/[^/]*/?\\'" file-name)
       (when (file-directory-p file-name)
-        (goto-project file-name)))
+        (project-activate file-name)))
 
      ((file-directory-p file-name)
       (cond
@@ -226,10 +249,19 @@
       (delete-other-windows))
      )))
 
-(define-key dired-mode-map [remap dired-find-file] 'my-find-file)
-(define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file)
+(defun projects-list-find-file ()
+  (interactive)
+  (when (file-directory-p (dired-get-filename))
+    (project-activate file-name)))
 
-(defun create-projects-window ()
+(if (eq command-line-args '("emacs"))
+    (progn
+      (define-key dired-mode-map [remap dired-find-file] 'projects-list-find-file)
+      (define-key dired-mode-map [remap dired-find-file-other-window] 'projects-list-find-file))
+  (define-key dired-mode-map [remap dired-find-file] 'my-find-file)
+  (define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file))
+
+(defun projects-list-create ()
   (let* ((buffer (dired-noselect "~/projects"))
          (window (display-buffer-use-some-window buffer nil)))
     (set-window-dedicated-p window t)
@@ -240,15 +272,15 @@
   ;; to do: automatically find all "projects/*" directories in connected storage devices,
   ;;   and create an eyebrowse window for each;
   )
-(defun show-projects ()
+(defun projects-list-activate ()
   (interactive)
   (call-process-shell-command
     (concat
       "emacsclient --socket-name / --eval '(select-frame-set-input-focus (selected-frame))'"
       " || emacs")))
-(global-set-key (kbd "M-RET") 'show-projects)
+(global-set-key (kbd "M-RET") 'projects-list-activate)
 (when (eq command-line-args '("emacs"))
-  (add-hook 'emacs-startup-hook (lambda () (create-projects-window)))
+  (add-hook 'emacs-startup-hook (lambda () (projects-list-create)))
   (setq server-name "/")
   (server-start))
 
@@ -256,17 +288,15 @@
 (package-initialize)
 (defun require-package (package)
   (unless (require package nil 'noerror)
-    (progn
-      (unless (assoc package package-archive-contents)
-	      (package-refresh-contents))
-      (package-install package)
-      (require package))))
+    (unless (assoc package package-archive-contents)
+	    (package-refresh-contents))
+    (package-install package)
+    (require package)))
 (defun install-package (package)
   (unless (package-installed-p package nil 'noerror)
-    (progn
-      (unless (assoc package package-archive-contents)
-	      (package-refresh-contents))
-      (package-install package))))
+    (unless (assoc package package-archive-contents)
+	     (package-refresh-contents))
+    (package-install package)))
 (add-to-list 'package-archives
 	           '("melpa" . "https://melpa.org/packages/") t)
 ;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el
@@ -324,6 +354,7 @@
 (add-to-list 'modalka-excluded-modes 'Info-mode)
 ;;(modalka-global-mode 1)
 
+;; https://explog.in/dot/emacs/config.html
 ;; https://iqss.github.io/IQSS.emacs/init.html
 ;; https://www.spacemacs.org/layers/LAYERS.html
 ;; https://www.reddit.com/r/rust/comments/a3da5g/my_entire_emacs_config_for_rust_in_fewer_than_20/
@@ -348,9 +379,6 @@
 
 ;; lsp-rust, lsp-flycheck
 ;; https://christian.kellner.me/2017/05/31/language-server-protocol-lsp-rust-and-emacs/
-;; https://github.com/rust-lang/rust-mode
-;; https://github.com/kwrooijen/cargo.el
-;; https://github.com/racer-rust/emacs-racer
 ;; https://github.com/flycheck/flycheck-rust
 ;; http://julienblanchard.com/2016/fancy-rust-development-with-emacs/
 
