@@ -3,11 +3,12 @@
 (setq use-dialog-box nil)
 (setq inhibit-startup-screen t)
 (setq visible-bell t)
-;;(setq insert-default-directory nil) ;; alternatively we can use double slash mechanism;
+;(setq insert-default-directory nil) ;; alternatively we can use double slash mechanism;
 (setq-default major-mode 'text-mode)
-(global-set-key (kbd "C-x k") #'kill-this-buffer)
 (cua-mode 1)
 (setq window-sides-vertical t)
+(global-set-key (kbd "C-x k") #'kill-this-buffer)
+(global-set-key (kbd "C-TAB") (lambda () (other-window -1)))
 ;; after deleting a window kill its buffer if it doesn't have any other window;
 
 (setq make-backup-files nil)
@@ -74,9 +75,9 @@
 (global-set-key (kbd "C-<up>") 'previous-paragraph)
 
 (add-to-list 'default-frame-alist '(foreground-color . "#222222"))
-(set-face-attribute 'highlight nil :background "LightBlue1") ;;"#CCFFFF"
-(set-face-attribute 'region nil :background "LightBlue1")
-(set-face-attribute 'default nil :height 105)
+(set-face-attribute 'highlight nil :background "#CCFFFF")
+(set-face-attribute 'region nil :background "#CCFFFF")
+(set-face-attribute 'default nil :family "Monospace" :height 105)
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
 
 (setq blink-cursor-blinks 0)
@@ -103,27 +104,21 @@
         (message "file doesn't exist: '%s';" $path)))))
 
 (require 'dired)
-(setq dired-recursive-deletes 'always)
-(setq dired-recursive-copies 'always)
+(setq dired-recursive-deletes 'always
+      dired-recursive-copies 'always
+      dired-keep-marker-rename nil
+      dired-keep-marker-copy nil)
 (setq dired-listing-switches "-l -I \".#*\" -I \"#*#\" -I \"*.lock\" -I \"target\"")
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
-;; remove first line in dired;
-(add-hook 'dired-after-readin-hook
-          (lambda () (let ((buffer-read-only))
-                       (save-excursion
-                         (delete-region (progn (goto-char (point-min)) (point))
-                                        (progn (forward-line 1) (point)))))))
+;; only move between lines containing a file;
+(define-key dired-mode-map [remap next-line] 'dired-next-line)
+(define-key dired-mode-map [remap previous-line] 'dired-previous-line)
 ;; make the first line of dired, invisible;
-;;(add-hook
-;; 'dired-after-readin-hook
-;; (lambda ()
-;;   (let ((buffer-read-only))
-;;     (save-excursion
-;;       (set-text-properties 1 (progn (goto-char 1) (forward-line 1) (point))
-;;                            '(invisible t))))))
-;; auto refresh dired, but be quiet about it;
-(add-hook 'dired-mode-hook 'auto-revert-mode) ;;(setq global-auto-revert-non-file-buffers t)
-(setq auto-revert-verbose nil)
+(add-hook 'dired-after-readin-hook (lambda ()
+  (let ((buffer-read-only))
+    (save-excursion
+      (set-text-properties 1 (progn (goto-char 1) (forward-line 1) (point))
+                           '(invisible t))))))
 
 ;; https://github.com/Fuco1/dired-hacks#dired-open
 ;; https://www.emacswiki.org/emacs/DiredView
@@ -136,6 +131,9 @@
 ;;   https://github.com/Fuco1/dired-hacks/blob/master/dired-ranger.el
 ;; sort numbers (10 after 9)
 ;;   https://emacs.stackexchange.com/questions/5649/sort-file-names-numbered-in-dired
+;; https://github.com/Alexander-Miller/treemacs/blob/master/src/extra/treemacs-icons-dired.el
+;;   https://github.com/domtronn/all-the-icons.el
+;;   https://github.com/sebastiencs/icons-in-terminal
 ;; show state of files (modified or not, git) in dired using marks;
 ;;   https://github.com/syohex/emacs-dired-k
 ;;   https://github.com/dgutov/diff-hl
@@ -143,15 +141,11 @@
 ;;   show branch in the header of side window;
 
 (require 'hl-line)
-(add-hook 'dired-mode-hook 'hl-line-mode)
-;;(add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
-
+(add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
 ;; when moving between windows, send point to highlighted line (if there is any);
-(defun my-other-window ()
-  (interactive)
+(add-hook 'buffer-list-update-hook (lambda ()
   (if hl-line-overlay (goto-char (overlay-start hl-line-overlay)))
-  (other-window 1))
-(global-set-key (kbd "C-TAB") #'my-other-window)
+  (other-window 1)))
 
 (defun project-side-window-open ()
   (let* ((buffer (dired-noselect project-path))
@@ -204,10 +198,7 @@
     project-dir
     "\" --eval '(select-frame-set-input-focus (selected-frame))'"
     " || "
-    "emacs --eval '(project-open \"" project-dir "\")'"))
-
-  ;; send point to highlighted line (if there is any);
-  (if hl-line-overlay (goto-char (overlay-start hl-line-overlay))))
+    "emacs --eval '(project-open \"" project-dir "\")'")))
 
 (defun my-find-file ()
   (interactive)
@@ -312,52 +303,101 @@
 
 ;; https://github.com/wasamasa/eyebrowse
 
-(defun project-tree-show ()
-  ()
-  (treemacs-find-file )
-  )
-(with-eval-after-load 'treemacs
-  (project-tree-show)
-  (on-window-buffer-focus (lambda (buffer)
-    (buffer-file-name buffer)
-    (project-tree-show))))
-
 ;; modal key_bindings
 ;; https://github.com/mrkkrp/modalka
-(require-package 'modalka)
-(add-hook 'modalka-mode-hook (lambda ()
-                               (set-cursor-color "black")
-                               (call-process-shell-command "i3-msg mode default")))
-(define-key modalka-mode-map (kbd "RET")
-  (lambda ()
-    (interactive)
-    (modalka-global-mode -1)
-    (set-cursor-color "red")
-    (call-process-shell-command "i3-msg mode insert")))
+;(require-package 'modalka)
+;(defun modal-buffer-p ()
+;  (or (derived-mode-p 'text-mode 'prog-mode 'conf-mode)
+;      (equal major-mode 'shell-mode)))
+;(defun modalka--maybe-activate ()
+;  (if (modal-buffer-p) (modalka-mode 1)))
+;(add-hook 'modalka-mode-hook (lambda () (set-cursor-color "black")))
+;(add-hook 'buffer-list-update-hook
+;          (lambda ()
+;            (if (with-current-buffer (window-buffer (selected-window))
+;                  (and (not modalka-mode) (modal-buffer-p)))
+;                (set-cursor-color "red")
+;              (set-cursor-color "black"))))
+;(global-set-key (kbd "<escape>") (lambda () (interactive) (modalka--maybe-activate)))
+;(global-set-key (kbd "<tab>") (lambda () (interactive) (modalka--maybe-activate)))
+;(define-key modalka-mode-map (kbd "RET")
+;  (lambda ()
+;    (interactive)
+;    (modalka-mode -1)
+;    (set-cursor-color "red")))
 
-;;(modalka-define-kbd "f" "C-f")
-;;(modalka-define-kbd "b" "C-b")
-;;(modalka-define-kbd "n" "C-n")
-;;(modalka-define-kbd "p" "C-p")
-;;(modalka-define-kbd "a" "C-a")
-;;(modalka-define-kbd "e" "C-e")
-;;(modalka-define-kbd "m" "C-SPC")
-;;(modalka-define-kbd "<escape>" "C-g")
-;;(modalka-define-kbd "<tab>" "C-g")
-;;(define-key modalka-mode-map (kbd "x f")
-;;  (lambda () (interactive) (call-process-shell-command "i3-msg workspace /Firefox/;
-;;    if [[ \"$(i3-msg [workspace=__focused__ class=Firefox] focus)\" =~ \"false\" ]];
-;;    then i3-msg 'workspace /Firefox/; exec firefox'; fi")))
+;(add-to-list 'modalka-excluded-modes 'dired-mode)
+;(add-to-list 'modalka-excluded-modes 'help-mode)
+;(add-to-list 'modalka-excluded-modes 'Info-mode)
 
-(add-to-list 'modalka-excluded-modes 'dired-mode)
-(add-to-list 'modalka-excluded-modes 'help-mode)
-(add-to-list 'modalka-excluded-modes 'Info-mode)
-;;(modalka-global-mode 1)
+;; https://stackoverflow.com/questions/19757612/how-to-redefine-a-key-inside-a-minibuffer-mode-map
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Prefix-Keys.html
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Key-Sequences.html
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Key-Sequence-Input.html
+;; https://www.emacswiki.org/emacs/KeySequence
+
+;; modalka-define-kbd is only for global keybindings
+;; local keybindings must be defined for each mode separately;
+;(modalka-define-kbd "a" "C-a") ;; move-beginning-of-line
+;(modalka-define-kbd "b" "C-b") ;; backward-char
+;(modalka-define-kbd "c" "C-c") ;;
+;(modalka-define-kbd "e" "C-e") ;; move-end-of-line
+;(modalka-define-kbd "f" "C-f") ;; forward-char
+;(modalka-define-kbd "g" "C-g") ;;
+;(modalka-define-kbd "h" "C-h") ;;
+;(modalka-define-kbd "i" "C-i") ;; * indent-for-tab-command
+;(modalka-define-kbd "j" "C-j") ;; * electric-newline-and-maybe-indent
+;(modalka-define-kbd "k" "C-k") ;; * kill-line
+;(modalka-define-kbd "l" "C-l") ;; * recenter-top-bottom
+;(modalka-define-kbd "m" "C-SPC") ;; cua-set-mark
+;(modalka-define-kbd "n" "C-n") ;; next-line
+;(modalka-define-kbd "o" "C-o") ;; * open-line
+;(modalka-define-kbd "p" "C-p") ;; previous-line
+;(modalka-define-kbd "q" "C-q") ;; * quoted-insert
+;(modalka-define-kbd "r" "C-r") ;; isearch-repeat-backward
+;(modalka-define-kbd "s" "C-s") ;; isearch-forward
+;(modalka-define-kbd "t" "C-t") ;; * transpose-char
+;(modalka-define-kbd "u" "C-u") ;; universal-argument
+;(modalka-define-kbd "v" "C-v") ;; cua-paste
+;(modalka-define-kbd "w" "C-w") ;; * kill-region
+;(modalka-define-kbd "x" "C-x") ;;
+;(modalka-define-kbd "y" "C-y") ;; * cua-paste
+;(modalka-define-kbd "z" "C-z") ;; undo
+;(modalka-define-kbd "1" "C-1") ;; (digit-argument 1)
+;(modalka-define-kbd "2" "C-2")
+;(modalka-define-kbd "3" "C-3")
+;(modalka-define-kbd "4" "C-4")
+;(modalka-define-kbd "5" "C-5")
+;(modalka-define-kbd "6" "C-6")
+;(modalka-define-kbd "7" "C-7")
+;(modalka-define-kbd "8" "C-8")
+;(modalka-define-kbd "9" "C-9")
+;(modalka-define-kbd "0" "C-0")
+;(modalka-define-kbd "," "C-,")
+;(modalka-define-kbd "_" "C-_") ;; * undo
+;(modalka-global-mode 1)
+
+(defun double-space-to-tab ()
+  (interactive)
+  (if (equal (char-before (point)) ?\s)
+      (progn (delete-backward-char 1)
+             (execute-kbd-macro (kbd "<tab>")))
+             ;; (call-interactively (key-binding "<tab>"))
+    (insert " ")))
+(define-key minibuffer-map (kbd "SPC") 'double-space-to-tab)
+(require 'shell)
+(define-key minibuffer-local-shell-command-map (kbd "SPC") 'double-space-to-tab)
+(define-key shell-mode-map (kbd "SPC") 'double-space-to-tab)
+
+(defun sleep ()
+  (interactive)
+  (call-process-shell-command "sleep 0.1; systemctl suspend"))
 
 ;; https://explog.in/dot/emacs/config.html
 ;; https://iqss.github.io/IQSS.emacs/init.html
 ;; https://www.spacemacs.org/layers/LAYERS.html
 ;; https://www.reddit.com/r/rust/comments/a3da5g/my_entire_emacs_config_for_rust_in_fewer_than_20/
+;; https://github.com/hlissner/doom-emacs/wiki/FAQ#how-is-dooms-startup-so-fast
 
 ;; https://www.emacswiki.org/emacs/Dedicated_Minibuffer_Frame
 ;; https://stackoverflow.com/questions/3050011/is-it-possible-to-move-the-emacs-minibuffer-to-the-top-of-the-screen
@@ -367,49 +407,44 @@
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Visibility-of-Frames.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Child-Frames.html#Child-Frames
 
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
-
-;; https://orgmode.org/manual/Tables.html
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html
-;; http://shallowsky.com/blog/linux/editors/graphics-in-emacs.html
-;; https://www.gnu.org/software/auctex
-;; https://github.com/aaptel/preview-latex
-;; https://github.com/josteink/wsd-mode
-;; https://jblevins.org/projects/markdown-mode/
-
 ;; lsp-rust, lsp-flycheck
 ;; https://christian.kellner.me/2017/05/31/language-server-protocol-lsp-rust-and-emacs/
 ;; https://github.com/flycheck/flycheck-rust
+;; https://github.com/brotzeit/rustic
 ;; http://julienblanchard.com/2016/fancy-rust-development-with-emacs/
+;(setq rust-indent-offset 2)
 
+;; http://company-mode.github.io/
 ;; (setq ido-enable-flex-matching t)
 ;; (setq ido-everywhere t)
 ;; (ido-mode 1)
-;; ido-ubiquitous, helm, icicles, icomplete
+;; ido-ubiquitous, helm, icomplete
 
-;; /sudo::/...
-;; /root@localhost:/
-
-;; https://github.com/hlissner/doom-emacs/wiki/FAQ#how-is-dooms-startup-so-fast
 ;; http://ergoemacs.org/emacs/emacs_magit-mode_tutorial.html
 ;;   https://magit.vc/
 ;;   https://github.com/vermiculus/magithub
 ;; https://github.com/DarthFennec/highlight-indent-guides
 ;;   https://github.com/zk-phi/indent-guide
+;; https://orgmode.org/manual/Tables.html
+  ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html
+;; http://shallowsky.com/blog/linux/editors/graphics-in-emacs.html
+  ;; https://www.gnu.org/software/auctex
+  ;; https://github.com/aaptel/preview-latex
+  ;; https://github.com/josteink/wsd-mode
+  ;; https://jblevins.org/projects/markdown-mode/
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/gnus/index.html
 ;;   https://www.gnu.org/software/emacs/manual/html_node/message/index.html
 ;;   https://www.gnu.org/software/emacs/manual/html_node/emacs/Gnus.html
 ;;   https://www.gnu.org/software/emacs/manual/html_node/emacs/Sending-Mail.html
 ;;   https://www.gnu.org/software/emacs/manual/html_node/emacs/Rmail.html
 ;;   https://www.gnu.org/software/emacs/manual/html_node/mh-e/index.html
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Calendar_002fDiary.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Spelling.html
 ;; https://www.emacswiki.org/emacs/DictMode
 ;;   https://github.com/gromnitsky/wordnut
 ;;   https://www.emacswiki.org/emacs/ThesauriAndSynonyms
 ;;   https://github.com/atykhonov/google-translate
 ;; https://www.gnu.org/software/emacs/manual/html_node/calc/index.html
-;; https://github.com/domtronn/all-the-icons.el
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Calendar_002fDiary.html
 ;; https://www.gnu.org/software/emacs-muse/manual/html_node/Extending-Muse.html#Extending-Muse
 ;; https://github.com/Fuco1/smartparens
-;; http://company-mode.github.io/
