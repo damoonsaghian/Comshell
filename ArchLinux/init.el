@@ -1,7 +1,6 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (setq use-dialog-box nil)
-(setq inhibit-startup-screen t)
 (setq visible-bell t)
 ;(setq insert-default-directory nil) ;; alternatively we can use double slash mechanism;
 (setq-default major-mode 'text-mode)
@@ -21,30 +20,16 @@
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Regexps.html
 ;; http://www.rexegg.com/
 
-;; header line instead of modeline;
-(setq-default mode-line-format nil)
-(setq Info-use-header-line nil)
-(setq-default
- header-line-format
- '((:eval (propertize " " 'display '((space :align-to 0))))
-   (:eval (replace-regexp-in-string "<.*>" "" (buffer-name)))
-   (:eval (if (buffer-modified-p)
-              (propertize "* " 'face '(:foreground "red"))
-            "  "))
-   ;;(:propertize "%30q" face (:foreground "dark cyan"))
-   (:eval (if (and (equal (window-start) (point-min)) (equal (window-end) (point-max)))
-              nil
-            (propertize "%q" 'face '(:foreground "dark cyan"))))))
-   "                                           "
-   mode-line-misc-info))
-(set-face-attribute 'header-line nil :foreground "#222222" :background "#dddddd")
-
 (setq window-divider-default-places t
       window-divider-default-right-width 1
       window-divider-default-bottom-width 1)
 (window-divider-mode 1)
 (set-face-attribute 'window-divider nil :foreground "#555555")
+
 (scroll-bar-mode -1)
+(setq-default indicate-buffer-boundaries '((up . left) (down . left)))
+
+(setq-default mode-line-format nil)
 
 ;; never recenter point
 (setq scroll-conservatively 101)
@@ -115,7 +100,7 @@
 (define-key dired-mode-map [remap previous-line] 'dired-previous-line)
 ;; make the first line of dired, invisible;
 (add-hook 'dired-after-readin-hook (lambda ()
-  (let ((buffer-read-only))
+  (let ((inhibit-read-only t))
     (save-excursion
       (set-text-properties 1 (progn (goto-char 1) (forward-line 1) (point))
                            '(invisible t))))))
@@ -143,25 +128,43 @@
 (require 'hl-line)
 (add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
 ;; when moving between windows, send point to highlighted line (if there is any);
-(add-hook 'buffer-list-update-hook (lambda ()
-  (if hl-line-overlay (goto-char (overlay-start hl-line-overlay)))
-  (other-window 1)))
+(add-hook
+ 'buffer-list-update-hook
+ (lambda () (if hl-line-overlay (goto-char (overlay-start hl-line-overlay)))))
+;; this may cause inconviniece when a temporary buffer is created or killed;
+;; alternative: advise select-window;
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Advising-Functions.html
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Advising-Named-Functions.html
+;; https://www.emacswiki.org/emacs/AdvisingFunctions
 
-(defun project-side-window-open ()
+(defun project-new-view (project-path)
+  ;; new eyebrowse
+
+  ;; project window: a side window with two line which shows "*project*" buffer,
+  ;;   a buffer with a single line showing the name of the project,
+  ;;   and a mode line showing the eyebrowse status;
   (let* ((buffer (dired-noselect project-path))
          (window (display-buffer-in-side-window
                   buffer
-                  '((side . left) (window-width . 0.2) (no-delete-other-windows . t)))))
-    (set-window-dedicated-p window t)
+                  '((side . left) (slot . 0) (window-width . 0.2)))))
+    (set-window-parameter window 'no-delete-other-windows t)
+    (set-window-parameter window 'no-other-window t)
+    (set-window-dedicated-p window t) ;; not sure if this is necessary;
     (select-window window)
-    (hl-line-highlight)
-    ;; send a message to all servers except "/", to hide their frame;
-    ))
+    )
 
-(defun project-initial-view (project-path)
-  (delete-other-windows)
-  (switch-to-buffer "*scratch*")
-  )
+  ;; project directory window: a side window which shows the content of project directory;
+  (let* ((buffer (dired-noselect project-path))
+         (window (display-buffer-in-side-window
+                  buffer
+                  '((side . left) (slot . 1) (window-width . 0.2)))))
+    (set-window-parameter window 'no-delete-other-windows t)
+    (set-window-parameter window 'delete-window (lambda ()
+      ;; delte eyebrowse view;
+      ))
+    (set-window-dedicated-p window t) ;; not sure if this is necessary;
+    (select-window window)
+    (hl-line-highlight)))
 
 (defun project-open (project-dir)
   (setq-default server-name project-dir)
@@ -173,6 +176,7 @@
     (unless (file-exists-p desktop-file-dir-path)
       (make-directory desktop-file-dir-path t))
     (unless (file-exists-p desktop-file-path)
+      (project-new-view)
       (desktop-save desktop-file-dir-path))
     (setq desktop-path (list desktop-file-dir-path)
           desktop-restore-frames nil
@@ -186,10 +190,7 @@
   (setq-default desktop-path (expand-file ".cache/" project-dir))
   (setq-default desktop-restore-eager 5)
   (setq-default desktop-load-locked-desktop t)
-  (desktop-save-mode 1)
-
-  (when nil ;; first window's buffer is not project-dir
-    (project-initial-view)))
+  (desktop-save-mode 1))
 
 (defun project-activate (project-dir)
   (call-process-shell-command
@@ -202,12 +203,9 @@
 
 (defun my-find-file ()
   (interactive)
+  (hl-line-highlight)
   (let ((file-name (dired-get-filename)))
     (cond
-     ((string-match-p "/projects/[^/]*/?\\'" file-name)
-      (when (file-directory-p file-name)
-        (project-activate file-name)))
-
      ((file-directory-p file-name)
       (cond
        ((file-exists-p (expand-file file-name ".gallery"))
@@ -221,11 +219,10 @@
         ;; http://wikemacs.org/wiki/Media_player
         ;; https://github.com/dbrock/bongo
         )
-       ((file-exists-p (expand-file file-name ".media"))
+       ;((file-exists-p (expand-file file-name ".media"))
         ;; view in overlay;
-        )
+        ;)
        (t
-        (hl-line-highlight)
         (select-window
          (display-buffer-use-some-window (find-file-noselect file-name) nil))
         (delete-other-windows))))
@@ -234,7 +231,7 @@
       ;; view image;
       )
 
-     (t (hl-line-highlight)
+     (t
       (select-window
        (display-buffer-use-some-window (find-file-noselect file-name) nil))
       (delete-other-windows))
@@ -242,13 +239,18 @@
 
 (defun projects-list-find-file ()
   (interactive)
-  (when (file-directory-p (dired-get-filename))
+  (when (file-directory-p file-name)
+    (hl-line-highlight)
+    ;; send a message to all servers except "/", to hide their frame;
     (project-activate file-name)))
 
 (if (eq command-line-args '("emacs"))
     (progn
       (define-key dired-mode-map [remap dired-find-file] 'projects-list-find-file)
-      (define-key dired-mode-map [remap dired-find-file-other-window] 'projects-list-find-file))
+      (define-key dired-mode-map [remap dired-find-file-other-window] 'projects-list-find-file)
+      (add-hook 'emacs-startup-hook (lambda () (projects-list-create)))
+      (setq server-name "/")
+      (server-start))
   (define-key dired-mode-map [remap dired-find-file] 'my-find-file)
   (define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file))
 
@@ -258,11 +260,17 @@
     (set-window-dedicated-p window t)
     (select-window window))
 
-    (local-set-key (kbd "<escape>") #'my-other-window)
+    (local-set-key (kbd "<escape>") #'aaa)
+
+    (setq header-line-format
+          '((:eval (propertize " " 'display '((space :align-to 0))))
+            mode-line-misc-info))
+    (set-face-attribute 'header-line nil :foreground "#222222" :background "#dddddd")
 
   ;; to do: automatically find all "projects/*" directories in connected storage devices,
   ;;   and create an eyebrowse window for each;
   )
+
 (defun projects-list-activate ()
   (interactive)
   (call-process-shell-command
@@ -270,10 +278,6 @@
       "emacsclient --socket-name / --eval '(select-frame-set-input-focus (selected-frame))'"
       " || emacs")))
 (global-set-key (kbd "M-RET") 'projects-list-activate)
-(when (eq command-line-args '("emacs"))
-  (add-hook 'emacs-startup-hook (lambda () (projects-list-create)))
-  (setq server-name "/")
-  (server-start))
 
 (require 'package)
 (package-initialize)
@@ -403,6 +407,7 @@
 ;; https://stackoverflow.com/questions/3050011/is-it-possible-to-move-the-emacs-minibuffer-to-the-top-of-the-screen
 ;; https://stackoverflow.com/questions/5079466/hide-emacs-echo-area-during-inactivity
 ;; https://emacs.stackexchange.com/questions/1074/how-to-display-the-content-of-minibuffer-in-the-middle-of-the-emacs-frame
+;; https://github.com/muffinmad/emacs-mini-frame
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffers-and-Frames.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Visibility-of-Frames.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Child-Frames.html#Child-Frames
