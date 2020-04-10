@@ -98,12 +98,20 @@
 ;; only move between lines containing a file;
 (define-key dired-mode-map [remap next-line] 'dired-next-line)
 (define-key dired-mode-map [remap previous-line] 'dired-previous-line)
-;; make the first line of dired, invisible;
+;; dired first line:
 (add-hook 'dired-after-readin-hook (lambda ()
-  (let ((inhibit-read-only t))
+  (let ((inhibit-read-only t)
+        (window (get-buffer-window)))
     (save-excursion
-      (set-text-properties 1 (progn (goto-char 1) (forward-line 1) (point))
-                           '(invisible t))))))
+      ;; replace the first line with the name of the directory;
+      (delete-region (progn (goto-char (point-min)) (point))
+                     (progn (move-end-of-line) (point)))
+      (insert (file-name-directory (directory-file-name default-directory)))
+      ;; in the case of a project directory window, make the first line invisible;
+      (unless (and (eq (window-parameter window 'window-side) 'left)
+                   (eq (window-parameter window 'window-slot) 0))
+        (set-text-properties 1 (progn (goto-char 1) (forward-line 1) (point))
+                             '(invisible t)))))))
 
 ;; https://github.com/Fuco1/dired-hacks#dired-open
 ;; https://www.emacswiki.org/emacs/DiredView
@@ -137,24 +145,14 @@
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Advising-Named-Functions.html
 ;; https://www.emacswiki.org/emacs/AdvisingFunctions
 
-(defun project-new-view (project-path)
+(defun project-new-view (project-dir)
   ;; new eyebrowse
 
-  ;; project window: a side window with two line which shows "*project*" buffer,
-  ;;   a buffer with a single line showing the name of the project,
-  ;;   and a mode line showing the eyebrowse status;
-  (let* ((buffer (dired-noselect project-path))
-         (window (display-buffer-in-side-window
-                  buffer
-                  '((side . left) (slot . 0) (window-width . 0.2)))))
-    (set-window-parameter window 'no-delete-other-windows t)
-    (set-window-parameter window 'no-other-window t)
-    (set-window-dedicated-p window t) ;; not sure if this is necessary;
-    (select-window window)
-    )
-
-  ;; project directory window: a side window which shows the content of project directory;
-  (let* ((buffer (dired-noselect project-path))
+  ;; project directory window, a side window which shows:
+  ;; , the content of project directory;
+  ;; , the name of the project in the first line;
+  ;; , eyebrowse views status in the header line;
+  (let* ((buffer (dired-noselect project-dir))
          (window (display-buffer-in-side-window
                   buffer
                   '((side . left) (slot . 1) (window-width . 0.2)))))
@@ -163,8 +161,11 @@
       ;; delte eyebrowse view;
       ))
     (set-window-dedicated-p window t) ;; not sure if this is necessary;
+
     (select-window window)
-    (hl-line-highlight)))
+    (setq header-line-format
+          '((:eval (propertize " " 'display '((space :align-to 0))))
+            mode-line-misc-info))))
 
 (defun project-open (project-dir)
   (setq-default server-name project-dir)
@@ -199,7 +200,7 @@
     project-dir
     "\" --eval '(select-frame-set-input-focus (selected-frame))'"
     " || "
-    "emacs --eval '(project-open \"" project-dir "\")'")))
+    "emacs --mm --eval '(project-open \"" project-dir "\")'")))
 
 (defun my-find-file ()
   (interactive)
