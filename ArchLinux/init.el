@@ -6,7 +6,7 @@
 (setq-default major-mode 'text-mode)
 (cua-mode 1)
 (setq window-sides-vertical t)
-(global-set-key (kbd "C-x k") #'kill-this-buffer)
+(global-set-key (kbd "C-x k") (lambda () (quit-window t)))
 (global-set-key (kbd "C-TAB") (lambda () (other-window -1)))
 ;; after deleting a window kill its buffer if it doesn't have any other window;
 
@@ -109,6 +109,7 @@
                      (progn (move-end-of-line) (point)))
       (insert (file-name-directory (directory-file-name default-directory)))
       ;; in the case of a project directory window, make the first line invisible;
+      ;; alternative: (eq window (frame-first-window))
       (unless (and (eq (window-parameter window 'window-side) 'left)
                    (eq (window-parameter window 'window-slot) 0))
         (set-text-properties 1 (progn (goto-char 1) (forward-line 1) (point))
@@ -133,6 +134,10 @@
 
 (require 'hl-line)
 (add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
+;; when focus out of a frame, send point to highlighted line (if there is any);
+(add-hook
+ 'focus-out-hook
+ (lambda () (if hl-line-overlay (goto-char (overlay-start hl-line-overlay)))))
 ;; when moving between windows, send point to highlighted line (if there is any);
 (add-hook
  'buffer-list-update-hook
@@ -153,11 +158,8 @@
   (let* ((buffer (dired-noselect project-dir))
          (window (display-buffer-in-side-window
                   buffer
-                  '((side . left) (slot . 1) (window-width . 0.2)))))
+                  '((side . left) (slot . 0) (window-width . 0.2)))))
     (set-window-parameter window 'no-delete-other-windows t)
-    (set-window-parameter window 'delete-window (lambda ()
-      ;; delte eyebrowse view;
-      ))
     (set-window-dedicated-p window t) ;; not sure if this is necessary;
 
     (select-window window)
@@ -191,14 +193,11 @@
   (setq-default desktop-load-locked-desktop t)
   (desktop-save-mode 1))
 
-(defun project-activate (project-dir)
-  (call-process-shell-command
-   (concat
-    "emacsclient --socket-name \""
-    project-dir
-    "\" --eval '(select-frame-set-input-focus (selected-frame))'"
-    " || "
-    "emacs --maximized --eval '(project-open \"" project-dir "\")'")))
+(defun delete-following-windows ()
+  (let ((window (next-window)))
+    (unless (eq (window-parameter nil 'window-slot) 0)
+      (delete-window window)
+      (delete-following-windows))))
 
 (defun my-find-file ()
   (interactive)
@@ -208,63 +207,74 @@
      ((file-directory-p file-name)
       (cond
        ((file-exists-p (expand-file file-name ".gallery"))
-        ;; open media browser in the right window
+        (select-window
+         (display-buffer-use-some-window (find-file-noselect file-name) nil))
+        (delete-following-windows)
         ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
         ;; https://github.com/larsmagne/movie.el
-        ;; http://ergoemacs.org/emacs/emacs_view_image_thumbnails.html
-        ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Image_002dDired.html
-        ;; mpv
         ;; https://www.gnu.org/software/emms/
         ;; http://wikemacs.org/wiki/Media_player
         ;; https://github.com/dbrock/bongo
         )
+
+       ((eq (window-parameter nil 'window-side) 'left)
+        (let* ((buffer (dired-noselect project-dir))
+               (slot (+ 1 (window-parameter nil 'window-slot)))
+               (window (display-buffer-in-side-window
+                        buffer
+                        '((side . left) (slot . ,slot) (window-width . 0.2)))))
+          (set-window-parameter window 'no-delete-other-windows t)
+          (set-window-dedicated-p window t) ;; not sure if this is necessary;
+          (select-window window)
+          (delete-following-windows)))
+
        ;((file-exists-p (expand-file file-name ".media"))
         ;; view in overlay;
         ;)
+
        (t
         (select-window
          (display-buffer-use-some-window (find-file-noselect file-name) nil))
-        (delete-other-windows))))
+        (delete-following-windows))))
 
      ((string-match-p "\\.jpg/?\\'" file-name)
-      ;; view image;
+      ;; view in overlay;
       )
 
      (t
       (select-window
        (display-buffer-use-some-window (find-file-noselect file-name) nil))
-      (delete-other-windows))
+      (delete-following-windows))
      )))
+
+;; projects list: an Emacs instance with a floating frame, showing the list of projects;
 
 (defun projects-list-find-file ()
   (interactive)
   (when (file-directory-p file-name)
     (hl-line-highlight)
     ;; send a message to all servers except "/", to hide their frame;
-    (project-activate file-name)))
-
-(if (eq command-line-args '("emacs"))
-    (progn
-      (define-key dired-mode-map [remap dired-find-file] 'projects-list-find-file)
-      (define-key dired-mode-map [remap dired-find-file-other-window] 'projects-list-find-file)
-      (add-hook 'emacs-startup-hook (lambda () (projects-list-create)))
-      (setq server-name "/")
-      (server-start))
-  (define-key dired-mode-map [remap dired-find-file] 'my-find-file)
-  (define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file))
+    (call-process-shell-command
+     (concat
+      "emacsclient --socket-name \""
+      file-name
+      "\" --eval '(select-frame-set-input-focus (selected-frame))'"
+      " || "
+      "emacs --maximized --eval '(project-open \"" file-name "\")'"))))
 
 (defun projects-list-create ()
   (let* ((buffer (dired-noselect "~/projects"))
          (window (display-buffer-use-some-window buffer nil)))
+    (set-window-parameter window 'no-delete-other-windows t)
     (set-window-dedicated-p window t)
     (select-window window))
 
-    (local-set-key (kbd "<escape>") #'aaa)
+  (global-set-key (kbd "C-TAB") #'lower-frame)
 
-    (setq header-line-format
-          '((:eval (propertize " " 'display '((space :align-to 0))))
-            mode-line-misc-info))
-    (set-face-attribute 'header-line nil :foreground "#222222" :background "#dddddd")
+  ;; eyebrowse views status in the header line;
+  (setq header-line-format
+        '((:eval (propertize " " 'display '((space :align-to 0))))
+          mode-line-misc-info))
 
   ;; to do: automatically find all "projects/*" directories in connected storage devices,
   ;;   and create an eyebrowse window for each;
@@ -277,6 +287,16 @@
       "emacsclient --socket-name / --eval '(select-frame-set-input-focus (selected-frame))'"
       " || emacs")))
 (global-set-key (kbd "M-RET") 'projects-list-activate)
+
+(if (eq command-line-args '("emacs"))
+    (progn
+      (define-key dired-mode-map [remap dired-find-file] 'projects-list-find-file)
+      (define-key dired-mode-map [remap dired-find-file-other-window] 'projects-list-find-file)
+      (add-hook 'emacs-startup-hook 'projects-list-create)
+      (setq server-name "/")
+      (server-start))
+  (define-key dired-mode-map [remap dired-find-file] 'my-find-file)
+  (define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file))
 
 (require 'package)
 (package-initialize)
@@ -303,8 +323,6 @@
 ;; https://www.reddit.com/r/emacs/comments/9drkhm/is_it_able_to_manage_emacs_packages_using_cli/
 ;; https://www.reddit.com/r/emacs/comments/acvn2l/elisp_script_to_install_all_packages_very_fast/
 ;; https://emacs.stackexchange.com/questions/34180/how-can-i-script-emacs-to-install-packages-from-list
-
-;; https://github.com/wasamasa/eyebrowse
 
 ;; modal key_bindings
 ;; https://github.com/mrkkrp/modalka
@@ -402,6 +420,7 @@
 ;; https://www.reddit.com/r/rust/comments/a3da5g/my_entire_emacs_config_for_rust_in_fewer_than_20/
 ;; https://github.com/hlissner/doom-emacs/wiki/FAQ#how-is-dooms-startup-so-fast
 
+;(setq minibuffer-auto-raise t)
 ;; https://www.emacswiki.org/emacs/Dedicated_Minibuffer_Frame
 ;; https://stackoverflow.com/questions/3050011/is-it-possible-to-move-the-emacs-minibuffer-to-the-top-of-the-screen
 ;; https://stackoverflow.com/questions/5079466/hide-emacs-echo-area-during-inactivity
