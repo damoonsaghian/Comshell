@@ -93,11 +93,12 @@
       dired-recursive-copies 'always
       dired-keep-marker-rename nil
       dired-keep-marker-copy nil)
-(setq dired-listing-switches "-l -I \".#*\" -I \"#*#\" -I \"*.lock\" -I \"target\"")
+(setq dired-listing-switches "-lv -I \"#*#\" -I \"*.lock\" -I \"target\"")
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
 ;; only move between lines containing a file;
 (define-key dired-mode-map [remap next-line] 'dired-next-line)
 (define-key dired-mode-map [remap previous-line] 'dired-previous-line)
+
 ;; dired first line:
 (add-hook 'dired-after-readin-hook (lambda ()
   (let ((inhibit-read-only t)
@@ -113,17 +114,13 @@
         (set-text-properties 1 (progn (goto-char 1) (forward-line 1) (point))
                              '(invisible t)))))))
 
-;; https://github.com/Fuco1/dired-hacks#dired-open
 ;; https://www.emacswiki.org/emacs/DiredView
-;; async file operations in dired
-;; https://github.com/jwiegley/emacs-async
-;; https://truongtx.me/tmtxt-dired-async.html
-;; https://github.com/jwiegley/emacs-async/blob/master/dired-async.el
-;; https://oremacs.com/2016/02/24/dired-rsync/
 ;; for copy_paste mechanism:
 ;;   https://github.com/Fuco1/dired-hacks/blob/master/dired-ranger.el
-;; sort numbers (10 after 9)
-;;   https://emacs.stackexchange.com/questions/5649/sort-file-names-numbered-in-dired
+;; async file operations in dired
+;;   https://github.com/jwiegley/emacs-async
+;;   https://truongtx.me/tmtxt-dired-async.html
+;;   https://github.com/jwiegley/emacs-async/blob/master/dired-async.el
 ;; https://github.com/Alexander-Miller/treemacs/blob/master/src/extra/treemacs-icons-dired.el
 ;;   https://github.com/domtronn/all-the-icons.el
 ;;   https://github.com/sebastiencs/icons-in-terminal
@@ -131,7 +128,8 @@
 ;;   https://github.com/syohex/emacs-dired-k
 ;;   https://github.com/dgutov/diff-hl
 ;;   https://emacs.stackexchange.com/questions/9503/how-can-i-visualize-vcs-status-in-dired
-;;   show branch in the header of side window;
+;; https://oremacs.com/2016/02/24/dired-rsync/
+;; https://github.com/Fuco1/dired-hacks#dired-open
 
 (require 'hl-line)
 (add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
@@ -200,7 +198,7 @@
     project-dir
     "\" --eval '(select-frame-set-input-focus (selected-frame))'"
     " || "
-    "emacs --mm --eval '(project-open \"" project-dir "\")'")))
+    "emacs --maximized --eval '(project-open \"" project-dir "\")'")))
 
 (defun my-find-file ()
   (interactive)
@@ -409,6 +407,7 @@
 ;; https://stackoverflow.com/questions/5079466/hide-emacs-echo-area-during-inactivity
 ;; https://emacs.stackexchange.com/questions/1074/how-to-display-the-content-of-minibuffer-in-the-middle-of-the-emacs-frame
 ;; https://github.com/muffinmad/emacs-mini-frame
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Initial-Parameters.html#Initial-Parameters
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffers-and-Frames.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Visibility-of-Frames.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Child-Frames.html#Child-Frames

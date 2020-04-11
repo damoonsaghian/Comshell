@@ -64,6 +64,8 @@ monospace-font-name='monospace 10.5'
 gtk-theme='Materia-light-compact'
 cursor-blink-timeout=1000
 enable-hot-corners=false
+[org/gnome/mutter]
+center-new-windows=true
 [org/gnome/desktop/wm/preferences]
 button-layout=''
 [org/gnome/desktop/wm/keybindings]
