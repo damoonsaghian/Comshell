@@ -7,7 +7,7 @@
 (cua-mode 1)
 (setq window-sides-vertical t)
 (global-set-key (kbd "C-x k") (lambda () (quit-window t)))
-(global-set-key (kbd "C-TAB") (lambda () (other-window -1)))
+(global-set-key (kbd "C-<backspace>") (lambda () (other-window -1)))
 ;; after deleting a window kill its buffer if it doesn't have any other window;
 
 (setq make-backup-files nil)
@@ -98,6 +98,8 @@
 ;; only move between lines containing a file;
 (define-key dired-mode-map [remap next-line] 'dired-next-line)
 (define-key dired-mode-map [remap previous-line] 'dired-previous-line)
+(require 'hl-line)
+(add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
 
 ;; dired first line:
 (add-hook 'dired-after-readin-hook (lambda ()
@@ -132,24 +134,43 @@
 ;; https://oremacs.com/2016/02/24/dired-rsync/
 ;; https://github.com/Fuco1/dired-hacks#dired-open
 
-(require 'hl-line)
-(add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
-;; when focus out of a frame, send point to highlighted line (if there is any);
-(add-hook
- 'focus-out-hook
- (lambda () (if hl-line-overlay (goto-char (overlay-start hl-line-overlay)))))
-;; when moving between windows, send point to highlighted line (if there is any);
-(add-hook
- 'buffer-list-update-hook
- (lambda () (if hl-line-overlay (goto-char (overlay-start hl-line-overlay)))))
-;; this may cause inconviniece when a temporary buffer is created or killed;
-;; alternative: advise select-window;
-;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Advising-Functions.html
-;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Advising-Named-Functions.html
-;; https://www.emacswiki.org/emacs/AdvisingFunctions
+(require 'package)
+(package-initialize)
+(add-to-list 'package-archives
+	           '("melpa" . "https://melpa.org/packages/") t)
+(defun require-package (package)
+  (unless (require package nil 'noerror)
+    (package-refresh-contents)
+    (package-install package)
+    (require package)))
+(defun install-package (package)
+  (unless (package-installed-p package)
+    (package-refresh-contents)
+    (package-install package)))
+;; https://emacs.stackexchange.com/questions/38206/upgrading-packages-automatically
+;; https://www.reddit.com/r/emacs/comments/acvn2l/elisp_script_to_install_all_packages_very_fast/
+;; https://www.reddit.com/r/emacs/comments/a4n6iw/how_to_easily_update_one_elpa_package/
+;; https://emacs.stackexchange.com/questions/4045/automatically-update-packages-and-delete-old-versions
+;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el#L251
+;; https://github.com/mola-T/SPU
+
+(require 'eyebrowse)
+(setq eyebrowse-keymap-prefix (kbd "C-w"))
+(setq eyebrowse-mode-line-separator " ")
+(setq eyebrowse-mode-line-left-delimiter "")
+(setq eyebrowse-mode-line-right-delimiter "")
+(setq eyebrowse-wrap-around t)
+(define-key eyebrowse-mode-map (kbd "j") 'eyebrowse-prev-window-config)
+(define-key eyebrowse-mode-map (kbd "k") 'eyebrowse-next-window-config)
+(define-key eyebrowse-mode-map (kbd "h") 'eyebrowse-last-window-config)
+(define-key eyebrowse-mode-map (kbd "q") 'eyebrowse-close-window-config)
+
+(add-to-list 'window-persistent-parameters '(window-side . writable))
+(add-to-list 'window-persistent-parameters '(window-slot . writable))
 
 (defun project-new-view (project-dir)
-  ;; new eyebrowse
+  (interactive)
+  (eyebrowse-create-window-config)
 
   ;; project directory window, a side window which shows:
   ;; , the content of project directory;
@@ -166,6 +187,7 @@
     (setq header-line-format
           '((:eval (propertize " " 'display '((space :align-to 0))))
             mode-line-misc-info))))
+(define-key eyebrowse-mode-map (kbd "w") 'project-new-view)
 
 (defun project-open (project-dir)
   (setq-default server-name project-dir)
@@ -180,7 +202,6 @@
       (project-new-view)
       (desktop-save desktop-file-dir-path))
     (setq desktop-path (list desktop-file-dir-path)
-          desktop-restore-frames nil
           desktop-load-locked-desktop t)
     (desktop-save-mode 1)
     (desktop-read desktop-file-dir-path))
@@ -269,7 +290,7 @@
     (set-window-dedicated-p window t)
     (select-window window))
 
-  (global-set-key (kbd "C-TAB") #'lower-frame)
+  (global-set-key (kbd "C-<backspace>") #'lower-frame)
 
   ;; eyebrowse views status in the header line;
   (setq header-line-format
@@ -277,7 +298,7 @@
           mode-line-misc-info))
 
   ;; to do: automatically find all "projects/*" directories in connected storage devices,
-  ;;   and create an eyebrowse window for each;
+  ;;   and create an eyebrowse view for each;
   )
 
 (defun projects-list-activate ()
@@ -286,7 +307,7 @@
     (concat
       "emacsclient --socket-name / --eval '(select-frame-set-input-focus (selected-frame))'"
       " || emacs")))
-(global-set-key (kbd "M-RET") 'projects-list-activate)
+(global-set-key (kbd "C-p") 'projects-list-activate)
 
 (if (eq command-line-args '("emacs"))
     (progn
@@ -298,34 +319,9 @@
   (define-key dired-mode-map [remap dired-find-file] 'my-find-file)
   (define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file))
 
-(require 'package)
-(package-initialize)
-(defun require-package (package)
-  (unless (require package nil 'noerror)
-    (unless (assoc package package-archive-contents)
-	    (package-refresh-contents))
-    (package-install package)
-    (require package)))
-(defun install-package (package)
-  (unless (package-installed-p package nil 'noerror)
-    (unless (assoc package package-archive-contents)
-	     (package-refresh-contents))
-    (package-install package)))
-(add-to-list 'package-archives
-	           '("melpa" . "https://melpa.org/packages/") t)
-;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el
-;; https://emacs.stackexchange.com/questions/38206/upgrading-packages-automatically
-
-;; https://github.com/jwiegley/use-package
-;; https://github.com/SidharthArya/emacsit
-;; https://www.reddit.com/r/emacs/comments/bwptua/a_simple_package_manager_for_emacs/
-;; https://www.reddit.com/r/emacs/comments/5v8n87/emacs_is_often_touted_for_its_concurrency_over/
-;; https://www.reddit.com/r/emacs/comments/9drkhm/is_it_able_to_manage_emacs_packages_using_cli/
-;; https://www.reddit.com/r/emacs/comments/acvn2l/elisp_script_to_install_all_packages_very_fast/
-;; https://emacs.stackexchange.com/questions/34180/how-can-i-script-emacs-to-install-packages-from-list
-
 ;; modal key_bindings
 ;; https://github.com/mrkkrp/modalka
+;; https://github.com/emacsorphanage/god-mode
 ;(require-package 'modalka)
 ;(defun modal-buffer-p ()
 ;  (or (derived-mode-p 'text-mode 'prog-mode 'conf-mode)
