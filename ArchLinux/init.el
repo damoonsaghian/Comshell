@@ -108,7 +108,7 @@
     (save-excursion
       ;; replace the first line with the name of the directory;
       (delete-region (progn (goto-char (point-min)) (point))
-                     (progn (move-end-of-line) (point)))
+                     (progn (move-end-of-line nil) (point)))
       (insert (file-name-directory (directory-file-name default-directory)))
       ;; in the case of a project directory window, make the first line invisible;
       ;; alternative: (eq window (frame-first-window))
@@ -137,7 +137,7 @@
 (require 'package)
 (package-initialize)
 (add-to-list 'package-archives
-	           '("melpa" . "https://melpa.org/packages/") t)
+	           '("melpa" . "https://stable.melpa.org/packages/") t)
 (defun require-package (package)
   (unless (require package nil 'noerror)
     (package-refresh-contents)
@@ -154,7 +154,7 @@
 ;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el#L251
 ;; https://github.com/mola-T/SPU
 
-(require 'eyebrowse)
+(require-package 'eyebrowse)
 (setq eyebrowse-keymap-prefix (kbd "C-w"))
 (setq eyebrowse-mode-line-separator " ")
 (setq eyebrowse-mode-line-left-delimiter "")
@@ -209,7 +209,7 @@
   ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Emacs-Sessions.html
   ;; https://stackoverflow.com/questions/4477376/some-emacs-desktop-save-questions-how-to-change-it-to-save-in-emacs-d-emacs
   (setq-default desktop-base-file-name "emacs.desktop")
-  (setq-default desktop-path (expand-file ".cache/" project-dir))
+  (setq-default desktop-path (expand-file-name ".cache/" project-dir))
   (setq-default desktop-restore-eager 5)
   (setq-default desktop-load-locked-desktop t)
   (desktop-save-mode 1))
@@ -227,7 +227,7 @@
     (cond
      ((file-directory-p file-name)
       (cond
-       ((file-exists-p (expand-file file-name ".gallery"))
+       ((file-exists-p (expand-file-name file-name ".gallery"))
         (select-window
          (display-buffer-use-some-window (find-file-noselect file-name) nil))
         (delete-following-windows)
@@ -401,7 +401,7 @@
              (execute-kbd-macro (kbd "<tab>")))
              ;; (call-interactively (key-binding "<tab>"))
     (insert " ")))
-(define-key minibuffer-map (kbd "SPC") 'double-space-to-tab)
+(define-key minibuffer-local-map (kbd "SPC") 'double-space-to-tab)
 (require 'shell)
 (define-key minibuffer-local-shell-command-map (kbd "SPC") 'double-space-to-tab)
 (define-key shell-mode-map (kbd "SPC") 'double-space-to-tab)
