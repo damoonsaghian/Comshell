@@ -193,7 +193,7 @@
     (cond
      ((file-directory-p file-name)
       (cond
-       ((file-exists-p (expand-file-name file-name ".gallery"))
+       ((file-exists-p (expand-file-name ".gallery" file-name))
         (select-window
          (display-buffer-use-some-window (find-file-noselect file-name) nil))
         (delete-following-windows)
@@ -205,11 +205,11 @@
         )
 
        ((eq (window-parameter nil 'window-side) 'left)
-        (let* ((buffer (dired-noselect project-dir))
+        (let* ((buffer (dired-noselect file-name))
                (slot (+ 1 (window-parameter nil 'window-slot)))
                (window (display-buffer-in-side-window
                         buffer
-                        '((side . left) (slot . ,slot)))))
+                        `((side . left) (slot . ,slot)))))
           (set-window-parameter window 'no-delete-other-windows t)
           (set-window-parameter window 'window-width 0.2)
           (select-window window)
@@ -220,8 +220,8 @@
         ;)
 
        (t
-        (select-window
-         (display-buffer-use-some-window (find-file-noselect file-name) nil))
+        ;(select-window
+         ;(display-buffer-use-some-window (find-file-noselect file-name) nil))
         (delete-following-windows))))
 
      ((string-match-p "\\.jpg/?\\'" file-name)
