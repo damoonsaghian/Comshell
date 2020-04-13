@@ -7,8 +7,8 @@
 (setq-default major-mode 'text-mode)
 (cua-mode 1)
 (setq window-sides-vertical t)
-(global-set-key (kbd "C-x k") (lambda () (quit-window t)))
-(global-set-key (kbd "C-<backspace>") (lambda () (other-window -1)))
+(global-set-key (kbd "C-x k") (lambda () (interactive) (quit-window t)))
+(global-set-key (kbd "C-<backspace>") (lambda () (interactive) (other-window -1)))
 ;; after deleting a window kill its buffer if it doesn't have any other window;
 
 (setq make-backup-files nil)
@@ -102,21 +102,30 @@
 (require 'hl-line)
 (add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
 
-;; dired first line:
-(add-hook 'dired-after-readin-hook (lambda ()
-  (let ((inhibit-read-only t)
-        (window (get-buffer-window)))
-    (save-excursion
-      ;; replace the first line with the name of the directory;
-      (delete-region (progn (goto-char (point-min)) (point))
-                     (progn (move-end-of-line nil) (point)))
-      (insert (file-name-directory (directory-file-name default-directory)))
-      ;; in the case of a project directory window, make the first line invisible;
-      ;; alternative: (eq window (frame-first-window))
-      (unless (and (eq (window-parameter window 'window-side) 'left)
-                   (eq (window-parameter window 'window-slot) 0))
-        (set-text-properties 1 (progn (goto-char 1) (forward-line 1) (point))
-                             '(invisible t)))))))
+(add-hook 'window-configuration-change-hook (lambda ()
+  (when (derived-mode-p 'dired-mode)
+    (hl-line-highlight)
+    (let ((inhibit-read-only t)
+          (window (selected-window)))
+        ;; alternative:
+        ;(and (eq (window-parameter window 'window-side) 'left)
+                     ;(eq (window-parameter window 'window-slot) 0))
+        (if (eq window (frame-first-window))
+            ;; in the case of a project directory window:
+            ;; , show the eyebrowse views status, in the header line;
+            ;; , replace the first line with the name of the directory;
+            (progn
+              (setq header-line-format
+                    '((:eval (propertize " " 'display '((space :align-to 0))))
+                      mode-line-misc-info))
+              (save-excursion
+                (delete-region (progn (goto-char (point-min)) (point))
+                               (progn (move-end-of-line nil) (point)))
+                (insert (file-name-nondirectory (directory-file-name default-directory)))))
+          ;; otherwise make the first line invisible;
+          (save-excursion
+            (set-text-properties 1 (progn (goto-char 1) (forward-line 1) (point))
+                                 '(invisible t))))))))
 
 ;; https://www.emacswiki.org/emacs/DiredView
 ;; for copy_paste mechanism:
@@ -151,11 +160,7 @@
                   '((side . left) (slot . 0)))))
     (set-window-parameter window 'no-delete-other-windows t)
     (set-window-parameter window 'window-width 0.2)
-
-    (select-window window)
-    (setq header-line-format
-          '((:eval (propertize " " 'display '((space :align-to 0))))
-            mode-line-misc-info))))
+    (select-window window)))
 
 (defun project-open (project-dir)
   (let ((project-cache-dir (expand-file-name ".cache/" project-dir)))
@@ -252,7 +257,7 @@
     (set-window-dedicated-p window t)
     (select-window window))
 
-  (global-set-key (kbd "C-<backspace>") #'lower-frame)
+  (global-set-key (kbd "C-<backspace>") 'lower-frame)
 
   ;; eyebrowse views status in the header line;
   (setq header-line-format
@@ -317,8 +322,9 @@
 (define-key eyebrowse-mode-map (kbd "h") 'eyebrowse-last-window-config)
 (define-key eyebrowse-mode-map (kbd "q") 'eyebrowse-close-window-config)
 (unless (equal command-line-args '("emacs"))
-  (define-key eyebrowse-mode-map (kbd "w") 'eyebrowse-create-window-config))
-
+  (define-key eyebrowse-mode-map (kbd "w") (lambda ()
+    (eyebrowse-create-window-config)
+    (project-new-view))))
 
 ;; modal key_bindings
 ;; https://github.com/mrkkrp/modalka
