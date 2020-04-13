@@ -1,5 +1,6 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
+(setq inhibit-startup-screen t)
 (setq use-dialog-box nil)
 (setq visible-bell t)
 ;(setq insert-default-directory nil) ;; alternatively we can use double slash mechanism;
@@ -134,6 +135,157 @@
 ;; https://oremacs.com/2016/02/24/dired-rsync/
 ;; https://github.com/Fuco1/dired-hacks#dired-open
 
+;; to store/restore side windows;
+(add-to-list 'window-persistent-parameters '(window-side . writable))
+(add-to-list 'window-persistent-parameters '(window-slot . writable))
+
+(defun project-new-view (project-dir)
+  (interactive)
+  ;; project directory window, a side window which shows:
+  ;; , the content of project directory;
+  ;; , the name of the project in the first line;
+  ;; , eyebrowse views status in the header line;
+  (let* ((buffer (dired-noselect project-dir))
+         (window (display-buffer-in-side-window
+                  buffer
+                  '((side . left) (slot . 0)))))
+    (set-window-parameter window 'no-delete-other-windows t)
+    (set-window-parameter window 'window-width 0.2)
+
+    (select-window window)
+    (setq header-line-format
+          '((:eval (propertize " " 'display '((space :align-to 0))))
+            mode-line-misc-info))))
+
+(defun project-open (project-dir)
+  (let ((project-cache-dir (expand-file-name ".cache/" project-dir)))
+    (unless (file-exists-p project-cache-dir)
+      (make-directory project-cache-dir t))
+    (setq server-name (expand-file-name ".cache/emacs.socket" project-dir))
+    (server-start)
+
+    (require 'desktop)
+    (setq desktop-path (list project-cache-dir)
+          desktop-base-file-name "emacs.desktop"
+          desktop-restore-eager 5
+          desktop-load-locked-desktop t)
+    (if (file-exists-p (expand-file-name "emacs.desktop" project-cache-dir))
+        (desktop-read project-cache-dir)
+      (project-new-view project-dir)
+      (desktop-save project-cache-dir))
+    (desktop-save-mode 1)))
+
+(defun delete-following-windows ()
+  (let ((window (next-window)))
+    (unless (eq (window-parameter window 'window-slot) 0)
+      (delete-window window)
+      (delete-following-windows))))
+
+(defun my-find-file ()
+  (interactive)
+  (hl-line-highlight)
+  (let ((file-name (dired-get-filename)))
+    (cond
+     ((file-directory-p file-name)
+      (cond
+       ((file-exists-p (expand-file-name file-name ".gallery"))
+        (select-window
+         (display-buffer-use-some-window (find-file-noselect file-name) nil))
+        (delete-following-windows)
+        ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
+        ;; https://github.com/larsmagne/movie.el
+        ;; https://www.gnu.org/software/emms/
+        ;; http://wikemacs.org/wiki/Media_player
+        ;; https://github.com/dbrock/bongo
+        )
+
+       ((eq (window-parameter nil 'window-side) 'left)
+        (let* ((buffer (dired-noselect project-dir))
+               (slot (+ 1 (window-parameter nil 'window-slot)))
+               (window (display-buffer-in-side-window
+                        buffer
+                        '((side . left) (slot . ,slot)))))
+          (set-window-parameter window 'no-delete-other-windows t)
+          (set-window-parameter window 'window-width 0.2)
+          (select-window window)
+          (delete-following-windows)))
+
+       ;((file-exists-p (expand-file file-name ".media"))
+        ;; view in overlay;
+        ;)
+
+       (t
+        (select-window
+         (display-buffer-use-some-window (find-file-noselect file-name) nil))
+        (delete-following-windows))))
+
+     ((string-match-p "\\.jpg/?\\'" file-name)
+      ;; view in overlay;
+      )
+
+     (t
+      (select-window
+       (display-buffer-use-some-window (find-file-noselect file-name) nil))
+      (delete-following-windows))
+     )))
+
+;; projects list: an Emacs instance with a floating frame, showing the list of projects;
+
+(defun projects-list-find-file ()
+  (interactive)
+  (let ((file-name (dired-get-filename)))
+    (when (file-directory-p file-name)
+      (hl-line-highlight)
+      ;; send a message to all servers except "projects-list", to hide their frame;
+      (call-process-shell-command
+       (concat
+        "emacsclient --socket-name \""
+        (expand-file-name ".cache/emacs.socket" file-name)
+        "\" --eval '(select-frame-set-input-focus (selected-frame))'"
+        " || "
+        "emacs --maximized --eval '(project-open \"" file-name "\")' &")))))
+
+(defun projects-list-create ()
+  (let* ((buffer (dired-noselect "~/projects"))
+         (window (display-buffer-use-some-window buffer nil)))
+    (set-window-parameter window 'no-delete-other-windows t)
+    (set-window-dedicated-p window t)
+    (select-window window))
+
+  (global-set-key (kbd "C-<backspace>") #'lower-frame)
+
+  ;; eyebrowse views status in the header line;
+  (setq header-line-format
+        '((:eval (propertize " " 'display '((space :align-to 0))))
+          mode-line-misc-info))
+
+  ;; to do: automatically find all "projects/*" directories in connected storage devices,
+  ;;   and create an eyebrowse view for each;
+  )
+
+(defun projects-list-activate ()
+  (interactive)
+  (call-process-shell-command
+    (concat
+      "emacsclient --socket-name projects-list"
+      " --eval '(select-frame-set-input-focus (selected-frame))'"
+      " || emacs &")))
+(global-set-key (kbd "C-p") 'projects-list-activate)
+
+
+(if (equal command-line-args '("emacs"))
+    (progn
+      (define-key dired-mode-map [remap dired-find-file] 'projects-list-find-file)
+      (define-key dired-mode-map [remap dired-find-file-other-window] 'projects-list-find-file)
+      (add-hook 'emacs-startup-hook 'projects-list-create)
+      (setq server-name "projects-list")
+      (server-start))
+  (define-key dired-mode-map [remap dired-find-file] 'my-find-file)
+  (define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file))
+
+;; otherwise "select-frame-set-input-focus" above doesn't work properly;
+(add-hook 'focus-in-hook (lambda () (raise-frame)))
+
 (require 'package)
 (package-initialize)
 (add-to-list 'package-archives
@@ -164,160 +316,9 @@
 (define-key eyebrowse-mode-map (kbd "k") 'eyebrowse-next-window-config)
 (define-key eyebrowse-mode-map (kbd "h") 'eyebrowse-last-window-config)
 (define-key eyebrowse-mode-map (kbd "q") 'eyebrowse-close-window-config)
+(unless (equal command-line-args '("emacs"))
+  (define-key eyebrowse-mode-map (kbd "w") 'eyebrowse-create-window-config))
 
-(add-to-list 'window-persistent-parameters '(window-side . writable))
-(add-to-list 'window-persistent-parameters '(window-slot . writable))
-
-(defun project-new-view (project-dir)
-  (interactive)
-  (eyebrowse-create-window-config)
-
-  ;; project directory window, a side window which shows:
-  ;; , the content of project directory;
-  ;; , the name of the project in the first line;
-  ;; , eyebrowse views status in the header line;
-  (let* ((buffer (dired-noselect project-dir))
-         (window (display-buffer-in-side-window
-                  buffer
-                  '((side . left) (slot . 0) (window-width . 0.2)))))
-    (set-window-parameter window 'no-delete-other-windows t)
-    (set-window-dedicated-p window t) ;; not sure if this is necessary;
-
-    (select-window window)
-    (setq header-line-format
-          '((:eval (propertize " " 'display '((space :align-to 0))))
-            mode-line-misc-info))))
-(define-key eyebrowse-mode-map (kbd "w") 'project-new-view)
-
-(defun project-open (project-dir)
-  (setq-default server-name project-dir)
-  (server-start)
-
-  (require 'desktop)
-  (let ((desktop-file-dir-path (expand-file-name ".cache/" project-dir))
-        (desktop-file-path (expand-file-name ".cache/.emacs.desktop" project-dir)))
-    (unless (file-exists-p desktop-file-dir-path)
-      (make-directory desktop-file-dir-path t))
-    (unless (file-exists-p desktop-file-path)
-      (project-new-view)
-      (desktop-save desktop-file-dir-path))
-    (setq desktop-path (list desktop-file-dir-path)
-          desktop-load-locked-desktop t)
-    (desktop-save-mode 1)
-    (desktop-read desktop-file-dir-path))
-  (setq desktop-restore-eager 5)
-  ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Emacs-Sessions.html
-  ;; https://stackoverflow.com/questions/4477376/some-emacs-desktop-save-questions-how-to-change-it-to-save-in-emacs-d-emacs
-  (setq-default desktop-base-file-name "emacs.desktop")
-  (setq-default desktop-path (expand-file-name ".cache/" project-dir))
-  (setq-default desktop-restore-eager 5)
-  (setq-default desktop-load-locked-desktop t)
-  (desktop-save-mode 1))
-
-(defun delete-following-windows ()
-  (let ((window (next-window)))
-    (unless (eq (window-parameter nil 'window-slot) 0)
-      (delete-window window)
-      (delete-following-windows))))
-
-(defun my-find-file ()
-  (interactive)
-  (hl-line-highlight)
-  (let ((file-name (dired-get-filename)))
-    (cond
-     ((file-directory-p file-name)
-      (cond
-       ((file-exists-p (expand-file-name file-name ".gallery"))
-        (select-window
-         (display-buffer-use-some-window (find-file-noselect file-name) nil))
-        (delete-following-windows)
-        ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
-        ;; https://github.com/larsmagne/movie.el
-        ;; https://www.gnu.org/software/emms/
-        ;; http://wikemacs.org/wiki/Media_player
-        ;; https://github.com/dbrock/bongo
-        )
-
-       ((eq (window-parameter nil 'window-side) 'left)
-        (let* ((buffer (dired-noselect project-dir))
-               (slot (+ 1 (window-parameter nil 'window-slot)))
-               (window (display-buffer-in-side-window
-                        buffer
-                        '((side . left) (slot . ,slot) (window-width . 0.2)))))
-          (set-window-parameter window 'no-delete-other-windows t)
-          (set-window-dedicated-p window t) ;; not sure if this is necessary;
-          (select-window window)
-          (delete-following-windows)))
-
-       ;((file-exists-p (expand-file file-name ".media"))
-        ;; view in overlay;
-        ;)
-
-       (t
-        (select-window
-         (display-buffer-use-some-window (find-file-noselect file-name) nil))
-        (delete-following-windows))))
-
-     ((string-match-p "\\.jpg/?\\'" file-name)
-      ;; view in overlay;
-      )
-
-     (t
-      (select-window
-       (display-buffer-use-some-window (find-file-noselect file-name) nil))
-      (delete-following-windows))
-     )))
-
-;; projects list: an Emacs instance with a floating frame, showing the list of projects;
-
-(defun projects-list-find-file ()
-  (interactive)
-  (when (file-directory-p file-name)
-    (hl-line-highlight)
-    ;; send a message to all servers except "/", to hide their frame;
-    (call-process-shell-command
-     (concat
-      "emacsclient --socket-name \""
-      file-name
-      "\" --eval '(select-frame-set-input-focus (selected-frame))'"
-      " || "
-      "emacs --maximized --eval '(project-open \"" file-name "\")'"))))
-
-(defun projects-list-create ()
-  (let* ((buffer (dired-noselect "~/projects"))
-         (window (display-buffer-use-some-window buffer nil)))
-    (set-window-parameter window 'no-delete-other-windows t)
-    (set-window-dedicated-p window t)
-    (select-window window))
-
-  (global-set-key (kbd "C-<backspace>") #'lower-frame)
-
-  ;; eyebrowse views status in the header line;
-  (setq header-line-format
-        '((:eval (propertize " " 'display '((space :align-to 0))))
-          mode-line-misc-info))
-
-  ;; to do: automatically find all "projects/*" directories in connected storage devices,
-  ;;   and create an eyebrowse view for each;
-  )
-
-(defun projects-list-activate ()
-  (interactive)
-  (call-process-shell-command
-    (concat
-      "emacsclient --socket-name / --eval '(select-frame-set-input-focus (selected-frame))'"
-      " || emacs")))
-(global-set-key (kbd "C-p") 'projects-list-activate)
-
-(if (eq command-line-args '("emacs"))
-    (progn
-      (define-key dired-mode-map [remap dired-find-file] 'projects-list-find-file)
-      (define-key dired-mode-map [remap dired-find-file-other-window] 'projects-list-find-file)
-      (add-hook 'emacs-startup-hook 'projects-list-create)
-      (setq server-name "/")
-      (server-start))
-  (define-key dired-mode-map [remap dired-find-file] 'my-find-file)
-  (define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file))
 
 ;; modal key_bindings
 ;; https://github.com/mrkkrp/modalka
