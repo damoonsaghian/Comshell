@@ -99,33 +99,25 @@
 ;; only move between lines containing a file;
 (define-key dired-mode-map [remap next-line] 'dired-next-line)
 (define-key dired-mode-map [remap previous-line] 'dired-previous-line)
-(require 'hl-line)
-(add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
+;; make the first line invisible;
+(add-hook 'dired-after-readin-hook (lambda ()
+  (let ((inhibit-read-only t))
+    (save-excursion
+      (set-text-properties
+        1
+        (progn (goto-char 1) (forward-line 1) (point))
+        '(invisible t))))))
 
-(add-hook 'window-configuration-change-hook (lambda ()
-  (when (derived-mode-p 'dired-mode)
-    (hl-line-highlight)
-    (let ((inhibit-read-only t)
-          (window (selected-window)))
-        ;; alternative:
-        ;(and (eq (window-parameter window 'window-side) 'left)
-                     ;(eq (window-parameter window 'window-slot) 0))
-        (if (eq window (frame-first-window))
-            ;; in the case of a project directory window:
-            ;; , show the eyebrowse views status, in the header line;
-            ;; , replace the first line with the name of the directory;
-            (progn
-              (setq header-line-format
-                    '((:eval (propertize " " 'display '((space :align-to 0))))
-                      mode-line-misc-info))
-              (save-excursion
-                (delete-region (progn (goto-char (point-min)) (point))
-                               (progn (move-end-of-line nil) (point)))
-                (insert (file-name-nondirectory (directory-file-name default-directory)))))
-          ;; otherwise make the first line invisible;
-          (save-excursion
-            (set-text-properties 1 (progn (goto-char 1) (forward-line 1) (point))
-                                 '(invisible t))))))))
+(require 'hl-line)
+(add-hook 'dired-mode-hook (lambda ()
+  (setq hl-line-mode t)
+  (when (string-match-p "/projects/[^/]*/?\\'" default-directory) ;; alt: dired-directory
+    (setq header-line-format
+          '((:eval (propertize " " 'display '((space :align-to 0))))
+            (:eval (replace-regexp-in-string "<.*>" "" (buffer-name)))
+            " "
+            mode-line-misc-info)))))
+(add-hook 'window-configuration-change-hook 'hl-line-highlight)
 
 ;; https://www.emacswiki.org/emacs/DiredView
 ;; for copy_paste mechanism:
@@ -148,12 +140,8 @@
 (add-to-list 'window-persistent-parameters '(window-side . writable))
 (add-to-list 'window-persistent-parameters '(window-slot . writable))
 
-(defun project-new-view (project-dir)
+(defun project-directory-side-window (project-dir)
   (interactive)
-  ;; project directory window, a side window which shows:
-  ;; , the content of project directory;
-  ;; , the name of the project in the first line;
-  ;; , eyebrowse views status in the header line;
   (let* ((buffer (dired-noselect project-dir))
          (window (display-buffer-in-side-window
                   buffer
@@ -176,19 +164,22 @@
           desktop-load-locked-desktop t)
     (if (file-exists-p (expand-file-name "emacs.desktop" project-cache-dir))
         (desktop-read project-cache-dir)
-      (project-new-view project-dir)
+      (project-directory-side-window project-dir)
       (desktop-save project-cache-dir))
     (desktop-save-mode 1)))
 
 (defun delete-following-windows ()
   (let ((window (next-window)))
     (unless (eq (window-parameter window 'window-slot) 0)
-      (delete-window window)
-      (delete-following-windows))))
+      (condition-case nil
+          (progn (delete-window window)
+                 (delete-following-windows))
+        (error (set-window-buffer window "*scratch*"))))))
 
 (defun my-find-file ()
   (interactive)
   (hl-line-highlight)
+  (delete-following-windows)
   (let ((file-name (dired-get-filename)))
     (cond
      ((file-directory-p file-name)
@@ -196,7 +187,6 @@
        ((file-exists-p (expand-file-name ".gallery" file-name))
         (select-window
          (display-buffer-use-some-window (find-file-noselect file-name) nil))
-        (delete-following-windows)
         ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
         ;; https://github.com/larsmagne/movie.el
         ;; https://www.gnu.org/software/emms/
@@ -210,10 +200,9 @@
                (window (display-buffer-in-side-window
                         buffer
                         `((side . left) (slot . ,slot)))))
-          (set-window-parameter window 'no-delete-other-windows t)
           (set-window-parameter window 'window-width 0.2)
-          (select-window window)
-          (delete-following-windows)))
+          (set-window-parameter window 'no-delete-other-windows t)
+          (select-window window)))
 
        ;((file-exists-p (expand-file file-name ".media"))
         ;; view in overlay;
@@ -222,7 +211,7 @@
        (t
         ;(select-window
          ;(display-buffer-use-some-window (find-file-noselect file-name) nil))
-        (delete-following-windows))))
+        )))
 
      ((string-match-p "\\.jpg/?\\'" file-name)
       ;; view in overlay;
@@ -230,8 +219,7 @@
 
      (t
       (select-window
-       (display-buffer-use-some-window (find-file-noselect file-name) nil))
-      (delete-following-windows))
+       (display-buffer-use-some-window (find-file-noselect file-name) nil)))
      )))
 
 ;; projects list: an Emacs instance with a floating frame, showing the list of projects;
@@ -277,7 +265,6 @@
       " || emacs &")))
 (global-set-key (kbd "C-p") 'projects-list-activate)
 
-
 (if (equal command-line-args '("emacs"))
     (progn
       (define-key dired-mode-map [remap dired-find-file] 'projects-list-find-file)
@@ -314,8 +301,6 @@
 (require-package 'eyebrowse)
 (setq eyebrowse-keymap-prefix (kbd "C-w"))
 (setq eyebrowse-mode-line-separator " ")
-(setq eyebrowse-mode-line-left-delimiter "")
-(setq eyebrowse-mode-line-right-delimiter "")
 (setq eyebrowse-wrap-around t)
 (define-key eyebrowse-mode-map (kbd "j") 'eyebrowse-prev-window-config)
 (define-key eyebrowse-mode-map (kbd "k") 'eyebrowse-next-window-config)
@@ -324,7 +309,7 @@
 (unless (equal command-line-args '("emacs"))
   (define-key eyebrowse-mode-map (kbd "w") (lambda ()
     (eyebrowse-create-window-config)
-    (project-new-view))))
+    (project-directory-side-window))))
 
 ;; modal key_bindings
 ;; https://github.com/mrkkrp/modalka
