@@ -140,9 +140,11 @@
 (add-to-list 'window-persistent-parameters '(window-side . writable))
 (add-to-list 'window-persistent-parameters '(window-slot . writable))
 
-(defun project-directory-side-window (project-dir)
+(defvar project-dir-g)
+
+(defun project-directory-side-window ()
   (interactive)
-  (let* ((buffer (dired-noselect project-dir))
+  (let* ((buffer (dired-noselect project-dir-g))
          (window (display-buffer-in-side-window
                   buffer
                   '((side . left) (slot . 0)))))
@@ -151,6 +153,7 @@
     (select-window window)))
 
 (defun project-open (project-dir)
+  (setq project-dir-g project-dir)
   (let ((project-cache-dir (expand-file-name ".cache/" project-dir)))
     (unless (file-exists-p project-cache-dir)
       (make-directory project-cache-dir t))
@@ -236,7 +239,7 @@
         (expand-file-name ".cache/emacs.socket" file-name)
         "\" --eval '(select-frame-set-input-focus (selected-frame))'"
         " || "
-        "emacs --maximized --eval '(project-open \"" file-name "\")' &")))))
+        "emacs --eval '(project-open \"" file-name "\")' &")))))
 
 (defun projects-list-create ()
   (let* ((buffer (dired-noselect "~/projects"))
@@ -244,8 +247,6 @@
     (set-window-parameter window 'no-delete-other-windows t)
     (set-window-dedicated-p window t)
     (select-window window))
-
-  (global-set-key (kbd "C-<backspace>") 'lower-frame)
 
   ;; eyebrowse views status in the header line;
   (setq header-line-format
@@ -263,7 +264,10 @@
       "emacsclient --socket-name projects-list"
       " --eval '(select-frame-set-input-focus (selected-frame))'"
       " || emacs &")))
-(global-set-key (kbd "C-p") 'projects-list-activate)
+
+(define-prefix-command 'project-map)
+(global-set-key (kbd "C-p") 'project-map)
+(global-set-key (kbd "C-p p") 'projects-list-activate)
 
 (if (equal command-line-args '("emacs"))
     (progn
@@ -272,6 +276,7 @@
       (add-hook 'emacs-startup-hook 'projects-list-create)
       (setq server-name "projects-list")
       (server-start))
+  (add-to-list 'default-frame-alist '(fullscreen . maximized))
   (define-key dired-mode-map [remap dired-find-file] 'my-find-file)
   (define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file))
 
@@ -298,16 +303,18 @@
 ;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el#L251
 ;; https://github.com/mola-T/SPU
 
+
 (require-package 'eyebrowse)
-(setq eyebrowse-keymap-prefix (kbd "C-w"))
+(eyebrowse-mode t)
 (setq eyebrowse-mode-line-separator " ")
 (setq eyebrowse-wrap-around t)
-(define-key eyebrowse-mode-map (kbd "j") 'eyebrowse-prev-window-config)
-(define-key eyebrowse-mode-map (kbd "k") 'eyebrowse-next-window-config)
-(define-key eyebrowse-mode-map (kbd "h") 'eyebrowse-last-window-config)
-(define-key eyebrowse-mode-map (kbd "q") 'eyebrowse-close-window-config)
+(global-set-key (kbd "C-p j") 'eyebrowse-prev-window-config)
+(global-set-key (kbd "C-p k") 'eyebrowse-next-window-config)
+(global-set-key (kbd "C-p h") 'eyebrowse-last-window-config)
+(global-set-key (kbd "C-p q") 'eyebrowse-close-window-config)
 (unless (equal command-line-args '("emacs"))
-  (define-key eyebrowse-mode-map (kbd "w") (lambda ()
+  (global-set-key (kbd "C-p n") (lambda ()
+    (interactive)
     (eyebrowse-create-window-config)
     (project-directory-side-window))))
 
