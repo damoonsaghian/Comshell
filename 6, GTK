@@ -39,10 +39,16 @@ Actor: mutable;
 ; pkexec pacman -S gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
 poppler-glib goffice goocanvas
 
-; cargo build --release
-; cp .target/release/comshell /usr/local/bin/
+; curl --proto '=https' -sSf -o comshell.zip https://github.com/damoonsaghian/Comshell/archive/master.zip
+; unzip comshell.zip -d comshell
+; cd comshell
+ensure the downloaded files aren't malicious, then:
+;sh
+cargo build --release
+cp .target/release/comshell /usr/local/bin/
 
-; printf '[Desktop Entry]\nName=Comshell\nExec=comshell\nIcon=computer\nType=Application' >
+printf '[Desktop Entry]\nName=Comshell\nExec=comshell\nIcon=computer\nType=Application' >
   ~/.config/autostart/comshell.desktop
-; pkexec cp ~/.config/autostart/comshell.desktop /etc/skel/.config/autostart/
-; pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/
+pkexec cp ~/.config/autostart/comshell.desktop /etc/skel/.config/autostart/
+pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/
+;
