@@ -39,10 +39,6 @@ Actor: mutable;
 ; pkexec pacman -S gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
 poppler-glib goffice goocanvas
 
-; curl --proto '=https' -sSf -o comshell.zip https://github.com/damoonsaghian/Comshell/archive/master.zip
-; unzip comshell.zip -d comshell
-; cd comshell
-ensure the downloaded files aren't malicious, then:
 ;sh
 cargo build --release
 cp .target/release/comshell /usr/local/bin/

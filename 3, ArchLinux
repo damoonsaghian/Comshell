@@ -57,3 +57,12 @@ note that due to a bug, "pkexec" does not work with the fallback Polkit agent,
 there is a workaround though (it requires "ctrl+c" to stop):
 ; pkttyagent -p $(echo $$) | pkexec ...
 or you can just use "su" instead;
+
+now we can even have a prototype of Comshell using Emacs;
+a separate application is implemented using GJS,
+  to view web pages, pdfs, images and videos, as an overlay window;
+; pkexec pacman -S emacs webkit2gtk poppler-glib gst-plugins-{base,good,bad} gst-libav
+; mkdir -p ~/.emacs.d
+; cd ~/.emacs.d
+; export url=https://raw.githubusercontent.com/damoonsaghian/Comshell/master/ArchLinux/
+; curl --proto '=https' -sSf -o #1 "$url"{init.el,overlay.js}
