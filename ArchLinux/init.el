@@ -6,20 +6,17 @@
 ;(setq insert-default-directory nil) ;; alternatively we can use double slash mechanism;
 (setq-default major-mode 'text-mode)
 (cua-mode 1)
-(setq window-sides-vertical t)
 
-(global-set-key (kbd "C-x 0") (lambda () (interactive)
-  (if (window-deletable-p) (delete-window))))
+(defvar project-dir-g)
 
 (setq make-backup-files nil)
 ;; automatically recover unsaved files;
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Recover.html
 ;; https://www.emacswiki.org/emacs/AutoSave#toc1
 ;;   https://www.gnu.org/software/emacs/manual/html_node/emacs/Auto-Save-Files.html
-;; auto-save-file-name-transforms
-;; "^\\(\\.*\\)\\'\\|^target\\'|\\.lock\\'\\|^\\(\\#*\\)\\#\\'"
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Regexps.html
-;; http://www.rexegg.com/
+;; auto-save-file-name-transforms, using project-dir-g
+
+(setq window-sides-vertical t)
 
 (setq window-divider-default-places t
       window-divider-default-right-width 1
@@ -148,8 +145,6 @@
 (add-to-list 'window-persistent-parameters '(window-side . writable))
 (add-to-list 'window-persistent-parameters '(window-slot . writable))
 
-(defvar project-dir-g)
-
 (defun project-directory-side-window ()
   (interactive)
   (let* ((buffer (dired-noselect project-dir-g))
@@ -186,18 +181,6 @@
           (progn (delete-window window)
                  (delete-following-windows))
         (error (set-window-buffer window "*scratch*"))))))
-
-;; to deal with the case when we are in a middle window, and the Emacs is close;
-;; otherwise highlighted line may not correspond to the file shown in the following window;
-(add-hook 'window-setup-hook (lambda ()
-  (delete-following-windows)
-  (let ((original-window (selected-window)))
-    (mapcar
-      (lambda (window)
-        (select-window window)
-        (hl-line-highlight))
-      (window-list))
-    (select-window original-window))))
 
 (defun my-find-file ()
   (interactive)
@@ -298,7 +281,19 @@
       (server-start))
   (add-to-list 'default-frame-alist '(fullscreen . maximized))
   (define-key dired-mode-map [remap dired-find-file] 'my-find-file)
-  (define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file))
+  (define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file)
+
+  ;; to deal with the case when we are in a middle window, and the Emacs is close;
+  ;; otherwise highlighted line may not correspond to the file shown in the following window;
+  (add-hook 'window-setup-hook (lambda ()
+                                 (delete-following-windows)
+                                 (let ((original-window (selected-window)))
+                                   (mapcar
+                                    (lambda (window)
+                                      (select-window window)
+                                      (hl-line-highlight))
+                                    (window-list))
+                                   (select-window original-window)))))
 
 ;; otherwise "select-frame-set-input-focus" above doesn't work properly;
 (add-hook 'focus-in-hook (lambda () (raise-frame)))
