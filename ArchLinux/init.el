@@ -8,6 +8,7 @@
 (cua-mode 1)
 (setq make-backup-files nil)
 (setq auto-save-default nil)
+(setq-default mode-line-format nil)
 
 (setq window-divider-default-places t
       window-divider-default-right-width 1
@@ -15,10 +16,12 @@
 (window-divider-mode 1)
 (set-face-attribute 'window-divider nil :foreground "#555555")
 
-(setq-default mode-line-format nil)
+(scroll-bar-mode -1)
+(setq-default indicate-buffer-boundaries '((up . left) (down . left)))
 
 (scroll-bar-mode -1)
 (setq-default indicate-buffer-boundaries '((up . left) (down . left)))
+
 
 ;; never recenter point
 (setq scroll-conservatively 101)
@@ -139,8 +142,7 @@
 
 (defvar project-directory nil)
 
-;; a global variable used to stop infinite loop when loading an undo list;
-;; the main idea of the code saving/loading undo_list is taken from here:
+;; the following code for saving/loading undo_list is taken from here:
 ;; https://stackoverflow.com/a/2985357
 (defvar handling-undo-saving nil)
 
@@ -171,7 +173,6 @@
 (add-hook 'write-file-functions 'save-undo-list)
 
 (defun load-undo-list ()
-  (ignore-errors
     (let ((undo-file-name (expand-file-name
                            (subst-char-in-string
                             ?/ ?!
@@ -181,10 +182,10 @@
       (when (and
              (not handling-undo-saving)
              (null buffer-undo-list)
-             (file-exists-p undo-file-name)
-             (let* ((handling-undo-saving t)
-                    (undo-buffer-to-eval (find-file-noselect undo-file-name)))
-               (eval (read undo-buffer-to-eval))))))))
+             (file-exists-p undo-file-name))
+        (let* ((handling-undo-saving t)
+               (undo-buffer-to-eval (find-file-noselect undo-file-name)))
+          (eval (read undo-buffer-to-eval))))))
 ;; load undo list, after a file is visited;
 (add-hook 'find-file-hook 'load-undo-list)
 
@@ -530,11 +531,12 @@
 ;; http://julienblanchard.com/2016/fancy-rust-development-with-emacs/
 ;(setq rust-indent-offset 2)
 
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Icomplete.html
 ;; http://company-mode.github.io/
 ;; (setq ido-enable-flex-matching t)
 ;; (setq ido-everywhere t)
 ;; (ido-mode 1)
-;; ido-ubiquitous, helm, icomplete
+;; ido-ubiquitous, helm
 
 ;; http://ergoemacs.org/emacs/emacs_magit-mode_tutorial.html
 ;;   https://magit.vc/
