@@ -6,17 +6,8 @@
 ;(setq insert-default-directory nil) ;; alternatively we can use double slash mechanism;
 (setq-default major-mode 'text-mode)
 (cua-mode 1)
-
-(defvar project-dir-g)
-
 (setq make-backup-files nil)
-;; automatically recover unsaved files;
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Recover.html
-;; https://www.emacswiki.org/emacs/AutoSave#toc1
-;;   https://www.gnu.org/software/emacs/manual/html_node/emacs/Auto-Save-Files.html
-;; auto-save-file-name-transforms, using project-dir-g
-
-(setq window-sides-vertical t)
+(setq auto-save-default nil)
 
 (setq window-divider-default-places t
       window-divider-default-right-width 1
@@ -141,13 +132,88 @@
 ;; https://oremacs.com/2016/02/24/dired-rsync/
 ;; https://github.com/Fuco1/dired-hacks#dired-open
 
+(setq window-sides-vertical t)
 ;; to store/restore side windows;
 (add-to-list 'window-persistent-parameters '(window-side . writable))
 (add-to-list 'window-persistent-parameters '(window-slot . writable))
 
+(defvar project-directory nil)
+
+;; a global variable used to stop infinite loop when loading an undo list;
+;; the main idea of the code saving/loading undo_list is taken from here:
+;; https://stackoverflow.com/a/2985357
+(defvar handling-undo-saving nil)
+
+(defun save-undo-list ()
+  (let ((project-undo-dir
+         (expand-file-name ".cache/emacs-undo/" project-directory)))
+    (save-excursion
+      (ignore-errors
+        (let ((undo-to-save `(setq buffer-undo-list ',buffer-undo-list))
+              (undo-file-name (expand-file-name
+                               (subst-char-in-string
+                                ?/ ?!
+                                (replace-regexp-in-string "!" "!!"
+                                                          buffer-file-name))
+                               project-undo-dir)))
+          (unless (file-exists-p project-undo-dir)
+            (make-directory project-undo-dir t))
+          (find-file undo-file-name)
+          (erase-buffer)
+          (let (print-level
+                print-length)
+            (print undo-to-save (current-buffer)))
+          (let ((write-file-hooks (remove 'save-undo-list write-file-hooks)))
+            (save-buffer))
+          (kill-buffer))))
+    nil))
+;; save undo list, before writing out a buffer to its visited file;
+(add-hook 'write-file-functions 'save-undo-list)
+
+(defun load-undo-list ()
+  (ignore-errors
+    (let ((undo-file-name (expand-file-name
+                           (subst-char-in-string
+                            ?/ ?!
+                            (replace-regexp-in-string "!" "!!"
+                                                      buffer-file-name))
+                           (expand-file-name ".cache/emacs-undo/" project-directory))))
+      (when (and
+             (not handling-undo-saving)
+             (null buffer-undo-list)
+             (file-exists-p undo-file-name)
+             (let* ((handling-undo-saving t)
+                    (undo-buffer-to-eval (find-file-noselect undo-file-name)))
+               (eval (read undo-buffer-to-eval))))))))
+;; load undo list, after a file is visited;
+(add-hook 'find-file-hook 'load-undo-list)
+
+;; delete the corresponding undo_list file,
+;;   when the file is not found or the buffer is killed;
+;    (add-hook 'find-file-not-found-functions
+;              (lambda ()
+;                (let ((undo-file-name (expand-file-name
+;                                       (subst-char-in-string
+;                                        ?/ ?!
+;                                        (replace-regexp-in-string "!" "!!"
+;                                                                  buffer-file-name))
+;                                       project-undo-dir)))
+;                  (delete-file undo-file-name)))
+;              nil)
+;    (add-hook 'kill-buffer-hook
+;              (lambda ()
+;                (let ((undo-file-name (expand-file-name
+;                                       (subst-char-in-string
+;                                        ?/ ?!
+;                                        (replace-regexp-in-string "!" "!!"
+;                                                                  buffer-file-name))
+;                                       project-undo-dir)))
+;                  (delete-file undo-file-name))))
+
+
 (defun project-directory-side-window ()
   (interactive)
-  (let* ((buffer (dired-noselect project-dir-g))
+  (let* ((buffer (dired-noselect project-directory))
          (window (display-buffer-in-side-window
                   buffer
                   '((side . left) (slot . 0)))))
@@ -156,12 +222,15 @@
     (select-window window)))
 
 (defun project-open (project-dir)
-  (setq project-dir-g project-dir)
-  (let ((project-cache-dir (expand-file-name ".cache/" project-dir)))
+  (setq project-directory project-dir)
+  (let* ((project-cache-dir (expand-file-name ".cache/" project-directory)))
     (unless (file-exists-p project-cache-dir)
       (make-directory project-cache-dir t))
-    (setq server-name (expand-file-name ".cache/emacs.socket" project-dir))
+
+    (setq server-name (expand-file-name "emacs.socket" project-cache-dir))
     (server-start)
+
+    (auto-save-visited-mode 1)
 
     (require 'desktop)
     (setq desktop-path (list project-cache-dir)
@@ -496,3 +565,5 @@
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Calendar_002fDiary.html
 ;; https://www.gnu.org/software/emacs-muse/manual/html_node/Extending-Muse.html#Extending-Muse
 ;; https://github.com/Fuco1/smartparens
+;; https://github.com/jackkamm/undo-propose-el
+;; https://github.com/jgarvin/mandimus
