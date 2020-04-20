@@ -19,10 +19,6 @@
 (scroll-bar-mode -1)
 (setq-default indicate-buffer-boundaries '((up . left) (down . left)))
 
-(scroll-bar-mode -1)
-(setq-default indicate-buffer-boundaries '((up . left) (down . left)))
-
-
 ;; never recenter point
 (setq scroll-conservatively 101)
 ;; move point to top/bottom of buffer before signaling a scrolling error;
@@ -140,77 +136,29 @@
 (add-to-list 'window-persistent-parameters '(window-side . writable))
 (add-to-list 'window-persistent-parameters '(window-slot . writable))
 
+(require 'package)
+(package-initialize)
+(add-to-list 'package-archives
+	           '("melpa" . "https://stable.melpa.org/packages/") t)
+(defun require-package (package)
+  (unless (require package nil 'noerror)
+    (package-refresh-contents)
+    (package-install package)
+    (require package)))
+(defun install-package (package)
+  (unless (package-installed-p package)
+    (package-refresh-contents)
+    (package-install package)))
+;; https://emacs.stackexchange.com/questions/38206/upgrading-packages-automatically
+;; https://www.reddit.com/r/emacs/comments/acvn2l/elisp_script_to_install_all_packages_very_fast/
+;; https://www.reddit.com/r/emacs/comments/a4n6iw/how_to_easily_update_one_elpa_package/
+;; https://emacs.stackexchange.com/questions/4045/automatically-update-packages-and-delete-old-versions
+;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el#L251
+;; https://github.com/mola-T/SPU
+
+(require-package 'undohist)
+
 (defvar project-directory nil)
-
-;; the following code for saving/loading undo_list is taken from here:
-;; https://stackoverflow.com/a/2985357
-(defvar handling-undo-saving nil)
-
-(defun save-undo-list ()
-  (let ((project-undo-dir
-         (expand-file-name ".cache/emacs-undo/" project-directory)))
-    (save-excursion
-      (ignore-errors
-        (let ((undo-to-save `(setq buffer-undo-list ',buffer-undo-list))
-              (undo-file-name (expand-file-name
-                               (subst-char-in-string
-                                ?/ ?!
-                                (replace-regexp-in-string "!" "!!"
-                                                          buffer-file-name))
-                               project-undo-dir)))
-          (unless (file-exists-p project-undo-dir)
-            (make-directory project-undo-dir t))
-          (find-file undo-file-name)
-          (erase-buffer)
-          (let (print-level
-                print-length)
-            (print undo-to-save (current-buffer)))
-          (let ((write-file-hooks (remove 'save-undo-list write-file-hooks)))
-            (save-buffer))
-          (kill-buffer))))
-    nil))
-;; save undo list, before writing out a buffer to its visited file;
-(add-hook 'write-file-functions 'save-undo-list)
-
-(defun load-undo-list ()
-    (let ((undo-file-name (expand-file-name
-                           (subst-char-in-string
-                            ?/ ?!
-                            (replace-regexp-in-string "!" "!!"
-                                                      buffer-file-name))
-                           (expand-file-name ".cache/emacs-undo/" project-directory))))
-      (when (and
-             (not handling-undo-saving)
-             (null buffer-undo-list)
-             (file-exists-p undo-file-name))
-        (let* ((handling-undo-saving t)
-               (undo-buffer-to-eval (find-file-noselect undo-file-name)))
-          (eval (read undo-buffer-to-eval))))))
-;; load undo list, after a file is visited;
-(add-hook 'find-file-hook 'load-undo-list)
-
-;; delete the corresponding undo_list file,
-;;   when the file is not found or the buffer is killed;
-;    (add-hook 'find-file-not-found-functions
-;              (lambda ()
-;                (let ((undo-file-name (expand-file-name
-;                                       (subst-char-in-string
-;                                        ?/ ?!
-;                                        (replace-regexp-in-string "!" "!!"
-;                                                                  buffer-file-name))
-;                                       project-undo-dir)))
-;                  (delete-file undo-file-name)))
-;              nil)
-;    (add-hook 'kill-buffer-hook
-;              (lambda ()
-;                (let ((undo-file-name (expand-file-name
-;                                       (subst-char-in-string
-;                                        ?/ ?!
-;                                        (replace-regexp-in-string "!" "!!"
-;                                                                  buffer-file-name))
-;                                       project-undo-dir)))
-;                  (delete-file undo-file-name))))
-
 
 (defun project-directory-side-window ()
   (interactive)
@@ -232,6 +180,9 @@
     (server-start)
 
     (auto-save-visited-mode 1)
+
+    (setq undohist-directory (expand-file-name "emacs-undo" project-cache-dir))
+    (undohist-initialize)
 
     (require 'desktop)
     (setq desktop-path (list project-cache-dir)
@@ -367,26 +318,6 @@
 
 ;; otherwise "select-frame-set-input-focus" above doesn't work properly;
 (add-hook 'focus-in-hook (lambda () (raise-frame)))
-
-(require 'package)
-(package-initialize)
-(add-to-list 'package-archives
-	           '("melpa" . "https://stable.melpa.org/packages/") t)
-(defun require-package (package)
-  (unless (require package nil 'noerror)
-    (package-refresh-contents)
-    (package-install package)
-    (require package)))
-(defun install-package (package)
-  (unless (package-installed-p package)
-    (package-refresh-contents)
-    (package-install package)))
-;; https://emacs.stackexchange.com/questions/38206/upgrading-packages-automatically
-;; https://www.reddit.com/r/emacs/comments/acvn2l/elisp_script_to_install_all_packages_very_fast/
-;; https://www.reddit.com/r/emacs/comments/a4n6iw/how_to_easily_update_one_elpa_package/
-;; https://emacs.stackexchange.com/questions/4045/automatically-update-packages-and-delete-old-versions
-;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el#L251
-;; https://github.com/mola-T/SPU
 
 (require-package 'eyebrowse)
 (eyebrowse-mode t)
