@@ -3,12 +3,10 @@
 (setq inhibit-startup-screen t)
 (setq use-dialog-box nil)
 (setq visible-bell t)
-;(setq insert-default-directory nil) ;; alternatively we can use double slash mechanism;
-(setq-default major-mode 'text-mode)
-(cua-mode 1)
 (setq make-backup-files nil)
 (setq auto-save-default nil)
-(setq-default mode-line-format nil)
+(setq-default major-mode 'text-mode)
+(cua-mode 1)
 
 (setq window-divider-default-places t
       window-divider-default-right-width 1
@@ -16,10 +14,15 @@
 (window-divider-mode 1)
 (set-face-attribute 'window-divider nil :foreground "#555555")
 
+(setq-default mode-line-format nil)
 (scroll-bar-mode -1)
 (setq-default indicate-buffer-boundaries '((up . left) (down . left)))
 
-;; never recenter point
+(setq blink-cursor-blinks 0)
+(setq-default cursor-in-non-selected-windows nil)
+;; https://github.com/Malabarba/beacon
+
+;; never recenter point;
 (setq scroll-conservatively 101)
 ;; move point to top/bottom of buffer before signaling a scrolling error;
 (setq scroll-error-top-bottom t)
@@ -47,15 +50,11 @@
     (right-char)))
 (global-set-key (kbd "C-<up>") 'previous-paragraph)
 
-(add-to-list 'default-frame-alist '(foreground-color . "#222222"))
+(add-to-list 'default-frame-alist '(foreground-color . "#333333"))
 (set-face-attribute 'highlight nil :background "#CCFFFF")
 (set-face-attribute 'region nil :background "#CCFFFF")
 (set-face-attribute 'default nil :family "Monospace" :height 105)
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
-
-(setq blink-cursor-blinks 0)
-(setq-default cursor-in-non-selected-windows nil)
-;; https://github.com/Malabarba/beacon
 
 (setq-default indent-tabs-mode nil)
 (setq-default truncate-lines t)
@@ -81,12 +80,9 @@
       dired-recursive-copies 'always
       dired-keep-marker-rename nil
       dired-keep-marker-copy nil)
-(setq dired-listing-switches "-lv -I \"#*#\" -I \"*.lock\" -I \"target\"")
+(setq dired-listing-switches "-lv -I \"*.lock\" -I \"target\"")
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
-;; only move between lines containing a file;
-(define-key dired-mode-map [remap next-line] 'dired-next-line)
-(define-key dired-mode-map [remap previous-line] 'dired-previous-line)
-;; make the first line invisible;
+;; make the first line in dired invisible;
 (add-hook 'dired-after-readin-hook (lambda ()
   (let ((inhibit-read-only t))
     (save-excursion
@@ -95,20 +91,22 @@
         (progn (goto-char 1) (forward-line 1) (point))
         '(invisible t))))))
 
+;; for dired buffers enable line highlighting, and if it's a project directory,
+;;   put the project name and "misc-info" in the header line;
 (require 'hl-line)
 (add-hook 'dired-mode-hook (lambda ()
   (setq hl-line-mode t)
-  (when (string-match-p "/projects/[^/]*/?\\'" default-directory) ;; alt: dired-directory
+  (when (string-match-p "/projects/[^/]*/?\\'" default-directory)
     (setq header-line-format
           '((:eval (propertize " " 'display '((space :align-to 0))))
             (:eval (replace-regexp-in-string "<.*>" "" (buffer-name)))
             " "
             mode-line-misc-info)))))
 
+;; before leaving a window, send the cursor back to the highlighted line;
 (add-hook 'mouse-leave-buffer-hook (lambda ()
   (if hl-line-overlay
     (goto-char (overlay-start hl-line-overlay)))))
-
 (global-set-key (kbd "C-x o") (lambda () (interactive)
   (if hl-line-overlay
     (goto-char (overlay-start hl-line-overlay)))
@@ -116,7 +114,8 @@
 
 ;; https://www.emacswiki.org/emacs/DiredView
 ;; for copy_paste mechanism:
-;;   https://github.com/Fuco1/dired-hacks/blob/master/dired-ranger.el
+;;   https://emacs.stackexchange.com/questions/39116/simple-ways-to-copy-paste-files-and-directories-between-dired-buffers
+;;   https://emacs.stackexchange.com/questions/17599/current-path-in-dired-or-dired-to-clipboard
 ;; async file operations in dired
 ;;   https://github.com/jwiegley/emacs-async
 ;;   https://truongtx.me/tmtxt-dired-async.html
