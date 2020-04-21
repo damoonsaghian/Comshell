@@ -75,6 +75,28 @@
              ))
         (message "file doesn't exist: '%s';" $path)))))
 
+(require 'package)
+(package-initialize)
+(add-to-list 'package-archives
+	           '("melpa" . "https://stable.melpa.org/packages/") t)
+(defun require-package (package)
+  (unless (require package nil 'noerror)
+    (package-refresh-contents)
+    (package-install package)
+    (require package)))
+(defun install-package (package)
+  (unless (package-installed-p package)
+    (package-refresh-contents)
+    (package-install package)))
+;; https://emacs.stackexchange.com/questions/38206/upgrading-packages-automatically
+;; https://www.reddit.com/r/emacs/comments/acvn2l/elisp_script_to_install_all_packages_very_fast/
+;; https://www.reddit.com/r/emacs/comments/a4n6iw/how_to_easily_update_one_elpa_package/
+;; https://emacs.stackexchange.com/questions/4045/automatically-update-packages-and-delete-old-versions
+;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el#L251
+;; https://github.com/mola-T/SPU
+
+(install-package 'undohist)
+
 (require 'dired)
 (setq dired-recursive-deletes 'always
       dired-recursive-copies 'always
@@ -82,14 +104,37 @@
       dired-keep-marker-copy nil)
 (setq dired-listing-switches "-lv -I \"*.lock\" -I \"target\"")
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
-;; make the first line in dired invisible;
+
+(require-package 'all-the-icons)
+(unless (require 'all-the-icons nil 'noerror)
+  (package-refresh-contents)
+  (package-install 'all-the-icons)
+  (require 'all-the-icons)
+  (all-the-icons-install-fonts t))
+(setq all-the-icons-scale-factor 1.1)
+(setq-default face-remapping-alist
+              '((all-the-icons-yellow all-the-icons-dyellow)
+                (all-the-icons-lyellow all-the-icons-dyellow)))
+
+;; indired make the first line invisible, and put icons in the first column;
 (add-hook 'dired-after-readin-hook (lambda ()
   (let ((inhibit-read-only t))
     (save-excursion
+
       (set-text-properties
         1
         (progn (goto-char 1) (forward-line 1) (point))
-        '(invisible t))))))
+        '(invisible t))
+
+      (while (not (eobp))
+        (let ((filename (dired-get-filename nil t)))
+          (when filename
+            (let ((ov (make-overlay (point) (+ (point) 1)))               
+		  (icon (if (file-directory-p filename)
+			    (all-the-icons-icon-for-dir filename :height 1.1)
+			  (all-the-icons-icon-for-file filename :height 1.1))))
+              (overlay-put ov 'display icon))))
+        (forward-line 1))))))
 
 ;; for dired buffers enable line highlighting, and if it's a project directory,
 ;;   put the project name and "misc-info" in the header line;
@@ -112,7 +157,6 @@
     (goto-char (overlay-start hl-line-overlay)))
   (other-window -1)))
 
-;; https://www.emacswiki.org/emacs/DiredView
 ;; for copy_paste mechanism:
 ;;   https://emacs.stackexchange.com/questions/39116/simple-ways-to-copy-paste-files-and-directories-between-dired-buffers
 ;;   https://emacs.stackexchange.com/questions/17599/current-path-in-dired-or-dired-to-clipboard
@@ -123,10 +167,6 @@
 ;; https://github.com/Alexander-Miller/treemacs/blob/master/src/extra/treemacs-icons-dired.el
 ;;   https://github.com/domtronn/all-the-icons.el
 ;;   https://github.com/sebastiencs/icons-in-terminal
-;; show state of files (modified or not, git) in dired using marks;
-;;   https://github.com/syohex/emacs-dired-k
-;;   https://github.com/dgutov/diff-hl
-;;   https://emacs.stackexchange.com/questions/9503/how-can-i-visualize-vcs-status-in-dired
 ;; https://oremacs.com/2016/02/24/dired-rsync/
 ;; https://github.com/Fuco1/dired-hacks#dired-open
 
@@ -134,28 +174,6 @@
 ;; to store/restore side windows;
 (add-to-list 'window-persistent-parameters '(window-side . writable))
 (add-to-list 'window-persistent-parameters '(window-slot . writable))
-
-(require 'package)
-(package-initialize)
-(add-to-list 'package-archives
-	           '("melpa" . "https://stable.melpa.org/packages/") t)
-(defun require-package (package)
-  (unless (require package nil 'noerror)
-    (package-refresh-contents)
-    (package-install package)
-    (require package)))
-(defun install-package (package)
-  (unless (package-installed-p package)
-    (package-refresh-contents)
-    (package-install package)))
-;; https://emacs.stackexchange.com/questions/38206/upgrading-packages-automatically
-;; https://www.reddit.com/r/emacs/comments/acvn2l/elisp_script_to_install_all_packages_very_fast/
-;; https://www.reddit.com/r/emacs/comments/a4n6iw/how_to_easily_update_one_elpa_package/
-;; https://emacs.stackexchange.com/questions/4045/automatically-update-packages-and-delete-old-versions
-;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el#L251
-;; https://github.com/mola-T/SPU
-
-(require-package 'undohist)
 
 (defvar project-directory nil)
 
@@ -180,6 +198,7 @@
 
     (auto-save-visited-mode 1)
 
+    (require 'undohist)
     (setq undohist-directory (expand-file-name "emacs-undo" project-cache-dir))
     (undohist-initialize)
 
@@ -462,7 +481,6 @@
 ;(setq rust-indent-offset 2)
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Icomplete.html
-;; http://company-mode.github.io/
 ;; (setq ido-enable-flex-matching t)
 ;; (setq ido-everywhere t)
 ;; (ido-mode 1)
