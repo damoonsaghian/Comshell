@@ -119,6 +119,7 @@
 (setq-default face-remapping-alist
               '((all-the-icons-yellow all-the-icons-dyellow)
                 (all-the-icons-lyellow all-the-icons-dyellow)))
+;; https://github.com/seagle0128/icons-in-terminal.el
 
 ;; indired make the first line invisible, and put icons in the first column;
 ;; https://github.com/jtbm37/all-the-icons-dired/blob/master/all-the-icons-dired.el
@@ -187,9 +188,8 @@
   (let* ((buffer (dired-noselect project-directory))
          (window (display-buffer-in-side-window
                   buffer
-                  '((side . left) (slot . 0)))))
+                  '((side . left) (slot . 0) (window-width . 0.2)))))
     (set-window-parameter window 'no-delete-other-windows t)
-    (set-window-parameter window 'window-width 0.2)
     (select-window window)))
 
 (defun project-open (project-dir)
@@ -208,6 +208,43 @@
     (undohist-initialize)
 
     (require 'desktop)
+    (push '(foreground-color . :never) frameset-filter-alist)
+    (push '(background-color . :never) frameset-filter-alist)
+    (push '(background-mode . :never) frameset-filter-alist)
+    (push '(font . :never) frameset-filter-alist)
+    (push '(font-backend . :never) frameset-filter-alist)
+    (push '(font-parameter . :never) frameset-filter-alist)
+    (push '(cursor-type . :never) frameset-filter-alist)
+    (push '(cursor-color . :never) frameset-filter-alist)
+    (push '(mouse-color . :never) frameset-filter-alist)
+    (push '(border-width . :never) frameset-filter-alist)
+    (push '(internal-border-width . :never) frameset-filter-alist)
+    (push '(right-divider-width . :never) frameset-filter-alist)
+    (push '(bottom-divider-width . :never) frameset-filter-alist)
+    (push '(vertical-scroll-bars . :never) frameset-filter-alist)
+    (push '(screen-gamma . :never) frameset-filter-alist)
+    (push '(alpha . :never) frameset-filter-alist)
+    (push '(line-spacing . :never) frameset-filter-alist)
+    (push '(left-fringe . :never) frameset-filter-alist)
+    (push '(right-fringe . :never) frameset-filter-alist)
+    (push '(no-special-glyphs . :never) frameset-filter-alist)
+    (push '(scroll-bar-foreground . :never) frameset-filter-alist)
+    (push '(scroll-bar-background . :never) frameset-filter-alist)
+    (push '(scroll-bar-width . :never) frameset-filter-alist)
+    (push '(scroll-bar-height . :never) frameset-filter-alist)
+    (push '(menu-bar-lines . :never) frameset-filter-alist)
+    (push '(tool-bar-lines . :never) frameset-filter-alist)
+    (push '(tool-bar-position . :never) frameset-filter-alist)
+    (push '(title . :never) frameset-filter-alist)
+    (push '(wait-for-wm . :never) frameset-filter-alist)
+    (push '(inhibit-double-buffering . :never) frameset-filter-alist)
+    (push '(icon-type . :never) frameset-filter-alist)
+    (push '(auto-raise . :never) frameset-filter-alist)
+    (push '(auto-lower . :never) frameset-filter-alist)
+    (push '(visibility . :never) frameset-filter-alist)
+    (push '(display-type . :never) frameset-filter-alist)
+    (push '(environment . :never) frameset-filter-alist)
+
     (setq desktop-path (list project-cache-dir)
           desktop-base-file-name "emacs.desktop"
           desktop-restore-eager 5
@@ -249,8 +286,7 @@
                (slot (+ 1 (window-parameter nil 'window-slot)))
                (window (display-buffer-in-side-window
                         buffer
-                        `((side . left) (slot . ,slot)))))
-          (set-window-parameter window 'window-width 0.2)
+                        `((side . left) (slot . ,slot) (window-width . 0.2)))))
           (set-window-parameter window 'no-delete-other-windows t)
           (select-window window)))
 
@@ -320,12 +356,14 @@
     (progn
       (define-key dired-mode-map [remap dired-find-file] 'projects-list-find-file)
       (define-key dired-mode-map [remap dired-find-file-other-window] 'projects-list-find-file)
+      (define-key dired-mode-map [remap dired-mouse-find-file-other-window] 'my-find-file)
       (add-hook 'emacs-startup-hook 'projects-list-create)
       (setq server-name "projects-list")
       (server-start))
   (add-to-list 'default-frame-alist '(fullscreen . maximized))
   (define-key dired-mode-map [remap dired-find-file] 'my-find-file)
   (define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file)
+  (define-key dired-mode-map [remap dired-mouse-find-file-other-window] 'my-find-file)
 
   ;; to deal with the case when we are in a middle window, and the Emacs is close;
   ;; otherwise highlighted line may not correspond to the file shown in the following window;
