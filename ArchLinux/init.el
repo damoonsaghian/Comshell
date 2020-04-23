@@ -111,12 +111,17 @@
   (package-install 'all-the-icons)
   (require 'all-the-icons)
   (all-the-icons-install-fonts t))
-(setq all-the-icons-scale-factor 1.1)
+(setq all-the-icons-scale-factor 1.0)
+(setq all-the-icons-default-adjust 0.0)
+(add-to-list 'all-the-icons-icon-alist
+             '("\\.js$" all-the-icons-alltheicon "javascript"
+               :height 1.15 :v-adjust 0.0 :face all-the-icons-yellow))
 (setq-default face-remapping-alist
               '((all-the-icons-yellow all-the-icons-dyellow)
                 (all-the-icons-lyellow all-the-icons-dyellow)))
 
 ;; indired make the first line invisible, and put icons in the first column;
+;; https://github.com/jtbm37/all-the-icons-dired/blob/master/all-the-icons-dired.el
 (add-hook 'dired-after-readin-hook (lambda ()
   (let ((inhibit-read-only t))
     (save-excursion
@@ -131,8 +136,8 @@
           (when filename
             (let ((ov (make-overlay (point) (+ (point) 1)))               
 		  (icon (if (file-directory-p filename)
-			    (all-the-icons-icon-for-dir filename :height 1.1)
-			  (all-the-icons-icon-for-file filename :height 1.1))))
+			    (all-the-icons-icon-for-dir filename)
+			  (all-the-icons-icon-for-file filename))))
               (overlay-put ov 'display icon))))
         (forward-line 1))))))
 
@@ -515,5 +520,6 @@
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Calendar_002fDiary.html
 ;; https://www.gnu.org/software/emacs-muse/manual/html_node/Extending-Muse.html#Extending-Muse
 ;; https://github.com/Fuco1/smartparens
+;; https://github.com/fniessen/emacs-leuven-theme
 ;; https://github.com/jackkamm/undo-propose-el
 ;; https://github.com/jgarvin/mandimus
