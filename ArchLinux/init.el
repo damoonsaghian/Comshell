@@ -263,6 +263,9 @@
         (error (progn (set-window-dedicated-p window nil)
                       (set-window-buffer window "*scratch*")))))))
 
+(global-set-key (kbd "C-x 0") (lambda () (interactive)
+                                (delete-following-windows) (delete-window) (other-window -1)))
+
 (defun my-find-file ()
   (interactive)
   (hl-line-highlight)
@@ -276,11 +279,6 @@
             (let* ((buffer (find-file-noselect file-name))
                    (window (display-buffer-use-some-window buffer nil)))
               (set-window-parameter window 'no-delete-other-windows t)
-              (set-window-parameter window 'delete-window
-                                    (lambda (window) (select-window window)
-                                      (set-window-parameter window 'delete-window nil)
-                                      (select-window (previous-window))
-                                      (delete-following-windows)))
               (set-window-dedicated-p window t)
               (select-window window)
               ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
@@ -306,11 +304,6 @@
                (window (or (display-buffer-use-some-window buffer nil)
                            (display-buffer-below-selected buffer nil))))
           (set-window-parameter window 'no-delete-other-windows t)
-          (set-window-parameter window 'delete-window
-                                (lambda (window) (select-window window)
-                                  (set-window-parameter window 'delete-window nil)
-                                  (select-window (previous-window))
-                                  (delete-following-windows)))
           (set-window-dedicated-p window t)
           (select-window window)))))
 
@@ -323,11 +316,6 @@
              (window (or (display-buffer-use-some-window buffer nil)
                          (display-buffer-below-selected buffer nil))))
         (set-window-parameter window 'no-delete-other-windows t)
-        (set-window-parameter window 'delete-window
-                              (lambda (window) (select-window window)
-                                (set-window-parameter window 'delete-window nil)
-                                (select-window (previous-window))
-                                (delete-following-windows)))
         (set-window-dedicated-p window t)
         (select-window window))))))
 
