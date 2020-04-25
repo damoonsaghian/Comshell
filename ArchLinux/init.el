@@ -171,6 +171,16 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (install-package 'undohist)
 
+(defun nadvice/undo-tree-ignore-text-properties (old-fun &rest args)
+  (dolist (item buffer-undo-list)
+    (and (consp item)
+         (stringp (car item))
+         (setcar item (substring-no-properties (car item)))))
+  (apply old-fun args))
+(advice-add 'undo-list-transfer-to-tree :around
+            #'nadvice/undo-tree-ignore-text-properties)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defvar project-directory nil)
 
 (defun project-directory-side-window ()
@@ -250,7 +260,8 @@
       (condition-case nil
           (progn (delete-window window)
                  (delete-following-windows))
-        (error (set-window-buffer window "*scratch*"))))))
+        (error (progn (set-window-dedicated-p window nil)
+                      (set-window-buffer window "*scratch*")))))))
 
 (defun my-find-file ()
   (interactive)
@@ -260,42 +271,65 @@
     (cond
      ((file-directory-p file-name)
       (cond
-       ((file-exists-p (expand-file-name ".gallery" file-name))
-        (select-window
-         (display-buffer-use-some-window (find-file-noselect file-name) nil))
-        ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
-        ;; https://github.com/larsmagne/movie.el
-        ;; https://www.gnu.org/software/emms/
-        ;; http://wikemacs.org/wiki/Media_player
-        ;; https://github.com/dbrock/bongo
-        )
-
        ((eq (window-parameter nil 'window-side) 'left)
-        (let* ((buffer (dired-noselect file-name))
-               (slot (+ 1 (window-parameter nil 'window-slot)))
-               (window (display-buffer-in-side-window
-                        buffer
-                        `((side . left) (slot . ,slot) (window-width . 0.2)))))
-          (set-window-parameter window 'no-delete-other-windows t)
-          (select-window window)))
+        (if (file-exists-p (expand-file-name ".gallery" file-name))
+            (let* ((buffer (find-file-noselect file-name))
+                   (window (display-buffer-use-some-window buffer nil)))
+              (set-window-parameter window 'no-delete-other-windows t)
+              (set-window-parameter window 'delete-window
+                                    (lambda (window) (select-window window)
+                                      (set-window-parameter window 'delete-window nil)
+                                      (select-window (previous-window))
+                                      (delete-following-windows)))
+              (set-window-dedicated-p window t)
+              (select-window window)
+              ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
+              ;; https://github.com/larsmagne/movie.el
+              ;; https://www.gnu.org/software/emms/
+              ;; http://wikemacs.org/wiki/Media_player
+              ;; https://github.com/dbrock/bongo
+              )
+          (let* ((buffer (dired-noselect file-name))
+                 (slot (+ 1 (window-parameter nil 'window-slot)))
+                 (window (display-buffer-in-side-window
+                          buffer
+                          `((side . left) (slot . ,slot) (window-width . 0.2)))))
+            (set-window-parameter window 'no-delete-other-windows t)
+            (select-window window))))
 
        ;((file-exists-p (expand-file file-name ".media"))
         ;; view in overlay;
         ;)
 
        (t
-        ;(select-window
-         ;(display-buffer-use-some-window (find-file-noselect file-name) nil))
-        )))
+        (let* ((buffer (find-file-noselect file-name))
+               (window (or (display-buffer-use-some-window buffer nil)
+                           (display-buffer-below-selected buffer nil))))
+          (set-window-parameter window 'no-delete-other-windows t)
+          (set-window-parameter window 'delete-window
+                                (lambda (window) (select-window window)
+                                  (set-window-parameter window 'delete-window nil)
+                                  (select-window (previous-window))
+                                  (delete-following-windows)))
+          (set-window-dedicated-p window t)
+          (select-window window)))))
 
      ((string-match-p "\\.jpg/?\\'" file-name)
       ;; view in overlay;
       )
 
      (t
-      (select-window
-       (display-buffer-use-some-window (find-file-noselect file-name) nil)))
-     )))
+      (let* ((buffer (find-file-noselect file-name))
+             (window (or (display-buffer-use-some-window buffer nil)
+                         (display-buffer-below-selected buffer nil))))
+        (set-window-parameter window 'no-delete-other-windows t)
+        (set-window-parameter window 'delete-window
+                              (lambda (window) (select-window window)
+                                (set-window-parameter window 'delete-window nil)
+                                (select-window (previous-window))
+                                (delete-following-windows)))
+        (set-window-dedicated-p window t)
+        (select-window window))))))
 
 ;; projects list: an Emacs instance with a floating frame, showing the list of projects;
 
@@ -383,6 +417,7 @@
   (if hl-line-overlay
     (goto-char (overlay-start hl-line-overlay)))))
 
+;; after switching correct highlights;
 (add-hook 'eyebrowse-post-window-switch-hook (lambda ()
   (let ((original-window (selected-window)))
     (mapcar
@@ -391,6 +426,9 @@
         (hl-line-highlight))
       (window-list))
     (select-window original-window))))
+;; alternatively use "window" property of overlays,
+;;   to make highlights apply only on current window;
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Overlay-Properties.html
 
 ;; for dired buffers enable line highlighting, and if it's a project directory,
 ;;   make a  header line that shows the project's views, and project's name;
