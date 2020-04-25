@@ -8,6 +8,11 @@
 (setq-default major-mode 'text-mode)
 (cua-mode 1)
 
+(setq window-sides-vertical t)
+(add-to-list 'window-persistent-parameters '(window-side . writable))
+(add-to-list 'window-persistent-parameters '(window-slot . writable))
+(add-to-list 'window-persistent-parameters '(no-delete-other-windows . writable))
+
 (setq window-divider-default-places t
       window-divider-default-right-width 1
       window-divider-default-bottom-width 1)
@@ -75,28 +80,6 @@
              ))
         (message "file doesn't exist: '%s';" $path)))))
 
-(require 'package)
-(package-initialize)
-(add-to-list 'package-archives
-	           '("melpa" . "https://stable.melpa.org/packages/") t)
-(defun require-package (package)
-  (unless (require package nil 'noerror)
-    (package-refresh-contents)
-    (package-install package)
-    (require package)))
-(defun install-package (package)
-  (unless (package-installed-p package)
-    (package-refresh-contents)
-    (package-install package)))
-;; https://emacs.stackexchange.com/questions/38206/upgrading-packages-automatically
-;; https://www.reddit.com/r/emacs/comments/acvn2l/elisp_script_to_install_all_packages_very_fast/
-;; https://www.reddit.com/r/emacs/comments/a4n6iw/how_to_easily_update_one_elpa_package/
-;; https://emacs.stackexchange.com/questions/4045/automatically-update-packages-and-delete-old-versions
-;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el#L251
-;; https://github.com/mola-T/SPU
-
-(install-package 'undohist)
-
 (require 'dired)
 (setq dired-recursive-deletes 'always
       dired-recursive-copies 'always
@@ -105,56 +88,8 @@
 (setq dired-listing-switches "-lv -I \"*.lock\" -I \"target\"")
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
 
-(require-package 'all-the-icons)
-(unless (require 'all-the-icons nil 'noerror)
-  (package-refresh-contents)
-  (package-install 'all-the-icons)
-  (require 'all-the-icons)
-  (all-the-icons-install-fonts t))
-(setq all-the-icons-scale-factor 1.0)
-(setq all-the-icons-default-adjust 0.0)
-(add-to-list 'all-the-icons-icon-alist
-             '("\\.js$" all-the-icons-alltheicon "javascript"
-               :height 1.15 :v-adjust 0.0 :face all-the-icons-yellow))
-(setq-default face-remapping-alist
-              '((all-the-icons-yellow all-the-icons-dyellow)
-                (all-the-icons-lyellow all-the-icons-dyellow)))
-;; https://github.com/seagle0128/icons-in-terminal.el
-
-;; indired make the first line invisible, and put icons in the first column;
-;; https://github.com/jtbm37/all-the-icons-dired/blob/master/all-the-icons-dired.el
-(add-hook 'dired-after-readin-hook (lambda ()
-  (let ((inhibit-read-only t))
-    (save-excursion
-
-      (set-text-properties
-        1
-        (progn (goto-char 1) (forward-line 1) (point))
-        '(invisible t))
-
-      (while (not (eobp))
-        (let ((filename (dired-get-filename nil t)))
-          (when filename
-            (let ((ov (make-overlay (point) (+ (point) 1)))               
-		  (icon (if (file-directory-p filename)
-			    (all-the-icons-icon-for-dir filename)
-			  (all-the-icons-icon-for-file filename))))
-              (overlay-put ov 'display icon))))
-        (forward-line 1))))))
-
-;; for dired buffers enable line highlighting, and if it's a project directory,
-;;   put the project name and "misc-info" in the header line;
 (require 'hl-line)
-(add-hook 'dired-mode-hook (lambda ()
-  (setq hl-line-mode t)
-  (when (string-match-p "/projects/[^/]*/?\\'" default-directory)
-    (setq header-line-format
-          '((:eval (propertize " " 'display '((space :align-to 0))))
-            (:eval (replace-regexp-in-string "<.*>" "" (buffer-name)))
-            " "
-            mode-line-misc-info)))))
-
-;; before leaving a window, send the cursor back to the highlighted line;
+;; before leaving a window, send the cursor back to the highlighted line (if there is any);
 (add-hook 'mouse-leave-buffer-hook (lambda ()
   (if hl-line-overlay
     (goto-char (overlay-start hl-line-overlay)))))
@@ -176,10 +111,65 @@
 ;; https://oremacs.com/2016/02/24/dired-rsync/
 ;; https://github.com/Fuco1/dired-hacks#dired-open
 
-(setq window-sides-vertical t)
-;; to store/restore side windows;
-(add-to-list 'window-persistent-parameters '(window-side . writable))
-(add-to-list 'window-persistent-parameters '(window-slot . writable))
+(require 'package)
+(package-initialize)
+(add-to-list 'package-archives
+	           '("melpa" . "https://stable.melpa.org/packages/") t)
+(defun require-package (package)
+  (unless (require package nil 'noerror)
+    (package-refresh-contents)
+    (package-install package)
+    (require package)))
+(defun install-package (package)
+  (unless (package-installed-p package)
+    (package-refresh-contents)
+    (package-install package)))
+;; https://emacs.stackexchange.com/questions/38206/upgrading-packages-automatically
+;; https://www.reddit.com/r/emacs/comments/acvn2l/elisp_script_to_install_all_packages_very_fast/
+;; https://www.reddit.com/r/emacs/comments/a4n6iw/how_to_easily_update_one_elpa_package/
+;; https://emacs.stackexchange.com/questions/4045/automatically-update-packages-and-delete-old-versions
+;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el#L251
+;; https://github.com/mola-T/SPU
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require-package 'all-the-icons)
+(unless (require 'all-the-icons nil 'noerror)
+  (package-refresh-contents)
+  (package-install 'all-the-icons)
+  (require 'all-the-icons)
+  (all-the-icons-install-fonts t))
+(setq all-the-icons-scale-factor 1.0)
+(setq all-the-icons-default-adjust 0.0)
+(add-to-list 'all-the-icons-icon-alist
+             '("\\.js$" all-the-icons-alltheicon "javascript"
+               :height 1.15 :v-adjust 0.0 :face all-the-icons-yellow))
+(setq-default face-remapping-alist
+              '((all-the-icons-yellow all-the-icons-dyellow)
+                (all-the-icons-lyellow all-the-icons-dyellow)))
+;; https://github.com/seagle0128/icons-in-terminal.el
+
+;; in dired make the first line invisible, and put icons in the first column;
+;; https://github.com/jtbm37/all-the-icons-dired/blob/master/all-the-icons-dired.el
+(add-hook 'dired-after-readin-hook (lambda ()
+  (let ((inhibit-read-only t))
+    (save-excursion
+      (set-text-properties
+       1
+       (progn (goto-char 1) (forward-line 1) (point))
+       '(invisible t))
+
+      (while (not (eobp))
+        (let ((filename (dired-get-filename nil t)))
+          (when filename
+            (let ((ov (make-overlay (point) (+ (point) 1)))               
+		  (icon (if (file-directory-p filename)
+			    (all-the-icons-icon-for-dir filename :v-adjust 0.1)
+			  (all-the-icons-icon-for-file filename))))
+              (overlay-put ov 'display icon))))
+        (forward-line 1))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(install-package 'undohist)
 
 (defvar project-directory nil)
 
@@ -241,7 +231,6 @@
     (push '(icon-type . :never) frameset-filter-alist)
     (push '(auto-raise . :never) frameset-filter-alist)
     (push '(auto-lower . :never) frameset-filter-alist)
-    (push '(visibility . :never) frameset-filter-alist)
     (push '(display-type . :never) frameset-filter-alist)
     (push '(environment . :never) frameset-filter-alist)
 
@@ -331,11 +320,6 @@
     (set-window-dedicated-p window t)
     (select-window window))
 
-  ;; eyebrowse views status in the header line;
-  (setq header-line-format
-        '((:eval (propertize " " 'display '((space :align-to 0))))
-          mode-line-misc-info))
-
   ;; to do: automatically find all "projects/*" directories in connected storage devices,
   ;;   and create an eyebrowse view for each;
   )
@@ -380,6 +364,7 @@
 ;; otherwise "select-frame-set-input-focus" above doesn't work properly;
 (add-hook 'focus-in-hook (lambda () (raise-frame)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require-package 'eyebrowse)
 (eyebrowse-mode t)
 (setq eyebrowse-mode-line-separator " ")
@@ -407,6 +392,24 @@
       (window-list))
     (select-window original-window))))
 
+;; for dired buffers enable line highlighting, and if it's a project directory,
+;;   make a  header line that shows the project's views, and project's name;
+(add-hook 'dired-mode-hook (lambda ()
+  (setq hl-line-mode t)
+  (when (string-match-p "/projects/[^/]*/?\\'" default-directory)
+    (setq header-line-format
+          '((:eval (propertize " " 'display '((space :align-to 0))))
+            (:eval (let ((views-num (length (eyebrowse--get 'window-configs))))
+                     (if (< 1 views-num)
+                         (propertize (format "%d/%d "
+                                             (eyebrowse--get 'current-slot)
+                                             views-num)
+                                     'font-lock-face '(:foreground "forest green")))))
+            (:eval (replace-regexp-in-string
+                    "^[[:digit:]]+, " ""
+                    (file-name-nondirectory (directory-file-name default-directory)))))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; modal key_bindings
 ;; https://github.com/mrkkrp/modalka
 ;; https://github.com/emacsorphanage/god-mode
