@@ -85,8 +85,10 @@
       dired-recursive-copies 'always
       dired-keep-marker-rename nil
       dired-keep-marker-copy nil)
-(setq dired-listing-switches "-lv -I \"*.lock\" -I \"target\"")
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
+(setq dired-listing-switches "-v")
+(setq dired-listing-switches "-l -I \"*.lock\" -I \"target\"")
+(setq insert-directory-program "exa")
 
 (require 'hl-line)
 ;; before leaving a window, send the cursor back to the highlighted line (if there is any);
@@ -105,9 +107,6 @@
 ;;   https://github.com/jwiegley/emacs-async
 ;;   https://truongtx.me/tmtxt-dired-async.html
 ;;   https://github.com/jwiegley/emacs-async/blob/master/dired-async.el
-;; https://github.com/Alexander-Miller/treemacs/blob/master/src/extra/treemacs-icons-dired.el
-;;   https://github.com/domtronn/all-the-icons.el
-;;   https://github.com/sebastiencs/icons-in-terminal
 ;; https://oremacs.com/2016/02/24/dired-rsync/
 ;; https://github.com/Fuco1/dired-hacks#dired-open
 
@@ -371,17 +370,20 @@
   (define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file)
   (define-key dired-mode-map [remap dired-mouse-find-file-other-window] 'my-find-file)
 
-  ;; to deal with the case when we are in a middle window, and the Emacs is close;
-  ;; otherwise highlighted line may not correspond to the file shown in the following window;
-  (add-hook 'window-setup-hook (lambda ()
-                                 (delete-following-windows)
-                                 (let ((original-window (selected-window)))
-                                   (mapcar
-                                    (lambda (window)
-                                      (select-window window)
-                                      (hl-line-highlight))
-                                    (window-list))
-                                   (select-window original-window)))))
+  (add-hook
+   'window-setup-hook
+   (lambda ()
+     ;; to deal with the case when we are in a middle window, and the Emacs is closed;
+     ;; otherwise highlighted line may not correspond to the file shown in the following window;
+     (delete-following-windows)
+
+     (let ((original-window (selected-window)))
+       (mapcar
+        (lambda (window)
+          (select-window window)
+          (hl-line-highlight))
+        (window-list))
+       (select-window original-window)))))
 
 ;; otherwise "select-frame-set-input-focus" above doesn't work properly;
 (add-hook 'focus-in-hook (lambda () (raise-frame)))
