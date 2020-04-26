@@ -5,7 +5,6 @@
 (setq visible-bell t)
 (setq make-backup-files nil)
 (setq auto-save-default nil)
-(setq-default major-mode 'text-mode)
 (cua-mode 1)
 
 (setq window-sides-vertical t)
