@@ -61,7 +61,7 @@ or you can just use "su" instead;
 now we can even have a prototype of Comshell using Emacs;
 a separate application is implemented using GJS,
   to view web pages, pdfs, images and videos, as an overlay window;
-; pkexec pacman -S emacs exa webkit2gtk poppler-glib gst-plugins-{base,good,bad} gst-libav
+; pkexec pacman -S emacs webkit2gtk poppler-glib gst-plugins-{base,good,bad} gst-libav
 ; mkdir -p ~/.emacs.d
 ; cd ~/.emacs.d
 ; export url=https://raw.githubusercontent.com/damoonsaghian/Comshell/master/ArchLinux/
