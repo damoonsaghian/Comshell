@@ -85,8 +85,15 @@
       dired-keep-marker-copy nil)
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
 (setq dired-listing-switches "-v")
-(setq dired-listing-switches "-l -I \"*.lock\" -I \"target\"")
-(setq insert-directory-program "exa")
+;; unfortunately "ls -v" sorting is case sensitive, even when "LC_COLLATE=en_US.UTF-8";
+;; so i had to use Emacs' own "ls";
+(require 'ls-lisp)
+(setq ls-lisp-use-insert-directory-program nil)
+(setq ls-lisp-ignore-case t)
+(require 'dired-x)
+(setq dired-omit-verbose nil)
+(setq dired-omit-files "^target$\\|\\.lock$")
+(add-hook 'dired-mode-hook 'dired-omit-mode)
 
 (require 'hl-line)
 ;; before leaving a window, send the cursor back to the highlighted line (if there is any);
