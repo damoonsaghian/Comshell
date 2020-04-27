@@ -4,7 +4,6 @@
 (setq use-dialog-box nil)
 (setq visible-bell t)
 (setq make-backup-files nil)
-(setq auto-save-default nil)
 (cua-mode 1)
 
 (setq window-sides-vertical t)
@@ -199,13 +198,30 @@
     (setq server-name (expand-file-name "emacs.socket" project-cache-dir))
     (server-start)
 
-    (auto-save-visited-mode 1)
-
     (require 'undohist)
     (setq undohist-directory (expand-file-name "emacs-undo" project-cache-dir))
-    (undohist-initialize)
+    (if (not (file-directory-p undohist-directory))
+      (make-directory undohist-directory t))
+    (add-hook 'after-save-hook 'undohist-save-safe)
+    (add-hook 'auto-save-hook 'undohist-save-safe)
+    (add-hook 'find-file-hook 'undohist-recover-safe)
 
-    (require 'desktop)
+    ;; put auto_save files in "project-dir/.cache/emacs-autosave"
+    (let ((project-autosave-dir (expand-file-name "emacs-autosave/" project-cache-dir)))
+      (unless (file-exists-p project-autosave-dir)
+        (make-directory project-autosave-dir t))
+      (setq auto-save-file-name-transforms
+            `((".*" ,project-autosave-dir t))))
+    (setq auto-save-list-file-name (expand-file-name "emacs-autosave-list" project-cache-dir))
+    (add-hook 'find-file-hook (lambda ()
+                                (let ((yes-or-no-p))
+                                  (fset 'yes-or-no-p (lambda (prompt) t))
+                                  (if (file-exists-p (make-auto-save-file-name))
+                                      (condition-case nil
+                                          (save-excursion (recover-this-file))
+                                        (error
+                                         "Failed to recover `%s'" file))))))
+
     (push '(foreground-color . :never) frameset-filter-alist)
     (push '(background-color . :never) frameset-filter-alist)
     (push '(background-mode . :never) frameset-filter-alist)
@@ -242,6 +258,7 @@
     (push '(display-type . :never) frameset-filter-alist)
     (push '(environment . :never) frameset-filter-alist)
 
+    (require 'desktop)
     (setq desktop-path (list project-cache-dir)
           desktop-base-file-name "emacs.desktop"
           desktop-restore-eager 5
