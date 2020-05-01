@@ -18,6 +18,8 @@
 (set-face-attribute 'window-divider nil :foreground "#555555")
 
 (setq-default mode-line-format nil)
+(set-face-attribute 'header-line nil :foreground "#222222" :background "#dddddd")
+
 (scroll-bar-mode -1)
 (setq-default indicate-buffer-boundaries '((up . left) (down . left)))
 
@@ -118,7 +120,7 @@
 (require 'package)
 (package-initialize)
 (add-to-list 'package-archives
-	           '("melpa" . "https://stable.melpa.org/packages/") t)
+             '("melpa" . "https://melpa.org/packages/") t)
 (defun require-package (package)
   (unless (require package nil 'noerror)
     (package-refresh-contents)
@@ -135,7 +137,7 @@
 ;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el#L251
 ;; https://github.com/mola-T/SPU
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ======================= icons =============================
 (require-package 'all-the-icons)
 (unless (require 'all-the-icons nil 'noerror)
   (package-refresh-contents)
@@ -172,19 +174,18 @@
               (overlay-put ov 'display icon))))
         (forward-line 1))))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(install-package 'undohist)
+;; ==========================================================
+;; undo
 
-(defun nadvice/undo-tree-ignore-text-properties (old-fun &rest args)
-  (dolist (item buffer-undo-list)
-    (and (consp item)
-         (stringp (car item))
-         (setcar item (substring-no-properties (car item)))))
-  (apply old-fun args))
-(advice-add 'undo-list-transfer-to-tree :around
-            #'nadvice/undo-tree-ignore-text-properties)
+(require-package 'undo-fu)
+(global-unset-key (kbd "C-z"))
+(global-set-key (kbd "C-z")   'undo-fu-only-undo)
+(global-set-key (kbd "C-S-z") 'undo-fu-only-redo)
+(install-package 'undo-fu-session)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ==========================================================
+;; project
+
 (defvar project-directory nil)
 
 (defun project-directory-side-window ()
@@ -205,17 +206,19 @@
     (setq server-name (expand-file-name "emacs.socket" project-cache-dir))
     (server-start)
 
-    (require 'undohist)
-    (setq undohist-directory (expand-file-name "emacs-undo" project-cache-dir))
-    (if (not (file-directory-p undohist-directory))
-      (make-directory undohist-directory t))
-    (add-hook 'after-save-hook 'undohist-save-safe)
-    (add-hook 'auto-save-hook 'undohist-save-safe)
-    (add-hook 'find-file-hook 'undohist-recover-safe)
+    (require 'undo-fu-session)
+    (setq-default undo-fu-session-mode t)
+    (setq undo-fu-session-directory (expand-file-name "emacs-undo" project-cache-dir))
+    (unless (file-directory-p undo-fu-session-directory)
+      (make-directory undo-fu-session-directory t))
+    (add-hook 'after-save-hook #'undo-fu-session-save-safe)
+    ;(add-hook 'after-save-hook (lambda () (setq buffer-undo-list nil)))
+    (add-hook 'auto-save-hook #'undo-fu-session-save-safe)
+    (add-hook 'find-file-hook #'undo-fu-session-recover-safe)
 
     ;; put auto_save files in "project-dir/.cache/emacs-autosave"
     (let ((project-autosave-dir (expand-file-name "emacs-autosave/" project-cache-dir)))
-      (unless (file-exists-p project-autosave-dir)
+      (unless (file-directory-p project-autosave-dir)
         (make-directory project-autosave-dir t))
       (setq auto-save-file-name-transforms
             `((".*" ,project-autosave-dir t))))
@@ -411,7 +414,9 @@
 ;; otherwise "select-frame-set-input-focus" above doesn't work properly;
 (add-hook 'focus-in-hook (lambda () (raise-frame)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ===========================================================
+;; eyebrowse
+
 (require-package 'eyebrowse)
 (eyebrowse-mode t)
 (setq eyebrowse-mode-line-separator " ")
@@ -460,7 +465,9 @@
                     "^[[:digit:]]+, " ""
                     (file-name-nondirectory (directory-file-name default-directory)))))))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; =============================================================
+;;modalka
+
 ;; modal key_bindings
 ;; https://github.com/mrkkrp/modalka
 ;; https://github.com/emacsorphanage/god-mode
