@@ -107,6 +107,11 @@
     (goto-char (overlay-start hl-line-overlay)))
   (other-window -1)))
 
+;; key_bindings to interact with audio player:
+;; next -> forward
+;; back -> backward
+;; space -> pause/play
+
 ;; for copy_paste mechanism:
 ;;   https://emacs.stackexchange.com/questions/39116/simple-ways-to-copy-paste-files-and-directories-between-dired-buffers
 ;;   https://emacs.stackexchange.com/questions/17599/current-path-in-dired-or-dired-to-clipboard
@@ -115,7 +120,6 @@
 ;;   https://truongtx.me/tmtxt-dired-async.html
 ;;   https://github.com/jwiegley/emacs-async/blob/master/dired-async.el
 ;; https://oremacs.com/2016/02/24/dired-rsync/
-;; https://github.com/Fuco1/dired-hacks#dired-open
 
 (require 'package)
 (package-initialize)
@@ -137,7 +141,9 @@
 ;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el#L251
 ;; https://github.com/mola-T/SPU
 
-;; ======================= icons =============================
+;; ==========================================================
+;; icon
+
 (require-package 'all-the-icons)
 (unless (require 'all-the-icons nil 'noerror)
   (package-refresh-contents)
@@ -308,9 +314,6 @@
               (select-window window)
               ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
               ;; https://github.com/larsmagne/movie.el
-              ;; https://www.gnu.org/software/emms/
-              ;; http://wikemacs.org/wiki/Media_player
-              ;; https://github.com/dbrock/bongo
               )
           (let* ((buffer (dired-noselect file-name))
                  (slot (+ 1 (window-parameter nil 'window-slot)))
@@ -332,8 +335,16 @@
           (set-window-dedicated-p window t)
           (select-window window)))))
 
-     ((string-match-p "\\.jpg/?\\'" file-name)
+     ((string-match-p (concat "\\.avif\\|\\.jpg$\\|\\.png$\\|\\.gif$\\|\\.webp\\|"
+                              "\\.webm$\\|\\.mkv$\\|\\.mp4$\\|\\.mpg$\\|\\.flv$")
+                      file-name)
       ;; view in overlay;
+      (start-process "dired-open" nil "mpv" file-name)
+      )
+
+     ((string-match-p "\\.ogg$\\|\\.opus$\\|\\.mka$\\|\\.mp3$" file-name)
+      ;; tell overlay to play the file;
+      (start-process "dired-open" nil "mpv" "--player-operation-mode=pseudo-gui" file-name)
       )
 
      (t
