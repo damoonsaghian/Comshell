@@ -80,6 +80,9 @@
              ))
         (message "file doesn't exist: '%s';" $path)))))
 
+;; =====================================================
+;; dired
+
 (require 'dired)
 (setq dired-recursive-deletes 'always
       dired-recursive-copies 'always
@@ -120,6 +123,121 @@
 ;;   https://truongtx.me/tmtxt-dired-async.html
 ;;   https://github.com/jwiegley/emacs-async/blob/master/dired-async.el
 ;; https://oremacs.com/2016/02/24/dired-rsync/
+
+(defun delete-following-windows ()
+  (let ((window (next-window)))
+    (unless (eq (window-parameter window 'window-slot) 0)
+      (condition-case nil
+          (progn (delete-window window)
+                 (delete-following-windows))
+        (error (progn (set-window-dedicated-p window nil)
+                      (set-window-buffer window "*scratch*")))))))
+
+(global-set-key (kbd "C-x 0") (lambda () (interactive)
+                                (delete-following-windows) (delete-window) (other-window -1)))
+
+(defun my-find-file ()
+  (interactive)
+  (hl-line-highlight)
+  (delete-following-windows)
+  (let ((file-name (dired-get-filename)))
+    (cond
+     ((file-directory-p file-name)
+      (cond
+       ((eq (window-parameter nil 'window-side) 'left)
+        (if (file-exists-p (expand-file-name ".gallery" file-name))
+            (let* ((buffer (find-file-noselect file-name))
+                   (window (display-buffer-use-some-window buffer nil)))
+              (set-window-parameter window 'no-delete-other-windows t)
+              (set-window-dedicated-p window t)
+              (select-window window)
+              ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
+              ;; https://github.com/larsmagne/movie.el
+              )
+          (let* ((buffer (dired-noselect file-name))
+                 (slot (+ 1 (window-parameter nil 'window-slot)))
+                 (window (display-buffer-in-side-window
+                          buffer
+                          `((side . left) (slot . ,slot) (window-width . 0.2)))))
+            (set-window-parameter window 'no-delete-other-windows t)
+            (select-window window))))
+
+       ;((file-exists-p (expand-file file-name ".media"))
+        ;; view in overlay;
+        ;)
+
+       (t
+        (let* ((buffer (find-file-noselect file-name))
+               (window (or (display-buffer-use-some-window buffer nil)
+                           (display-buffer-below-selected buffer nil))))
+          (set-window-parameter window 'no-delete-other-windows t)
+          (set-window-dedicated-p window t)
+          (select-window window)))))
+
+     ((string-match-p (concat "\\.avif\\|\\.jpg$\\|\\.png$\\|\\.gif$\\|\\.webp\\|"
+                              "\\.webm$\\|\\.mkv$\\|\\.mp4$\\|\\.mpg$\\|\\.flv$")
+                      file-name)
+      ;; view in overlay;
+      (start-process "dired-open" nil "mpv" file-name)
+      )
+
+     ((string-match-p "\\.ogg$\\|\\.opus$\\|\\.mka$\\|\\.mp3$" file-name)
+      ;; tell overlay to play the file;
+      (start-process "dired-open" nil "mpv" "--player-operation-mode=pseudo-gui" file-name)
+      )
+
+     (t
+      (let* ((buffer (find-file-noselect file-name))
+             (window (or (display-buffer-use-some-window buffer nil)
+                         (display-buffer-below-selected buffer nil))))
+        (set-window-parameter window 'no-delete-other-windows t)
+        (set-window-dedicated-p window t)
+        (select-window window))))))
+
+(defun projects-list-find-file ()
+  (interactive)
+  (let ((file-name (dired-get-filename)))
+    (when (file-directory-p file-name)
+      (hl-line-highlight)
+      ;; send a message to all servers except "projects-list", to hide their frame;
+      (call-process-shell-command
+       (concat
+        "emacsclient --socket-name \""
+        (expand-file-name ".cache/emacs.socket" file-name)
+        "\" --eval '(select-frame-set-input-focus (selected-frame))'"
+        " || "
+        "emacs --eval '(project-open \"" file-name "\")' &")))))
+
+;; otherwise "select-frame-set-input-focus" above doesn't work properly;
+(add-hook 'focus-in-hook (lambda () (raise-frame)))
+
+(if (equal command-line-args '("emacs"))
+    (progn
+      (define-key dired-mode-map [remap dired-find-file] 'projects-list-find-file)
+      (define-key dired-mode-map [remap dired-find-file-other-window] 'projects-list-find-file)
+      (define-key dired-mode-map [remap dired-mouse-find-file-other-window] 'projects-list-find-file))
+  (add-to-list 'default-frame-alist '(fullscreen . maximized))
+  (define-key dired-mode-map [remap dired-find-file] 'my-find-file)
+  (define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file)
+  (define-key dired-mode-map [remap dired-mouse-find-file-other-window] 'my-find-file)
+
+  (add-hook
+   'window-setup-hook
+   (lambda ()
+     ;; to deal with the case when we are in a middle window, and the Emacs is closed;
+     ;; otherwise highlighted line may not correspond to the file shown in the following window;
+     (delete-following-windows)
+
+     (let ((original-window (selected-window)))
+       (mapcar
+        (lambda (window)
+          (select-window window)
+          (hl-line-highlight))
+        (window-list))
+       (select-window original-window)))))
+
+;; =========================================================
+;; package management
 
 (require 'package)
 (package-initialize)
@@ -285,92 +403,7 @@
       (desktop-save project-cache-dir))
     (desktop-save-mode 1)))
 
-(defun delete-following-windows ()
-  (let ((window (next-window)))
-    (unless (eq (window-parameter window 'window-slot) 0)
-      (condition-case nil
-          (progn (delete-window window)
-                 (delete-following-windows))
-        (error (progn (set-window-dedicated-p window nil)
-                      (set-window-buffer window "*scratch*")))))))
-
-(global-set-key (kbd "C-x 0") (lambda () (interactive)
-                                (delete-following-windows) (delete-window) (other-window -1)))
-
-(defun my-find-file ()
-  (interactive)
-  (hl-line-highlight)
-  (delete-following-windows)
-  (let ((file-name (dired-get-filename)))
-    (cond
-     ((file-directory-p file-name)
-      (cond
-       ((eq (window-parameter nil 'window-side) 'left)
-        (if (file-exists-p (expand-file-name ".gallery" file-name))
-            (let* ((buffer (find-file-noselect file-name))
-                   (window (display-buffer-use-some-window buffer nil)))
-              (set-window-parameter window 'no-delete-other-windows t)
-              (set-window-dedicated-p window t)
-              (select-window window)
-              ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
-              ;; https://github.com/larsmagne/movie.el
-              )
-          (let* ((buffer (dired-noselect file-name))
-                 (slot (+ 1 (window-parameter nil 'window-slot)))
-                 (window (display-buffer-in-side-window
-                          buffer
-                          `((side . left) (slot . ,slot) (window-width . 0.2)))))
-            (set-window-parameter window 'no-delete-other-windows t)
-            (select-window window))))
-
-       ;((file-exists-p (expand-file file-name ".media"))
-        ;; view in overlay;
-        ;)
-
-       (t
-        (let* ((buffer (find-file-noselect file-name))
-               (window (or (display-buffer-use-some-window buffer nil)
-                           (display-buffer-below-selected buffer nil))))
-          (set-window-parameter window 'no-delete-other-windows t)
-          (set-window-dedicated-p window t)
-          (select-window window)))))
-
-     ((string-match-p (concat "\\.avif\\|\\.jpg$\\|\\.png$\\|\\.gif$\\|\\.webp\\|"
-                              "\\.webm$\\|\\.mkv$\\|\\.mp4$\\|\\.mpg$\\|\\.flv$")
-                      file-name)
-      ;; view in overlay;
-      (start-process "dired-open" nil "mpv" file-name)
-      )
-
-     ((string-match-p "\\.ogg$\\|\\.opus$\\|\\.mka$\\|\\.mp3$" file-name)
-      ;; tell overlay to play the file;
-      (start-process "dired-open" nil "mpv" "--player-operation-mode=pseudo-gui" file-name)
-      )
-
-     (t
-      (let* ((buffer (find-file-noselect file-name))
-             (window (or (display-buffer-use-some-window buffer nil)
-                         (display-buffer-below-selected buffer nil))))
-        (set-window-parameter window 'no-delete-other-windows t)
-        (set-window-dedicated-p window t)
-        (select-window window))))))
-
 ;; projects list: an Emacs instance with a floating frame, showing the list of projects;
-
-(defun projects-list-find-file ()
-  (interactive)
-  (let ((file-name (dired-get-filename)))
-    (when (file-directory-p file-name)
-      (hl-line-highlight)
-      ;; send a message to all servers except "projects-list", to hide their frame;
-      (call-process-shell-command
-       (concat
-        "emacsclient --socket-name \""
-        (expand-file-name ".cache/emacs.socket" file-name)
-        "\" --eval '(select-frame-set-input-focus (selected-frame))'"
-        " || "
-        "emacs --eval '(project-open \"" file-name "\")' &")))))
-
 (defun projects-list-create ()
   (let* ((buffer (dired-noselect "~/projects"))
          (window (display-buffer-use-some-window buffer nil)))
@@ -381,6 +414,11 @@
   ;; to do: automatically find all "projects/*" directories in connected storage devices,
   ;;   and create an eyebrowse view for each;
   )
+
+(when (equal command-line-args '("emacs"))
+  (add-hook 'emacs-startup-hook 'projects-list-create)
+  (setq server-name "projects-list")
+  (server-start))
 
 (defun projects-list-activate ()
   (interactive)
@@ -393,37 +431,6 @@
 (define-prefix-command 'project-map)
 (global-set-key (kbd "C-p") 'project-map)
 (global-set-key (kbd "C-p p") 'projects-list-activate)
-
-(if (equal command-line-args '("emacs"))
-    (progn
-      (define-key dired-mode-map [remap dired-find-file] 'projects-list-find-file)
-      (define-key dired-mode-map [remap dired-find-file-other-window] 'projects-list-find-file)
-      (define-key dired-mode-map [remap dired-mouse-find-file-other-window] 'my-find-file)
-      (add-hook 'emacs-startup-hook 'projects-list-create)
-      (setq server-name "projects-list")
-      (server-start))
-  (add-to-list 'default-frame-alist '(fullscreen . maximized))
-  (define-key dired-mode-map [remap dired-find-file] 'my-find-file)
-  (define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file)
-  (define-key dired-mode-map [remap dired-mouse-find-file-other-window] 'my-find-file)
-
-  (add-hook
-   'window-setup-hook
-   (lambda ()
-     ;; to deal with the case when we are in a middle window, and the Emacs is closed;
-     ;; otherwise highlighted line may not correspond to the file shown in the following window;
-     (delete-following-windows)
-
-     (let ((original-window (selected-window)))
-       (mapcar
-        (lambda (window)
-          (select-window window)
-          (hl-line-highlight))
-        (window-list))
-       (select-window original-window)))))
-
-;; otherwise "select-frame-set-input-focus" above doesn't work properly;
-(add-hook 'focus-in-hook (lambda () (raise-frame)))
 
 ;; ===========================================================
 ;; eyebrowse
