@@ -178,12 +178,14 @@
                               "\\.webm$\\|\\.mkv$\\|\\.mp4$\\|\\.mpg$\\|\\.flv$")
                       file-name)
       ;; view in overlay;
-      (start-process "dired-open" nil "mpv" file-name)
+
+      (call-process "xdg-open" nil 0 nil file-name)
       )
 
      ((string-match-p "\\.ogg$\\|\\.opus$\\|\\.mka$\\|\\.mp3$" file-name)
       ;; tell overlay to play the file;
-      (start-process "dired-open" nil "mpv" "--player-operation-mode=pseudo-gui" file-name)
+
+      (call-process "xdg-open" nil 0 nil file-name)
       )
 
      (t
