@@ -341,14 +341,18 @@
     ;; , undo all the way back to previously saved;
     ;; , save undo history;
     (run-with-idle-timer 10 t (lambda ()
-                                (unless (equal buffer-undo-list saved-undo-list)
-                                  (let ((buffer-undo-list buffer-undo-list))
-                                    (save-excursion
-                                      (primitive-undo (length buffer-undo-list) buffer-undo-list)
-                                      (setq last-command 'ignore)
-                                      (undohist-save-safe)
-                                      (primitive-undo 1 buffer-undo-list)))
-                                  (setq saved-undo-list buffer-undo-list))))
+                                (dolist (buffer (buffer-list))
+                                  (with-current-buffer buffer
+                                    (unless (or (null buffer-file-name)
+                                                (eq t buffer-undo-list)
+                                                (equal buffer-undo-list saved-undo-list))
+                                      (let ((buffer-undo-list buffer-undo-list))
+                                        (save-excursion
+                                          (primitive-undo (length buffer-undo-list) buffer-undo-list)
+                                          (setq last-command 'ignore)
+                                          (undohist-save-safe)
+                                          (primitive-undo 1 buffer-undo-list)))
+                                      (setq saved-undo-list buffer-undo-list))))))
     ;; recover file from its saved undo history;
     (add-hook 'find-file-hook (lambda ()
                                 (undohist-recover-safe)
