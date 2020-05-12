@@ -332,26 +332,24 @@
         (make-directory undohist-directory t))
     (defvar-local saved-undo-list nil)
 
+    ;; clear undo history, after saving the buffer (even if buffer is unmodified);
     (advice-add 'save-buffer :after (lambda (&optional _arg)
-                                      (unless (buffer-modified-p)
                                         (delete-file (make-undohist-file-name buffer-file-name))
                                         (setq saved-undo-list nil)
-                                        (setq buffer-undo-list nil))))
-    (add-hook 'after-save-hook (lambda ()
-                                 (delete-file (make-undohist-file-name buffer-file-name))
-                                 (setq saved-undo-list nil)
-                                 (setq buffer-undo-list nil)))
-
+                                        (setq buffer-undo-list nil)))
+    ;; every 10 seconds, if buffer-undo-list is modified, while keeping buffer-undo-list:
+    ;; , undo all the way back to previously saved;
+    ;; , save undo history;
     (run-with-idle-timer 10 t (lambda ()
                                 (unless (equal buffer-undo-list saved-undo-list)
                                   (let ((buffer-undo-list buffer-undo-list))
-                                    ;; undo all
-                                    (primitive-undo (length buffer-undo-list) buffer-undo-list)
-                                    (setq last-command 'ignore)
-                                    (undohist-save-safe)
-                                    ;; undo the above undo all
-                                    (primitive-undo 1 buffer-undo-list))
+                                    (save-excursion
+                                      (primitive-undo (length buffer-undo-list) buffer-undo-list)
+                                      (setq last-command 'ignore)
+                                      (undohist-save-safe)
+                                      (primitive-undo 1 buffer-undo-list)))
                                   (setq saved-undo-list buffer-undo-list))))
+    ;; recover file from its saved undo history;
     (add-hook 'find-file-hook (lambda ()
                                 (undohist-recover-safe)
                                 (primitive-undo 1 buffer-undo-list)
