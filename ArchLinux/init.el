@@ -4,6 +4,7 @@
 (setq use-dialog-box nil)
 (setq visible-bell t)
 (setq make-backup-files nil)
+(setq auto-save-default nil)
 (cua-mode 1)
 
 (setq window-sides-vertical t)
@@ -17,11 +18,11 @@
 (window-divider-mode 1)
 (set-face-attribute 'window-divider nil :foreground "#555555")
 
-(setq-default mode-line-format nil)
-(set-face-attribute 'header-line nil :foreground "#222222" :background "#dddddd")
-
 (scroll-bar-mode -1)
 (setq-default indicate-buffer-boundaries '((up . left) (down . left)))
+
+(setq-default mode-line-format nil)
+(set-face-attribute 'header-line nil :foreground "#333333" :background "#dddddd")
 
 (setq blink-cursor-blinks 0)
 (setq-default cursor-in-non-selected-windows nil)
@@ -301,16 +302,9 @@
         (forward-line 1))))))
 
 ;; ==========================================================
-;; undo
-
-(require-package 'undo-fu)
-(global-unset-key (kbd "C-z"))
-(global-set-key (kbd "C-z")   'undo-fu-only-undo)
-(global-set-key (kbd "C-S-z") 'undo-fu-only-redo)
-(install-package 'undo-fu-session)
-
-;; ==========================================================
 ;; project
+
+(install-package 'undohist)
 
 (defvar project-directory nil)
 
@@ -332,31 +326,37 @@
     (setq server-name (expand-file-name "emacs.socket" project-cache-dir))
     (server-start)
 
-    (require 'undo-fu-session)
-    (setq-default undo-fu-session-mode t)
-    (setq undo-fu-session-directory (expand-file-name "emacs-undo" project-cache-dir))
-    (unless (file-directory-p undo-fu-session-directory)
-      (make-directory undo-fu-session-directory t))
-    (add-hook 'after-save-hook #'undo-fu-session-save-safe)
-    ;(add-hook 'after-save-hook (lambda () (setq buffer-undo-list nil)))
-    (add-hook 'auto-save-hook #'undo-fu-session-save-safe)
-    (add-hook 'find-file-hook #'undo-fu-session-recover-safe)
+    (require 'undohist)
+    (setq undohist-directory (expand-file-name "emacs-undo" project-cache-dir))
+    (if (not (file-directory-p undohist-directory))
+        (make-directory undohist-directory t))
+    (defvar-local saved-undo-list nil)
 
-    ;; put auto_save files in "project-dir/.cache/emacs-autosave"
-    (let ((project-autosave-dir (expand-file-name "emacs-autosave/" project-cache-dir)))
-      (unless (file-directory-p project-autosave-dir)
-        (make-directory project-autosave-dir t))
-      (setq auto-save-file-name-transforms
-            `((".*" ,project-autosave-dir t))))
-    (setq auto-save-list-file-name (expand-file-name "emacs-autosave-list" project-cache-dir))
+    (advice-add 'save-buffer :after (lambda (&optional _arg)
+                                      (unless (buffer-modified-p)
+                                        (delete-file (make-undohist-file-name buffer-file-name))
+                                        (setq saved-undo-list nil)
+                                        (setq buffer-undo-list nil))))
+    (add-hook 'after-save-hook (lambda ()
+                                 (delete-file (make-undohist-file-name buffer-file-name))
+                                 (setq saved-undo-list nil)
+                                 (setq buffer-undo-list nil)))
+
+    (run-with-idle-timer 10 t (lambda ()
+                                (unless (equal buffer-undo-list saved-undo-list)
+                                  (let ((buffer-undo-list buffer-undo-list))
+                                    ;; undo all
+                                    (primitive-undo (length buffer-undo-list) buffer-undo-list)
+                                    (setq last-command 'ignore)
+                                    (undohist-save-safe)
+                                    ;; undo the above undo all
+                                    (primitive-undo 1 buffer-undo-list))
+                                  (setq saved-undo-list buffer-undo-list))))
     (add-hook 'find-file-hook (lambda ()
-                                (let ((yes-or-no-p))
-                                  (fset 'yes-or-no-p (lambda (prompt) t))
-                                  (if (file-exists-p (make-auto-save-file-name))
-                                      (condition-case nil
-                                          (save-excursion (recover-this-file))
-                                        (error
-                                         "Failed to recover `%s'" file))))))
+                                (undohist-recover-safe)
+                                (primitive-undo 1 buffer-undo-list)
+                                (setq last-command 'ignore)
+                                (setq saved-undo-list buffer-undo-list)))
 
     (push '(foreground-color . :never) frameset-filter-alist)
     (push '(background-color . :never) frameset-filter-alist)
