@@ -5,12 +5,12 @@
 (setq visible-bell t)
 (setq make-backup-files nil)
 (setq auto-save-default nil)
-(cua-mode 1)
 
 (setq window-sides-vertical t)
 (add-to-list 'window-persistent-parameters '(window-side . writable))
 (add-to-list 'window-persistent-parameters '(window-slot . writable))
 (add-to-list 'window-persistent-parameters '(no-delete-other-windows . writable))
+(add-to-list 'window-persistent-parameters '(header-line-format . writable))
 
 (setq window-divider-default-places t
       window-divider-default-right-width 1
@@ -22,6 +22,15 @@
 (setq-default indicate-buffer-boundaries '((up . left) (down . left)))
 
 (setq-default mode-line-format nil)
+(setq-default header-line-format
+              '((:eval (propertize " " 'display '((space :align-to 0))))
+                (:eval (or buffer-file-name dired-directory (buffer-name)))
+                (:eval (if (buffer-modified-p)
+                           (propertize "* " 'face '(:foreground "red"))
+                         "  "))
+                (:eval (if (and (equal (window-start) (point-min)) (equal (window-end) (point-max)))
+                           nil
+                         (propertize "%q" 'face '(:foreground "dark cyan"))))))
 (set-face-attribute 'header-line nil :foreground "#333333" :background "#dddddd")
 
 (setq blink-cursor-blinks 0)
@@ -102,6 +111,7 @@
 (add-hook 'dired-mode-hook 'dired-omit-mode)
 
 (require 'hl-line)
+(add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
 ;; before leaving a window, send the cursor back to the highlighted line (if there is any);
 (add-hook 'mouse-leave-buffer-hook (lambda ()
   (if hl-line-overlay
@@ -152,6 +162,7 @@
               (set-window-parameter window 'no-delete-other-windows t)
               (set-window-dedicated-p window t)
               (select-window window)
+              (set-window-parameter window 'header-line-format 'none)
               ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
               ;; https://github.com/larsmagne/movie.el
               )
@@ -161,7 +172,8 @@
                           buffer
                           `((side . left) (slot . ,slot) (window-width . 0.2)))))
             (set-window-parameter window 'no-delete-other-windows t)
-            (select-window window))))
+            (select-window window)
+            (set-window-parameter window 'header-line-format 'none))))
 
        ;((file-exists-p (expand-file file-name ".media"))
         ;; view in overlay;
@@ -173,7 +185,8 @@
                            (display-buffer-below-selected buffer nil))))
           (set-window-parameter window 'no-delete-other-windows t)
           (set-window-dedicated-p window t)
-          (select-window window)))))
+          (select-window window)
+          (set-window-parameter window 'header-line-format 'none)))))
 
      ((string-match-p (concat "\\.avif\\|\\.jpg$\\|\\.png$\\|\\.gif$\\|\\.webp\\|"
                               "\\.webm$\\|\\.mkv$\\|\\.mp4$\\|\\.mpg$\\|\\.flv$")
@@ -195,7 +208,8 @@
                          (display-buffer-below-selected buffer nil))))
         (set-window-parameter window 'no-delete-other-windows t)
         (set-window-dedicated-p window t)
-        (select-window window))))))
+        (select-window window)
+        (set-window-parameter window 'header-line-format 'none))))))
 
 (defun projects-list-find-file ()
   (interactive)
@@ -315,7 +329,20 @@
                   buffer
                   '((side . left) (slot . 0) (window-width . 0.2)))))
     (set-window-parameter window 'no-delete-other-windows t)
-    (select-window window)))
+    (select-window window)
+    ;; show project's views, and project's name, in the header line;
+    (set-window-parameter window 'header-line-format
+                          '((:eval (propertize " " 'display '((space :align-to 0))))
+                            (:eval (let ((views-num (length (eyebrowse--get 'window-configs))))
+                                     (if (< 1 views-num)
+                                         (propertize (format "%d/%d "
+                                                             (eyebrowse--get 'current-slot)
+                                                             views-num)
+                                                     'font-lock-face '(:foreground "forest green")))))
+                            (:eval (replace-regexp-in-string
+                                    "^[[:digit:]]+, " ""
+                                    (file-name-nondirectory (directory-file-name default-directory))))))
+    ))
 
 (defun project-open (project-dir)
   (setq project-directory project-dir)
@@ -331,12 +358,12 @@
     (if (not (file-directory-p undohist-directory))
         (make-directory undohist-directory t))
     (defvar-local saved-undo-list nil)
-
     ;; clear undo history, after saving the buffer (even if buffer is unmodified);
     (advice-add 'save-buffer :after (lambda (&optional _arg)
                                         (delete-file (make-undohist-file-name buffer-file-name))
                                         (setq saved-undo-list nil)
                                         (setq buffer-undo-list nil)))
+
     ;; every 10 seconds, if buffer-undo-list is modified, while keeping buffer-undo-list:
     ;; , undo all the way back to previously saved;
     ;; , save undo history;
@@ -470,25 +497,9 @@
 ;;   to make highlights apply only on current window;
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Overlay-Properties.html
 
-;; for dired buffers enable line highlighting, and if it's a project directory,
-;;   make a  header line that shows the project's views, and project's name;
-(add-hook 'dired-mode-hook (lambda ()
-  (setq hl-line-mode t)
-  (when (string-match-p "/projects/[^/]*/?\\'" default-directory)
-    (setq header-line-format
-          '((:eval (propertize " " 'display '((space :align-to 0))))
-            (:eval (let ((views-num (length (eyebrowse--get 'window-configs))))
-                     (if (< 1 views-num)
-                         (propertize (format "%d/%d "
-                                             (eyebrowse--get 'current-slot)
-                                             views-num)
-                                     'font-lock-face '(:foreground "forest green")))))
-            (:eval (replace-regexp-in-string
-                    "^[[:digit:]]+, " ""
-                    (file-name-nondirectory (directory-file-name default-directory)))))))))
-
 ;; =============================================================
 ;;modalka
+(cua-mode 1)
 
 ;; modal key_bindings
 ;; https://github.com/mrkkrp/modalka
