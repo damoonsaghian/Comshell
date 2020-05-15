@@ -507,19 +507,20 @@
 ;;   to make highlights apply only on current window;
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Overlay-Properties.html
 
-;(advice-add 'delete-window :before
-            (defun maybe-kill-buffer ()
-              ;; delete the buffer if it's not in any other eyebrowse window;
-              (let ((buffer (window-buffer (selected-window))))
-                (let ((buffer-has-no-window t))
-                  (dolist (window-config (eyebrowse--get 'window-configs))
-                    (eyebrowse--walk-window-config (cadr window-config)
-                                                   (lambda (item)
-                                                     (when (eq (car item) 'buffer)
-                                                       (let ((buffer-name (cadr item)))
-                                                         (if (equal (buffer-name buffer) buffer-name)
-                                                             (setq buffer-has-no-window nil)))))))
-                  (if buffer-has-no-window (kill-buffer buffer)))));)
+(run-with-idle-timer
+ 30 t
+ (lambda ()
+   ;; delete the buffer if it's not in any other eyebrowse window;
+   (dolist (buffer (buffer-list))
+     (let ((buffer-has-no-window t))
+       (dolist (window-config (eyebrowse--get 'window-configs))
+         (eyebrowse--walk-window-config (cadr window-config)
+                                        (lambda (item)
+                                          (when (eq (car item) 'buffer)
+                                            (let ((buffer-name (cadr item)))
+                                              (if (equal (buffer-name buffer) buffer-name)
+                                                  (setq buffer-has-no-window nil)))))))
+       (if buffer-has-no-window (kill-buffer buffer))))))
 
 ;; =============================================================
 ;;modalka
