@@ -512,15 +512,16 @@
  (lambda ()
    ;; delete the buffer if it's not in any other eyebrowse window;
    (dolist (buffer (buffer-list))
-     (let ((buffer-has-no-window t))
-       (dolist (window-config (eyebrowse--get 'window-configs))
-         (eyebrowse--walk-window-config (cadr window-config)
-                                        (lambda (item)
-                                          (when (eq (car item) 'buffer)
-                                            (let ((buffer-name (cadr item)))
-                                              (if (equal (buffer-name buffer) buffer-name)
-                                                  (setq buffer-has-no-window nil)))))))
-       (if buffer-has-no-window (kill-buffer buffer))))))
+     (unless (get-buffer-window buffer)
+       (let ((buffer-has-no-window t))
+         (dolist (window-config (eyebrowse--get 'window-configs))
+           (eyebrowse--walk-window-config (cadr window-config)
+                                          (lambda (item)
+                                            (when (eq (car item) 'buffer)
+                                              (let ((buffer-name (cadr item)))
+                                                (if (equal (buffer-name buffer) buffer-name)
+                                                    (setq buffer-has-no-window nil)))))))
+         (if buffer-has-no-window (kill-buffer buffer)))))))
 
 ;; =============================================================
 ;;modalka
