@@ -6,6 +6,25 @@
 (setq make-backup-files nil)
 (setq auto-save-default nil)
 
+(defun delete-following-windows ()
+  (let ((window (next-window)))
+    (unless (eq (window-parameter window 'window-slot) 0)
+      (condition-case nil
+          (progn (delete-window window)
+                 (delete-following-windows))
+        (error (progn (set-window-dedicated-p window nil)
+                      (save-selected-window
+                        (select-window window)
+                        (display-about-screen))))))))
+(global-set-key (kbd "C-x 0")
+                (lambda () (interactive)
+                    (delete-following-windows)
+                    (condition-case nil
+                        (delete-window)
+                      (error (progn (set-window-dedicated-p (selected-window) nil)
+                                    (display-about-screen))))
+                    (other-window -1)))
+
 (setq window-sides-vertical t)
 (add-to-list 'window-persistent-parameters '(window-side . writable))
 (add-to-list 'window-persistent-parameters '(window-slot . writable))
@@ -66,6 +85,7 @@
 (global-set-key (kbd "C-<up>") 'previous-paragraph)
 
 (add-to-list 'default-frame-alist '(foreground-color . "#333333"))
+(set-face-attribute 'fringe nil :background 'unspecified)
 (set-face-attribute 'highlight nil :background "#CCFFFF")
 (set-face-attribute 'region nil :background "#CCFFFF")
 (set-face-attribute 'default nil :family "Monospace" :height 105)
@@ -134,18 +154,6 @@
 ;;   https://truongtx.me/tmtxt-dired-async.html
 ;;   https://github.com/jwiegley/emacs-async/blob/master/dired-async.el
 ;; https://oremacs.com/2016/02/24/dired-rsync/
-
-(defun delete-following-windows ()
-  (let ((window (next-window)))
-    (unless (eq (window-parameter window 'window-slot) 0)
-      (condition-case nil
-          (progn (delete-window window)
-                 (delete-following-windows))
-        (error (progn (set-window-dedicated-p window nil)
-                      (set-window-buffer window "*scratch*")))))))
-
-(global-set-key (kbd "C-x 0") (lambda () (interactive)
-                                (delete-following-windows) (delete-window) (other-window -1)))
 
 (defun my-find-file ()
   (interactive)
@@ -480,22 +488,38 @@
     (eyebrowse-create-window-config)
     (project-directory-side-window))))
 
-(add-hook 'eyebrowse-pre-window-switch-hook (lambda ()
-  (if hl-line-overlay
-    (goto-char (overlay-start hl-line-overlay)))))
+(add-hook 'eyebrowse-pre-window-switch-hook
+          (lambda ()
+            (if hl-line-overlay
+                (goto-char (overlay-start hl-line-overlay)))))
 
 ;; after switching correct highlights;
-(add-hook 'eyebrowse-post-window-switch-hook (lambda ()
-  (let ((original-window (selected-window)))
-    (mapcar
-      (lambda (window)
-        (select-window window)
-        (hl-line-highlight))
-      (window-list))
-    (select-window original-window))))
+(add-hook 'eyebrowse-post-window-switch-hook
+          (lambda ()
+            (let ((original-window (selected-window)))
+              (mapcar
+               (lambda (window)
+                 (select-window window)
+                 (hl-line-highlight))
+               (window-list))
+              (select-window original-window))))
 ;; alternatively use "window" property of overlays,
 ;;   to make highlights apply only on current window;
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Overlay-Properties.html
+
+;(advice-add 'delete-window :before
+            (defun maybe-kill-buffer ()
+              ;; delete the buffer if it's not in any other eyebrowse window;
+              (let ((buffer (window-buffer (selected-window))))
+                (let ((buffer-has-no-window t))
+                  (dolist (window-config (eyebrowse--get 'window-configs))
+                    (eyebrowse--walk-window-config (cadr window-config)
+                                                   (lambda (item)
+                                                     (when (eq (car item) 'buffer)
+                                                       (let ((buffer-name (cadr item)))
+                                                         (if (equal (buffer-name buffer) buffer-name)
+                                                             (setq buffer-has-no-window nil)))))))
+                  (if buffer-has-no-window (kill-buffer buffer)))));)
 
 ;; =============================================================
 ;;modalka
