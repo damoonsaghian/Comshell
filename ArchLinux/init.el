@@ -44,7 +44,7 @@
 (setq-default header-line-format
               '((:eval (propertize " " 'display '((space :align-to 0))))
                 (:eval (or buffer-file-name dired-directory (buffer-name)))
-                (:eval (if (buffer-modified-p)
+                (:eval (if (and buffer-file-name (buffer-modified-p))
                            (propertize "* " 'face '(:foreground "red"))
                          "  "))
                 (:eval (if (and (equal (window-start) (point-min)) (equal (window-end) (point-max)))
@@ -261,72 +261,8 @@
         (window-list))
        (select-window original-window)))))
 
-;; =========================================================
-;; package management
-
-(require 'package)
-(package-initialize)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/") t)
-(defun require-package (package)
-  (unless (require package nil 'noerror)
-    (package-refresh-contents)
-    (package-install package)
-    (require package)))
-(defun install-package (package)
-  (unless (package-installed-p package)
-    (package-refresh-contents)
-    (package-install package)))
-;; https://emacs.stackexchange.com/questions/38206/upgrading-packages-automatically
-;; https://www.reddit.com/r/emacs/comments/acvn2l/elisp_script_to_install_all_packages_very_fast/
-;; https://www.reddit.com/r/emacs/comments/a4n6iw/how_to_easily_update_one_elpa_package/
-;; https://emacs.stackexchange.com/questions/4045/automatically-update-packages-and-delete-old-versions
-;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el#L251
-;; https://github.com/mola-T/SPU
-
-;; ==========================================================
-;; icon
-
-(require-package 'all-the-icons)
-(unless (require 'all-the-icons nil 'noerror)
-  (package-refresh-contents)
-  (package-install 'all-the-icons)
-  (require 'all-the-icons)
-  (all-the-icons-install-fonts t))
-(setq all-the-icons-scale-factor 1.0)
-(setq all-the-icons-default-adjust 0.0)
-(add-to-list 'all-the-icons-icon-alist
-             '("\\.js$" all-the-icons-alltheicon "javascript"
-               :height 1.15 :v-adjust 0.0 :face all-the-icons-yellow))
-(setq-default face-remapping-alist
-              '((all-the-icons-yellow all-the-icons-dyellow)
-                (all-the-icons-lyellow all-the-icons-dyellow)))
-;; https://github.com/seagle0128/icons-in-terminal.el
-
-;; in dired make the first line invisible, and put icons in the first column;
-;; https://github.com/jtbm37/all-the-icons-dired/blob/master/all-the-icons-dired.el
-(add-hook 'dired-after-readin-hook (lambda ()
-  (let ((inhibit-read-only t))
-    (save-excursion
-      (set-text-properties
-       1
-       (progn (goto-char 1) (forward-line 1) (point))
-       '(invisible t))
-
-      (while (not (eobp))
-        (let ((filename (dired-get-filename nil t)))
-          (when filename
-            (let ((ov (make-overlay (point) (+ (point) 1)))               
-		  (icon (if (file-directory-p filename)
-			    (all-the-icons-icon-for-dir filename :v-adjust 0.1)
-			  (all-the-icons-icon-for-file filename))))
-              (overlay-put ov 'display icon))))
-        (forward-line 1))))))
-
 ;; ==========================================================
 ;; project
-
-(install-package 'undohist)
 
 (defvar project-directory nil)
 
@@ -361,39 +297,7 @@
     (setq server-name (expand-file-name "emacs.socket" project-cache-dir))
     (server-start)
 
-    (require 'undohist)
-    (setq undohist-directory (expand-file-name "emacs-undo" project-cache-dir))
-    (if (not (file-directory-p undohist-directory))
-        (make-directory undohist-directory t))
-    (defvar-local saved-undo-list nil)
-    ;; clear undo history, after saving the buffer (even if buffer is unmodified);
-    (advice-add 'save-buffer :after (lambda (&optional _arg)
-                                        (delete-file (make-undohist-file-name buffer-file-name))
-                                        (setq saved-undo-list nil)
-                                        (setq buffer-undo-list nil)))
-
-    ;; every 10 seconds, if buffer-undo-list is modified, while keeping buffer-undo-list:
-    ;; , undo all the way back to previously saved;
-    ;; , save undo history;
-    (run-with-idle-timer 10 t (lambda ()
-                                (dolist (buffer (buffer-list))
-                                  (with-current-buffer buffer
-                                    (unless (or (null buffer-file-name)
-                                                (eq t buffer-undo-list)
-                                                (equal buffer-undo-list saved-undo-list))
-                                      (let ((buffer-undo-list buffer-undo-list))
-                                        (save-excursion
-                                          (primitive-undo (length buffer-undo-list) buffer-undo-list)
-                                          (setq last-command 'ignore)
-                                          (undohist-save-safe)
-                                          (primitive-undo 1 buffer-undo-list)))
-                                      (setq saved-undo-list buffer-undo-list))))))
-    ;; recover file from its saved undo history;
-    (add-hook 'find-file-hook (lambda ()
-                                (undohist-recover-safe)
-                                (primitive-undo 1 buffer-undo-list)
-                                (setq last-command 'ignore)
-                                (setq saved-undo-list buffer-undo-list)))
+    (undo-system project-cache-dir)
 
     (push '(foreground-color . :never) frameset-filter-alist)
     (push '(background-color . :never) frameset-filter-alist)
@@ -471,6 +375,122 @@
 (global-set-key (kbd "C-p") 'project-map)
 (global-set-key (kbd "C-p p") 'projects-list-activate)
 
+;; =========================================================
+;; package management
+
+(require 'package)
+(package-initialize)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/") t)
+(defun require-package (package)
+  (unless (require package nil 'noerror)
+    (package-refresh-contents)
+    (package-install package)
+    (require package)))
+(defun install-package (package)
+  (unless (package-installed-p package)
+    (package-refresh-contents)
+    (package-install package)))
+;; https://emacs.stackexchange.com/questions/38206/upgrading-packages-automatically
+;; https://www.reddit.com/r/emacs/comments/acvn2l/elisp_script_to_install_all_packages_very_fast/
+;; https://www.reddit.com/r/emacs/comments/a4n6iw/how_to_easily_update_one_elpa_package/
+;; https://emacs.stackexchange.com/questions/4045/automatically-update-packages-and-delete-old-versions
+;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el#L251
+;; https://github.com/mola-T/SPU
+
+;; ==========================================================
+;; icon
+
+(require-package 'all-the-icons)
+(unless (require 'all-the-icons nil 'noerror)
+  (package-refresh-contents)
+  (package-install 'all-the-icons)
+  (require 'all-the-icons)
+  (all-the-icons-install-fonts t))
+(setq all-the-icons-scale-factor 1.0)
+(setq all-the-icons-default-adjust 0.0)
+(add-to-list 'all-the-icons-icon-alist
+             '("\\.js$" all-the-icons-alltheicon "javascript"
+               :height 1.15 :v-adjust 0.0 :face all-the-icons-yellow))
+(setq-default face-remapping-alist
+              '((all-the-icons-yellow all-the-icons-dyellow)
+                (all-the-icons-lyellow all-the-icons-dyellow)))
+;; https://github.com/seagle0128/icons-in-terminal.el
+
+;; in dired make the first line invisible, and put icons in the first column;
+;; https://github.com/jtbm37/all-the-icons-dired/blob/master/all-the-icons-dired.el
+(add-hook 'dired-after-readin-hook (lambda ()
+  (let ((inhibit-read-only t))
+    (save-excursion
+      (set-text-properties
+       1
+       (progn (goto-char 1) (forward-line 1) (point))
+       '(invisible t))
+
+      (while (not (eobp))
+        (let ((filename (dired-get-filename nil t)))
+          (when filename
+            (let ((ov (make-overlay (point) (+ (point) 1)))               
+		  (icon (if (file-directory-p filename)
+			    (all-the-icons-icon-for-dir filename :v-adjust 0.1)
+			  (all-the-icons-icon-for-file filename))))
+              (overlay-put ov 'display icon))))
+        (forward-line 1))))))
+
+;; ==========================================================
+;; undo system which also is used to recover unsaved files;
+(install-package 'undohist)
+
+(defun undo-system (project-cache-dir)
+  (require 'undohist)
+  (setq undohist-directory (expand-file-name "emacs-undo" project-cache-dir))
+  (if (not (file-directory-p undohist-directory))
+      (make-directory undohist-directory t))
+  (defvar-local saved-undo-list nil)
+
+  ;; clear undo history, after saving the buffer (even if buffer is unmodified);
+  (advice-add 'save-buffer :after (lambda (&optional _arg)
+                                        (delete-file (make-undohist-file-name buffer-file-name))
+                                        (setq saved-undo-list nil)
+                                        (setq buffer-undo-list nil)))
+
+  (defvar-local undo-save-timer nil)
+  (defun undo-save-set-timer (buffer)
+    (when buffer
+      (with-current-buffer buffer
+        (unless (or (null buffer-file-name)
+                    (eq t buffer-undo-list)
+                    (equal buffer-undo-list saved-undo-list))
+          (let ((buffer-undo-list buffer-undo-list))
+            (save-excursion
+              (primitive-undo (length buffer-undo-list) buffer-undo-list)
+              (setq last-command 'ignore)
+              (undohist-save-safe)
+              (primitive-undo 1 buffer-undo-list)))
+          (setq saved-undo-list buffer-undo-list)))))
+
+  ;; after 10 seconds, if buffer-undo-list is modified, while keeping buffer-undo-list:
+  ;; , undo all the way back to previously saved;
+  ;; , save undo history;
+  ;; , undo the previous undo all;
+  (add-hook 'after-change-functions (lambda (_beg _end _length)
+                                      (unless (null buffer-file-name)
+                                        ;; cancel any previous timer;
+                                        (when undo-save-timer
+                                          (cancel-timer undo-save-timer)
+                                          (setq undo-save-timer nil))
+                                        (setq undo-save-timer
+                                              (run-at-time 10 nil
+                                                           'undo-save-set-timer
+                                                           (current-buffer))))))
+
+  ;; recover file from its saved undo history;
+  (add-hook 'find-file-hook (lambda ()
+                              (undohist-recover-safe)
+                              (primitive-undo 1 buffer-undo-list)
+                              (setq last-command 'ignore)
+                              (setq saved-undo-list buffer-undo-list))))
+
 ;; ===========================================================
 ;; eyebrowse
 
@@ -508,11 +528,12 @@
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Overlay-Properties.html
 
 (run-with-idle-timer
- 30 t
+ 20 t
  (lambda ()
    ;; delete the buffer if it's not in any other eyebrowse window;
    (dolist (buffer (buffer-list))
-     (unless (get-buffer-window buffer)
+     (unless (or (get-buffer-window buffer)
+                 (equal buffer (get-buffer "*Messages*")))
        (let ((buffer-has-no-window t))
          (dolist (window-config (eyebrowse--get 'window-configs))
            (eyebrowse--walk-window-config (cadr window-config)
