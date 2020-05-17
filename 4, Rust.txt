@@ -33,6 +33,11 @@ Pony_like actors can be done in Rust using "may_actor";
 , immutable data will be wrapped in "Arc", and we have direct access to it;
 , mutable data will be wrapped in "Actor" and we can access it only through the actor itself;
 
+async access: Rc
+async access from multiple threads: Arc
+async mutable access: Rc<RefCell>
+async mutable access from mutiple threads: Actor
+
 it's better to use "&mut" only for the receiver in methods;
 and anywhere else use actors to control mutability;
 
@@ -148,8 +153,13 @@ note that if we put a generic type parameter in the return type of a function,
 "https://crates.io/crates/serde"
 "https://github.com/ron-rs/ron"
 
-actors can contain parameters which can be adjusted gradually, based on received messages;
-  this can be used to implement learning capabilities;
+math:
+"https://nalgebra.org/rustdoc/nalgebra/index.html"
+"https://gitlab.com/ornamentist/un-algebra"
+"https://github.com/rustsim/alga"
+
+machine learning:
+methods that their operation depends on adjustable fields;
 
 ; pkexec pacman -S rustup gcc
 ; rustup default stable

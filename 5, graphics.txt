@@ -47,6 +47,14 @@ data structure for graphical objects:
 "https://www.scratchapixel.com"
 "https://www.scratchapixel.com/lessons/3d-basic-rendering/phong-shader-BRDF"
 
+"https://github.com/rust-windowing/winit"
+"https://github.com/kas-gui/kas"
+"https://github.com/sebcrozet/kiss3d"
+"https://github.com/three-rs/three"
+"https://crates.io/crates/rust-3d"
+"https://github.com/38/plotters"
+"https://github.com/rustsim/nphysics"
+
 mono_space fonts:
   wide characters are forced to squeeze;
   narrow characters are forced to stretch;

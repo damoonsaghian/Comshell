@@ -23,6 +23,8 @@ Actor: mutable;
 "https://gitlab.freedesktop.org/gstreamer/gstreamer-rs/tree/master/tutorials"
 "https://github.com/fengalin/media-toc"
 
+"https://bitbucket.org/tiax/gtk-textbuffer-with-undo/src/default/undobuffer.py"
+  "https://stackoverflow.com/questions/76096/undo-with-gtk-textview"
 "https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
 "http://zetcode.com/gui/pygtk/advancedwidgets/"
 "https://github.com/MeanEYE/Sunflower"
