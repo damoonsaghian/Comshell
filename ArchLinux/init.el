@@ -170,7 +170,9 @@
               (set-window-parameter window 'no-delete-other-windows t)
               (set-window-dedicated-p window t)
               (select-window window)
-              (set-window-parameter window 'header-line-format 'none)
+              (set-window-parameter window 'header-line-format
+                                    '((:eval (propertize " " 'display '((space :align-to 0))))
+                                      mode-line-misc-info))
               ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
               ;; https://github.com/larsmagne/movie.el
               )
@@ -217,7 +219,9 @@
         (set-window-parameter window 'no-delete-other-windows t)
         (set-window-dedicated-p window t)
         (select-window window)
-        (set-window-parameter window 'header-line-format 'none))))))
+        (set-window-parameter window 'header-line-format
+                              '((:eval (propertize " " 'display '((space :align-to 0))))
+                                mode-line-misc-info)))))))
 
 (defun projects-list-find-file ()
   (interactive)
@@ -277,12 +281,6 @@
     ;; show project's views, and project's name, in the header line;
     (set-window-parameter window 'header-line-format
                           '((:eval (propertize " " 'display '((space :align-to 0))))
-                            (:eval (let ((views-num (length (eyebrowse--get 'window-configs))))
-                                     (if (< 1 views-num)
-                                         (propertize (format "%d/%d "
-                                                             (eyebrowse--get 'current-slot)
-                                                             views-num)
-                                                     'font-lock-face '(:foreground "forest green")))))
                             (:eval (replace-regexp-in-string
                                     "^[[:digit:]]+, " ""
                                     (file-name-nondirectory (directory-file-name default-directory))))))
@@ -533,7 +531,7 @@
    ;; delete the buffer if it's not in any other eyebrowse window;
    (dolist (buffer (buffer-list))
      (unless (or (get-buffer-window buffer)
-                 (equal buffer (get-buffer "*Messages*")))
+                 (and (null buffer-file-name) (null dired-directory)))
        (let ((buffer-has-no-window t))
          (dolist (window-config (eyebrowse--get 'window-configs))
            (eyebrowse--walk-window-config (cadr window-config)
