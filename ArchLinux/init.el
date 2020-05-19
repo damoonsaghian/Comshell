@@ -5,6 +5,7 @@
 (setq visible-bell t)
 (setq make-backup-files nil)
 (setq auto-save-default nil)
+(require 'seq)
 
 (defun delete-following-windows ()
   (let ((window (next-window)))
@@ -165,7 +166,7 @@
       (cond
        ((eq (window-parameter nil 'window-side) 'left)
         (if (file-exists-p (expand-file-name ".gallery" file-name))
-            (let* ((buffer (find-file-noselect file-name))
+            (let* ((buffer (dired-noselect file-name))
                    (window (display-buffer-use-some-window buffer nil)))
               (set-window-parameter window 'no-delete-other-windows t)
               (set-window-dedicated-p window t)
@@ -190,7 +191,7 @@
         ;)
 
        (t
-        (let* ((buffer (find-file-noselect file-name))
+        (let* ((buffer (dired-noselect file-name))
                (window (or (display-buffer-use-some-window buffer nil)
                            (display-buffer-below-selected buffer nil))))
           (set-window-parameter window 'no-delete-other-windows t)
@@ -222,6 +223,40 @@
         (set-window-parameter window 'header-line-format
                               '((:eval (propertize " " 'display '((space :align-to 0))))
                                 mode-line-misc-info)))))))
+
+;; indicate modified state of a file in dired;
+;(set-fringe-bitmap-face 'filled-square '(:foreground "red"))
+(defun modified-indicator-add (file-name)
+  (let (parent-directories)
+    ;; find parent directories
+    (dolist (directory parent-directories)
+      (with-current-buffer (dired-noselect directory)
+        (save-excursion
+          (dired-goto-file file-name)
+          (let ((ov (make-overlay (point) (+ (point) 1))))
+            (overlay-put ov 'modified-indicator t)
+            (overlay-put ov 'display '(left-fringe filled-square)))
+          )))))
+(defun modified-indicator-remove (file-name)
+  (let (parent-directories)
+    ;; find parent directories
+    (dolist (directory parent-directories)
+      (with-current-buffer (dired-noselect directory)
+        (save-excursion
+          (dired-goto-file file-name)
+          (delete-overlay (elt (seq-filter
+                                (lambda (ov) (overlay-get ov 'modified-indicator))
+                                (overlays-at (point)))
+                               0))
+          )))))
+(add-hook 'first-change-hook (lambda ()
+                               (if buffer-file-name
+                                   (modified-indicator-add buffer-file-name))))
+(advice-add 'save-buffer :after (lambda (&optional _arg)
+                                  (modified-indicator-remove buffer-file-name)))
+(advice-add 'undo :after (lambda ()
+                           (unless (or (null buffer-file-name) (buffer-modified-p))
+                             (modified-indicator-remove buffer-file-name))))
 
 (defun projects-list-find-file ()
   (interactive)
@@ -407,33 +442,32 @@
   (all-the-icons-install-fonts t))
 (setq all-the-icons-scale-factor 1.0)
 (setq all-the-icons-default-adjust 0.0)
-(add-to-list 'all-the-icons-icon-alist
-             '("\\.js$" all-the-icons-alltheicon "javascript"
-               :height 1.15 :v-adjust 0.0 :face all-the-icons-yellow))
 (setq-default face-remapping-alist
               '((all-the-icons-yellow all-the-icons-dyellow)
                 (all-the-icons-lyellow all-the-icons-dyellow)))
 ;; https://github.com/seagle0128/icons-in-terminal.el
 
 ;; in dired make the first line invisible, and put icons in the first column;
-;; https://github.com/jtbm37/all-the-icons-dired/blob/master/all-the-icons-dired.el
-(add-hook 'dired-after-readin-hook (lambda ()
-  (let ((inhibit-read-only t))
-    (save-excursion
-      (set-text-properties
-       1
-       (progn (goto-char 1) (forward-line 1) (point))
-       '(invisible t))
-
-      (while (not (eobp))
-        (let ((filename (dired-get-filename nil t)))
-          (when filename
-            (let ((ov (make-overlay (point) (+ (point) 1)))               
-		  (icon (if (file-directory-p filename)
-			    (all-the-icons-icon-for-dir filename :v-adjust 0.1)
-			  (all-the-icons-icon-for-file filename))))
-              (overlay-put ov 'display icon))))
-        (forward-line 1))))))
+(add-hook
+ 'dired-after-readin-hook
+ (lambda ()
+   (setq-local tab-width 1) ;; to align icons using a tab char;
+   (let ((inhibit-read-only t))
+     (save-excursion
+       (set-text-properties 1 (progn (goto-char 1) (forward-line 1) (point))
+                            '(invisible t))
+       (while (not (eobp))
+         (let ((filename (dired-get-filename nil t)))
+           (when filename
+             (let ((ov (make-overlay (point) (+ 2 (point))))
+                   (icon (if (file-directory-p filename)
+                             (all-the-icons-icon-for-dir filename :v-adjust 0.1)
+                           (all-the-icons-icon-for-file filename))))
+               (overlay-put ov 'priority 100)
+               (overlay-put ov 'display icon))
+             (dired-next-line 0)
+             (set-text-properties (1- (point)) (point) '(display (space :align-to 3)))))
+         (forward-line 1))))))
 
 ;; ==========================================================
 ;; undo system which also is used to recover unsaved files;
