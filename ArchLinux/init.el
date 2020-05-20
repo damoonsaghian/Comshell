@@ -172,8 +172,10 @@
               (set-window-dedicated-p window t)
               (select-window window)
               (set-window-parameter window 'header-line-format
-                                    '((:eval (propertize " " 'display '((space :align-to 0))))
-                                      mode-line-misc-info))
+                                    (if (window-at-side-p nil 'top)
+                                        '((:eval (propertize " " 'display '((space :align-to 0))))
+                                          mode-line-misc-info)
+                                      'none))
               ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
               ;; https://github.com/larsmagne/movie.el
               )
@@ -221,42 +223,11 @@
         (set-window-dedicated-p window t)
         (select-window window)
         (set-window-parameter window 'header-line-format
-                              '((:eval (propertize " " 'display '((space :align-to 0))))
-                                mode-line-misc-info)))))))
-
-;; indicate modified state of a file in dired;
-;(set-fringe-bitmap-face 'filled-square '(:foreground "red"))
-(defun modified-indicator-add (file-name)
-  (let (parent-directories)
-    ;; find parent directories
-    (dolist (directory parent-directories)
-      (with-current-buffer (dired-noselect directory)
-        (save-excursion
-          (dired-goto-file file-name)
-          (let ((ov (make-overlay (point) (+ (point) 1))))
-            (overlay-put ov 'modified-indicator t)
-            (overlay-put ov 'display '(left-fringe filled-square)))
-          )))))
-(defun modified-indicator-remove (file-name)
-  (let (parent-directories)
-    ;; find parent directories
-    (dolist (directory parent-directories)
-      (with-current-buffer (dired-noselect directory)
-        (save-excursion
-          (dired-goto-file file-name)
-          (delete-overlay (elt (seq-filter
-                                (lambda (ov) (overlay-get ov 'modified-indicator))
-                                (overlays-at (point)))
-                               0))
-          )))))
-(add-hook 'first-change-hook (lambda ()
-                               (if buffer-file-name
-                                   (modified-indicator-add buffer-file-name))))
-(advice-add 'save-buffer :after (lambda (&optional _arg)
-                                  (modified-indicator-remove buffer-file-name)))
-(advice-add 'undo :after (lambda ()
-                           (unless (or (null buffer-file-name) (buffer-modified-p))
-                             (modified-indicator-remove buffer-file-name))))
+                              (if (window-at-side-p nil 'top)
+                                  '((:eval (propertize " " 'display '((space :align-to 0))))
+                                    mode-line-misc-info)
+                                'none)))
+      ))))
 
 (defun projects-list-find-file ()
   (interactive)
@@ -528,8 +499,15 @@
 
 (require-package 'eyebrowse)
 (eyebrowse-mode t)
-(setq eyebrowse-mode-line-separator " ")
+(set-face-attribute 'eyebrowse-mode-line-separator nil :foreground "#bbbbbb")
+(set-face-attribute 'eyebrowse-mode-line-inactive nil :foreground "#999999")
+(face-spec-set 'eyebrowse-mode-line-active '((t (nil))) 'face-defface-spec)
+(setq eyebrowse-mode-line-separator "  ")
+(setq eyebrowse-mode-line-left-delimiter "")
+(setq eyebrowse-mode-line-right-delimiter "")
+(setq eyebrowse-mode-line-style t)
 (setq eyebrowse-wrap-around t)
+(setq eyebrowse-tagged-slot-format "%s%t")
 (global-set-key (kbd "C-p j") 'eyebrowse-prev-window-config)
 (global-set-key (kbd "C-p k") 'eyebrowse-next-window-config)
 (global-set-key (kbd "C-p h") 'eyebrowse-last-window-config)
@@ -575,6 +553,27 @@
                                                 (if (equal (buffer-name buffer) buffer-name)
                                                     (setq buffer-has-no-window nil)))))))
          (if buffer-has-no-window (kill-buffer buffer)))))))
+
+;; modified indicator
+(defun modified-indicator (show)
+  (when (and buffer-file-name
+             (window-parameter nil 'header-line-format))
+    (if show
+        (progn
+          (eyebrowse-rename-window-config (eyebrowse--get 'current-slot)
+                                                 (propertize "*" 'face '(:foreground "red"))
+                                                 ))
+      (eyebrowse-rename-window-config (eyebrowse--get 'current-slot)
+                                                 ""))
+    (force-mode-line-update t)))
+
+(add-hook 'first-change-hook (lambda () (modified-indicator t)))
+(add-hook 'after-save-hook (lambda () (modified-indicator nil)))
+(add-hook 'post-command-hook
+               (lambda ()
+                 (when (and (eq this-command 'undo)
+                            (not (buffer-modified-p)))
+                   (modified-indicator nil))))
 
 ;; =============================================================
 ;;modalka
