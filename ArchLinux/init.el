@@ -465,7 +465,8 @@
                     (eq t buffer-undo-list)
                     (equal buffer-undo-list saved-undo-list))
           (let ((buffer-undo-list buffer-undo-list)
-                (inhibit-modification-hooks t))
+                (inhibit-modification-hooks t)
+                last-command)
             (save-excursion
               (primitive-undo (length buffer-undo-list) buffer-undo-list)
               (setq last-command 'ignore)
@@ -508,8 +509,7 @@
 (setq eyebrowse-mode-line-right-delimiter "")
 (setq eyebrowse-mode-line-style t)
 (setq eyebrowse-wrap-around t)
-(setq eyebrowse-slot-format "●")
-(setq eyebrowse-tagged-slot-format "●●")
+(setq eyebrowse-tagged-slot-format "%s●")
 (global-set-key (kbd "C-p j") 'eyebrowse-prev-window-config)
 (global-set-key (kbd "C-p k") 'eyebrowse-next-window-config)
 (global-set-key (kbd "C-p h") 'eyebrowse-last-window-config)
@@ -561,13 +561,19 @@
 (defun modified-indicator (show)
   (when (and buffer-file-name
              (window-parameter nil 'header-line-format))
-    (dolist (window-config (eyebrowse--get 'window-configs))
-      (let (buffer-in-slot-p)
+
+    (if show
+        (eyebrowse-rename-window-config (eyebrowse--get 'current-slot) "*")
+      (eyebrowse-rename-window-config (eyebrowse--get 'current-slot) ""))
+
+    (let ((buffer (current-buffer))
+          buffer-in-slot-p)
+      (dolist (window-config (eyebrowse--get 'window-configs))
         (eyebrowse--walk-window-config (cadr window-config)
                                             (lambda (item)
                                               (when (eq (car item) 'buffer)
                                                 (let ((buffer-name (cadr item)))
-                                                  (if (equal (buffer-name (current-buffer)) buffer-name)
+                                                  (if (equal (buffer-name buffer) buffer-name)
                                                       (setq buffer-in-slot-p t))))))
         (when buffer-in-slot-p
           (if show
@@ -575,9 +581,7 @@
             (eyebrowse-rename-window-config (car window-config) "")))))
     (force-mode-line-update t)))
 
-(add-hook 'first-change-hook
-          (lambda ()
-                (modified-indicator t)))
+(add-hook 'first-change-hook (lambda () (modified-indicator t)))
 (add-hook 'after-save-hook (lambda () (modified-indicator nil)))
 (add-hook 'post-command-hook
                (lambda ()
