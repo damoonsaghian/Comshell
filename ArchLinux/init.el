@@ -44,9 +44,9 @@
 (setq-default mode-line-format nil)
 (setq-default header-line-format
               '((:eval (propertize " " 'display '((space :align-to 0))))
-                (:eval (or buffer-file-name dired-directory (buffer-name)))
+                (:eval (or buffer-file-truename dired-directory (buffer-name)))
                 (:eval (if (and buffer-file-name (buffer-modified-p))
-                           (propertize "* " 'face '(:foreground "red"))
+                           (propertize "● " 'face '(:foreground "red"))
                          "  "))
                 (:eval (if (and (equal (window-start) (point-min)) (equal (window-end) (point-max)))
                            nil
@@ -165,7 +165,7 @@
      ((file-directory-p file-name)
       (cond
        ((eq (window-parameter nil 'window-side) 'left)
-        (if (file-exists-p (expand-file-name ".gallery" file-name))
+        (if (string-match-p "\\.g/?$" file-name)
             (let* ((buffer (dired-noselect file-name))
                    (window (display-buffer-use-some-window buffer nil)))
               (set-window-parameter window 'no-delete-other-windows t)
@@ -188,7 +188,7 @@
             (select-window window)
             (set-window-parameter window 'header-line-format 'none))))
 
-       ;((file-exists-p (expand-file file-name ".media"))
+       ;((string-match-p "\\.m/?$" file-name)
         ;; view in overlay;
         ;)
 
@@ -201,7 +201,7 @@
           (select-window window)
           (set-window-parameter window 'header-line-format 'none)))))
 
-     ((string-match-p (concat "\\.avif\\|\\.jpg$\\|\\.png$\\|\\.gif$\\|\\.webp\\|"
+     ((string-match-p (concat "\\.avif$\\|\\.jpg$\\|\\.png$\\|\\.gif$\\|\\.webp\\|"
                               "\\.webm$\\|\\.mkv$\\|\\.mp4$\\|\\.mpg$\\|\\.flv$")
                       file-name)
       ;; view in overlay;
@@ -404,6 +404,7 @@
 
 ;; ==========================================================
 ;; icon
+;; https://github.com/seagle0128/icons-in-terminal.el
 
 (require-package 'all-the-icons)
 (unless (require 'all-the-icons nil 'noerror)
@@ -416,7 +417,9 @@
 (setq-default face-remapping-alist
               '((all-the-icons-yellow all-the-icons-dyellow)
                 (all-the-icons-lyellow all-the-icons-dyellow)))
-;; https://github.com/seagle0128/icons-in-terminal.el
+(add-to-list 'all-the-icons-icon-alist
+             '("\\.js$" all-the-icons-alltheicon "javascript"
+               :height 1.15 :v-adjust 0.0 :face all-the-icons-yellow))
 
 ;; in dired make the first line invisible, and put icons in the first column;
 (add-hook
