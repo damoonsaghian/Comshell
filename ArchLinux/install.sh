@@ -157,7 +157,7 @@ echo '<?xml version="1.0"?>
 ' > /etc/fonts/local.conf
 
 echo '
-PS1="\[$(tput setab 4)\]\[$(tput setaf 15)\]\w\[$(tput sgr0)\]\[$(tput setaf 4)\]\[$(tput sgr0)\] "
+PS1="\[$(tput setaf 1)\]\w >\[$(tput sgr0)\] "
 unset HISTFILE
 ' >> /etc/skel/.bashrc
 

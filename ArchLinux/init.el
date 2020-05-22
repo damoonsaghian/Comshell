@@ -9,14 +9,16 @@
 
 (defun delete-following-windows ()
   (let ((window (next-window)))
-    (unless (eq (window-parameter window 'window-slot) 0)
+    (unless (equal window (frame-first-window)) ;(or (eq (window-parameter window 'window-slot) 0))
       (condition-case nil
           (progn (delete-window window)
                  (delete-following-windows))
-        (error (progn (set-window-dedicated-p window nil)
-                      (save-selected-window
-                        (select-window window)
-                        (display-about-screen))))))))
+        (error (progn
+                 (save-selected-window
+                   (select-window window)
+                   (display-buffer (get-buffer-create "*GNU Emacs*")
+                                   '(nil (inhibit-same-window . t)))
+                   (delete-window window))))))))
 (global-set-key (kbd "C-x 0")
                 (lambda () (interactive)
                     (delete-following-windows)
@@ -141,6 +143,55 @@
   (if hl-line-overlay
     (goto-char (overlay-start hl-line-overlay)))
   (other-window -1)))
+
+'(nconc dired-font-lock-keywords
+       (list
+        '("[^ .]\\(\\.[^. /]+\\)$" 1 diredfl-file-suffix) ; Suffix, including `.'.
+        '("\\([^ ]+\\) -> .+$" 1 diredfl-symlink)         ; Symbolic links
+
+        ;; 1) Date/time and 2) filename w/o suffix.
+        ;;    This is a bear, and it is fragile - Emacs can change `dired-move-to-filename-regexp'.
+        `(,dired-move-to-filename-regexp
+          (7 diredfl-date-time t t) ; Date/time, locale (western or eastern)
+          (2 diredfl-date-time t t) ; Date/time, ISO
+          (,(concat "\\(.+\\)\\(" (concat (funcall #'regexp-opt diredfl-compressed-extensions)
+                                     "\\)[*]?$"))
+           nil nil (0 diredfl-compressed-file-name keep t))) ; Compressed-file suffix
+        `(,dired-move-to-filename-regexp
+          (7 diredfl-date-time t t) ; Date/time, locale (western or eastern)
+          (2 diredfl-date-time t t) ; Date/time, ISO
+          ("\\(.+\\)$" nil nil (0 diredfl-file-name keep t))) ; Filename (not a compressed file)
+
+        ;; Files to ignore
+        '(diredfl-match-ignored-extensions 1 diredfl-ignored-file-name t)
+
+        ;; Compressed-file (suffix)
+        (list (concat "\\(" (concat (funcall #'regexp-opt diredfl-compressed-extensions) "\\)[*]?$"))
+              1 diredfl-compressed-file-suffix t)
+        '("\\([*]\\)$" 1 diredfl-executable-tag t) ; Executable (*)
+
+        ;; Inode, hard-links, & file size (. and , are for the decimal point, depending on locale)
+        ;; See comment for `directory-listing-before-filename-regexp' in `files.el' or `files+.el'.
+        '("\\_<\\(\\([0-9]+\\([.,][0-9]+\\)?\\)[BkKMGTPEZY]?[ /]?\\)" 1 'diredfl-number)
+
+        ;; Directory names - exclude d:/..., Windows drive letter in a dir heading.
+        (list (concat dired-re-maybe-mark dired-re-inode-size "\\(d\\)[^:]")
+              '(1 diredfl-dir-priv t) '(".+" (dired-move-to-filename) nil (0 diredfl-dir-name t)))
+
+        (list (concat dired-re-maybe-mark dired-re-inode-size "\\([bcsmpS]\\)") ; (rare)
+              '(1 diredfl-rare-priv keep))
+        (list (concat dired-re-maybe-mark dired-re-inode-size "\\(l\\)[-rwxlsStT]") ; l
+              '(1 diredfl-rare-priv keep))
+
+        (list (concat "^\\([^\n " (char-to-string dired-del-marker) "].*$\\)")
+              '(1 diredfl-flag-mark-line prepend))                          ; Flag/mark lines
+        (list (concat "^\\([^\n " (char-to-string dired-del-marker) "]\\)") ; Flags, marks (except D)
+              '(1 diredfl-flag-mark prepend))
+
+        (list (concat "^\\([" (char-to-string dired-del-marker) "].*$\\)") ; Deletion-flagged lines
+              '(1 diredfl-deletion-file-name prepend))
+        (list (concat "^\\([" (char-to-string dired-del-marker) "]\\)") ; Deletion flags (D)
+              '(1 diredfl-deletion prepend))))
 
 ;; key_bindings to interact with audio player:
 ;; next -> forward
@@ -505,7 +556,7 @@
 (require-package 'eyebrowse)
 (eyebrowse-mode t)
 (set-face-attribute 'eyebrowse-mode-line-separator nil :foreground "#bbbbbb")
-(set-face-attribute 'eyebrowse-mode-line-inactive nil :foreground "#aaaaaa") 
+(set-face-attribute 'eyebrowse-mode-line-inactive nil :foreground "#999999") 
 (face-spec-set 'eyebrowse-mode-line-active '((t (nil))) 'face-defface-spec)
 (setq eyebrowse-mode-line-separator " ")
 (setq eyebrowse-mode-line-left-delimiter "")
@@ -591,6 +642,11 @@
                  (when (and (eq this-command 'undo)
                             (not (buffer-modified-p)))
                    (modified-indicator nil))))
+;; for newly created window configs:
+(add-hook 'eyebrowse-pre-window-switch-hook
+          (lambda ()
+            (when (buffer-modified-p)
+              (modified-indicator t))))
 
 ;; =============================================================
 ;;modalka
