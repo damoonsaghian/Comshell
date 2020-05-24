@@ -290,7 +290,6 @@
 
       (dolist (directory parent-directories)
         (with-current-buffer (dired-noselect directory)
-          (let ((inhibit-read-only t))
             (save-excursion
               (dired-goto-file file-name)
               (if remove
@@ -298,10 +297,12 @@
                                         (lambda (ov) (overlay-get ov 'modified-indicator))
                                         (overlays-at (point)))
                                        0))
-                (let ((ov (make-overlay (point) (+ (point) 1))))
+                (let ((s "x")
+                      (ov (make-overlay (point) (1+ (point)))))
+                  (put-text-property 0 1 'display '(left-fringe filled-square error) s)
                   (overlay-put ov 'modified-indicator t)
-                  (overlay-put ov 'display '(left-fringe filled-square (:foreground "red"))))
-                ))))))))
+                  (overlay-put ov 'before-string s))
+                )))))))
 
 (add-hook 'first-change-hook (lambda () (modified-indicator buffer-file-name)))
 (add-hook 'after-save-hook (lambda () (modified-indicator buffer-file-name 'remove)))
