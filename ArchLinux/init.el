@@ -274,37 +274,42 @@
 
 ;; indicate modified state of a file in dired;
 ;(set-fringe-bitmap-face 'filled-square '(:foreground "red"))
-(defun modified-indicator-add (file-name)
-  (let (parent-directories)
-    ;; find parent directories
-    (dolist (directory parent-directories)
-      (with-current-buffer (dired-noselect directory)
-        (save-excursion
-          (dired-goto-file file-name)
-          (let ((ov (make-overlay (point) (+ (point) 1))))
-            (overlay-put ov 'modified-indicator t)
-            (overlay-put ov 'display '(left-fringe filled-square)))
-          )))))
-(defun modified-indicator-remove (file-name)
-  (let (parent-directories)
-    ;; find parent directories
-    (dolist (directory parent-directories)
-      (with-current-buffer (dired-noselect directory)
-        (save-excursion
-          (dired-goto-file file-name)
-          (delete-overlay (elt (seq-filter
-                                (lambda (ov) (overlay-get ov 'modified-indicator))
-                                (overlays-at (point)))
-                               0))
-          )))))
-(add-hook 'first-change-hook (lambda ()
-                               (if buffer-file-name
-                                   (modified-indicator-add buffer-file-name))))
-(add-hook 'after-save-hook (lambda ()
-                             (modified-indicator-remove buffer-file-name)))
-(advice-add 'undo :after (lambda (&optional _arg)
-                           (unless (or (null buffer-file-name) (buffer-modified-p))
-                             (modified-indicator-remove buffer-file-name))))
+(defun modified-indicator (file-name &optional remove)
+  (when (and file-name
+             (eq 'none
+                 (window-parameter nil 'header-line-format)))
+    (let (parent-directories)
+
+      ;; find parent directories in the project;
+      (let ((file-name (file-name-directory file-name)))
+        (if (string-match-p "/projects/" file-name)
+            (while (or (not (string-match-p "/projects/$" file-name)))
+              (push file-name parent-directories)
+              (setq file-name
+                    (file-name-directory (directory-file-name file-name))))))
+
+      (dolist (directory parent-directories)
+        (with-current-buffer (dired-noselect directory)
+          (let ((inhibit-read-only t))
+            (save-excursion
+              (dired-goto-file file-name)
+              (if remove
+                  (delete-overlay (elt (seq-filter
+                                        (lambda (ov) (overlay-get ov 'modified-indicator))
+                                        (overlays-at (point)))
+                                       0))
+                (let ((ov (make-overlay (point) (+ (point) 1))))
+                  (overlay-put ov 'modified-indicator t)
+                  (overlay-put ov 'display '(left-fringe filled-square (:foreground "red"))))
+                ))))))))
+
+(add-hook 'first-change-hook (lambda () (modified-indicator buffer-file-name)))
+(add-hook 'after-save-hook (lambda () (modified-indicator buffer-file-name 'remove)))
+;(advice-add 'undo :after (lambda (&optional _arg)))
+(add-hook 'post-command-hook (lambda ()
+                               (when (and (eq this-command 'undo)
+                                          (not (buffer-modified-p)))
+                                 (modified-indicator buffer-file-name 'remove))))
 
 (defun projects-list-find-file ()
   (interactive)
@@ -503,6 +508,9 @@
 (add-to-list 'all-the-icons-icon-alist
              '("\\.js$" all-the-icons-alltheicon "javascript"
                :height 1.15 :v-adjust 0.0 :face all-the-icons-yellow))
+(add-to-list 'all-the-icons-icon-alist
+             '("\\.el$" all-the-icons-fileicon "elisp"
+               :height 1.0 :v-adjust 0.0 :face all-the-icons-purple))
 
 ;; in dired make the first line invisible, and put icons in the first column;
 (add-hook
