@@ -133,6 +133,22 @@
 (setq dired-omit-files "^target$\\|\\.lock$")
 (add-hook 'dired-mode-hook 'dired-omit-mode)
 
+;; make the first line and the first two columns in dired, invisible;
+(add-hook
+ 'dired-after-readin-hook
+ (lambda ()
+   (let ((inhibit-read-only t))
+     (save-excursion
+       (set-text-properties 1 (progn (goto-char 1) (forward-line 1) (point))
+                            '(invisible t))
+       (while (not (eobp))
+         (let ((filename (dired-get-filename nil t)))
+           (when filename
+             (set-text-properties (point) (1+ (point)) '(invisible t))
+             (dired-next-line 0)
+             (set-text-properties (1- (point)) (point) '(invisible t))))
+         (forward-line 1))))))
+
 (require 'hl-line)
 (add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
 ;; before leaving a window, send the cursor back to the highlighted line (if there is any);
@@ -490,50 +506,6 @@
 ;; https://emacs.stackexchange.com/questions/4045/automatically-update-packages-and-delete-old-versions
 ;; https://github.com/rranelli/auto-package-update.el/blob/master/auto-package-update.el#L251
 ;; https://github.com/mola-T/SPU
-
-;; ==========================================================
-;; icon
-;; https://github.com/seagle0128/icons-in-terminal.el
-
-(require-package 'all-the-icons)
-(unless (require 'all-the-icons nil 'noerror)
-  (package-refresh-contents)
-  (package-install 'all-the-icons)
-  (require 'all-the-icons)
-  (all-the-icons-install-fonts t))
-(setq all-the-icons-scale-factor 1.0)
-(setq all-the-icons-default-adjust 0.0)
-(setq-default face-remapping-alist
-              '((all-the-icons-yellow all-the-icons-dyellow)
-                (all-the-icons-lyellow all-the-icons-dyellow)))
-(add-to-list 'all-the-icons-icon-alist
-             '("\\.js$" all-the-icons-alltheicon "javascript"
-               :height 1.15 :v-adjust 0.0 :face all-the-icons-yellow))
-(add-to-list 'all-the-icons-icon-alist
-             '("\\.el$" all-the-icons-fileicon "elisp"
-               :height 1.0 :v-adjust 0.0 :face all-the-icons-purple))
-
-;; in dired make the first line invisible, and put icons in the first column;
-(add-hook
- 'dired-after-readin-hook
- (lambda ()
-   (setq-local tab-width 1) ;; to align icons using a tab char;
-   (let ((inhibit-read-only t))
-     (save-excursion
-       (set-text-properties 1 (progn (goto-char 1) (forward-line 1) (point))
-                            '(invisible t))
-       (while (not (eobp))
-         (let ((filename (dired-get-filename nil t)))
-           (when filename
-             (let ((ov (make-overlay (point) (+ 2 (point))))
-                   (icon (if (file-directory-p filename)
-                             (all-the-icons-icon-for-dir filename :v-adjust 0.1)
-                           (all-the-icons-icon-for-file filename))))
-               (overlay-put ov 'priority 100)
-               (overlay-put ov 'display icon))
-             (dired-next-line 0)
-             (set-text-properties (1- (point)) (point) '(display (space :align-to 3)))))
-         (forward-line 1))))))
 
 ;; ==========================================================
 ;; undo system which also is used to recover unsaved files;
