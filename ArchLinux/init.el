@@ -3,6 +3,7 @@
 (setq inhibit-startup-screen t)
 (setq use-dialog-box nil)
 (setq visible-bell t)
+(setq create-lockfiles nil)
 (setq make-backup-files nil)
 (setq auto-save-default nil)
 (require 'seq)
@@ -142,10 +143,45 @@
   (lambda () (interactive)
     (forward-line -1)))
 
-;; make the first line and the first two columns in dired, invisible;
+(defun parent-directories-update ()
+  ;; (let (parent-directories)
+  ;;   ;; find parent directories in the project;
+  ;;   (let ((file-name (file-name-directory file-name)))
+  ;;     (if (string-match-p "/projects/" file-name)
+  ;;         (while (or (not (string-match-p "/projects/$" file-name)))
+  ;;           (push file-name parent-directories)
+  ;;           (setq file-name
+  ;;                 (file-name-directory (directory-file-name file-name))))))
+
+  ;;   (save-selected-window
+  ;;     (project-directory-side-window)
+  ;;     (mapcar
+  ;;      (lambda (window)
+
+  ;;        (select-window window)
+  ;;        (hl-line-highlight))
+  ;;      (window-list))
+    
+  ;;   (when (eq 'none
+  ;;             (window-parameter nil 'header-line-format))
+
+  ;;     (dolist (directory parent-directories)
+  ;;       (with-current-buffer (dired-noselect directory)
+  ;;           (save-excursion
+  ;;             (dired-goto-file file-name)
+              
+  ;;             ))))
+  ;;   )
+
+  ;;     )
+  )
+
+(add-hook 'window-configuration-change-hook 'parent-directories-update)
+
 (add-hook
  'dired-after-readin-hook
  (lambda ()
+   ;; make the first line and the first two columns in dired, invisible;
    (let ((inhibit-read-only t))
      (save-excursion
        (goto-char 1)
@@ -158,7 +194,13 @@
              (set-text-properties (point) (1+ (point)) '(invisible t))
              (dired-next-line 0)
              (set-text-properties (1- (point)) (point) '(invisible t))))
-         (forward-line 1))))))
+         (forward-line 1))))
+
+   (parent-directories-update)
+   (dolist (buffer (buffer-list))
+     (with-current-buffer buffer
+       (if (buffer-modified-p)
+           (modified-indicator (buffer-file-name)))))))
 
 (require 'hl-line)
 (add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
@@ -300,7 +342,6 @@
       ))))
 
 ;; indicate modified state of a file in dired;
-;(set-fringe-bitmap-face 'filled-square '(:foreground "red"))
 (defun modified-indicator (file-name &optional remove)
   (when (and file-name
              (eq 'none
@@ -472,17 +513,17 @@
          (window (display-buffer-use-some-window buffer nil)))
     (set-window-parameter window 'no-delete-other-windows t)
     (set-window-dedicated-p window t)
-    (select-window window))
+    (select-window window)
 
-  (set-window-parameter window 'header-line-format
-                        '((:eval (propertize " " 'display '((space :align-to 0))))
-                          (:eval (let ((views-num (length (eyebrowse--get 'window-configs))))
-                                   (if (< 1 views-num)
-                                       (propertize (format "%d/%d "
-                                                           (eyebrowse--get 'current-slot)
-                                                           views-num)
-                                                   'font-lock-face '(:foreground "forest green")))))
-                          "projects"))
+    (set-window-parameter window 'header-line-format
+                          '((:eval (propertize " " 'display '((space :align-to 0))))
+                            (:eval (let ((views-num (length (eyebrowse--get 'window-configs))))
+                                     (if (< 1 views-num)
+                                         (propertize (format "%d/%d "
+                                                             (eyebrowse--get 'current-slot)
+                                                             views-num)
+                                                     'font-lock-face '(:foreground "forest green")))))
+                            "projects")))
 
   ;; to do: automatically find all "projects/*" directories in connected storage devices,
   ;;   and create an eyebrowse view for each;
@@ -589,16 +630,7 @@
 
 (require-package 'eyebrowse)
 (eyebrowse-mode t)
-(set-face-attribute 'eyebrowse-mode-line-separator nil :foreground "#bbbbbb")
-(set-face-attribute 'eyebrowse-mode-line-inactive nil :foreground "#999999") 
-(face-spec-set 'eyebrowse-mode-line-active '((t (nil))) 'face-defface-spec)
-(setq eyebrowse-mode-line-separator " ")
-(setq eyebrowse-mode-line-left-delimiter "")
-(setq eyebrowse-mode-line-right-delimiter "")
-(setq eyebrowse-mode-line-style t)
 (setq eyebrowse-wrap-around t)
-;(setq eyebrowse-slot-format "●")
-;(setq eyebrowse-tagged-slot-format "●")
 (global-set-key (kbd "C-p j") 'eyebrowse-prev-window-config)
 (global-set-key (kbd "C-p k") 'eyebrowse-next-window-config)
 (global-set-key (kbd "C-p h") 'eyebrowse-last-window-config)
