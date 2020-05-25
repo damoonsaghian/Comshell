@@ -133,14 +133,25 @@
 (setq dired-omit-files "^target$\\|\\.lock$")
 (add-hook 'dired-mode-hook 'dired-omit-mode)
 
+(define-key dired-mode-map [remap next-line]
+  (lambda () (interactive)
+    (forward-line 1)
+    (if (eq (point) (point-max))
+        (forward-line -1))))
+(define-key dired-mode-map [remap previous-line]
+  (lambda () (interactive)
+    (forward-line -1)))
+
 ;; make the first line and the first two columns in dired, invisible;
 (add-hook
  'dired-after-readin-hook
  (lambda ()
    (let ((inhibit-read-only t))
      (save-excursion
-       (set-text-properties 1 (progn (goto-char 1) (forward-line 1) (point))
-                            '(invisible t))
+       (goto-char 1)
+       (forward-line 2)
+       (narrow-to-region (point) (point-max))
+
        (while (not (eobp))
          (let ((filename (dired-get-filename nil t)))
            (when filename
@@ -462,6 +473,16 @@
     (set-window-parameter window 'no-delete-other-windows t)
     (set-window-dedicated-p window t)
     (select-window window))
+
+  (set-window-parameter window 'header-line-format
+                        '((:eval (propertize " " 'display '((space :align-to 0))))
+                          (:eval (let ((views-num (length (eyebrowse--get 'window-configs))))
+                                   (if (< 1 views-num)
+                                       (propertize (format "%d/%d "
+                                                           (eyebrowse--get 'current-slot)
+                                                           views-num)
+                                                   'font-lock-face '(:foreground "forest green")))))
+                          "projects"))
 
   ;; to do: automatically find all "projects/*" directories in connected storage devices,
   ;;   and create an eyebrowse view for each;
