@@ -48,11 +48,10 @@
 
 (setq-default mode-line-format nil)
 (setq-default header-line-format
-              '((:eval (propertize " " 'display '((space :align-to 0))))
+              '((:eval (if (and buffer-file-name (buffer-modified-p))
+                           (propertize "▉" 'face '(:foreground "red"))))
+                (:eval (propertize " " 'display '((space :align-to 0))))
                 (:eval (or buffer-file-truename dired-directory (buffer-name)))
-                (:eval (if (and buffer-file-name (buffer-modified-p))
-                           (propertize "* " 'face '(:foreground "red"))
-                         "  "))
                 (:eval (if (and (equal (window-start) (point-min)) (equal (window-end) (point-max)))
                            nil
                          (propertize "%q" 'face '(:foreground "dark cyan"))))))
@@ -216,7 +215,7 @@
                         (buffer-modified-p buffer))
                    (let ((s "x")
                          (ov (make-overlay (point) (1+ (point)))))
-                     (put-text-property 0 1 'display '(left-fringe filled-square error) s)
+                     (put-text-property 0 1 'display '(left-fringe filled-rectangle error) s)
                      (overlay-put ov 'modified-indicator t)
                      (overlay-put ov 'before-string s))))))
          (forward-line 1))))
@@ -378,7 +377,7 @@
                 (if (overlayp overlay) (delete-overlay overlay)))
             (let ((s "x")
                   (ov (make-overlay (point) (1+ (point)))))
-              (put-text-property 0 1 'display '(left-fringe filled-square error) s)
+              (put-text-property 0 1 'display '(left-fringe filled-rectangle error) s)
               (overlay-put ov 'modified-indicator t)
               (overlay-put ov 'before-string s))
             ))))))
