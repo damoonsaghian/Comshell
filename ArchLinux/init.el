@@ -31,20 +31,17 @@
                                   (set-window-prev-buffers nil nil))))
                   (other-window -1)))
 
-(setq window-sides-vertical t)
-(add-to-list 'window-persistent-parameters '(window-side . writable))
-(add-to-list 'window-persistent-parameters '(window-slot . writable))
-(add-to-list 'window-persistent-parameters '(no-delete-other-windows . writable))
-(add-to-list 'window-persistent-parameters '(header-line-format . writable))
-
 (setq window-divider-default-places t
       window-divider-default-right-width 1
       window-divider-default-bottom-width 1)
 (window-divider-mode 1)
 (set-face-attribute 'window-divider nil :foreground "#555555")
 
-(scroll-bar-mode -1)
-(setq-default indicate-buffer-boundaries '((up . left) (down . left)))
+(setq window-sides-vertical t)
+(add-to-list 'window-persistent-parameters '(window-side . writable))
+(add-to-list 'window-persistent-parameters '(window-slot . writable))
+(add-to-list 'window-persistent-parameters '(no-delete-other-windows . writable))
+(add-to-list 'window-persistent-parameters '(header-line-format . writable))
 
 (setq-default mode-line-format nil)
 (setq-default header-line-format
@@ -52,14 +49,14 @@
                            (propertize "▉" 'face '(:foreground "red"))))
                 (:eval (propertize " " 'display '((space :align-to 0))))
                 (:eval (or buffer-file-truename dired-directory (buffer-name)))
+                " "
                 (:eval (if (and (equal (window-start) (point-min)) (equal (window-end) (point-max)))
                            nil
                          (propertize "%q" 'face '(:foreground "dark cyan"))))))
 (set-face-attribute 'header-line nil :foreground "#333333" :background "#dddddd")
 
-(setq blink-cursor-blinks 0)
-(setq-default cursor-in-non-selected-windows nil)
-;; https://github.com/Malabarba/beacon
+(scroll-bar-mode -1)
+(setq-default indicate-buffer-boundaries '((up . left) (down . left)))
 
 ;; never recenter point;
 (setq scroll-conservatively 101)
@@ -89,6 +86,10 @@
     (right-char)))
 (global-set-key (kbd "C-<up>") 'previous-paragraph)
 
+(setq blink-cursor-blinks 0)
+(setq-default cursor-in-non-selected-windows nil)
+;; https://github.com/Malabarba/beacon
+
 (add-to-list 'default-frame-alist '(foreground-color . "#333333"))
 (set-face-attribute 'fringe nil :background 'unspecified)
 (set-face-attribute 'highlight nil :background "#CCFFFF")
@@ -104,16 +105,15 @@
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/FFAP.html
 (defun goto-link-at-point ()
   (interactive)
-  (let (($path (ffap-file-at-point)))
-    (if (string-match-p "\\`git://" $path)
-        (progn
-          (
-           ))
-      (if (string-match-p "\\`https?://" $path)
-          (progn
-            (
-             ))
-        (message "file doesn't exist: '%s';" $path)))))
+  (let ((path (ffap-file-at-point)))
+    (cond
+     ((string-match-p "\\`git://" path)
+      )
+     ((string-match-p "\\`https?://" path)
+      )
+     (t
+      (message "file doesn't exist: '%s';" path))
+     )))
 
 ;; =====================================================
 ;; dired
@@ -804,6 +804,9 @@
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Visibility-of-Frames.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Child-Frames.html#Child-Frames
 
+;; https://github.com/bmag/imenu-list
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Imenu.html
+
 ;; lsp-rust, lsp-flycheck
 ;; https://christian.kellner.me/2017/05/31/language-server-protocol-lsp-rust-and-emacs/
 ;; https://github.com/flycheck/flycheck-rust
@@ -816,6 +819,10 @@
 ;; (setq ido-everywhere t)
 ;; (ido-mode 1)
 ;; ido-ubiquitous, helm
+
+;; highlight-changes-mode
+;; instead of highlighting create fringes;
+;; https://github.com/emacs-evil/goto-chg/blob/master/goto-chg.el
 
 ;; http://ergoemacs.org/emacs/emacs_magit-mode_tutorial.html
 ;;   https://magit.vc/

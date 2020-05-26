@@ -12,7 +12,6 @@ main.loadTheme();
 // hide notification banners;
 {
   const bannerBin = main.messageTray._bannerBin;
-  //if (bannerBin) bannerBin.set_y_align(clutter.ActorAlign.END);
   if (bannerBin) bannerBin.hide();
 }
 
@@ -122,8 +121,8 @@ main.panel.statusArea.aggregateMenu.container.hide();
     }
   }
 
-  // https://github.com/hedayaty/NetSpeed
-  // net usage
+  // https://github.com/hedayaty/NetSpeed/blob/master/net_speed.js
+  // https://github.com/hedayaty/NetSpeed/blob/master/net_speed_status_icon.js
 
   const rfkillIcon = new st.Icon({ style_class: "system-status-icon" });
   leftBox.add_child(rfkillIcon);
