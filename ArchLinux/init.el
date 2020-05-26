@@ -3,6 +3,8 @@
 (setq inhibit-startup-screen t)
 (setq use-dialog-box nil)
 (setq visible-bell t)
+(global-auto-revert-mode 1)
+(setq global-auto-revert-non-file-buffers t)
 (setq create-lockfiles nil)
 (setq make-backup-files nil)
 (setq auto-save-default nil)
@@ -143,40 +145,52 @@
   (lambda () (interactive)
     (forward-line -1)))
 
+(defun parent-directories (file-name)
+  (let (parent-directories)
+    ;; find parent directories in the project;
+    (let ((file-name (file-name-directory file-name)))
+      (if (string-match-p "/projects/" file-name)
+          (while (or (not (string-match-p "/projects/$" file-name)))
+            (push file-name parent-directories)
+            (setq file-name
+                  (file-name-directory (directory-file-name file-name)))))
+      parent-directories)))
+
 (defun parent-directories-update ()
-  ;; (let (parent-directories)
-  ;;   ;; find parent directories in the project;
-  ;;   (let ((file-name (file-name-directory file-name)))
-  ;;     (if (string-match-p "/projects/" file-name)
-  ;;         (while (or (not (string-match-p "/projects/$" file-name)))
-  ;;           (push file-name parent-directories)
-  ;;           (setq file-name
-  ;;                 (file-name-directory (directory-file-name file-name))))))
+  (let ((main-file ""))
+    (mapcar
+     (lambda (window)
+       (let* ((buffer (window-buffer window))
+              (file-name (or (buffer-file-name buffer)
+                             (expand-file-name
+                              (with-current-buffer buffer default-directory)))))
+         (when (and file-name
+                    (eq 'none (window-parameter window 'header-line-format))
+                    (string-lessp main-file file-name))
+           (setq main-file file-name))))
+     (window-list))
 
-  ;;   (save-selected-window
-  ;;     (project-directory-side-window)
-  ;;     (mapcar
-  ;;      (lambda (window)
+    (let ((buffer (window-buffer (selected-window)))
+          (file-name (dired-get-filename nil t)))
+      (project-directory-side-window)
+      (dolist (directory (cdr (parent-directories main-file)))
+        (dired-goto-file directory)
+        (my-find-file))
+      (dired-goto-file main-file)
+      (my-find-file)
+      (let ((window (get-buffer-window buffer)))
+        (if (window-live-p window)
+            (select-window window)))
+      (if file-name (dired-goto-file file-name)))))
 
-  ;;        (select-window window)
-  ;;        (hl-line-highlight))
-  ;;      (window-list))
-    
-  ;;   (when (eq 'none
-  ;;             (window-parameter nil 'header-line-format))
+(add-hook 'post-command-hook (lambda ()
+                               (if (or (eq this-command 'kill-buffer)
+                                       (eq this-command 'delete-window))
+                                   (parent-directories-update))))
 
-  ;;     (dolist (directory parent-directories)
-  ;;       (with-current-buffer (dired-noselect directory)
-  ;;           (save-excursion
-  ;;             (dired-goto-file file-name)
-              
-  ;;             ))))
-  ;;   )
-
-  ;;     )
-  )
-
-(add-hook 'window-configuration-change-hook 'parent-directories-update)
+(advice-add 'dired-revert :after
+            (lambda (&rest _)
+              (parent-directories-update)))
 
 (add-hook
  'dired-after-readin-hook
@@ -192,15 +206,21 @@
          (let ((filename (dired-get-filename nil t)))
            (when filename
              (set-text-properties (point) (1+ (point)) '(invisible t))
-             (dired-next-line 0)
-             (set-text-properties (1- (point)) (point) '(invisible t))))
-         (forward-line 1))))
+             (dired-goto-file filename)
+             (set-text-properties (1- (point)) (point) '(invisible t))
 
-   (parent-directories-update)
-   (dolist (buffer (buffer-list))
-     (with-current-buffer buffer
-       (if (buffer-modified-p)
-           (modified-indicator (buffer-file-name)))))))
+             ;; if the corresponding buffer is modified, create a modified indicator;
+             (let ((buffer (get-file-buffer filename)))
+               (if (and buffer
+                        (not (file-directory-p filename))
+                        (buffer-modified-p buffer))
+                   (let ((s "x")
+                         (ov (make-overlay (point) (1+ (point)))))
+                     (put-text-property 0 1 'display '(left-fringe filled-square error) s)
+                     (overlay-put ov 'modified-indicator t)
+                     (overlay-put ov 'before-string s))))))
+         (forward-line 1))))
+   ))
 
 (require 'hl-line)
 (add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
@@ -346,31 +366,22 @@
   (when (and file-name
              (eq 'none
                  (window-parameter nil 'header-line-format)))
-    (let (parent-directories)
-
-      ;; find parent directories in the project;
-      (let ((file-name (file-name-directory file-name)))
-        (if (string-match-p "/projects/" file-name)
-            (while (or (not (string-match-p "/projects/$" file-name)))
-              (push file-name parent-directories)
-              (setq file-name
-                    (file-name-directory (directory-file-name file-name))))))
-
-      (dolist (directory parent-directories)
-        (with-current-buffer (dired-noselect directory)
-            (save-excursion
-              (dired-goto-file file-name)
-              (if remove
-                  (delete-overlay (elt (seq-filter
-                                        (lambda (ov) (overlay-get ov 'modified-indicator))
-                                        (overlays-at (point)))
-                                       0))
-                (let ((s "x")
-                      (ov (make-overlay (point) (1+ (point)))))
-                  (put-text-property 0 1 'display '(left-fringe filled-square error) s)
-                  (overlay-put ov 'modified-indicator t)
-                  (overlay-put ov 'before-string s))
-                )))))))
+    (dolist (directory (parent-directories file-name))
+      (with-current-buffer (dired-noselect directory)
+        (save-excursion
+          (dired-goto-file file-name)
+          (if remove
+              (let ((overlay (elt (seq-filter
+                                   (lambda (ov) (overlay-get ov 'modified-indicator))
+                                   (overlays-at (point)))
+                                  0)))
+                (if (overlayp overlay) (delete-overlay overlay)))
+            (let ((s "x")
+                  (ov (make-overlay (point) (1+ (point)))))
+              (put-text-property 0 1 'display '(left-fringe filled-square error) s)
+              (overlay-put ov 'modified-indicator t)
+              (overlay-put ov 'before-string s))
+            ))))))
 
 (add-hook 'first-change-hook (lambda () (modified-indicator buffer-file-name)))
 (add-hook 'after-save-hook (lambda () (modified-indicator buffer-file-name 'remove)))
@@ -505,7 +516,8 @@
         (desktop-read project-cache-dir)
       (project-directory-side-window)
       (desktop-save project-cache-dir))
-    (desktop-save-mode 1)))
+    (desktop-save-mode 1)
+    (parent-directories-update)))
 
 ;; projects list: an Emacs instance with a floating frame, showing the list of projects;
 (defun projects-list-create ()
@@ -649,13 +661,15 @@
 ;; after switching correct highlights;
 (add-hook 'eyebrowse-post-window-switch-hook
           (lambda ()
-            (let ((original-window (selected-window)))
-              (mapcar
-               (lambda (window)
-                 (select-window window)
-                 (hl-line-highlight))
-               (window-list))
-              (select-window original-window))))
+            (parent-directories-update)
+            ;; (let ((original-window (selected-window)))
+            ;;   (mapcar
+            ;;    (lambda (window)
+            ;;      (select-window window)
+            ;;      (hl-line-highlight))
+            ;;    (window-list))
+            ;;   (select-window original-window))
+            ))
 ;; alternatively use "window" property of overlays,
 ;;   to make highlights apply only on current window;
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Overlay-Properties.html
