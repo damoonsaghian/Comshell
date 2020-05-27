@@ -12,7 +12,8 @@
 
 (defun delete-following-windows ()
   (let ((window (next-window)))
-    (unless (equal window (frame-first-window))
+    (unless (or (equal window (frame-first-window))
+                (not (eq 'none (window-parameter window 'header-line-format))))
       (condition-case nil
           (progn (delete-window window)
                  (delete-following-windows))
@@ -37,7 +38,31 @@
 (window-divider-mode 1)
 (set-face-attribute 'window-divider nil :foreground "#555555")
 
+(global-unset-key (kbd "C-w"))
+(global-set-key (kbd "C-w j")
+                (lambda () (interactive)
+                  (if hl-line-overlay
+                      (goto-char (overlay-start hl-line-overlay)))
+                  (other-window -1)))
+(global-set-key (kbd "C-w k")
+                (lambda () (interactive)
+                  (if hl-line-overlay
+                      (goto-char (overlay-start hl-line-overlay)))
+                  (other-window 1)))
+(global-set-key (kbd "C-x C-f")
+                (lambda (filename &optional _wildcards)
+                  (interactive
+                   (find-file-read-args "Find file: "
+                                        (confirm-nonexistent-file-or-buffer)))
+                  (let ((buffer (find-file-noselect filename)))
+                    (display-buffer-in-side-window
+                     buffer `((side . bottom) (slot . 0) (window-width . 0.2))))))
+
 (setq window-sides-vertical t)
+(setq display-buffer-alist
+      `(("\\**\\*" display-buffer-in-side-window
+         (side . bottom) (slot . 0) (window-width . 0.2))))
+
 (add-to-list 'window-persistent-parameters '(window-side . writable))
 (add-to-list 'window-persistent-parameters '(window-slot . writable))
 (add-to-list 'window-persistent-parameters '(no-delete-other-windows . writable))
@@ -147,8 +172,9 @@
 (defun parent-directories (file-name)
   (let (parent-directories)
     ;; find parent directories in the project;
-    (let ((file-name (file-name-directory file-name)))
-      (if (string-match-p "/projects/" file-name)
+    (let ((file-name (file-name-directory (directory-file-name file-name))))
+      (if (and file-name
+               (string-match-p "/projects/" file-name))
           (while (or (not (string-match-p "/projects/$" file-name)))
             (push file-name parent-directories)
             (setq file-name
@@ -161,8 +187,8 @@
      (lambda (window)
        (let* ((buffer (window-buffer window))
               (file-name (or (buffer-file-name buffer)
-                             (expand-file-name
-                              (with-current-buffer buffer default-directory)))))
+                             (let ((dir (with-current-buffer buffer dired-directory)))
+                               (if dir (expand-file-name dir))))))
          (when (and file-name
                     (eq 'none (window-parameter window 'header-line-format))
                     (string-lessp main-file file-name))
@@ -175,8 +201,9 @@
       (dolist (directory (cdr (parent-directories main-file)))
         (dired-goto-file directory)
         (my-find-file))
-      (dired-goto-file main-file)
-      (my-find-file)
+      (when (string-lessp "" main-file)
+        (dired-goto-file main-file)
+        (my-find-file))
       (let ((window (get-buffer-window buffer)))
         (if (window-live-p window)
             (select-window window)))
@@ -226,11 +253,11 @@
 ;; before leaving a window, send the cursor back to the highlighted line (if there is any);
 (add-hook 'mouse-leave-buffer-hook (lambda ()
   (if hl-line-overlay
-    (goto-char (overlay-start hl-line-overlay)))))
-(global-set-key (kbd "C-x o") (lambda () (interactive)
-  (if hl-line-overlay
-    (goto-char (overlay-start hl-line-overlay)))
-  (other-window -1)))
+      (goto-char (overlay-start hl-line-overlay)))))
+(add-hook 'pre-command-hook (lambda ()
+                              (if (and (eq this-command 'other-window)
+                                       hl-line-overlay)
+                                  (goto-char (overlay-start hl-line-overlay)))))
 
 '(nconc dired-font-lock-keywords
        (list
@@ -513,6 +540,7 @@
           desktop-load-locked-desktop t)
     (if (file-exists-p (expand-file-name "emacs.desktop" project-cache-dir))
         (desktop-read project-cache-dir)
+      (display-about-screen)
       (project-directory-side-window)
       (desktop-save project-cache-dir))
     (desktop-save-mode 1)
