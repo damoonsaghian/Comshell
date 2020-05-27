@@ -13,7 +13,7 @@
 (defun delete-following-windows ()
   (let ((window (next-window)))
     (unless (or (equal window (frame-first-window))
-                (eq (window-parameter window 'window-slot) 0)) 
+                (eq (window-parameter window 'window-slot) 0))
       (condition-case nil
           (progn (delete-window window)
                  (delete-following-windows))
@@ -49,6 +49,12 @@
                   (if hl-line-overlay
                       (goto-char (overlay-start hl-line-overlay)))
                   (other-window 1)))
+
+(setq window-sides-vertical t)
+(setq display-buffer-alist
+      `(("\\*Completions\\*" display-buffer-pop-up-window)
+        ("\\*.*\\*" display-buffer-in-side-window
+         (side . bottom) (slot . 0) (window-height . 0.3))))
 (global-set-key (kbd "C-x C-f")
                 (lambda (filename &optional _wildcards)
                   (interactive
@@ -57,12 +63,7 @@
                   (let ((buffer (find-file-noselect filename)))
                     (select-window
                      (display-buffer-in-side-window
-                      buffer `((side . bottom) (slot . 0) (window-width . 0.2)))))))
-
-(setq window-sides-vertical t)
-(setq display-buffer-alist
-      `(("\\**\\*" display-buffer-in-side-window
-         (side . bottom) (slot . 0) (window-width . 0.2))))
+                      buffer `((side . bottom) (slot . 0) (window-height . 0.3)))))))
 
 ;; when an empty side window remains from last session,
 ;;   it will be used to show buffers (and i don't know why);
@@ -71,7 +72,8 @@
           (lambda ()
             (mapcar
              (lambda (window)
-               (if (eq (window-parameter window 'window-side) 'bottom)
+               (if (or (eq (window-parameter window 'window-side) 'bottom)
+                       (eq (window-parameter window 'window-side) 'top))
                    (delete-window window)))
              (window-list))
             t))
