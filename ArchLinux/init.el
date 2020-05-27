@@ -13,7 +13,7 @@
 (defun delete-following-windows ()
   (let ((window (next-window)))
     (unless (or (equal window (frame-first-window))
-                (not (eq 'none (window-parameter window 'header-line-format))))
+                (eq (window-parameter window 'window-slot) 0)) 
       (condition-case nil
           (progn (delete-window window)
                  (delete-following-windows))
@@ -55,13 +55,26 @@
                    (find-file-read-args "Find file: "
                                         (confirm-nonexistent-file-or-buffer)))
                   (let ((buffer (find-file-noselect filename)))
-                    (display-buffer-in-side-window
-                     buffer `((side . bottom) (slot . 0) (window-width . 0.2))))))
+                    (select-window
+                     (display-buffer-in-side-window
+                      buffer `((side . bottom) (slot . 0) (window-width . 0.2)))))))
 
 (setq window-sides-vertical t)
 (setq display-buffer-alist
       `(("\\**\\*" display-buffer-in-side-window
          (side . bottom) (slot . 0) (window-width . 0.2))))
+
+;; when an empty side window remains from last session,
+;;   it will be used to show buffers (and i don't know why);
+;; to avoid that:
+(add-hook 'kill-emacs-query-functions
+          (lambda ()
+            (mapcar
+             (lambda (window)
+               (if (eq (window-parameter window 'window-side) 'bottom)
+                   (delete-window window)))
+             (window-list))
+            t))
 
 (add-to-list 'window-persistent-parameters '(window-side . writable))
 (add-to-list 'window-persistent-parameters '(window-slot . writable))
@@ -442,22 +455,7 @@
   (add-to-list 'default-frame-alist '(fullscreen . maximized))
   (define-key dired-mode-map [remap dired-find-file] 'my-find-file)
   (define-key dired-mode-map [remap dired-find-file-other-window] 'my-find-file)
-  (define-key dired-mode-map [remap dired-mouse-find-file-other-window] 'my-find-file)
-
-  (add-hook
-   'window-setup-hook
-   (lambda ()
-     ;; to deal with the case when we are in a middle window, and the Emacs is closed;
-     ;; otherwise highlighted line may not correspond to the file shown in the following window;
-     (delete-following-windows)
-
-     (let ((original-window (selected-window)))
-       (mapcar
-        (lambda (window)
-          (select-window window)
-          (hl-line-highlight))
-        (window-list))
-       (select-window original-window)))))
+  (define-key dired-mode-map [remap dired-mouse-find-file-other-window] 'my-find-file))
 
 ;; ==========================================================
 ;; project
@@ -685,21 +683,7 @@
             (if hl-line-overlay
                 (goto-char (overlay-start hl-line-overlay)))))
 
-;; after switching correct highlights;
-(add-hook 'eyebrowse-post-window-switch-hook
-          (lambda ()
-            (parent-directories-update)
-            ;; (let ((original-window (selected-window)))
-            ;;   (mapcar
-            ;;    (lambda (window)
-            ;;      (select-window window)
-            ;;      (hl-line-highlight))
-            ;;    (window-list))
-            ;;   (select-window original-window))
-            ))
-;; alternatively use "window" property of overlays,
-;;   to make highlights apply only on current window;
-;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Overlay-Properties.html
+(add-hook 'eyebrowse-post-window-switch-hook 'parent-directories-update)
 
 (run-with-idle-timer
  20 t
