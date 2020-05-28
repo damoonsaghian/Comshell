@@ -245,14 +245,15 @@
                                   (goto-char (overlay-start hl-line-overlay)))))
 
 ;; https://github.com/purcell/diredfl
+(set-face-attribute 'dired-ignored nil :foreground "#FFFFFF")
 (nconc dired-font-lock-keywords
        (list
         ;; suffixes
-        '("[^ .]\\(\\.[^. /]+\\)$" 1 (:foreground "dark cyan"))
+        '("[^ .]\\(\\.[^. /]+\\)$" 1 dired-mark-face)
 
         ;; known file suffixes
         (list (concat "\\(" (concat (funcall #'regexp-opt (list ".txt" ".jpg")) "\\)[*]?$"))
-              1 '(:foreground "dark cyan") t)
+              1 'dired-ignored-face t)
         ))
 
 ;; key_bindings to interact with audio player:
