@@ -162,7 +162,9 @@
 (setq dired-recursive-deletes 'always
       dired-recursive-copies 'always
       dired-keep-marker-rename nil
-      dired-keep-marker-copy nil)
+      dired-keep-marker-copy nil
+      dired-keep-marker-hardlink nil
+      dired-keep-marker-symlink nil)
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
 (setq dired-listing-switches "-v")
 ;; unfortunately "ls -v" sorting is case sensitive, even when "LC_COLLATE=en_US.UTF-8";
@@ -175,6 +177,11 @@
 (setq dired-omit-files "^target$\\|\\.lock$")
 (add-hook 'dired-mode-hook 'dired-omit-mode)
 
+(define-key dired-mode-map [remap end-of-buffer]
+  (lambda () (interactive)
+    (end-of-buffer)
+    (if (eq (point) (point-max))
+        (forward-line -1))))
 (define-key dired-mode-map [remap next-line]
   (lambda () (interactive)
     (forward-line 1)
@@ -184,61 +191,12 @@
   (lambda () (interactive)
     (forward-line -1)))
 
-(defun parent-directories (file-name)
-  (let (parent-directories)
-    ;; find parent directories in the project;
-    (let ((file-name (file-name-directory (directory-file-name file-name))))
-      (if (and file-name
-               (string-match-p "/projects/" file-name))
-          (while (or (not (string-match-p "/projects/$" file-name)))
-            (push file-name parent-directories)
-            (setq file-name
-                  (file-name-directory (directory-file-name file-name)))))
-      parent-directories)))
-
-(defun parent-directories-update ()
-  (let ((main-file ""))
-    (mapcar
-     (lambda (window)
-       (let* ((buffer (window-buffer window))
-              (file-name (or (buffer-file-name buffer)
-                             (let ((dir (with-current-buffer buffer dired-directory)))
-                               (if dir (expand-file-name dir))))))
-         (when (and file-name
-                    (eq 'none (window-parameter window 'header-line-format))
-                    (string-lessp main-file file-name))
-           (setq main-file file-name))))
-     (window-list))
-
-    (let ((buffer (window-buffer (selected-window)))
-          (file-name (dired-get-filename nil t)))
-      (project-directory-side-window)
-      (dolist (directory (cdr (parent-directories main-file)))
-        (dired-goto-file directory)
-        (my-find-file))
-      (when (string-lessp "" main-file)
-        (dired-goto-file main-file)
-        (my-find-file))
-      (let ((window (get-buffer-window buffer)))
-        (if (window-live-p window)
-            (select-window window)))
-      (if file-name (dired-goto-file file-name)))))
-
-(add-hook 'post-command-hook (lambda ()
-                               (if (or (eq this-command 'kill-buffer)
-                                       (eq this-command 'delete-window))
-                                   (parent-directories-update))))
-
-(advice-add 'dired-revert :after
-            (lambda (&rest _)
-              (parent-directories-update)))
-
 (add-hook
  'dired-after-readin-hook
  (lambda ()
-   ;; make the first line and the first two columns in dired, invisible;
    (let ((inhibit-read-only t))
      (save-excursion
+       ;; hide the first line in dired;
        (goto-char 1)
        (forward-line 2)
        (narrow-to-region (point) (point-max))
@@ -246,11 +204,12 @@
        (while (not (eobp))
          (let ((filename (dired-get-filename nil t)))
            (when filename
+             ;; hide the two spaces at the begining of each line in dired;
              (set-text-properties (point) (1+ (point)) '(invisible t))
              (dired-goto-file filename)
              (set-text-properties (1- (point)) (point) '(invisible t))
 
-             ;; if the corresponding buffer is modified, create a modified indicator;
+             ;; if the corresponding buffer is modified, add a modified indicator;
              (let ((buffer (get-file-buffer filename)))
                (if (and buffer
                         (not (file-directory-p filename))
@@ -260,8 +219,19 @@
                      (put-text-property 0 1 'display '(left-fringe filled-rectangle error) s)
                      (overlay-put ov 'modified-indicator t)
                      (overlay-put ov 'before-string s))))))
-         (forward-line 1))))
-   ))
+         (forward-line 1))))))
+
+;; hide markers
+(advice-add 'dired-mark :after
+            (lambda (_arg &optional _interactive)
+              (save-excursion
+                (goto-char 1)
+                (while (not (eobp))
+                  (let ((filename (dired-get-filename nil t))
+                        (inhibit-read-only t))
+                    (when filename
+                      (set-text-properties (point) (1+ (point)) '(invisible t))))
+                  (forward-line 1)))))
 
 (require 'hl-line)
 (add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
@@ -274,54 +244,16 @@
                                        hl-line-overlay)
                                   (goto-char (overlay-start hl-line-overlay)))))
 
-'(nconc dired-font-lock-keywords
+;; https://github.com/purcell/diredfl
+(nconc dired-font-lock-keywords
        (list
-        '("[^ .]\\(\\.[^. /]+\\)$" 1 diredfl-file-suffix) ; Suffix, including `.'.
-        '("\\([^ ]+\\) -> .+$" 1 diredfl-symlink)         ; Symbolic links
+        ;; suffixes
+        '("[^ .]\\(\\.[^. /]+\\)$" 1 (:foreground "dark cyan"))
 
-        ;; 1) Date/time and 2) filename w/o suffix.
-        ;;    This is a bear, and it is fragile - Emacs can change `dired-move-to-filename-regexp'.
-        `(,dired-move-to-filename-regexp
-          (7 diredfl-date-time t t) ; Date/time, locale (western or eastern)
-          (2 diredfl-date-time t t) ; Date/time, ISO
-          (,(concat "\\(.+\\)\\(" (concat (funcall #'regexp-opt diredfl-compressed-extensions)
-                                     "\\)[*]?$"))
-           nil nil (0 diredfl-compressed-file-name keep t))) ; Compressed-file suffix
-        `(,dired-move-to-filename-regexp
-          (7 diredfl-date-time t t) ; Date/time, locale (western or eastern)
-          (2 diredfl-date-time t t) ; Date/time, ISO
-          ("\\(.+\\)$" nil nil (0 diredfl-file-name keep t))) ; Filename (not a compressed file)
-
-        ;; Files to ignore
-        '(diredfl-match-ignored-extensions 1 diredfl-ignored-file-name t)
-
-        ;; Compressed-file (suffix)
-        (list (concat "\\(" (concat (funcall #'regexp-opt diredfl-compressed-extensions) "\\)[*]?$"))
-              1 diredfl-compressed-file-suffix t)
-        '("\\([*]\\)$" 1 diredfl-executable-tag t) ; Executable (*)
-
-        ;; Inode, hard-links, & file size (. and , are for the decimal point, depending on locale)
-        ;; See comment for `directory-listing-before-filename-regexp' in `files.el' or `files+.el'.
-        '("\\_<\\(\\([0-9]+\\([.,][0-9]+\\)?\\)[BkKMGTPEZY]?[ /]?\\)" 1 'diredfl-number)
-
-        ;; Directory names - exclude d:/..., Windows drive letter in a dir heading.
-        (list (concat dired-re-maybe-mark dired-re-inode-size "\\(d\\)[^:]")
-              '(1 diredfl-dir-priv t) '(".+" (dired-move-to-filename) nil (0 diredfl-dir-name t)))
-
-        (list (concat dired-re-maybe-mark dired-re-inode-size "\\([bcsmpS]\\)") ; (rare)
-              '(1 diredfl-rare-priv keep))
-        (list (concat dired-re-maybe-mark dired-re-inode-size "\\(l\\)[-rwxlsStT]") ; l
-              '(1 diredfl-rare-priv keep))
-
-        (list (concat "^\\([^\n " (char-to-string dired-del-marker) "].*$\\)")
-              '(1 diredfl-flag-mark-line prepend))                          ; Flag/mark lines
-        (list (concat "^\\([^\n " (char-to-string dired-del-marker) "]\\)") ; Flags, marks (except D)
-              '(1 diredfl-flag-mark prepend))
-
-        (list (concat "^\\([" (char-to-string dired-del-marker) "].*$\\)") ; Deletion-flagged lines
-              '(1 diredfl-deletion-file-name prepend))
-        (list (concat "^\\([" (char-to-string dired-del-marker) "]\\)") ; Deletion flags (D)
-              '(1 diredfl-deletion prepend))))
+        ;; known file suffixes
+        (list (concat "\\(" (concat (funcall #'regexp-opt (list ".txt" ".jpg")) "\\)[*]?$"))
+              1 '(:foreground "dark cyan") t)
+        ))
 
 ;; key_bindings to interact with audio player:
 ;; next -> forward
@@ -401,6 +333,55 @@
         (select-window window)
         (set-window-parameter window 'header-line-format 'none))
       ))))
+
+(defun parent-directories (file-name)
+  (let (parent-directories)
+    ;; find parent directories in the project;
+    (let ((file-name (file-name-directory (directory-file-name file-name))))
+      (if (and file-name
+               (string-match-p "/projects/" file-name))
+          (while (or (not (string-match-p "/projects/$" file-name)))
+            (push file-name parent-directories)
+            (setq file-name
+                  (file-name-directory (directory-file-name file-name)))))
+      parent-directories)))
+
+(defun parent-directories-update ()
+  (let ((main-file ""))
+    (mapcar
+     (lambda (window)
+       (let* ((buffer (window-buffer window))
+              (file-name (or (buffer-file-name buffer)
+                             (let ((dir (with-current-buffer buffer dired-directory)))
+                               (if dir (expand-file-name dir))))))
+         (when (and file-name
+                    (eq 'none (window-parameter window 'header-line-format))
+                    (string-lessp main-file file-name))
+           (setq main-file file-name))))
+     (window-list))
+
+    (let ((buffer (window-buffer (selected-window)))
+          (file-name (dired-get-filename nil t)))
+      (project-directory-side-window)
+      (dolist (directory (cdr (parent-directories main-file)))
+        (dired-goto-file directory)
+        (my-find-file))
+      (when (string-lessp "" main-file)
+        (dired-goto-file main-file)
+        (my-find-file))
+      (let ((window (get-buffer-window buffer)))
+        (if (window-live-p window)
+            (select-window window)))
+      (if file-name (dired-goto-file file-name)))))
+
+(add-hook 'post-command-hook (lambda ()
+                               (if (or (eq this-command 'kill-buffer)
+                                       (eq this-command 'delete-window))
+                                   (parent-directories-update))))
+
+(advice-add 'dired-revert :after
+            (lambda (&rest _)
+              (parent-directories-update)))
 
 ;; indicate modified state of a file in dired;
 (defun modified-indicator (file-name &optional remove)
