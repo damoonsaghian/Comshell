@@ -18,7 +18,7 @@ a data race happens when these three behaviors occur:
 to prevent sharing mutable data, we can abandon mutability like in Haskell;
 but since mutability is necessary any way, it introduces a complicated mechanism (Monads);
 
-another approach to deal with mutable data shared concurrently, is the one used in Pony;
+another approach to deal with concurrently shared mutable data, is the one used in Pony;
 "https://www.ponylang.io/"
 it doesn't abandon aliasing nor mutability,
   instead it controls them using reference capabilities;
