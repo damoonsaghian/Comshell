@@ -191,6 +191,21 @@
   (lambda () (interactive)
     (forward-line -1)))
 
+(defvar video-file-suffix (concat "\\.avif$\\|\\.jpg$\\|\\.png$\\|\\.gif$\\|\\.webp$\\|"
+                                  "\\.webm$\\|\\.mkv$\\|\\.mp4$\\|\\.mpg$\\|\\.flv$\\|\\.g$"))
+(defvar audio-file-suffix "\\.ogg$\\|\\.opus$\\|\\.mka$\\|\\.mp3$")
+(defvar media-file-suffix (concat video-file-suffix "\\|" audio-file-suffix))
+(defvar known-file-suffix (concat video-file-suffix "\\|" audio-file-suffix "\\|\\.txt$"))
+
+;; https://github.com/purcell/diredfl
+(nconc dired-font-lock-keywords
+       (list
+        ;; suffixes
+        '("[^ .]\\(\\.[^. /]+\\)$" 1 dired-ignored-face)
+        ;; media files
+        `(,(concat "\\([^\n]*\\)\\(" media-file-suffix "\\)") 1 dired-mark-face t)
+        ))
+
 (add-hook
  'dired-after-readin-hook
  (lambda ()
@@ -205,9 +220,11 @@
          (let ((filename (dired-get-filename nil t)))
            (when filename
              ;; hide the two spaces at the begining of each line in dired;
-             (set-text-properties (point) (1+ (point)) '(invisible t))
+             (let ((ov (make-overlay (point) (1+ (point)))))
+               (overlay-put ov 'invisible t))
              (dired-goto-file filename)
-             (set-text-properties (1- (point)) (point) '(invisible t))
+             (let ((ov (make-overlay (1- (point)) (point))))
+               (overlay-put ov 'invisible t))
 
              ;; if the corresponding buffer is modified, add a modified indicator;
              (let ((buffer (get-file-buffer filename)))
@@ -220,8 +237,9 @@
                      (overlay-put ov 'modified-indicator t)
                      (overlay-put ov 'before-string s))))
 
-             ;; hide known file extionsions;
-             (if (search-forward-regexp "[^ .]\\(\\.txt\\|\\.mp4\\)$" (line-end-position) t)
+             ;; hide known file suffixes;
+             (if (search-forward-regexp (concat "[^ .]\\(" known-file-suffix "\\)")
+                                        (line-end-position) t)
                  (let ((ov (make-overlay (match-beginning 1) (match-end 1))))
                    (overlay-put ov 'invisible t)))
              ))
@@ -231,12 +249,12 @@
 (advice-add 'dired-mark :after
             (lambda (_arg &optional _interactive)
               (save-excursion
-                (goto-char 1)
+                (goto-char (point-min))
                 (while (not (eobp))
-                  (let ((filename (dired-get-filename nil t))
-                        (inhibit-read-only t))
+                  (let ((filename (dired-get-filename nil t)))
                     (when filename
-                      (set-text-properties (point) (1+ (point)) '(invisible t))))
+                      (let ((ov (make-overlay (point) (1+ (point)))))
+                        (overlay-put ov 'invisible t))))
                   (forward-line 1)))))
 
 (require 'hl-line)
@@ -249,13 +267,6 @@
                               (if (and (eq this-command 'other-window)
                                        hl-line-overlay)
                                   (goto-char (overlay-start hl-line-overlay)))))
-
-;; https://github.com/purcell/diredfl
-(nconc dired-font-lock-keywords
-       (list
-        ;; suffixes
-        '("[^ .]\\(\\.[^. /]+\\)$" 1 dired-ignored-face)
-        ))
 
 ;; key_bindings to interact with audio player:
 ;; next -> forward
@@ -299,9 +310,12 @@
             (select-window window)
             (set-window-parameter window 'header-line-format 'none))))
 
-       ;((string-match-p "\\.m/?$" file-name)
-        ;; view in overlay;
-        ;)
+       ;; ((string-match-p "\\.mp4/?$" file-name)
+       ;;  ;; view in overlay;
+       ;; )
+       ;; ((string-match-p "\\.mp3/?$" file-name)
+       ;;  ;; tell overlay to play the file;
+       ;; )
 
        (t
         (let* ((buffer (dired-noselect file-name))
@@ -312,15 +326,13 @@
           (select-window window)
           (set-window-parameter window 'header-line-format 'none)))))
 
-     ((string-match-p (concat "\\.avif$\\|\\.jpg$\\|\\.png$\\|\\.gif$\\|\\.webp\\|"
-                              "\\.webm$\\|\\.mkv$\\|\\.mp4$\\|\\.mpg$\\|\\.flv$")
-                      file-name)
+     ((string-match-p video-file-suffix file-name)
       ;; view in overlay;
 
       (call-process "xdg-open" nil 0 nil file-name)
       )
 
-     ((string-match-p "\\.ogg$\\|\\.opus$\\|\\.mka$\\|\\.mp3$" file-name)
+     ((string-match-p audio-file-suffix file-name)
       ;; tell overlay to play the file;
 
       (call-process "xdg-open" nil 0 nil file-name)
