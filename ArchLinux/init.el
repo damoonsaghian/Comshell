@@ -218,7 +218,13 @@
                          (ov (make-overlay (point) (1+ (point)))))
                      (put-text-property 0 1 'display '(left-fringe filled-rectangle error) s)
                      (overlay-put ov 'modified-indicator t)
-                     (overlay-put ov 'before-string s))))))
+                     (overlay-put ov 'before-string s))))
+
+             ;; hide known file extionsions;
+             (if (search-forward-regexp "[^ .]\\(\\.txt\\|\\.mp4\\)$" (line-end-position) t)
+                 (let ((ov (make-overlay (match-beginning 1) (match-end 1))))
+                   (overlay-put ov 'invisible t)))
+             ))
          (forward-line 1))))))
 
 ;; hide markers
@@ -245,15 +251,10 @@
                                   (goto-char (overlay-start hl-line-overlay)))))
 
 ;; https://github.com/purcell/diredfl
-(set-face-attribute 'dired-ignored nil :foreground "#FFFFFF")
 (nconc dired-font-lock-keywords
        (list
         ;; suffixes
-        '("[^ .]\\(\\.[^. /]+\\)$" 1 dired-mark-face)
-
-        ;; known file suffixes
-        (list (concat "\\(" (concat (funcall #'regexp-opt (list ".txt" ".jpg")) "\\)[*]?$"))
-              1 'dired-ignored-face t)
+        '("[^ .]\\(\\.[^. /]+\\)$" 1 dired-ignored-face)
         ))
 
 ;; key_bindings to interact with audio player:
