@@ -203,7 +203,12 @@
         ;; suffixes
         '("[^ .]\\(\\.[^. /]+\\)$" 1 dired-ignored-face)
         ;; media files
-        `(,(concat "\\([^\n]*\\)\\(" media-file-suffix "\\)") 1 dired-mark-face t)
+        `(,(concat "\\([^\n]*\\)\\(" media-file-suffix "\\)") 1 dired-mark-face prepend)
+        ;; marked files
+        `(,(concat "^\\([^\n " (char-to-string dired-del-marker) "].*$\\)")
+          1 dired-marked-face prepend)
+        `(,(concat "^\\([" (char-to-string dired-del-marker) "].*$\\)")
+          1 dired-flagged-face prepend)
         ))
 
 (add-hook
@@ -235,7 +240,22 @@
                          (ov (make-overlay (point) (1+ (point)))))
                      (put-text-property 0 1 'display '(left-fringe filled-rectangle error) s)
                      (overlay-put ov 'modified-indicator t)
-                     (overlay-put ov 'before-string s))))
+                     (overlay-put ov 'before-string s))
+                 (when (file-directory-p filename)
+                   (dolist (_buffer (seq-filter (lambda (buffer)
+                                                  (let ((f (buffer-file-name buffer)))
+                                                    (and (buffer-modified-p buffer)
+                                                         f
+                                                         (not (file-directory-p f))
+                                                         (string-prefix-p
+                                                          (file-name-as-directory filename)
+                                                          (expand-file-name f)))))
+                                                (buffer-list)))
+                     (let ((s "x")
+                           (ov (make-overlay (point) (1+ (point)))))
+                       (put-text-property 0 1 'display '(left-fringe filled-rectangle error) s)
+                       (overlay-put ov 'modified-indicator t)
+                       (overlay-put ov 'before-string s))))))
 
              ;; hide known file suffixes;
              (if (search-forward-regexp (concat "[^ .]\\(" known-file-suffix "\\)")
