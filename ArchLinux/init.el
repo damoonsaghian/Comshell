@@ -192,8 +192,8 @@
     (forward-line -1)))
 
 (defvar video-file-suffix (concat "\\.avif$\\|\\.jpg$\\|\\.png$\\|\\.gif$\\|\\.webp$\\|"
-                                  "\\.webm$\\|\\.mkv$\\|\\.mp4$\\|\\.mpg$\\|\\.flv$\\|\\.g$"))
-(defvar audio-file-suffix "\\.ogg$\\|\\.opus$\\|\\.mka$\\|\\.mp3$")
+                                  "\\.mp4$\\|\\.mkv$\\|\\.webm$\\|\\.mpg$\\|\\.flv$\\|\\.g$"))
+(defvar audio-file-suffix "\\.opus$\\|\\.ogg$\\|\\.mka$\\|\\.mp3$")
 (defvar media-file-suffix (concat video-file-suffix "\\|" audio-file-suffix))
 (defvar known-file-suffix (concat video-file-suffix "\\|" audio-file-suffix "\\|\\.txt$"))
 
@@ -268,11 +268,6 @@
                                        hl-line-overlay)
                                   (goto-char (overlay-start hl-line-overlay)))))
 
-;; key_bindings to interact with audio player:
-;; next -> forward
-;; back -> backward
-;; space -> pause/play
-
 ;; for copy_paste mechanism:
 ;;   https://emacs.stackexchange.com/questions/39116/simple-ways-to-copy-paste-files-and-directories-between-dired-buffers
 ;;   https://emacs.stackexchange.com/questions/17599/current-path-in-dired-or-dired-to-clipboard
@@ -311,10 +306,10 @@
             (set-window-parameter window 'header-line-format 'none))))
 
        ;; ((string-match-p "\\.mp4/?$" file-name)
-       ;;  ;; view in overlay;
+       ;;  ;; view the files in overlay;
        ;; )
        ;; ((string-match-p "\\.mp3/?$" file-name)
-       ;;  ;; tell overlay to play the file;
+       ;;  ;; play audio files;
        ;; )
 
        (t
@@ -333,7 +328,12 @@
       )
 
      ((string-match-p audio-file-suffix file-name)
-      ;; tell overlay to play the file;
+      ;; play audio file;
+      ;; https://www.gnu.org/software/emms/
+      ;; https://github.com/mihaiolteanu/vuiet
+      ;; https://github.com/jorenvo/simple-mpc
+      ;; https://github.com/pft/mingus
+      ;; https://github.com/mpdel/mpdel
 
       (call-process "xdg-open" nil 0 nil file-name)
       )
@@ -388,14 +388,7 @@
             (select-window window)))
       (if file-name (dired-goto-file file-name)))))
 
-(add-hook 'post-command-hook (lambda ()
-                               (if (or (eq this-command 'kill-buffer)
-                                       (eq this-command 'delete-window))
-                                   (parent-directories-update))))
-
-(advice-add 'dired-revert :after
-            (lambda (&rest _)
-              (parent-directories-update)))
+(advice-add 'dired-revert :after (lambda (&rest _) (parent-directories-update)))
 
 ;; indicate modified state of a file in dired;
 (defun modified-indicator (file-name &optional remove)
