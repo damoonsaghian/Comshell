@@ -84,28 +84,19 @@
 (add-to-list 'window-persistent-parameters '(window-side . writable))
 (add-to-list 'window-persistent-parameters '(window-slot . writable))
 (add-to-list 'window-persistent-parameters '(no-delete-other-windows . writable))
-(add-to-list 'window-persistent-parameters '(mode-line-format . writable))
+(add-to-list 'window-persistent-parameters '(header-line-format . writable))
 
 (setq-default mode-line-format nil)
+(set-face-attribute 'header-line nil :foreground "#333333" :background "#dddddd")
 (setq-default header-line-format
               '((:eval (if (and buffer-file-name (buffer-modified-p))
-                           (propertize "▉" 'face '(:foreground "red"))))
+                           (propertize "▊" 'face '(:foreground "red"))))
                 (:eval (propertize " " 'display '((space :align-to 0))))
-                (:eval (if (eq 'none (window-parameter nil 'mode-line-format))
-                           (replace-regexp-in-string
-                            known-file-suffix ""
-                            (if (buffer-file-name)
-                                (file-name-nondirectory (buffer-file-name))
-                              (file-name-nondirectory (directory-file-name default-directory))))
-                         (or buffer-file-truename dired-directory (buffer-name))))
-                " "
-                (:eval (if (and (equal (window-start) (point-min)) (equal (window-end) (point-max)))
-                           nil
-                         (propertize "%q" 'face '(:foreground "dark cyan"))))))
-(set-face-attribute 'header-line nil :foreground "#333333" :background "#dddddd")
+                (:eval (or buffer-file-truename dired-directory (buffer-name)))))
 
 (scroll-bar-mode -1)
-;;(setq-default indicate-buffer-boundaries '((up . left) (down . left)))
+;(if (and (equal (window-start) (point-min)) (equal (window-end) (point-max)))
+;    nil)
 
 ;; never recenter point;
 (setq scroll-conservatively 101)
@@ -317,7 +308,7 @@
               (set-window-parameter window 'no-delete-other-windows t)
               (set-window-dedicated-p window t)
               (select-window window)
-              (set-window-parameter window 'mode-line-format 'none)
+              (set-window-parameter window 'header-line-format 'none)
               ;; https://lars.ingebrigtsen.no/2011/04/12/emacs-movie-browser/
               ;; https://github.com/larsmagne/movie.el
               )
@@ -328,7 +319,7 @@
                           `((side . left) (slot . ,slot) (window-width . 0.2)))))
             (set-window-parameter window 'no-delete-other-windows t)
             (select-window window)
-            (set-window-parameter window 'mode-line-format 'none))))
+            (set-window-parameter window 'header-line-format 'none))))
 
        ;; ((string-match-p "\\.mp4/?$" file-name)
        ;;  ;; view the files in overlay;
@@ -344,7 +335,7 @@
           (set-window-parameter window 'no-delete-other-windows t)
           (set-window-dedicated-p window t)
           (select-window window)
-          (set-window-parameter window 'mode-line-format 'none)))))
+          (set-window-parameter window 'header-line-format 'none)))))
 
      ((string-match-p video-file-suffix file-name)
       ;; view in overlay;
@@ -370,7 +361,7 @@
         (set-window-parameter window 'no-delete-other-windows t)
         (set-window-dedicated-p window t)
         (select-window window)
-        (set-window-parameter window 'mode-line-format 'none))
+        (set-window-parameter window 'header-line-format 'none))
       ))))
 
 (defun parent-directories (file-name)
@@ -394,7 +385,7 @@
                              (let ((dir (with-current-buffer buffer dired-directory)))
                                (if dir (expand-file-name dir))))))
          (when (and file-name
-                    (eq 'none (window-parameter window 'mode-line-format))
+                    (eq 'none (window-parameter window 'header-line-format))
                     (string-lessp main-file file-name))
            (setq main-file file-name))))
      (window-list))
@@ -425,7 +416,7 @@
 ;; indicate modified state of a file in dired;
 (defun modified-indicator (file-name &optional remove)
   (when (and file-name
-             (eq 'none (window-parameter nil 'mode-line-format)))
+             (eq 'none (window-parameter nil 'header-line-format)))
     (dolist (directory (parent-directories file-name))
       (with-current-buffer (dired-noselect directory)
         (save-excursion
@@ -486,23 +477,22 @@
                   '((side . left) (slot . 0) (window-width . 0.2)))))
     (set-window-parameter window 'no-delete-other-windows t)
     (select-window window)
+
     ;; show project's views, and project's name, in the header line;
-    (set-window-parameter window 'header-line-format
-                          '((:eval (propertize " " 'display '((space :align-to 0))))
-                            (:eval (let ((views-num (length (eyebrowse--get 'window-configs))))
-                                     (if (< 1 views-num)
-                                         (propertize (format "%d/%d "
-                                                             (eyebrowse--get 'current-slot)
-                                                             views-num)
-                                                     'font-lock-face '(:foreground "forest green")))))
-                            (:eval (replace-regexp-in-string
-                                    "^[[:digit:]]+, " ""
-                                    (file-name-nondirectory (directory-file-name default-directory))))
-                            " "
-                            (:eval (if (and (equal (window-start) (point-min)) (equal (window-end) (point-max)))
-                                       nil
-                                     (propertize "%q" 'face '(:foreground "dark cyan"))))))
-    ))
+    (set-window-parameter
+     window
+     'header-line-format
+     '((:eval (propertize " " 'display '((space :align-to 0))))
+       (:eval (let ((views-num (length (eyebrowse--get 'window-configs))))
+                (if (< 1 views-num)
+                    (propertize (format "%d/%d "
+                                        (eyebrowse--get 'current-slot)
+                                        views-num)
+                                'font-lock-face '(:foreground "forest green")))))
+       (:eval (replace-regexp-in-string
+               "^[[:digit:]]+, " ""
+               (file-name-nondirectory (directory-file-name default-directory))))
+       ))))
 
 (defun project-open (project-dir)
   (setq project-directory project-dir)
