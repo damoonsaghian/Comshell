@@ -10,6 +10,14 @@
 (setq auto-save-default nil)
 (require 'seq)
 
+(setq-default mode-line-format nil)
+(set-face-attribute 'header-line nil :foreground "#333333" :background "#dddddd")
+(setq-default header-line-format
+              '((:eval (if (and buffer-file-name (buffer-modified-p))
+                           (propertize "▊" 'face '(:foreground "red"))))
+                (:eval (propertize " " 'display '((space :align-to 0))))
+                (:eval (or buffer-file-truename dired-directory (buffer-name)))))
+
 (defun delete-following-windows ()
   (let ((window (next-window)))
     (unless (or (equal window (frame-first-window))
@@ -32,12 +40,6 @@
                                   (set-window-prev-buffers nil nil))))
                   (other-window -1)))
 
-(setq window-divider-default-places t
-      window-divider-default-right-width 1
-      window-divider-default-bottom-width 1)
-(window-divider-mode 1)
-(set-face-attribute 'window-divider nil :foreground "#555555")
-
 (global-unset-key (kbd "C-w"))
 (global-set-key (kbd "C-w j")
                 (lambda () (interactive)
@@ -50,6 +52,7 @@
                       (goto-char (overlay-start hl-line-overlay)))
                   (other-window 1)))
 
+(setq even-window-sizes 'height-only)
 (setq window-combination-limit nil)
 (setq window-combination-resize t)
 
@@ -86,17 +89,21 @@
 (add-to-list 'window-persistent-parameters '(no-delete-other-windows . writable))
 (add-to-list 'window-persistent-parameters '(header-line-format . writable))
 
-(setq-default mode-line-format nil)
-(set-face-attribute 'header-line nil :foreground "#333333" :background "#dddddd")
-(setq-default header-line-format
-              '((:eval (if (and buffer-file-name (buffer-modified-p))
-                           (propertize "▊" 'face '(:foreground "red"))))
-                (:eval (propertize " " 'display '((space :align-to 0))))
-                (:eval (or buffer-file-truename dired-directory (buffer-name)))))
+(setq window-divider-default-places t
+      window-divider-default-right-width 1
+      window-divider-default-bottom-width 1)
+(window-divider-mode 1)
+(set-face-attribute 'window-divider nil :foreground "#555555")
 
-(scroll-bar-mode -1)
-;(if (and (equal (window-start) (point-min)) (equal (window-end) (point-max)))
-;    nil)
+(scroll-bar-mode 1)
+(setq scroll-bar-adjust-thumb-portion nil)
+(add-to-list 'default-frame-alist '(scroll-bar-width . 12))
+(add-hook 'pre-redisplay-functions
+          (lambda (window)
+            (if (and (eq (window-start window) (point-min))
+                     (eq (window-end window t) (point-max)))
+                (set-window-scroll-bars window 0 'right nil)
+              (set-window-scroll-bars window 12 'right nil))))
 
 ;; never recenter point;
 (setq scroll-conservatively 101)
@@ -431,11 +438,14 @@
 
 (add-hook 'first-change-hook (lambda () (modified-indicator buffer-file-name)))
 (add-hook 'after-save-hook (lambda () (modified-indicator buffer-file-name 'remove)))
-;(advice-add 'undo :after (lambda (&optional _arg)))
-(add-hook 'post-command-hook (lambda ()
-                               (when (and (eq this-command 'undo)
-                                          (not (buffer-modified-p)))
-                                 (modified-indicator buffer-file-name 'remove))))
+(advice-add 'undo :after (lambda (&optional _arg)
+                           (when (and (eq this-command 'undo)
+                                      (not (buffer-modified-p)))
+                             (modified-indicator buffer-file-name 'remove))))
+;; (add-hook 'post-command-hook (lambda ()
+;;                                (when (and (eq this-command 'undo)
+;;                                           (not (buffer-modified-p)))
+;;                                  (modified-indicator buffer-file-name 'remove))))
 
 (defun projects-list-find-file ()
   (interactive)
