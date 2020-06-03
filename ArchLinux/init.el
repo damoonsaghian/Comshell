@@ -136,6 +136,7 @@
 (setq blink-cursor-blinks 0)
 (setq-default cursor-in-non-selected-windows nil)
 ;; https://github.com/Malabarba/beacon
+;; https://github.com/alphapapa/scrollkeeper.el
 
 (add-to-list 'default-frame-alist '(foreground-color . "#333333"))
 (set-face-attribute 'fringe nil :background 'unspecified)
@@ -238,26 +239,7 @@
              (let ((ov (make-overlay (1- (point)) (point))))
                (overlay-put ov 'invisible t))
 
-             ;; if the corresponding buffer is modified, add a modified indicator;
-             ;; for directories this must be done for each modified buffer whose file's path
-             ;;   contains the directory;
-             (let ((buffer (get-file-buffer filename)))
-               (if (and buffer
-                        (not (file-directory-p filename))
-                        (buffer-modified-p buffer))
-                   (modified-indicator-add-overlay)
-                 (if (file-directory-p filename)
-                     (dolist (_buffer
-                              (seq-filter (lambda (buffer)
-                                            (let ((f (buffer-file-name buffer)))
-                                              (and (buffer-modified-p buffer)
-                                                   f
-                                                   (not (file-directory-p f))
-                                                   (string-prefix-p
-                                                    (file-name-as-directory filename)
-                                                    (expand-file-name f)))))
-                                          (buffer-list)))
-                       (modified-indicator-add-overlay)))))
+             (modified-indicator filename)
 
              ;; hide known file suffixes;
              (if (search-forward-regexp (concat "[^ .]\\(" known-file-suffix "\\)")
@@ -420,32 +402,57 @@
     (overlay-put ov 'modified-indicator t)
     (overlay-put ov 'before-string s)))
 
-;; indicate modified state of a file in dired;
-(defun modified-indicator (file-name &optional remove)
-  (when (and file-name
-             (eq 'none (window-parameter nil 'header-line-format)))
-    (dolist (directory (parent-directories file-name))
-      (with-current-buffer (dired-noselect directory)
-        (save-excursion
-          (dired-goto-file file-name)
-          (if remove
-              (let ((overlay (elt (seq-filter
-                                   (lambda (ov) (overlay-get ov 'modified-indicator))
-                                   (overlays-at (point)))
-                                  0)))
-                (if (overlayp overlay) (delete-overlay overlay)))
-            (modified-indicator-add-overlay)))))))
+;; if the corresponding buffer is modified, add a modified indicator overlay,
+;;   for the "filename" in its parent directory;
+;; for directories this must be done for each modified buffer whose file's path
+;;   contains the directory;
+(defun modified-indicator (filename)
+  (let ((buffer (get-file-buffer filename)))
+    (if (and buffer
+             (not (file-directory-p filename))
+             (buffer-modified-p buffer))
+        (modified-indicator-add-overlay)
+      (if (file-directory-p filename)
+          (dolist (_buffer
+                   (seq-filter (lambda (buffer)
+                                 (let ((f (buffer-file-name buffer)))
+                                   (and (buffer-modified-p buffer)
+                                        f
+                                        (not (file-directory-p f))
+                                        (string-prefix-p
+                                         (file-name-as-directory filename)
+                                         (expand-file-name f)))))
+                               (buffer-list)))
+            (modified-indicator-add-overlay))))))
 
-(add-hook 'first-change-hook (lambda () (modified-indicator buffer-file-name)))
-(add-hook 'after-save-hook (lambda () (modified-indicator buffer-file-name 'remove)))
+;; indicate modified state of a file in its root directories;
+(defun modified-indicator-all (file-name)
+  (when file-name
+    (dolist (directory (reverse (parent-directories file-name)))
+      ;; check if the dired buffer for "directory" exists;
+      (if (dired-find-buffer-nocreate (file-name-as-directory directory))
+          (with-current-buffer (dired-noselect directory)
+            (save-excursion
+              (dired-goto-file file-name)
+              ;; first remove all modified indicator overlays;
+              (dolist (ov (seq-filter
+                           (lambda (ov) (overlay-get ov 'modified-indicator))
+                           (overlays-at (point))))
+                (delete-overlay ov))
+              (modified-indicator file-name)
+              (setq file-name
+                    (file-name-directory (directory-file-name file-name)))))))))
+
+(add-hook 'first-change-hook
+          (lambda ()
+            ;; since "first-change-hook" runs before the change:
+            (run-with-idle-timer 0.5 nil
+                                 (lambda (file-name) (modified-indicator-all file-name))
+                                 buffer-file-name)))
+(add-hook 'after-save-hook (lambda () (modified-indicator-all buffer-file-name)))
 (advice-add 'undo :after (lambda (&optional _arg)
-                           (when (and (eq this-command 'undo)
-                                      (not (buffer-modified-p)))
-                             (modified-indicator buffer-file-name 'remove))))
-;; (add-hook 'post-command-hook (lambda ()
-;;                                (when (and (eq this-command 'undo)
-;;                                           (not (buffer-modified-p)))
-;;                                  (modified-indicator buffer-file-name 'remove))))
+                           (when (not (buffer-modified-p))
+                             (modified-indicator-all buffer-file-name))))
 
 (defun projects-list-find-file ()
   (interactive)
