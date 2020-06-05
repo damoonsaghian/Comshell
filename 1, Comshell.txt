@@ -77,7 +77,6 @@ in normal mode we can:
 , paste
 , undo, redo
 , find
-, enter insert mode;
+, space: insert mode;
 
-double space: creating tables
-auto_completion is done (after typing "space") only where there must be a predefined name;
+double space: auto_completion
