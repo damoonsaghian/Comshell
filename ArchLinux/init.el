@@ -8,15 +8,8 @@
 (setq create-lockfiles nil)
 (setq make-backup-files nil)
 (setq auto-save-default nil)
+(cua-mode 1)
 (require 'seq)
-
-(setq-default mode-line-format nil)
-(set-face-attribute 'header-line nil :foreground "#333333" :background "#dddddd")
-(setq-default header-line-format
-              '((:eval (if (and buffer-file-name (buffer-modified-p))
-                           (propertize "▊" 'face '(:foreground "red"))))
-                (:eval (propertize " " 'display '((space :align-to 0))))
-                (:eval (or buffer-file-truename dired-directory (buffer-name)))))
 
 (defun delete-following-windows ()
   (let ((window (next-window)))
@@ -30,27 +23,16 @@
                         (select-window window)
                         (display-about-screen)
                         (set-window-prev-buffers window nil))))))))
-(global-set-key (kbd "C-x 0")
-                (lambda () (interactive)
-                  (delete-following-windows)
-                  (condition-case nil
-                      (delete-window)
-                    (error (progn (set-window-dedicated-p nil nil)
-                                  (display-about-screen)
-                                  (set-window-prev-buffers nil nil))))
-                  (other-window -1)))
 
-(global-unset-key (kbd "C-w"))
-(global-set-key (kbd "C-w j")
-                (lambda () (interactive)
-                  (if hl-line-overlay
-                      (goto-char (overlay-start hl-line-overlay)))
-                  (other-window -1)))
-(global-set-key (kbd "C-w k")
-                (lambda () (interactive)
-                  (if hl-line-overlay
-                      (goto-char (overlay-start hl-line-overlay)))
-                  (other-window 1)))
+(defun my-delete-window () (interactive)
+       (delete-following-windows)
+       (condition-case nil
+           (delete-window)
+         (error (progn (set-window-dedicated-p nil nil)
+                       (display-about-screen)
+                       (set-window-prev-buffers nil nil))))
+       (other-window -1))
+(global-set-key [remap delete-window] 'my-delete-window)
 
 (setq even-window-sizes 'height-only)
 (setq window-combination-limit nil)
@@ -61,15 +43,6 @@
       `(("\\*Completions\\*" display-buffer-pop-up-window)
         ("\\*.*\\*" display-buffer-in-side-window
          (side . bottom) (slot . 0) (window-height . 0.3))))
-(global-set-key (kbd "C-x C-f")
-                (lambda (filename &optional _wildcards)
-                  (interactive
-                   (find-file-read-args "Find file: "
-                                        (confirm-nonexistent-file-or-buffer)))
-                  (let ((buffer (find-file-noselect filename)))
-                    (select-window
-                     (display-buffer-in-side-window
-                      buffer `((side . bottom) (slot . 0) (window-height . 0.3)))))))
 
 ;; when an empty side window remains from last session,
 ;;   it will be used to show buffers (and i don't know why);
@@ -88,6 +61,14 @@
 (add-to-list 'window-persistent-parameters '(window-slot . writable))
 (add-to-list 'window-persistent-parameters '(no-delete-other-windows . writable))
 (add-to-list 'window-persistent-parameters '(header-line-format . writable))
+
+(setq-default mode-line-format nil)
+(set-face-attribute 'header-line nil :foreground "#333333" :background "#dddddd")
+(setq-default header-line-format
+              '((:eval (if (and buffer-file-name (buffer-modified-p))
+                           (propertize "▊" 'face '(:foreground "red"))))
+                (:eval (propertize " " 'display '((space :align-to 0))))
+                (:eval (or buffer-file-truename dired-directory (buffer-name)))))
 
 (setq window-divider-default-places t
       window-divider-default-right-width 1
@@ -110,9 +91,8 @@
 ;; move point to top/bottom of buffer before signaling a scrolling error;
 (setq scroll-error-top-bottom t)
 
-;; paragraphs
 (setq paragraph-start "\n" paragraph-separate "\n")
-(defun next-paragraph ()
+(defun my-forward-paragraph ()
   (interactive)
   (unless (bobp) (left-char))
   (forward-paragraph)
@@ -121,8 +101,7 @@
     (redisplay t)
     (backward-paragraph)
     (right-char)))
-(global-set-key (kbd "C-<down>") 'next-paragraph)
-(defun previous-paragraph ()
+(defun my-backward-paragraph ()
   (interactive)
   (left-char)
   (backward-paragraph)
@@ -131,7 +110,6 @@
     (redisplay t)
     (backward-paragraph)
     (right-char)))
-(global-set-key (kbd "C-<up>") 'previous-paragraph)
 
 (setq blink-cursor-blinks 0)
 (setq-default cursor-in-non-selected-windows nil)
@@ -185,6 +163,7 @@
 (setq dired-omit-files "^target$\\|\\.lock$")
 (add-hook 'dired-mode-hook 'dired-omit-mode)
 
+(define-key dired-mode-map (kbd "s") 'isearch-forward)
 (define-key dired-mode-map [remap end-of-buffer]
   (lambda () (interactive)
     (end-of-buffer)
@@ -606,10 +585,6 @@
       " --eval '(select-frame-set-input-focus (selected-frame))'"
       " || emacs &")))
 
-(define-prefix-command 'project-map)
-(global-set-key (kbd "C-p") 'project-map)
-(global-set-key (kbd "C-p p") 'projects-list-activate)
-
 ;; =========================================================
 ;; package management
 
@@ -695,15 +670,6 @@
 (require-package 'eyebrowse)
 (eyebrowse-mode t)
 (setq eyebrowse-wrap-around t)
-(global-set-key (kbd "C-p j") 'eyebrowse-prev-window-config)
-(global-set-key (kbd "C-p k") 'eyebrowse-next-window-config)
-(global-set-key (kbd "C-p h") 'eyebrowse-last-window-config)
-(global-set-key (kbd "C-p q") 'eyebrowse-close-window-config)
-(unless (equal command-line-args '("emacs"))
-  (global-set-key (kbd "C-p n") (lambda ()
-    (interactive)
-    (eyebrowse-create-window-config)
-    (project-directory-side-window))))
 
 (add-hook 'eyebrowse-pre-window-switch-hook
           (lambda ()
@@ -731,95 +697,171 @@
            (if buffer-has-no-window (kill-buffer buffer))))))))
 
 ;; =============================================================
-;;modalka
-(cua-mode 1)
+;; modal keybinding
 
-;; modal key_bindings
+(require-package 'modalka)
+;; (add-to-list 'modalka-excluded-modes 'dired-mode)
+;; (add-to-list 'modalka-excluded-modes 'help-mode)
+;; (add-to-list 'modalka-excluded-modes 'Info-mode)
+(modalka-global-mode 1)
+
+;; (defun modal-buffer-p ()
+;;   (or (derived-mode-p 'text-mode 'prog-mode 'conf-mode)
+;;       (equal major-mode 'shell-mode)))
+;; (defun modalka--maybe-activate () (interactive)
+;;   (if (modal-buffer-p) (modalka-mode 1)))
+(global-set-key (kbd "<tab>") (lambda () (interactive) (modalka-mode 1)))
+
+(define-key modalka-mode-map (kbd "SPC")
+  (lambda () (interactive)
+    (modalka-mode -1)
+    (set-cursor-color "red")
+    ))
+(add-hook 'modalka-mode-hook (lambda () (set-cursor-color "black")))
+(add-hook 'buffer-list-update-hook
+          (lambda ()
+            (if (with-current-buffer (window-buffer (selected-window))
+                  (and ;;(modal-buffer-p)
+                       (not modalka-mode)))
+                (set-cursor-color "red")
+              (set-cursor-color "black"))))
+(set-face-attribute 'cursor nil :foreground "red")
+
+;; modalka-define-kbd is only for global keybindings
+;; local keybindings must be defined for each mode separately;
 ;; https://github.com/mrkkrp/modalka
-;; https://github.com/emacsorphanage/god-mode
-;(require-package 'modalka)
-;(defun modal-buffer-p ()
-;  (or (derived-mode-p 'text-mode 'prog-mode 'conf-mode)
-;      (equal major-mode 'shell-mode)))
-;(defun modalka--maybe-activate ()
-;  (if (modal-buffer-p) (modalka-mode 1)))
-;(add-hook 'modalka-mode-hook (lambda () (set-cursor-color "black")))
-;(add-hook 'buffer-list-update-hook
-;          (lambda ()
-;            (if (with-current-buffer (window-buffer (selected-window))
-;                  (and (not modalka-mode) (modal-buffer-p)))
-;                (set-cursor-color "red")
-;              (set-cursor-color "black"))))
-;(global-set-key (kbd "<escape>") (lambda () (interactive) (modalka--maybe-activate)))
-;(global-set-key (kbd "<tab>") (lambda () (interactive) (modalka--maybe-activate)))
-;(define-key modalka-mode-map (kbd "RET")
-;  (lambda ()
-;    (interactive)
-;    (modalka-mode -1)
-;    (set-cursor-color "red")))
-
-;(add-to-list 'modalka-excluded-modes 'dired-mode)
-;(add-to-list 'modalka-excluded-modes 'help-mode)
-;(add-to-list 'modalka-excluded-modes 'Info-mode)
-
 ;; https://stackoverflow.com/questions/19757612/how-to-redefine-a-key-inside-a-minibuffer-mode-map
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Prefix-Keys.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Key-Sequences.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Key-Sequence-Input.html
 ;; https://www.emacswiki.org/emacs/KeySequence
 
-;; modalka-define-kbd is only for global keybindings
-;; local keybindings must be defined for each mode separately;
-;(modalka-define-kbd "a" "C-a") ;; move-beginning-of-line
-;(modalka-define-kbd "b" "C-b") ;; backward-char
-;(modalka-define-kbd "c" "C-c") ;;
-;(modalka-define-kbd "e" "C-e") ;; move-end-of-line
+(define-key modalka-mode-map (kbd "j")
+  (lambda () (interactive)
+    (forward-same-syntax -1)
+    (if (eq ?\s (char-syntax
+                 (char-after (point))))
+        (forward-same-syntax -1))))
+(define-key modalka-mode-map (kbd "l")
+  (lambda () (interactive)
+    (forward-same-syntax)
+    (if (eq ?\s (char-syntax
+                 (char-before (point))))
+        (forward-same-syntax))))
+(define-key modalka-mode-map (kbd "i")
+  (lambda () (interactive) (forward-line -1)))
+(define-key modalka-mode-map (kbd "k") 'forward-line)
+
+(define-key dired-mode-map (kbd "f") nil)
+(define-prefix-command 'nav-map)
+(define-key modalka-mode-map (kbd "f") 'nav-map)
+(define-key modalka-mode-map (kbd "f i") 'my-backward-paragraph)
+(define-key modalka-mode-map (kbd "f k") 'my-forward-paragraph)
+(define-key modalka-mode-map (kbd "f j") 'beginning-of-buffer)
+(define-key modalka-mode-map (kbd "f l") 'end-of-buffer)
+
+(define-key modalka-mode-map (kbd "m")
+  (lambda () (interactive)
+    (if (eq major-mode 'dired-mode)
+        (dired-mark)
+      (cua-set-mark))))
+(modalka-define-kbd "x" (kbd "C-x"))
+(modalka-define-kbd "c" (kbd "C-c"))
+(define-key modalka-mode-map (kbd "v") 'cua-paste)
+(define-key modalka-mode-map (kbd "z") 'undo)
+
+;; "C-g"
+;; "C-h"
+;; kill-line
+;; "C-r" isearch-repeat-backward
+;; "C-u" universal-argument
+;; "C-1" (digit-argument 1)
+
+(modalka-define-kbd "a" "C-a") ;; move-beginning-of-line
+(modalka-define-kbd "b" "C-b") ;; backward-char
+;(modalka-define-kbd "c" "C-c")
+(modalka-define-kbd "e" "C-e") ;; move-end-of-line
 ;(modalka-define-kbd "f" "C-f") ;; forward-char
-;(modalka-define-kbd "g" "C-g") ;;
-;(modalka-define-kbd "h" "C-h") ;;
+(modalka-define-kbd "g" "C-g")
+(modalka-define-kbd "h" "C-h")
 ;(modalka-define-kbd "i" "C-i") ;; * indent-for-tab-command
 ;(modalka-define-kbd "j" "C-j") ;; * electric-newline-and-maybe-indent
 ;(modalka-define-kbd "k" "C-k") ;; * kill-line
 ;(modalka-define-kbd "l" "C-l") ;; * recenter-top-bottom
 ;(modalka-define-kbd "m" "C-SPC") ;; cua-set-mark
-;(modalka-define-kbd "n" "C-n") ;; next-line
-;(modalka-define-kbd "o" "C-o") ;; * open-line
-;(modalka-define-kbd "p" "C-p") ;; previous-line
-;(modalka-define-kbd "q" "C-q") ;; * quoted-insert
-;(modalka-define-kbd "r" "C-r") ;; isearch-repeat-backward
-;(modalka-define-kbd "s" "C-s") ;; isearch-forward
-;(modalka-define-kbd "t" "C-t") ;; * transpose-char
-;(modalka-define-kbd "u" "C-u") ;; universal-argument
+(modalka-define-kbd "n" "C-n") ;; next-line
+(modalka-define-kbd "o" "C-o") ;; * open-line
+(modalka-define-kbd "p" "C-p") ;; previous-line
+(modalka-define-kbd "q" "C-q") ;; * quoted-insert
+(modalka-define-kbd "r" "C-r") ;; isearch-repeat-backward
+(modalka-define-kbd "s" "C-s") ;; isearch-forward
+(modalka-define-kbd "t" "C-t") ;; * transpose-char
+(modalka-define-kbd "u" "C-u") ;; universal-argument
 ;(modalka-define-kbd "v" "C-v") ;; cua-paste
-;(modalka-define-kbd "w" "C-w") ;; * kill-region
-;(modalka-define-kbd "x" "C-x") ;;
-;(modalka-define-kbd "y" "C-y") ;; * cua-paste
+(modalka-define-kbd "w" "C-w") ;; * kill-region
+;(modalka-define-kbd "x" "C-x")
+(modalka-define-kbd "y" "C-y") ;; * cua-paste
 ;(modalka-define-kbd "z" "C-z") ;; undo
-;(modalka-define-kbd "1" "C-1") ;; (digit-argument 1)
-;(modalka-define-kbd "2" "C-2")
-;(modalka-define-kbd "3" "C-3")
-;(modalka-define-kbd "4" "C-4")
-;(modalka-define-kbd "5" "C-5")
-;(modalka-define-kbd "6" "C-6")
-;(modalka-define-kbd "7" "C-7")
-;(modalka-define-kbd "8" "C-8")
-;(modalka-define-kbd "9" "C-9")
-;(modalka-define-kbd "0" "C-0")
-;(modalka-define-kbd "," "C-,")
-;(modalka-define-kbd "_" "C-_") ;; * undo
-;(modalka-global-mode 1)
+(modalka-define-kbd "1" "C-1") ;; (digit-argument 1)
+(modalka-define-kbd "2" "C-2")
+(modalka-define-kbd "3" "C-3")
+(modalka-define-kbd "4" "C-4")
+(modalka-define-kbd "5" "C-5")
+(modalka-define-kbd "6" "C-6")
+(modalka-define-kbd "7" "C-7")
+(modalka-define-kbd "8" "C-8")
+(modalka-define-kbd "9" "C-9")
+(modalka-define-kbd "0" "C-0")
+(modalka-define-kbd "," "C-,")
+(modalka-define-kbd "_" "C-_") ;; * undo
+
+(define-key dired-mode-map (kbd "d") nil)
+(define-prefix-command 'window-map)
+(define-key modalka-mode-map (kbd "d") 'window-map)
+(define-key modalka-mode-map (kbd "d i")
+  (lambda () (interactive)
+    (if hl-line-overlay
+        (goto-char (overlay-start hl-line-overlay)))
+    (other-window -1)))
+(define-key modalka-mode-map (kbd "d k")
+  (lambda () (interactive)
+    (if hl-line-overlay
+        (goto-char (overlay-start hl-line-overlay)))
+    (other-window 1)))
+(define-key modalka-mode-map (kbd "d <backspace>") 'my-delete-window)
+(define-key modalka-mode-map (kbd "d /") 'my-delete-window)
+(define-key modalka-mode-map (kbd "d ;") 'delete-other-windows)
+(define-key modalka-mode-map (kbd "d d") 'projects-list-activate)
+
+(define-key modalka-mode-map (kbd "d j") 'eyebrowse-prev-window-config)
+(define-key modalka-mode-map (kbd "d l") 'eyebrowse-next-window-config)
+(define-key modalka-mode-map (kbd "d h") 'eyebrowse-last-window-config)
+(define-key modalka-mode-map (kbd "d q") 'eyebrowse-close-window-config)
+(define-key modalka-mode-map (kbd "d n")
+  (lambda () (interactive)
+    (eyebrowse-create-window-config)
+    (unless (equal command-line-args '("emacs"))
+      (project-directory-side-window))))
 
 (defun double-space-to-tab ()
   (interactive)
   (if (equal (char-before (point)) ?\s)
       (progn (delete-backward-char 1)
-             (execute-kbd-macro (kbd "<tab>")))
              ;; (call-interactively (key-binding "<tab>"))
+             ;; (execute-kbd-macro (kbd "<tab>"))
+             ;; (funcall (lookup-key keymap (kbd "TAB")))
+             (completion-at-point))
     (insert " ")))
-(define-key minibuffer-local-map (kbd "SPC") 'double-space-to-tab)
+(define-key minibuffer-local-map (kbd "SPC")
+  (lambda () (interactive)
+    (double-space-to-tab)))
 (require 'shell)
-(define-key minibuffer-local-shell-command-map (kbd "SPC") 'double-space-to-tab)
-(define-key shell-mode-map (kbd "SPC") 'double-space-to-tab)
+(define-key minibuffer-local-shell-command-map (kbd "SPC")
+  (lambda () (interactive)
+    (double-space-to-tab)))
+(define-key shell-mode-map (kbd "SPC")
+  (lambda () (interactive)
+    (double-space-to-tab)))
 
 (defun sleep ()
   (interactive)
