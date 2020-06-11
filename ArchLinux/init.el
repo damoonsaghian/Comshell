@@ -44,19 +44,6 @@
         ("\\*.*\\*" display-buffer-in-side-window
          (side . bottom) (slot . 0) (window-height . 0.3))))
 
-;; when an empty side window remains from last session,
-;;   it will be used to show buffers (and i don't know why);
-;; to avoid that:
-(add-hook 'kill-emacs-query-functions
-          (lambda ()
-            (mapcar
-             (lambda (window)
-               (if (or (eq (window-parameter window 'window-side) 'bottom)
-                       (eq (window-parameter window 'window-side) 'top))
-                   (delete-window window)))
-             (window-list))
-            t))
-
 (add-to-list 'window-persistent-parameters '(window-side . writable))
 (add-to-list 'window-persistent-parameters '(window-slot . writable))
 (add-to-list 'window-persistent-parameters '(no-delete-other-windows . writable))
@@ -117,11 +104,11 @@
 ;; https://github.com/alphapapa/scrollkeeper.el
 
 (add-to-list 'default-frame-alist '(foreground-color . "#333333"))
-(set-face-attribute 'fringe nil :background 'unspecified)
-(set-face-attribute 'highlight nil :background "#CCFFFF")
-(set-face-attribute 'region nil :background "#CCFFFF")
 (set-face-attribute 'default nil :family "Monospace" :height 105)
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
+(set-face-attribute 'highlight nil :background "#CCFFFF")
+(set-face-attribute 'region nil :background "#CCFFFF")
+(set-face-attribute 'fringe nil :background 'unspecified)
 
 (setq-default indent-tabs-mode nil)
 (setq-default truncate-lines t)
@@ -160,20 +147,24 @@
 (setq ls-lisp-ignore-case t)
 (require 'dired-x)
 (setq dired-omit-verbose nil)
-(setq dired-omit-files "^target$\\|\\.lock$")
+(setq dired-omit-files "\\.lock$")
 (add-hook 'dired-mode-hook 'dired-omit-mode)
 
-(define-key dired-mode-map (kbd "s") 'isearch-forward)
 (define-key dired-mode-map [remap end-of-buffer]
   (lambda () (interactive)
     (end-of-buffer)
     (if (eq (point) (point-max))
         (forward-line -1))))
+(define-key dired-mode-map [remap forward-line]
+  (lambda () (interactive)
+    (forward-line 1)
+    (when (eq (point) (point-max))
+      (forward-char -1))))
 (define-key dired-mode-map [remap next-line]
   (lambda () (interactive)
     (forward-line 1)
-    (if (eq (point) (point-max))
-        (forward-line -1))))
+    (when (eq (point) (point-max))
+      (forward-char -1))))
 (define-key dired-mode-map [remap previous-line]
   (lambda () (interactive)
     (forward-line -1)))
@@ -714,8 +705,9 @@
 
 (define-key modalka-mode-map (kbd "SPC")
   (lambda () (interactive)
-    (modalka-mode -1)
-    (set-cursor-color "red")
+    (when (not buffer-read-only)
+      (modalka-mode -1)
+      (set-cursor-color "red"))
     ))
 (add-hook 'modalka-mode-hook (lambda () (set-cursor-color "black")))
 (add-hook 'buffer-list-update-hook
@@ -763,7 +755,7 @@
 (define-key modalka-mode-map (kbd "m")
   (lambda () (interactive)
     (if (eq major-mode 'dired-mode)
-        (dired-mark)
+        (dired-mark nil)
       (cua-set-mark))))
 (modalka-define-kbd "x" (kbd "C-x"))
 (modalka-define-kbd "c" (kbd "C-c"))
@@ -792,7 +784,7 @@
 (modalka-define-kbd "n" "C-n") ;; next-line
 (modalka-define-kbd "o" "C-o") ;; * open-line
 (modalka-define-kbd "p" "C-p") ;; previous-line
-(modalka-define-kbd "q" "C-q") ;; * quoted-insert
+;(modalka-define-kbd "q" "C-q") ;; * quoted-insert
 (modalka-define-kbd "r" "C-r") ;; isearch-repeat-backward
 (modalka-define-kbd "s" "C-s") ;; isearch-forward
 (modalka-define-kbd "t" "C-t") ;; * transpose-char
@@ -900,6 +892,7 @@
 ;; (setq ido-everywhere t)
 ;; (ido-mode 1)
 ;; ido-ubiquitous, helm
+;; https://github.com/manateelazycat/snails
 
 ;; highlight-changes-mode
 ;; instead of highlighting create fringes;
