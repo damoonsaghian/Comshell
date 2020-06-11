@@ -169,13 +169,32 @@
   (lambda () (interactive)
     (forward-line -1)))
 
+;; for copy_paste mechanism:
+;;   https://emacs.stackexchange.com/questions/39116/simple-ways-to-copy-paste-files-and-directories-between-dired-buffers
+;;   https://emacs.stackexchange.com/questions/17599/current-path-in-dired-or-dired-to-clipboard
+;; async file operations in dired
+;;   https://github.com/jwiegley/emacs-async
+;;   https://truongtx.me/tmtxt-dired-async.html
+;;   https://github.com/jwiegley/emacs-async/blob/master/dired-async.el
+;; https://oremacs.com/2016/02/24/dired-rsync/
+
+(require 'hl-line)
+(add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
+;; before leaving a window, send the cursor back to the highlighted line (if there is any);
+(add-hook 'mouse-leave-buffer-hook (lambda ()
+  (if hl-line-overlay
+      (goto-char (overlay-start hl-line-overlay)))))
+(add-hook 'pre-command-hook (lambda ()
+                              (if (and (eq this-command 'other-window)
+                                       hl-line-overlay)
+                                  (goto-char (overlay-start hl-line-overlay)))))
+
 (defvar video-file-suffix (concat "\\.avif$\\|\\.jpg$\\|\\.png$\\|\\.gif$\\|\\.webp$\\|"
                                   "\\.mp4$\\|\\.mkv$\\|\\.webm$\\|\\.mpg$\\|\\.flv$\\|\\.g$"))
 (defvar audio-file-suffix "\\.opus$\\|\\.ogg$\\|\\.mka$\\|\\.mp3$")
 (defvar media-file-suffix (concat video-file-suffix "\\|" audio-file-suffix))
-(defvar known-file-suffix (concat video-file-suffix "\\|" audio-file-suffix "\\|\\.txt$"))
+(defvar known-file-suffix (concat media-file-suffix "\\|\\.txt$\\|\\.org$"))
 
-;; https://github.com/purcell/diredfl
 (nconc dired-font-lock-keywords
        (list
         ;; suffixes
@@ -230,26 +249,6 @@
                       (let ((ov (make-overlay (point) (1+ (point)))))
                         (overlay-put ov 'invisible t))))
                   (forward-line 1)))))
-
-(require 'hl-line)
-(add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
-;; before leaving a window, send the cursor back to the highlighted line (if there is any);
-(add-hook 'mouse-leave-buffer-hook (lambda ()
-  (if hl-line-overlay
-      (goto-char (overlay-start hl-line-overlay)))))
-(add-hook 'pre-command-hook (lambda ()
-                              (if (and (eq this-command 'other-window)
-                                       hl-line-overlay)
-                                  (goto-char (overlay-start hl-line-overlay)))))
-
-;; for copy_paste mechanism:
-;;   https://emacs.stackexchange.com/questions/39116/simple-ways-to-copy-paste-files-and-directories-between-dired-buffers
-;;   https://emacs.stackexchange.com/questions/17599/current-path-in-dired-or-dired-to-clipboard
-;; async file operations in dired
-;;   https://github.com/jwiegley/emacs-async
-;;   https://truongtx.me/tmtxt-dired-async.html
-;;   https://github.com/jwiegley/emacs-async/blob/master/dired-async.el
-;; https://oremacs.com/2016/02/24/dired-rsync/
 
 (defun my-find-file ()
   (interactive)
@@ -757,13 +756,24 @@
     (if (eq major-mode 'dired-mode)
         (dired-mark nil)
       (cua-set-mark))))
-(modalka-define-kbd "x" (kbd "C-x"))
-(modalka-define-kbd "c" (kbd "C-c"))
+(define-key modalka-mode-map (kbd "x") 'cua-cut-region)
+(define-key modalka-mode-map (kbd "c") 'cua-copy-region)
 (define-key modalka-mode-map (kbd "v") 'cua-paste)
 (define-key modalka-mode-map (kbd "z") 'undo)
+(modalka-define-kbd "w" "C-x C-s")
+(modalka-define-kbd "o" "C-x C-f")
 
-;; "C-g"
-;; "C-h"
+(define-key dired-mode-map (kbd "h") nil)
+(define-prefix-command 'help-map)
+(define-key modalka-mode-map (kbd "h") 'help-map)
+(modalka-define-kbd "h f" "C-h f")
+(modalka-define-kbd "h v" "C-h v")
+
+(define-key modalka-mode-map (kbd "q")
+  (lambda () (interactive)
+    (if buffer-read-only
+        (my-delete-window))))
+
 ;; kill-line
 ;; "C-r" isearch-repeat-backward
 ;; "C-u" universal-argument
@@ -771,27 +781,20 @@
 
 (modalka-define-kbd "a" "C-a") ;; move-beginning-of-line
 (modalka-define-kbd "b" "C-b") ;; backward-char
-;(modalka-define-kbd "c" "C-c")
 (modalka-define-kbd "e" "C-e") ;; move-end-of-line
 ;(modalka-define-kbd "f" "C-f") ;; forward-char
 (modalka-define-kbd "g" "C-g")
-(modalka-define-kbd "h" "C-h")
 ;(modalka-define-kbd "i" "C-i") ;; * indent-for-tab-command
 ;(modalka-define-kbd "j" "C-j") ;; * electric-newline-and-maybe-indent
 ;(modalka-define-kbd "k" "C-k") ;; * kill-line
 ;(modalka-define-kbd "l" "C-l") ;; * recenter-top-bottom
 ;(modalka-define-kbd "m" "C-SPC") ;; cua-set-mark
 (modalka-define-kbd "n" "C-n") ;; next-line
-(modalka-define-kbd "o" "C-o") ;; * open-line
 (modalka-define-kbd "p" "C-p") ;; previous-line
-;(modalka-define-kbd "q" "C-q") ;; * quoted-insert
 (modalka-define-kbd "r" "C-r") ;; isearch-repeat-backward
 (modalka-define-kbd "s" "C-s") ;; isearch-forward
 (modalka-define-kbd "t" "C-t") ;; * transpose-char
 (modalka-define-kbd "u" "C-u") ;; universal-argument
-;(modalka-define-kbd "v" "C-v") ;; cua-paste
-(modalka-define-kbd "w" "C-w") ;; * kill-region
-;(modalka-define-kbd "x" "C-x")
 (modalka-define-kbd "y" "C-y") ;; * cua-paste
 ;(modalka-define-kbd "z" "C-z") ;; undo
 (modalka-define-kbd "1" "C-1") ;; (digit-argument 1)
