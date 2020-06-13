@@ -8,7 +8,6 @@
 (setq create-lockfiles nil)
 (setq make-backup-files nil)
 (setq auto-save-default nil)
-(cua-mode 1)
 (require 'seq)
 
 (defun delete-following-windows ()
@@ -33,6 +32,18 @@
                        (set-window-prev-buffers nil nil))))
        (other-window -1))
 (global-set-key [remap delete-window] 'my-delete-window)
+(global-set-key (kbd "C-w") 'my-delete-window)
+
+(global-set-key (kbd "C-<prior>")
+  (lambda () (interactive)
+    (if hl-line-overlay
+        (goto-char (overlay-start hl-line-overlay)))
+    (other-window -1)))
+(global-set-key (kbd "C-<next>")
+  (lambda () (interactive)
+    (if hl-line-overlay
+        (goto-char (overlay-start hl-line-overlay)))
+    (other-window 1)))
 
 (setq even-window-sizes 'height-only)
 (setq window-combination-limit nil)
@@ -97,6 +108,8 @@
     (redisplay t)
     (backward-paragraph)
     (right-char)))
+(global-set-key (kbd "C-<up>") 'my-backward-paragraph)
+(global-set-key (kbd "C-<down>") 'my-forward-paragraph)
 
 (setq blink-cursor-blinks 0)
 (setq-default cursor-in-non-selected-windows nil)
@@ -110,6 +123,9 @@
 (set-face-attribute 'region nil :background "#CCFFFF")
 (set-face-attribute 'fringe nil :background 'unspecified)
 
+(cua-mode 1)
+(global-set-key (kbd "<tab>") 'completion-at-point)
+(global-set-key (kbd "C-S-q") 'kill-emacs)
 (setq-default indent-tabs-mode nil)
 (setq-default truncate-lines t)
 
@@ -169,9 +185,6 @@
   (lambda () (interactive)
     (forward-line -1)))
 
-;; for copy_paste mechanism:
-;;   https://emacs.stackexchange.com/questions/39116/simple-ways-to-copy-paste-files-and-directories-between-dired-buffers
-;;   https://emacs.stackexchange.com/questions/17599/current-path-in-dired-or-dired-to-clipboard
 ;; async file operations in dired
 ;;   https://github.com/jwiegley/emacs-async
 ;;   https://truongtx.me/tmtxt-dired-async.html
@@ -437,7 +450,7 @@
         " || "
         "emacs --eval '(project-open \"" file-name "\")' &")))))
 
-;; otherwise "select-frame-set-input-focus" above doesn't work properly;
+;; must add this, otherwise "select-frame-set-input-focus" above doesn't work properly;
 (add-hook 'focus-in-hook (lambda () (raise-frame)))
 
 (if (equal command-line-args '("emacs"))
@@ -574,6 +587,7 @@
       "emacsclient --socket-name projects-list"
       " --eval '(select-frame-set-input-focus (selected-frame))'"
       " || emacs &")))
+(global-set-key (kbd "M-RET") 'projects-list-activate)
 
 ;; =========================================================
 ;; package management
@@ -654,7 +668,7 @@
                               (setq last-command 'ignore)
                               (setq saved-undo-list buffer-undo-list))))
 
-;; ===========================================================
+;; =========================================================================
 ;; eyebrowse
 
 (require-package 'eyebrowse)
@@ -686,177 +700,17 @@
                                                       (setq buffer-has-no-window nil)))))))
            (if buffer-has-no-window (kill-buffer buffer))))))))
 
-;; =============================================================
-;; modal keybinding
-
-(require-package 'modalka)
-;; (add-to-list 'modalka-excluded-modes 'dired-mode)
-;; (add-to-list 'modalka-excluded-modes 'help-mode)
-;; (add-to-list 'modalka-excluded-modes 'Info-mode)
-(modalka-global-mode 1)
-
-;; (defun modal-buffer-p ()
-;;   (or (derived-mode-p 'text-mode 'prog-mode 'conf-mode)
-;;       (equal major-mode 'shell-mode)))
-;; (defun modalka--maybe-activate () (interactive)
-;;   (if (modal-buffer-p) (modalka-mode 1)))
-(global-set-key (kbd "<tab>") (lambda () (interactive) (modalka-mode 1)))
-
-(define-key modalka-mode-map (kbd "SPC")
-  (lambda () (interactive)
-    (when (not buffer-read-only)
-      (modalka-mode -1)
-      (set-cursor-color "red"))
-    ))
-(add-hook 'modalka-mode-hook (lambda () (set-cursor-color "black")))
-(add-hook 'buffer-list-update-hook
-          (lambda ()
-            (if (with-current-buffer (window-buffer (selected-window))
-                  (and ;;(modal-buffer-p)
-                       (not modalka-mode)))
-                (set-cursor-color "red")
-              (set-cursor-color "black"))))
-(set-face-attribute 'cursor nil :foreground "red")
-
-;; modalka-define-kbd is only for global keybindings
-;; local keybindings must be defined for each mode separately;
-;; https://github.com/mrkkrp/modalka
-;; https://stackoverflow.com/questions/19757612/how-to-redefine-a-key-inside-a-minibuffer-mode-map
-;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Prefix-Keys.html
-;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Key-Sequences.html
-;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Key-Sequence-Input.html
-;; https://www.emacswiki.org/emacs/KeySequence
-
-(define-key modalka-mode-map (kbd "j")
-  (lambda () (interactive)
-    (forward-same-syntax -1)
-    (if (eq ?\s (char-syntax
-                 (char-after (point))))
-        (forward-same-syntax -1))))
-(define-key modalka-mode-map (kbd "l")
-  (lambda () (interactive)
-    (forward-same-syntax)
-    (if (eq ?\s (char-syntax
-                 (char-before (point))))
-        (forward-same-syntax))))
-(define-key modalka-mode-map (kbd "i")
-  (lambda () (interactive) (forward-line -1)))
-(define-key modalka-mode-map (kbd "k") 'forward-line)
-
-(define-key dired-mode-map (kbd "f") nil)
-(define-prefix-command 'nav-map)
-(define-key modalka-mode-map (kbd "f") 'nav-map)
-(define-key modalka-mode-map (kbd "f i") 'my-backward-paragraph)
-(define-key modalka-mode-map (kbd "f k") 'my-forward-paragraph)
-(define-key modalka-mode-map (kbd "f j") 'beginning-of-buffer)
-(define-key modalka-mode-map (kbd "f l") 'end-of-buffer)
-
-(define-key modalka-mode-map (kbd "m")
-  (lambda () (interactive)
-    (if (eq major-mode 'dired-mode)
-        (dired-mark nil)
-      (cua-set-mark))))
-(define-key modalka-mode-map (kbd "x") 'cua-cut-region)
-(define-key modalka-mode-map (kbd "c") 'cua-copy-region)
-(define-key modalka-mode-map (kbd "v") 'cua-paste)
-(define-key modalka-mode-map (kbd "z") 'undo)
-(modalka-define-kbd "w" "C-x C-s")
-(modalka-define-kbd "o" "C-x C-f")
-
-(define-key dired-mode-map (kbd "h") nil)
-(define-prefix-command 'help-map)
-(define-key modalka-mode-map (kbd "h") 'help-map)
-(modalka-define-kbd "h f" "C-h f")
-(modalka-define-kbd "h v" "C-h v")
-
-(define-key modalka-mode-map (kbd "q")
-  (lambda () (interactive)
-    (if buffer-read-only
-        (my-delete-window))))
-
-;; kill-line
-;; "C-r" isearch-repeat-backward
-;; "C-u" universal-argument
-;; "C-1" (digit-argument 1)
-
-(modalka-define-kbd "a" "C-a") ;; move-beginning-of-line
-(modalka-define-kbd "b" "C-b") ;; backward-char
-(modalka-define-kbd "e" "C-e") ;; move-end-of-line
-;(modalka-define-kbd "f" "C-f") ;; forward-char
-(modalka-define-kbd "g" "C-g")
-;(modalka-define-kbd "i" "C-i") ;; * indent-for-tab-command
-;(modalka-define-kbd "j" "C-j") ;; * electric-newline-and-maybe-indent
-;(modalka-define-kbd "k" "C-k") ;; * kill-line
-;(modalka-define-kbd "l" "C-l") ;; * recenter-top-bottom
-;(modalka-define-kbd "m" "C-SPC") ;; cua-set-mark
-(modalka-define-kbd "n" "C-n") ;; next-line
-(modalka-define-kbd "p" "C-p") ;; previous-line
-(modalka-define-kbd "r" "C-r") ;; isearch-repeat-backward
-(modalka-define-kbd "s" "C-s") ;; isearch-forward
-(modalka-define-kbd "t" "C-t") ;; * transpose-char
-(modalka-define-kbd "u" "C-u") ;; universal-argument
-(modalka-define-kbd "y" "C-y") ;; * cua-paste
-;(modalka-define-kbd "z" "C-z") ;; undo
-(modalka-define-kbd "1" "C-1") ;; (digit-argument 1)
-(modalka-define-kbd "2" "C-2")
-(modalka-define-kbd "3" "C-3")
-(modalka-define-kbd "4" "C-4")
-(modalka-define-kbd "5" "C-5")
-(modalka-define-kbd "6" "C-6")
-(modalka-define-kbd "7" "C-7")
-(modalka-define-kbd "8" "C-8")
-(modalka-define-kbd "9" "C-9")
-(modalka-define-kbd "0" "C-0")
-(modalka-define-kbd "," "C-,")
-(modalka-define-kbd "_" "C-_") ;; * undo
-
-(define-key dired-mode-map (kbd "d") nil)
-(define-prefix-command 'window-map)
-(define-key modalka-mode-map (kbd "d") 'window-map)
-(define-key modalka-mode-map (kbd "d i")
-  (lambda () (interactive)
-    (if hl-line-overlay
-        (goto-char (overlay-start hl-line-overlay)))
-    (other-window -1)))
-(define-key modalka-mode-map (kbd "d k")
-  (lambda () (interactive)
-    (if hl-line-overlay
-        (goto-char (overlay-start hl-line-overlay)))
-    (other-window 1)))
-(define-key modalka-mode-map (kbd "d <backspace>") 'my-delete-window)
-(define-key modalka-mode-map (kbd "d /") 'my-delete-window)
-(define-key modalka-mode-map (kbd "d ;") 'delete-other-windows)
-(define-key modalka-mode-map (kbd "d d") 'projects-list-activate)
-
-(define-key modalka-mode-map (kbd "d j") 'eyebrowse-prev-window-config)
-(define-key modalka-mode-map (kbd "d l") 'eyebrowse-next-window-config)
-(define-key modalka-mode-map (kbd "d h") 'eyebrowse-last-window-config)
-(define-key modalka-mode-map (kbd "d q") 'eyebrowse-close-window-config)
-(define-key modalka-mode-map (kbd "d n")
+(global-set-key (kbd "M-<up>") 'eyebrowse-prev-window-config)
+(global-set-key (kbd "M-<down>") 'eyebrowse-next-window-config)
+(global-set-key (kbd "M-<left>") 'eyebrowse-last-window-config)
+(global-set-key (kbd "M-w") 'eyebrowse-close-window-config)
+(global-set-key (kbd "M-<right>")
   (lambda () (interactive)
     (eyebrowse-create-window-config)
     (unless (equal command-line-args '("emacs"))
       (project-directory-side-window))))
 
-(defun double-space-to-tab ()
-  (interactive)
-  (if (equal (char-before (point)) ?\s)
-      (progn (delete-backward-char 1)
-             ;; (call-interactively (key-binding "<tab>"))
-             ;; (execute-kbd-macro (kbd "<tab>"))
-             ;; (funcall (lookup-key keymap (kbd "TAB")))
-             (completion-at-point))
-    (insert " ")))
-(define-key minibuffer-local-map (kbd "SPC")
-  (lambda () (interactive)
-    (double-space-to-tab)))
-(require 'shell)
-(define-key minibuffer-local-shell-command-map (kbd "SPC")
-  (lambda () (interactive)
-    (double-space-to-tab)))
-(define-key shell-mode-map (kbd "SPC")
-  (lambda () (interactive)
-    (double-space-to-tab)))
+;; =====================================================================
 
 (defun sleep ()
   (interactive)
