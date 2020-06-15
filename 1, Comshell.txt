@@ -1,18 +1,13 @@
 = command based user interface
-command based user interfaces (using gesture, voice, keyboard) are
+command based user interfaces (using keyboard, voice, gesture) are
   faster, more convenient and more powerful,
   than pointer based user interfaces (using mouse, touch, pen)
 pointer based interface seems appealing at first sight, because of its discoverability;
 but with simple uniform GUI (ie the oposite of what we see in websites),
   there is no need for a pointer based user interface;
 
-touch based interfaces can still be useful in simple or special applications;
-touch interface has an additional problem:
- since interaction at a distance is not possible, one must always carry the whole system;
-
-a muli_touch touchpad can simulate key presses on a keyboard;
-it can also have a separate mode to operate as a mouse;
-for keyboards we either need a lot of keys, or we have to use modal editing (like in Vim);
+touch interface has an additional problem: interaction at a distance is not possible;
+but it can still be useful in simple or special applications;
 
 detection of voice commands is a relatively simple process (compared to general speech recognition),
   because we only need to match against a relatively small set of commands;
@@ -21,6 +16,22 @@ also it is better to put battery and transmitter of the headset in a separate un
   that can be put in the pocket;
   this makes the headset lighter and safer;
 
+for those who neither can use all their fingers, nor can talk,
+  gesture based (2d) input can be implemented;
+
+".data/keyboard.png"
+, two commas -> ;
+, ";" followed by comma -> .
+, comma followed by "(" -> {
+, ";" followed by "(" -> [
+, comma followed by "c" followed by space -> : (followed by space)
+, comma followed by "psi" followed by comma -> ψ
+, "_ab_c" then two underscores -> AbC
+, "__ab_c" then two underscores -> __ab_c__
+"https://github.com/adereth/dactyl-keyboard"
+Kinesis Advantage 2 keyboard
+"http://www.allthingsergo.com/the-best-ergonomic-mechanical-keyboards/"
+
 = Comshell
 Comshell is a unified computing environment, utilizing command based user interface;
 
@@ -28,7 +39,7 @@ Comshell is a unified computing environment, utilizing command based user interf
 
 projects are directories inside "~/projects/";
 list of all projects will appear in a floating layer, at the center of screen;
-list of all files in the project will be displayed in a tree_view at the left;
+list of files in the project will be displayed in the left side_bar;
 we can have views of different locations in a project (even of the same file);
 
 text files will be opened in a text editor;
@@ -50,7 +61,7 @@ projects in external disks (inside a root directory named "projects"),
 at the bottom, there is a status_bar showing messages at the left, and system status at the right;
 system status: network, CPU and RAM usage, year-month-day week_day AM/PM hour:minute
 
-gestures to:
+keybindings to:
 , move the cursor to the next or previous character or word;
 , move the cursor to the next or previous lines or table cells;
 , move the cursor to the next or previous paragraph;
@@ -58,4 +69,5 @@ gestures to:
 , paste
 , undo
 , find
+, backspace
 , auto_completion
