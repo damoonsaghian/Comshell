@@ -61,7 +61,11 @@ projects in external disks (inside a root directory named "projects"),
 at the bottom, there is a status_bar showing messages at the left, and system status at the right;
 system status: network, CPU and RAM usage, year-month-day week_day AM/PM hour:minute
 
-keybindings to:
+modal key_bindings;
+modes (normal mode and insert mode) must be visually distinctive;
+press "esc" to go to normal mode;
+in normal mode we can:
+, press "space" to go to insert mode;
 , move the cursor to the next or previous character or word;
 , move the cursor to the next or previous lines or table cells;
 , move the cursor to the next or previous paragraph;
@@ -69,5 +73,5 @@ keybindings to:
 , paste
 , undo
 , find
-, backspace
-, auto_completion
+
+double space: auto_completion

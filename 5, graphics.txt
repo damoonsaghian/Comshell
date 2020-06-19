@@ -66,5 +66,6 @@ proportional font for code:
   and easily distinguishable characters
   while allowing each character to take up the space that it needs
 "http://input.fontbureau.com/info/"
-two spaces -> elastic blocks
-"http://nickgravgaard.com/elastic-tabstops/"
+for proportional fonts, we can't use spaces for text alignment;
+elastic tabstops may help: "http://nickgravgaard.com/elastic-tabstops/";
+but i think, text alignment is a bad idea, in general;
