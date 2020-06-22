@@ -8,6 +8,7 @@
 (setq create-lockfiles nil)
 (setq make-backup-files nil)
 (setq auto-save-default nil)
+(cua-mode 1)
 (require 'seq)
 
 (defun delete-following-windows ()
@@ -32,18 +33,6 @@
                        (set-window-prev-buffers nil nil))))
        (other-window -1))
 (global-set-key [remap delete-window] 'my-delete-window)
-(global-set-key (kbd "C-w") 'my-delete-window)
-
-(global-set-key (kbd "C-<prior>")
-  (lambda () (interactive)
-    (if hl-line-overlay
-        (goto-char (overlay-start hl-line-overlay)))
-    (other-window -1)))
-(global-set-key (kbd "C-<next>")
-  (lambda () (interactive)
-    (if hl-line-overlay
-        (goto-char (overlay-start hl-line-overlay)))
-    (other-window 1)))
 
 (setq even-window-sizes 'height-only)
 (setq window-combination-limit nil)
@@ -108,13 +97,11 @@
     (redisplay t)
     (backward-paragraph)
     (right-char)))
-(global-set-key (kbd "C-<up>") 'my-backward-paragraph)
-(global-set-key (kbd "C-<down>") 'my-forward-paragraph)
 
-(setq blink-cursor-blinks 0)
+(blink-cursor-mode 0)
+(set-face-attribute 'cursor nil :background "forest green")
+(add-to-list 'default-frame-alist '(cursor-type . bar))
 (setq-default cursor-in-non-selected-windows nil)
-;; https://github.com/Malabarba/beacon
-;; https://github.com/alphapapa/scrollkeeper.el
 
 (add-to-list 'default-frame-alist '(foreground-color . "#333333"))
 (set-face-attribute 'default nil :family "Monospace" :height 105)
@@ -123,9 +110,7 @@
 (set-face-attribute 'region nil :background "#CCFFFF")
 (set-face-attribute 'fringe nil :background 'unspecified)
 
-(cua-mode 1)
-(global-set-key (kbd "<tab>") 'completion-at-point)
-(global-set-key (kbd "C-S-q") 'kill-emacs)
+(setq backward-delete-char-untabify-method 'hungry)
 (setq-default indent-tabs-mode nil)
 (setq-default truncate-lines t)
 
@@ -184,6 +169,18 @@
 (define-key dired-mode-map [remap previous-line]
   (lambda () (interactive)
     (forward-line -1)))
+
+(define-key dired-mode-map (kbd "C-SPC")
+  (lambda () (interactive)
+    (if (string-match-p
+         (concat "^\\([" (char-to-string dired-marker-char) "].*$\\)")
+         (thing-at-point 'line))
+        (dired-unmark nil)
+      (dired-mark nil))))
+(define-key dired-mode-map (kbd "C-RET") 'dired-mark-unmarked-files)
+(define-key dired-mode-map (kbd "C-/") 'dired-unmark-all-files)
+(define-key dired-mode-map (kbd "C-w") 'dired-do-rename)
+(define-key dired-mode-map (kbd "M-w") 'dired-do-copy)
 
 ;; async file operations in dired
 ;;   https://github.com/jwiegley/emacs-async
@@ -251,17 +248,19 @@
              ))
          (forward-line 1))))))
 
-;; hide markers
-(advice-add 'dired-mark :after
-            (lambda (_arg &optional _interactive)
-              (save-excursion
-                (goto-char (point-min))
-                (while (not (eobp))
-                  (let ((filename (dired-get-filename nil t)))
-                    (when filename
-                      (let ((ov (make-overlay (point) (1+ (point)))))
-                        (overlay-put ov 'invisible t))))
-                  (forward-line 1)))))
+(defun hide-markers (_arg &optional _interactive)
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (not (eobp))
+      (let ((filename (dired-get-filename nil t)))
+        (when filename
+          (let ((ov (make-overlay (point) (1+ (point)))))
+            (overlay-put ov 'invisible t))))
+      (forward-line 1))))
+(advice-add 'dired-mark :after 'hide-markers)
+(advice-add 'dired-mark-unmarked-files :after (lambda (_re _msg &optional _u _l _c)
+                                                (hide-markers nil)))
 
 (defun my-find-file ()
   (interactive)
@@ -587,7 +586,6 @@
       "emacsclient --socket-name projects-list"
       " --eval '(select-frame-set-input-focus (selected-frame))'"
       " || emacs &")))
-(global-set-key (kbd "M-RET") 'projects-list-activate)
 
 ;; =========================================================
 ;; package management
@@ -661,6 +659,10 @@
                                                            'undo-save-set-timer
                                                            (current-buffer))))))
 
+  (add-hook 'kill-emacs-hook (lambda ()
+                               (dolist (buffer (buffer-list))
+                                 (undo-save-set-timer buffer))))
+
   ;; recover file from its saved undo history;
   (add-hook 'find-file-hook (lambda ()
                               (undohist-recover-safe)
@@ -700,21 +702,197 @@
                                                       (setq buffer-has-no-window nil)))))))
            (if buffer-has-no-window (kill-buffer buffer))))))))
 
-(global-set-key (kbd "M-<up>") 'eyebrowse-prev-window-config)
-(global-set-key (kbd "M-<down>") 'eyebrowse-next-window-config)
-(global-set-key (kbd "M-<left>") 'eyebrowse-last-window-config)
-(global-set-key (kbd "M-w") 'eyebrowse-close-window-config)
-(global-set-key (kbd "M-<right>")
+;; =====================================================================
+;; beacon
+
+(require-package 'beacon)
+(setq beacon-color "#ffff80")
+(add-hook 'before-change-functions #'beacon--vanish)
+(add-hook 'pre-command-hook #'beacon--record-vars)
+(add-hook 'pre-command-hook #'beacon--vanish)
+(defvar my-beacon-timer nil)
+(defvar my-beacon-on-p nil)
+(add-hook 'post-command-hook
+          (lambda ()
+            (when (timerp my-beacon-timer)
+              (cancel-timer my-beacon-timer))
+            (setq my-beacon-timer
+                  (run-at-time nil 0.5 (lambda ()
+                                       (if my-beacon-on-p
+                                           (progn
+                                             (beacon--vanish)
+                                             (setq my-beacon-on-p nil))
+                                         (beacon--shine)
+                                         (setq my-beacon-on-p t))
+                                       )))))
+
+;; =====================================================================
+;; modal key_bindings
+
+(require-package 'modalka)
+(add-to-list 'modalka-excluded-modes 'shell-mode)
+(add-to-list 'modalka-excluded-modes 'eshell-mode)
+(add-to-list 'modalka-excluded-modes 'term-mode)
+(modalka-global-mode 1)
+
+(global-set-key (kbd "<tab>") (lambda () (interactive) (modalka-mode 1)))
+(global-set-key (kbd "<escape>") (lambda () (interactive) (modalka-mode 1)))
+
+(define-key modalka-mode-map (kbd "SPC")
+  (lambda () (interactive)
+    (when (not buffer-read-only)
+      (modalka-mode -1)
+      (setq-local beacon-color "#ffff80"))
+    (if (equal major-mode 'dired-mode)
+        (if (equal command-line-args '("emacs"))
+            (projects-list-find-file)
+          (my-find-file)))))
+
+(add-hook 'modalka-mode-hook
+          (lambda ()
+            (setq-local beacon-color "#c0ff9c")))
+
+;; https://stackoverflow.com/questions/19757612/how-to-redefine-a-key-inside-a-minibuffer-mode-map
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Prefix-Keys.html
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Key-Sequences.html
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Key-Sequence-Input.html
+;; https://www.emacswiki.org/emacs/KeySequence
+
+(define-key modalka-mode-map (kbd "f")
+  (lambda () (interactive)
+    (if (eq ?a (char-syntax (char-before (point))))
+        (forward-same-syntax -1)
+      (forward-char -1))
+    (if (eq ?\s (char-syntax (char-before (point))))
+        (forward-same-syntax -1))))
+(define-key modalka-mode-map (kbd "j")
+  (lambda () (interactive)
+    (if (eq ?\s (char-syntax (char-after (point))))
+        (forward-same-syntax))
+    (if (eq ?a (char-syntax (char-after (point))))
+        (forward-same-syntax)
+      (forward-char))))
+
+(define-key modalka-mode-map (kbd "d")
+  (lambda () (interactive) (forward-line -1)))
+(define-key modalka-mode-map (kbd "k") 'forward-line)
+(define-key modalka-mode-map (kbd "r") 'my-backward-paragraph)
+(define-key modalka-mode-map (kbd "u") 'my-forward-paragraph)
+(define-key modalka-mode-map (kbd "e") 'cua-scroll-down)
+(define-key modalka-mode-map (kbd "i") 'cua-scroll-up)
+(define-key modalka-mode-map (kbd "a") 'beginning-of-buffer)
+(define-key modalka-mode-map (kbd ";") 'end-of-buffer)
+
+(modalka-define-kbd "m" "C-SPC")
+(modalka-define-kbd "n" "C-RET")
+(modalka-define-kbd "z" "C-/")
+(modalka-define-kbd "x" "C-w")
+(modalka-define-kbd "c" "M-w")
+(modalka-define-kbd "v" "C-y")
+
+(modalka-define-kbd "," "C-M-s")
+(define-key isearch-mode-map (kbd "SPC")
+  (lambda () (isearch-yank-string ".*")))
+(define-key isearch-mode-map (kbd ",") 'isearch-repeat-forward)
+(define-key isearch-mode-map (kbd ".") 'isearch-repeat-backward)
+(define-key isearch-mode-map (kbd "<tab>") 'isearch-abort)
+(define-key isearch-mode-map (kbd "<escape>") 'isearch-abort)
+;; https://stackoverflow.com/questions/13095405/isearch-region-if-active-emacs
+;; https://www.reddit.com/r/emacs/comments/b7yjje/isearch_region_search/
+
+(define-prefix-command 'x-map)
+(define-key modalka-mode-map (kbd "h") 'x-map)
+(modalka-define-kbd "h SPC" "C-x C-s")
+(modalka-define-kbd "h g" "C-x C-f")
+(define-key modalka-mode-map (kbd "h h") 'projects-list-activate)
+
+(define-prefix-command 'help-map)
+(define-key modalka-mode-map (kbd "/") 'help-map)
+(modalka-define-kbd "/ f" "C-h f")
+(modalka-define-kbd "/ v" "C-h v")
+
+(modalka-define-kbd "g" "C-g")
+
+(define-key modalka-mode-map (kbd ".") 'shell)
+
+(define-key modalka-mode-map (kbd "y") 'universal-argument)
+
+(modalka-define-kbd "b" "C-b") ;; backward-char
+(modalka-define-kbd "p" "C-p") ;; previous-line
+(modalka-define-kbd "q" "M-q")
+(modalka-define-kbd "t" "C-t") ;; transpose-char
+(modalka-define-kbd "1" "C-1") ;; (digit-argument 1)
+(modalka-define-kbd "2" "C-2")
+(modalka-define-kbd "3" "C-3")
+(modalka-define-kbd "4" "C-4")
+(modalka-define-kbd "5" "C-5")
+(modalka-define-kbd "6" "C-6")
+(modalka-define-kbd "7" "C-7")
+(modalka-define-kbd "8" "C-8")
+(modalka-define-kbd "9" "C-9")
+(modalka-define-kbd "0" "C-0")
+(modalka-define-kbd "-" "C--")
+(modalka-define-kbd "=" "C-=")
+(modalka-define-kbd "[" "C-[")
+(modalka-define-kbd "]" "C-]")
+(modalka-define-kbd "'" "C-'")
+(modalka-define-kbd "`" "C-`")
+(modalka-define-kbd "\\" "C-\\")
+
+(define-key modalka-mode-map (kbd "s")
+  (lambda () (interactive)
+    (if hl-line-overlay
+        (goto-char (overlay-start hl-line-overlay)))
+    (other-window -1)))
+(define-key modalka-mode-map (kbd "l")
+  (lambda () (interactive)
+    (if hl-line-overlay
+        (goto-char (overlay-start hl-line-overlay)))
+    (other-window 1)))
+
+(define-key modalka-mode-map (kbd "h s") 'my-delete-window)
+(define-key modalka-mode-map (kbd "h d") 'delete-other-windows)
+(define-key modalka-mode-map (kbd "h a") 'eyebrowse-close-window-config)
+(define-key modalka-mode-map (kbd "h f")
   (lambda () (interactive)
     (eyebrowse-create-window-config)
     (unless (equal command-line-args '("emacs"))
       (project-directory-side-window))))
+
+(define-key modalka-mode-map (kbd "w") 'eyebrowse-prev-window-config)
+(define-key modalka-mode-map (kbd "o") 'eyebrowse-next-window-config)
+
+(define-key dired-mode-map (kbd "d") nil)
+(define-key dired-mode-map (kbd "o") nil)
+(define-key dired-mode-map (kbd "h") nil)
+(define-key dired-mode-map (kbd "SPC") nil)
+
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
+
+(defun double-space-to-tab ()
+  (interactive)
+  (if (and (equal (char-before (point)) ?\s)
+           (not (equal (char-before (1- (point))) ?\s))
+           (not (equal (char-before (1- (point))) ?\t))
+           (not (equal (char-before (1- (point))) ?\n)))
+      (progn (delete-backward-char 1)
+             (completion-at-point))
+    (insert " ")))
+(global-set-key (kbd "SPC") 'double-space-to-tab)
 
 ;; =====================================================================
 
 (defun sleep ()
   (interactive)
   (call-process-shell-command "sleep 0.1; systemctl suspend"))
+
+(defun reboot ()
+  (interactive)
+  (call-process-shell-command "systemctl reboot"))
+
+(defun poweroff ()
+  (interactive)
+  (call-process-shell-command "systemctl poweroff"))
 
 ;; https://explog.in/dot/emacs/config.html
 ;; https://iqss.github.io/IQSS.emacs/init.html
@@ -733,6 +911,7 @@
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffers-and-Frames.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Visibility-of-Frames.html
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Child-Frames.html#Child-Frames
+;; advice "message" function: https://www.emacswiki.org/emacs/EchoArea#toc3
 
 ;; https://github.com/bmag/imenu-list
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Imenu.html
@@ -761,14 +940,11 @@
 ;;   https://github.com/dgutov/diff-hl
 ;; https://github.com/DarthFennec/highlight-indent-guides
 ;;   https://github.com/zk-phi/indent-guide
-;; https://orgmode.org/manual/Tables.html
-  ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Text-Based-Tables.html
 ;; http://shallowsky.com/blog/linux/editors/graphics-in-emacs.html
-  ;; https://www.gnu.org/software/auctex
-  ;; https://github.com/aaptel/preview-latex
-  ;; https://github.com/josteink/wsd-mode
-  ;; https://jblevins.org/projects/markdown-mode/
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html
+;;   https://www.gnu.org/software/auctex
+;;   https://github.com/aaptel/preview-latex
+;;   https://github.com/josteink/wsd-mode
+;;   https://jblevins.org/projects/markdown-mode/
 ;; https://www.gnu.org/software/emacs/manual/html_node/gnus/index.html
 ;;   https://www.gnu.org/software/emacs/manual/html_node/message/index.html
 ;;   https://www.gnu.org/software/emacs/manual/html_node/emacs/Gnus.html
@@ -785,5 +961,4 @@
 ;; https://www.gnu.org/software/emacs-muse/manual/html_node/Extending-Muse.html#Extending-Muse
 ;; https://github.com/Fuco1/smartparens
 ;; https://github.com/fniessen/emacs-leuven-theme
-;; https://github.com/jackkamm/undo-propose-el
 ;; https://github.com/jgarvin/mandimus
