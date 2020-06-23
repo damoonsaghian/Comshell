@@ -78,6 +78,9 @@
 ;; move point to top/bottom of buffer before signaling a scrolling error;
 (setq scroll-error-top-bottom t)
 
+(defun my-previous-line () (interactive) (forward-line -1))
+(defun my-next-line () (interactive) (forward-line))
+
 (setq paragraph-start "\n" paragraph-separate "\n")
 (defun my-forward-paragraph ()
   (interactive)
@@ -97,11 +100,6 @@
     (redisplay t)
     (backward-paragraph)
     (right-char)))
-
-(blink-cursor-mode 0)
-(set-face-attribute 'cursor nil :background "forest green")
-(add-to-list 'default-frame-alist '(cursor-type . bar))
-(setq-default cursor-in-non-selected-windows nil)
 
 (add-to-list 'default-frame-alist '(foreground-color . "#333333"))
 (set-face-attribute 'default nil :family "Monospace" :height 105)
@@ -155,20 +153,28 @@
   (lambda () (interactive)
     (end-of-buffer)
     (if (eq (point) (point-max))
-        (forward-line -1))))
-(define-key dired-mode-map [remap forward-line]
+        (forward-line -1))
+    (dired-move-to-filename)))
+(define-key dired-mode-map [remap my-next-line]
   (lambda () (interactive)
     (forward-line 1)
-    (when (eq (point) (point-max))
-      (forward-char -1))))
+    (if (eq (point) (point-max))
+        (forward-char -1))
+    (dired-move-to-filename)))
+(define-key dired-mode-map [remap my-previous-line]
+  (lambda () (interactive)
+    (forward-line -1)
+    (dired-move-to-filename)))
 (define-key dired-mode-map [remap next-line]
   (lambda () (interactive)
     (forward-line 1)
-    (when (eq (point) (point-max))
-      (forward-char -1))))
+    (if (eq (point) (point-max))
+        (forward-char -1))
+    (dired-move-to-filename)))
 (define-key dired-mode-map [remap previous-line]
   (lambda () (interactive)
-    (forward-line -1)))
+    (forward-line -1)
+    (dired-move-to-filename)))
 
 (define-key dired-mode-map (kbd "C-SPC")
   (lambda () (interactive)
@@ -177,8 +183,10 @@
          (thing-at-point 'line))
         (dired-unmark nil)
       (dired-mark nil))))
-(define-key dired-mode-map (kbd "C-RET") 'dired-mark-unmarked-files)
-(define-key dired-mode-map (kbd "C-/") 'dired-unmark-all-files)
+(define-key dired-mode-map (kbd "C-RET")
+  (lambda () (interactive) (dired-mark-unmarked-files ".*" nil)))
+(define-key dired-mode-map (kbd "C-/")
+  (lambda () (interactive) (dired-unmark-all-files ?\r)))
 (define-key dired-mode-map (kbd "C-w") 'dired-do-rename)
 (define-key dired-mode-map (kbd "M-w") 'dired-do-copy)
 
@@ -191,13 +199,19 @@
 (require 'hl-line)
 (add-hook 'dired-mode-hook (lambda () (setq hl-line-mode t)))
 ;; before leaving a window, send the cursor back to the highlighted line (if there is any);
-(add-hook 'mouse-leave-buffer-hook (lambda ()
-  (if hl-line-overlay
-      (goto-char (overlay-start hl-line-overlay)))))
-(add-hook 'pre-command-hook (lambda ()
-                              (if (and (eq this-command 'other-window)
-                                       hl-line-overlay)
-                                  (goto-char (overlay-start hl-line-overlay)))))
+(add-hook 'mouse-leave-buffer-hook
+          (lambda ()
+            (when (and hl-line-overlay
+                       (eq major-mode 'dired-mode))
+              (goto-char (overlay-start hl-line-overlay))
+              (dired-move-to-filename))))
+(add-hook 'pre-command-hook
+          (lambda ()
+            (when (and (eq this-command 'other-window)
+                       (eq major-mode 'dired-mode)
+                       hl-line-overlay)
+              (goto-char (overlay-start hl-line-overlay))
+              (dired-move-to-filename))))
 
 (defvar video-file-suffix (concat "\\.avif$\\|\\.jpg$\\|\\.png$\\|\\.gif$\\|\\.webp$\\|"
                                   "\\.mp4$\\|\\.mkv$\\|\\.webm$\\|\\.mpg$\\|\\.flv$\\|\\.g$"))
@@ -703,7 +717,12 @@
            (if buffer-has-no-window (kill-buffer buffer))))))))
 
 ;; =====================================================================
-;; beacon
+;; cursor
+
+(blink-cursor-mode 0)
+(set-face-attribute 'cursor nil :background "forest green")
+(add-to-list 'default-frame-alist '(cursor-type . bar))
+(setq-default cursor-in-non-selected-windows nil)
 
 (require-package 'beacon)
 (setq beacon-color "#ffff80")
@@ -717,7 +736,7 @@
             (when (timerp my-beacon-timer)
               (cancel-timer my-beacon-timer))
             (setq my-beacon-timer
-                  (run-at-time nil 0.5 (lambda ()
+                  (run-at-time nil 0.3 (lambda ()
                                        (if my-beacon-on-p
                                            (progn
                                              (beacon--vanish)
@@ -760,7 +779,7 @@
 
 (define-key modalka-mode-map (kbd "f")
   (lambda () (interactive)
-    (if (eq ?a (char-syntax (char-before (point))))
+    (if (eq ?w (char-syntax (char-before (point))))
         (forward-same-syntax -1)
       (forward-char -1))
     (if (eq ?\s (char-syntax (char-before (point))))
@@ -769,19 +788,16 @@
   (lambda () (interactive)
     (if (eq ?\s (char-syntax (char-after (point))))
         (forward-same-syntax))
-    (if (eq ?a (char-syntax (char-after (point))))
+    (if (eq ?w (char-syntax (char-after (point))))
         (forward-same-syntax)
       (forward-char))))
 
-(define-key modalka-mode-map (kbd "d")
-  (lambda () (interactive) (forward-line -1)))
-(define-key modalka-mode-map (kbd "k") 'forward-line)
-(define-key modalka-mode-map (kbd "r") 'my-backward-paragraph)
-(define-key modalka-mode-map (kbd "u") 'my-forward-paragraph)
-(define-key modalka-mode-map (kbd "e") 'cua-scroll-down)
-(define-key modalka-mode-map (kbd "i") 'cua-scroll-up)
-(define-key modalka-mode-map (kbd "a") 'beginning-of-buffer)
-(define-key modalka-mode-map (kbd ";") 'end-of-buffer)
+(define-key modalka-mode-map (kbd "d") 'my-previous-line)
+(define-key modalka-mode-map (kbd "k") 'my-next-line)
+(define-key modalka-mode-map (kbd "s") 'my-backward-paragraph)
+(define-key modalka-mode-map (kbd "l") 'my-forward-paragraph)
+(define-key modalka-mode-map (kbd "a") 'cua-scroll-down)
+(define-key modalka-mode-map (kbd ";") 'cua-scroll-up)
 
 (modalka-define-kbd "m" "C-SPC")
 (modalka-define-kbd "n" "C-RET")
@@ -792,7 +808,9 @@
 
 (modalka-define-kbd "," "C-M-s")
 (define-key isearch-mode-map (kbd "SPC")
-  (lambda () (isearch-yank-string ".*")))
+  (lambda () (interactive)
+    (isearch-printing-char ?.)
+    (isearch-printing-char ?*)))
 (define-key isearch-mode-map (kbd ",") 'isearch-repeat-forward)
 (define-key isearch-mode-map (kbd ".") 'isearch-repeat-backward)
 (define-key isearch-mode-map (kbd "<tab>") 'isearch-abort)
@@ -804,12 +822,14 @@
 (define-key modalka-mode-map (kbd "h") 'x-map)
 (modalka-define-kbd "h SPC" "C-x C-s")
 (modalka-define-kbd "h g" "C-x C-f")
+(modalka-define-kbd "h <return>" "M-x")
 (define-key modalka-mode-map (kbd "h h") 'projects-list-activate)
 
 (define-prefix-command 'help-map)
 (define-key modalka-mode-map (kbd "/") 'help-map)
 (modalka-define-kbd "/ f" "C-h f")
 (modalka-define-kbd "/ v" "C-h v")
+(modalka-define-kbd "/ k" "C-h k")
 
 (modalka-define-kbd "g" "C-g")
 
@@ -839,15 +859,19 @@
 (modalka-define-kbd "`" "C-`")
 (modalka-define-kbd "\\" "C-\\")
 
-(define-key modalka-mode-map (kbd "s")
+(define-key modalka-mode-map (kbd "r")
   (lambda () (interactive)
     (if hl-line-overlay
         (goto-char (overlay-start hl-line-overlay)))
+    (if (equal major-mode 'dired-mode)
+        (dired-move-to-filename))
     (other-window -1)))
-(define-key modalka-mode-map (kbd "l")
+(define-key modalka-mode-map (kbd "u")
   (lambda () (interactive)
     (if hl-line-overlay
         (goto-char (overlay-start hl-line-overlay)))
+    (if (equal major-mode 'dired-mode)
+        (dired-move-to-filename))
     (other-window 1)))
 
 (define-key modalka-mode-map (kbd "h s") 'my-delete-window)
@@ -859,8 +883,8 @@
     (unless (equal command-line-args '("emacs"))
       (project-directory-side-window))))
 
-(define-key modalka-mode-map (kbd "w") 'eyebrowse-prev-window-config)
-(define-key modalka-mode-map (kbd "o") 'eyebrowse-next-window-config)
+(define-key modalka-mode-map (kbd "e") 'eyebrowse-prev-window-config)
+(define-key modalka-mode-map (kbd "i") 'eyebrowse-next-window-config)
 
 (define-key dired-mode-map (kbd "d") nil)
 (define-key dired-mode-map (kbd "o") nil)
