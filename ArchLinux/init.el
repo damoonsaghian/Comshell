@@ -101,6 +101,11 @@
     (backward-paragraph)
     (right-char)))
 
+(setq blink-cursor-blinks 0)
+(set-face-attribute 'cursor nil :background "forest green")
+(add-to-list 'default-frame-alist '(cursor-type . bar))
+(setq-default cursor-in-non-selected-windows nil)
+
 (add-to-list 'default-frame-alist '(foreground-color . "#333333"))
 (set-face-attribute 'default nil :family "Monospace" :height 105)
 (set-face-attribute 'fixed-pitch-serif nil :font "Monospace")
@@ -127,7 +132,46 @@
       (message "file doesn't exist: '%s';" path))
      )))
 
-;; =====================================================
+;; =======================================================
+;; active line highlight
+
+(defvar active-line-ovs nil)
+(defvar active-line-color "#ffffb0")
+
+(defun active-line-clear (&rest _)
+  (when (get-buffer-window)
+    (mapc 'delete-overlay active-line-ovs)
+    (setq active-line-ovs nil)))
+
+(defun active-line-hl ()
+  (let ((ov (make-overlay (line-beginning-position) (line-end-position))))
+    ;;(overlay-put ov 'active-line t)
+    (overlay-put ov 'priority 0)
+    (overlay-put ov 'window (selected-window))
+    (overlay-put ov 'face (list :background active-line-color))
+    (if (eq ?\n (char-after (line-end-position)))
+        (move-overlay ov (line-beginning-position) (1+ (line-end-position))))
+    (push ov active-line-ovs))
+
+  (if (null (char-after (line-end-position)))
+      (let ((ov (make-overlay (line-end-position) (line-end-position))))
+        (overlay-put ov 'priority 0)
+        (overlay-put ov 'window (selected-window))
+        (overlay-put ov 'after-string
+                     (propertize
+                      (make-string (- (window-width)
+                                      (save-excursion (goto-char(line-end-position))
+                                                      (current-column)))
+                                   ?\s)
+                      'face (list :background active-line-color)
+                      'cursor 1000))
+        (push ov active-line-ovs))))
+
+;;(add-hook 'before-change-functions 'active-line-clear)
+;;(add-hook 'pre-command-hook 'active-line-clear)
+(add-hook 'post-command-hook (lambda () (active-line-clear) (active-line-hl)))
+
+;; =======================================================
 ;; dired
 
 (require 'dired)
@@ -155,16 +199,6 @@
     (if (eq (point) (point-max))
         (forward-line -1))
     (dired-move-to-filename)))
-(define-key dired-mode-map [remap my-next-line]
-  (lambda () (interactive)
-    (forward-line 1)
-    (if (eq (point) (point-max))
-        (forward-char -1))
-    (dired-move-to-filename)))
-(define-key dired-mode-map [remap my-previous-line]
-  (lambda () (interactive)
-    (forward-line -1)
-    (dired-move-to-filename)))
 (define-key dired-mode-map [remap next-line]
   (lambda () (interactive)
     (forward-line 1)
@@ -172,6 +206,16 @@
         (forward-char -1))
     (dired-move-to-filename)))
 (define-key dired-mode-map [remap previous-line]
+  (lambda () (interactive)
+    (forward-line -1)
+    (dired-move-to-filename)))
+(define-key dired-mode-map [remap my-next-line]
+  (lambda () (interactive)
+    (forward-line 1)
+    (if (eq (point) (point-max))
+        (forward-char -1))
+    (dired-move-to-filename)))
+(define-key dired-mode-map [remap my-previous-line]
   (lambda () (interactive)
     (forward-line -1)
     (dired-move-to-filename)))
@@ -717,35 +761,6 @@
            (if buffer-has-no-window (kill-buffer buffer))))))))
 
 ;; =====================================================================
-;; cursor
-
-(blink-cursor-mode 0)
-(set-face-attribute 'cursor nil :background "forest green")
-(add-to-list 'default-frame-alist '(cursor-type . bar))
-(setq-default cursor-in-non-selected-windows nil)
-
-(require-package 'beacon)
-(setq beacon-color "#ffff80")
-(add-hook 'before-change-functions #'beacon--vanish)
-(add-hook 'pre-command-hook #'beacon--record-vars)
-(add-hook 'pre-command-hook #'beacon--vanish)
-(defvar my-beacon-timer nil)
-(defvar my-beacon-on-p nil)
-(add-hook 'post-command-hook
-          (lambda ()
-            (when (timerp my-beacon-timer)
-              (cancel-timer my-beacon-timer))
-            (setq my-beacon-timer
-                  (run-at-time nil 0.3 (lambda ()
-                                       (if my-beacon-on-p
-                                           (progn
-                                             (beacon--vanish)
-                                             (setq my-beacon-on-p nil))
-                                         (beacon--shine)
-                                         (setq my-beacon-on-p t))
-                                       )))))
-
-;; =====================================================================
 ;; modal key_bindings
 
 (require-package 'modalka)
@@ -761,7 +776,7 @@
   (lambda () (interactive)
     (when (not buffer-read-only)
       (modalka-mode -1)
-      (setq-local beacon-color "#ffff80"))
+      (setq-local active-line-color "#ffffb0"))
     (if (equal major-mode 'dired-mode)
         (if (equal command-line-args '("emacs"))
             (projects-list-find-file)
@@ -769,7 +784,7 @@
 
 (add-hook 'modalka-mode-hook
           (lambda ()
-            (setq-local beacon-color "#c0ff9c")))
+            (setq-local active-line-color "#ccffc7")))
 
 ;; https://stackoverflow.com/questions/19757612/how-to-redefine-a-key-inside-a-minibuffer-mode-map
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Prefix-Keys.html
