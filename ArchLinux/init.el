@@ -38,6 +38,8 @@
 (setq window-combination-limit nil)
 (setq window-combination-resize t)
 
+;; display special buffers (except completion buffer),
+;;   and buffers not belonging to the project, in the bottom side window;
 (setq window-sides-vertical t)
 (setq display-buffer-alist
       `(("\\*Completions\\*" display-buffer-pop-up-window)
@@ -106,6 +108,10 @@
     (backward-paragraph)
     (right-char)))
 
+(setq backward-delete-char-untabify-method 'hungry)
+(setq-default indent-tabs-mode nil)
+(setq-default truncate-lines t)
+
 (setq blink-cursor-blinks 0)
 (set-face-attribute 'cursor nil :background "forest green")
 (add-to-list 'default-frame-alist '(cursor-type . bar))
@@ -117,10 +123,6 @@
 (set-face-attribute 'highlight nil :background "#CCFFFF")
 (set-face-attribute 'region nil :background "#CCFFFF")
 (set-face-attribute 'fringe nil :background 'unspecified)
-
-(setq backward-delete-char-untabify-method 'hungry)
-(setq-default indent-tabs-mode nil)
-(setq-default truncate-lines t)
 
 (add-hook 'prog-mode-hook 'goto-address-mode)
 (add-hook 'text-mode-hook 'goto-address-mode)
@@ -143,7 +145,7 @@
 (defvar active-line-ovs nil)
 (defvar active-line-color "#ffffb0")
 
-(defun active-line-clear (&rest _)
+(defun active-line-clear ()
   (when (get-buffer-window)
     (mapc 'delete-overlay active-line-ovs)
     (setq active-line-ovs nil)))
@@ -171,7 +173,7 @@
                       'cursor 1000))
         (push ov active-line-ovs))))
 
-;;(add-hook 'before-change-functions 'active-line-clear)
+;;(add-hook 'before-change-functions (lambda (&rest _) (active-line-clear)))
 (add-hook 'after-change-functions
           (lambda (&rest _)
             (condition-case nil
@@ -938,7 +940,9 @@
            (not (equal (char-before (1- (point))) ?\t))
            (not (equal (char-before (1- (point))) ?\n)))
       (progn (delete-backward-char 1)
-             (completion-at-point))
+             (if (minibufferp)
+                 (minibuffer-complete)
+               (completion-at-point)))
     (insert " ")))
 (global-set-key (kbd "SPC") 'double-space-to-tab)
 
