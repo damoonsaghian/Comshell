@@ -42,6 +42,11 @@
 (setq display-buffer-alist
       `(("\\*Completions\\*" display-buffer-pop-up-window)
         ("\\*.*\\*" display-buffer-in-side-window
+         (side . bottom) (slot . 0) (window-height . 0.3))
+        ((lambda (b _) (not (string-match-p
+                             (concat "^" project-directory)
+                             b)))
+         display-buffer-in-side-window
          (side . bottom) (slot . 0) (window-height . 0.3))))
 
 (add-to-list 'window-persistent-parameters '(window-side . writable))
@@ -806,16 +811,20 @@
 
 (define-key modalka-mode-map (kbd "f")
   (lambda () (interactive)
-    (if (eq ?w (char-syntax (char-before (point))))
+    (if (and (char-before (point))
+             (eq ?w (char-syntax (char-before (point)))))
         (forward-same-syntax -1)
       (forward-char -1))
-    (if (eq ?\s (char-syntax (char-before (point))))
+    (if (and (char-before (point))
+             (eq ?\s (char-syntax (char-before (point)))))
         (forward-same-syntax -1))))
 (define-key modalka-mode-map (kbd "j")
   (lambda () (interactive)
-    (if (eq ?\s (char-syntax (char-after (point))))
+    (if (and (char-after (point))
+             (eq ?\s (char-syntax (char-after (point)))))
         (forward-same-syntax))
-    (if (eq ?w (char-syntax (char-after (point))))
+    (if (and (char-after (point))
+             (eq ?w (char-syntax (char-after (point)))))
         (forward-same-syntax)
       (forward-char))))
 
@@ -823,8 +832,10 @@
 (define-key modalka-mode-map (kbd "k") 'my-next-line)
 (define-key modalka-mode-map (kbd "s") 'my-backward-paragraph)
 (define-key modalka-mode-map (kbd "l") 'my-forward-paragraph)
-(define-key modalka-mode-map (kbd "a") 'cua-scroll-down)
-(define-key modalka-mode-map (kbd ";") 'cua-scroll-up)
+(define-key modalka-mode-map (kbd "a") 'beginning-of-line)
+(define-key modalka-mode-map (kbd ";") 'end-of-line)
+(define-key modalka-mode-map (kbd "r") 'cua-scroll-down)
+(define-key modalka-mode-map (kbd "u") 'cua-scroll-up)
 
 (modalka-define-kbd "m" "C-SPC")
 (modalka-define-kbd "n" "C-RET")
@@ -886,14 +897,14 @@
 (modalka-define-kbd "`" "C-`")
 (modalka-define-kbd "\\" "C-\\")
 
-(define-key modalka-mode-map (kbd "r")
+(define-key modalka-mode-map (kbd "e")
   (lambda () (interactive)
     (if hl-line-overlay
         (goto-char (overlay-start hl-line-overlay)))
     (if (equal major-mode 'dired-mode)
         (dired-move-to-filename))
     (other-window -1)))
-(define-key modalka-mode-map (kbd "u")
+(define-key modalka-mode-map (kbd "i")
   (lambda () (interactive)
     (if hl-line-overlay
         (goto-char (overlay-start hl-line-overlay)))
@@ -910,8 +921,8 @@
     (unless (equal command-line-args '("emacs"))
       (project-directory-side-window))))
 
-(define-key modalka-mode-map (kbd "e") 'eyebrowse-prev-window-config)
-(define-key modalka-mode-map (kbd "i") 'eyebrowse-next-window-config)
+(define-key modalka-mode-map (kbd "w") 'eyebrowse-prev-window-config)
+(define-key modalka-mode-map (kbd "o") 'eyebrowse-next-window-config)
 
 (define-key dired-mode-map (kbd "d") nil)
 (define-key dired-mode-map (kbd "o") nil)
