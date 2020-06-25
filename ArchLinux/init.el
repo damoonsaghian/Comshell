@@ -145,7 +145,6 @@
 
 (defun active-line-hl ()
   (let ((ov (make-overlay (line-beginning-position) (line-end-position))))
-    ;;(overlay-put ov 'active-line t)
     (overlay-put ov 'priority 0)
     (overlay-put ov 'window (selected-window))
     (overlay-put ov 'face (list :background active-line-color))
@@ -168,8 +167,21 @@
         (push ov active-line-ovs))))
 
 ;;(add-hook 'before-change-functions 'active-line-clear)
-;;(add-hook 'pre-command-hook 'active-line-clear)
-(add-hook 'post-command-hook (lambda () (active-line-clear) (active-line-hl)))
+(add-hook 'after-change-functions
+          (lambda (&rest _)
+            (condition-case nil
+                (progn
+                  (active-line-clear)
+                  (active-line-hl))
+              (error nil))))
+(add-hook 'pre-command-hook 'active-line-clear)
+(add-hook 'post-command-hook
+          (lambda ()
+            (condition-case nil
+                (progn
+                  (active-line-clear)
+                  (active-line-hl))
+              (error nil))))
 
 ;; =======================================================
 ;; dired
@@ -279,7 +291,7 @@
 (add-hook
  'dired-after-readin-hook
  (lambda ()
-   (let ((inhibit-read-only t))
+;   (let ((inhibit-read-only t))
      (save-excursion
        ;; hide the first line in dired;
        (goto-char 1)
@@ -304,7 +316,7 @@
                  (let ((ov (make-overlay (match-beginning 1) (match-end 1))))
                    (overlay-put ov 'invisible t)))
              ))
-         (forward-line 1))))))
+         (forward-line 1)))));)
 
 (defun hide-markers (_arg &optional _interactive)
   (interactive)
