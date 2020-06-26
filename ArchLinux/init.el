@@ -940,7 +940,8 @@
            (not (equal (char-before (1- (point))) ?\t))
            (not (equal (char-before (1- (point))) ?\n)))
       (progn (delete-backward-char 1)
-             (if (minibufferp)
+             (if (equal "Find file: "
+                        (buffer-substring-no-properties (point-min) (minibuffer-prompt-end)))
                  (minibuffer-complete)
                (completion-at-point)))
     (insert " ")))
