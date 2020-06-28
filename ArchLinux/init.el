@@ -157,12 +157,7 @@
     (overlay-put ov 'face (list :background active-line-color))
     (if (eq ?\n (char-after (line-end-position)))
         (move-overlay ov (line-beginning-position) (1+ (line-end-position))))
-    (push ov active-line-ovs))
-
-  (if (null (char-after (line-end-position)))
-      (let ((ov (make-overlay (line-end-position) (line-end-position))))
-        (overlay-put ov 'priority 0)
-        (overlay-put ov 'window (selected-window))
+    (if (null (char-after (line-end-position)))
         (overlay-put ov 'after-string
                      (propertize
                       (make-string (- (window-width)
@@ -170,8 +165,23 @@
                                                       (current-column)))
                                    ?\s)
                       'face (list :background active-line-color)
-                      'cursor 1000))
-        (push ov active-line-ovs))))
+                      'cursor 1000)))
+    (push ov active-line-ovs))
+
+  ;; (if (null (char-after (line-end-position)))
+  ;;     (let ((ov (make-overlay (line-end-position) (line-end-position))))
+  ;;       (overlay-put ov 'priority 0)
+  ;;       (overlay-put ov 'window (selected-window))
+  ;;       (overlay-put ov 'after-string
+  ;;                    (propertize
+  ;;                     (make-string (- (window-width)
+  ;;                                     (save-excursion (goto-char(line-end-position))
+  ;;                                                     (current-column)))
+  ;;                                  ?\s)
+  ;;                     'face (list :background active-line-color)
+  ;;                     'cursor 1000))
+  ;;       (push ov active-line-ovs)))
+  )
 
 ;;(add-hook 'before-change-functions (lambda (&rest _) (active-line-clear)))
 (add-hook 'after-change-functions
@@ -181,7 +191,7 @@
                   (active-line-clear)
                   (active-line-hl))
               (error nil))))
-(add-hook 'pre-command-hook 'active-line-clear)
+;;(add-hook 'pre-command-hook 'active-line-clear)
 (add-hook 'post-command-hook
           (lambda ()
             (condition-case nil
