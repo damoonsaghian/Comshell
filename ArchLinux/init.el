@@ -43,12 +43,7 @@
 (setq window-sides-vertical t)
 (setq display-buffer-alist
       `(("\\*Completions\\*" display-buffer-pop-up-window)
-        ("\\*.*\\*" display-buffer-in-side-window
-         (side . bottom) (slot . 0) (window-height . 0.3))
-        ((lambda (b _) (not (string-match-p
-                             (concat "^" project-directory)
-                             b)))
-         display-buffer-in-side-window
+        (".*" display-buffer-in-side-window
          (side . bottom) (slot . 0) (window-height . 0.3))))
 
 (add-to-list 'window-persistent-parameters '(window-side . writable))
@@ -166,22 +161,7 @@
                                    ?\s)
                       'face (list :background active-line-color)
                       'cursor 1000)))
-    (push ov active-line-ovs))
-
-  ;; (if (null (char-after (line-end-position)))
-  ;;     (let ((ov (make-overlay (line-end-position) (line-end-position))))
-  ;;       (overlay-put ov 'priority 0)
-  ;;       (overlay-put ov 'window (selected-window))
-  ;;       (overlay-put ov 'after-string
-  ;;                    (propertize
-  ;;                     (make-string (- (window-width)
-  ;;                                     (save-excursion (goto-char(line-end-position))
-  ;;                                                     (current-column)))
-  ;;                                  ?\s)
-  ;;                     'face (list :background active-line-color)
-  ;;                     'cursor 1000))
-  ;;       (push ov active-line-ovs)))
-  )
+    (push ov active-line-ovs)))
 
 ;;(add-hook 'before-change-functions (lambda (&rest _) (active-line-clear)))
 (add-hook 'after-change-functions
@@ -200,7 +180,7 @@
                   (active-line-hl))
               (error nil))))
 
-;; =======================================================
+;; ==============================================================================
 ;; dired
 
 (require 'dired)
