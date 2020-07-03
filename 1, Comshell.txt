@@ -44,7 +44,7 @@ we can have views of different locations in a project (even of the same file);
 
 text files will be opened in a text editor;
 directories with ".g" suffixes, will be opened in a gallery view;
-directories with ".mp4" and ".mp3" suffixes, act like a media containers;
+directories within galleries, act like media containers;
 
 files and directories with names starting with a dot, will be hidden;
 ".cache" directory inside a project is for files we don't want to share or backup;
