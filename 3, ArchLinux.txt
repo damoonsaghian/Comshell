@@ -2,8 +2,8 @@ using Arch Linux we can easily setup and maintain a Linux system;
 the following shows how to setup a basic graphical environment, using GnomeShell;
 in the installed system you can press "alt-space" to show the list of applications;
 there you can also do power_off/restart, logout, suspend, and lock, by typing them;
-press "alt-m" to make a window maximized;
-press "alt-c" to close the window;
+press "alt-shift-space" to toggle maximized state of the window;
+press "alt-esc" to close the window;
 
 boot Arch Linux live environment;
 to ensure the system clock is accurate:
@@ -57,12 +57,3 @@ note that due to a bug, "pkexec" does not work with the fallback Polkit agent,
 there is a workaround though (it requires "ctrl+c" to stop):
 ; pkttyagent -p $(echo $$) | pkexec ...
 or you can just use "su" instead;
-
-now we can even have a prototype of Comshell using Emacs;
-a separate application is implemented using GJS,
-  to view web pages, pdfs, images and videos, as an overlay window;
-; pkexec pacman -S emacs webkit2gtk poppler-glib gst-plugins-{base,good,bad} gst-libav
-; mkdir -p ~/.emacs.d
-; cd ~/.emacs.d
-; export url=https://raw.githubusercontent.com/damoonsaghian/Comshell/master/ArchLinux/
-; curl --proto '=https' -sSf -o #1 "$url"{init.el,overlay.js}

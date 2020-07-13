@@ -23,6 +23,24 @@ Actor: mutable;
 "https://gitlab.freedesktop.org/gstreamer/gstreamer-rs/tree/master/tutorials"
 "https://github.com/fengalin/media-toc"
 
+; pkexec pacman -S gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
+poppler-glib goffice goocanvas
+
+;sh
+curl --proto '=https' -sSf -o comshell.zip https://github.com/damoonsaghian/Comshell/archive/master.zip
+unzip comshell.zip -d comshell
+
+cargo build --release
+pkexec cp .cache/target/release/comshell /usr/local/bin/
+
+printf '[Desktop Entry]\nName=Comshell\nExec=comshell\nIcon=computer\nType=Application' >
+  ~/.config/autostart/comshell.desktop
+pkexec cp ~/.config/autostart/comshell.desktop /etc/skel/.config/autostart/
+pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/
+;
+
+= prototype
+first we can implement a prototype of Comshell using PyGobject;
 "https://bitbucket.org/tiax/gtk-textbuffer-with-undo/src/default/undobuffer.py"
   "https://stackoverflow.com/questions/76096/undo-with-gtk-textview"
 "https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
@@ -34,19 +52,18 @@ Actor: mutable;
 "https://www.archlinux.org/packages/extra/any/meld/"
 "https://github.com/karlch/vimiv"
 "https://gitlab.gnome.org/GNOME/pitivi"
-"https://www.archlinux.org/packages/community/any/quodlibet/"
 "https://www.archlinux.org/packages/community/any/lollypop/"
 "https://www.archlinux.org/packages/community/any/gaupol/"
-
-; pkexec pacman -S gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
-poppler-glib goffice goocanvas
+"https://www.archlinux.org/packages/community/any/eolie/"
 
 ;sh
-cargo build --release
-cp .target/release/comshell /usr/local/bin/
+pkexec pacman -S python-gobject
 
-printf '[Desktop Entry]\nName=Comshell\nExec=comshell\nIcon=computer\nType=Application' >
+pkexec mkdir -p /usr/local/share/comshell-proto
+pkexec cp prototype/* /usr/local/share/comshell-proto/
+
+printf '[Desktop Entry]\nName=Comshell proto\nExec=python /usr/local/share/comshell-proto/main.py\nIcon=computer\nType=Application' >
   ~/.config/autostart/comshell.desktop
 pkexec cp ~/.config/autostart/comshell.desktop /etc/skel/.config/autostart/
-pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/
+pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/comshell-proto.desktop
 ;

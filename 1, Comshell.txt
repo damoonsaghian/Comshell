@@ -24,9 +24,9 @@ for those who neither can use all their fingers, nor can talk,
 , ";" followed by comma -> .
 , comma followed by "(" -> {
 , ";" followed by "(" -> [
-, comma followed by "c" followed by space -> : (followed by space)
+, comma followed by "c" followed by space -> : (followed by one space)
 , comma followed by "psi" followed by comma -> ψ
-, "_ab_c" then two underscores -> AbC
+, "_ab_c" then two underscores -> AbC (followed by one space)
 , "__ab_c" then two underscores -> __ab_c__
 "https://github.com/adereth/dactyl-keyboard"
 Kinesis Advantage 2 keyboard
@@ -35,16 +35,18 @@ Kinesis Advantage 2 keyboard
 = Comshell
 Comshell is a unified computing environment, utilizing command based user interface;
 
-".data/Comshell.png"
-
-projects are directories inside "~/projects/";
+projects are directories inside "~/projects/",
+  or in non_removable disks, inside a root directory named "projects";
 list of all projects will appear in a floating layer, at the center of screen;
 list of files in the project will be displayed in the left side_bar;
 we can have views of different locations in a project (even of the same file);
 
+projects in removable disks (inside a root directory named "projects"),
+  can be accessed from the floating layer showing projects list;
+
 text files will be opened in a text editor;
 directories with ".g" suffixes, will be opened in a gallery view;
-directories within galleries, act like media containers;
+files and directories inside galleries, will be opened in a floating layer;
 
 files and directories with names starting with a dot, will be hidden;
 ".cache" directory inside a project is for files we don't want to share or backup;
@@ -55,18 +57,12 @@ web pages:
 , move caret between visual objects (ignoring structural objects);
 , or use hinting for text input and other widgets, text and other elements like images and videos;
 
-projects in external disks (inside a root directory named "projects"),
-  can be accessed from a floating list view;
-
-at the bottom, there is a status_bar showing messages at the left, and system status at the right;
-system status: network, CPU and RAM usage, year-month-day week_day AM/PM hour:minute
-
 modal key_bindings;
 modes (normal mode and insert mode) must be visually distinctive;
 press "esc" to go to normal mode;
 in normal mode we can:
 , press "space" to go to insert mode;
-, move the cursor to the next or previous character or word;
+, move the cursor to the next or previous word;
 , move the cursor to the next or previous lines or table cells;
 , move the cursor to the next or previous paragraph;
 , start and end selection, then copy or cut;
@@ -74,4 +70,4 @@ in normal mode we can:
 , undo
 , find
 
-double space: auto_completion
+double space, not at the beginning of line: auto_completion
