@@ -59,19 +59,3 @@ scrollbar slider {
   min-width: 6px;
   min-height: 6px;
 }
-
-/*
-gradient + animation -> cursor
-"https://developer.gnome.org/gtk3/stable/chap-css-properties.html"
-gtk cursor-aspect-ratio style property;
-* {
-  -GtkTextView-error-underline-color: #FC4138;
-  -gtk-outline-radius: 2px;
-  -GtkWidget-cursor-aspect-ratio: 1;
-  -GtkTextView-cursor_aspect_ratio: 1;
-  -EelEditableLabe-cursor_aspect_ratio: 1;
-  -GtkWidget-focus-line-width: 3;
-}
-draw arrow at cursor position in TextView in GTK3:
-  "https://gist.github.com/musiKk/2266946"
-*/

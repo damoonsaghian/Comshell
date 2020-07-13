@@ -31,7 +31,9 @@ systemctl enable NetworkManager
 
 systemctl enable lightdm
 mkdir -p /etc/lightdm/lightdm.conf.d/
-echo '[LightDM]
+echo '[Seat:*]
+greeter-show-manual-login=true
+[LightDM]
 sessions-directory=/usr/share/wayland-sessions
 ' > /etc/lightdm/lightdm.conf.d/50-myconfig.conf
 mkdir -p /etc/lightdm/lightdm-gtk-greeter.conf.d/
@@ -69,10 +71,8 @@ center-new-windows=true
 [org/gnome/desktop/wm/preferences]
 button-layout=''
 [org/gnome/desktop/wm/keybindings]
-cycle-group=['<Alt>a']
-cycle-group-backward=['<Shift><Alt>a']
-close=['<Alt>c']
-toggle-maximized=['<Alt>m']
+close=['<Alt>Escape']
+toggle-maximized=['<Alt><Shift>Space']
 activate-window-menu=['']
 [org/gnome/shell/keybindings]
 toggle-application-view=['<Alt>Space', '<Super>a']
