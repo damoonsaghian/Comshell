@@ -57,3 +57,15 @@ note that due to a bug, "pkexec" does not work with the fallback Polkit agent,
 there is a workaround though (it requires "ctrl+c" to stop):
 ; pkttyagent -p $(echo $$) | pkexec ...
 or you can just use "su" instead;
+
+now we can even have a prototype of Comshell, using JupyterLab;
+"https://jupyterlab.readthedocs.io/"
+
+;sh
+pkexec pacman -S jupyterlab
+
+printf '[Desktop Entry]\nName=Comshell proto\nExec=jupyter lab\nIcon=computer\nType=Application' >
+  ~/.config/autostart/comshell.desktop
+pkexec cp ~/.config/autostart/comshell.desktop /etc/skel/.config/autostart/
+pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/comshell-proto.desktop
+;
