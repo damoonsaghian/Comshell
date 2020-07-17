@@ -41,8 +41,8 @@ pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/
 ;
 
 = prototype
-first we can implement a prototype of Comshell using "node-gtk";
-"https://github.com/romgrk/node-gtk"
+first we can implement a prototype of Comshell using Gjs;
+"https://gitlab.gnome.org/GNOME/gjs"
 
 "https://bitbucket.org/tiax/gtk-textbuffer-with-undo/src/default/undobuffer.py"
   "https://stackoverflow.com/questions/76096/undo-with-gtk-textview"
@@ -61,13 +61,10 @@ first we can implement a prototype of Comshell using "node-gtk";
 "https://www.archlinux.org/packages/community/any/eolie/"
 
 ;sh
-pkexec pacman -S npm gobject-introspection gcc
-pkexec npm install -g node-gtk
-
 pkexec mkdir -p /usr/local/share/comshell-proto
 pkexec cp prototype/* /usr/local/share/comshell-proto/
 
-printf '[Desktop Entry]\nName=Comshell proto\nExec=node /usr/local/share/comshell-proto/main.js \nIcon=computer\nType=Application' >
+printf '[Desktop Entry]\nName=Comshell proto\nExec=gjs /usr/local/share/comshell-proto/main.js \nIcon=computer\nType=Application' >
   ~/.config/autostart/comshell.desktop
 pkexec cp ~/.config/autostart/comshell.desktop /etc/skel/.config/autostart/
 pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/comshell-proto.desktop
