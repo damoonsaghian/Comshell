@@ -23,27 +23,13 @@ Actor: mutable;
 "https://gitlab.freedesktop.org/gstreamer/gstreamer-rs/tree/master/tutorials"
 "https://github.com/fengalin/media-toc"
 
-"https://bitbucket.org/tiax/gtk-textbuffer-with-undo/src/default/undobuffer.py"
-  "https://stackoverflow.com/questions/76096/undo-with-gtk-textview"
-"https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
-"http://zetcode.com/gui/pygtk/advancedwidgets/"
-"https://github.com/MeanEYE/Sunflower"
-"https://gitlab.gnome.org/GNOME/gnome-documents/-/tree/master/src"
-"https://github.com/zim-desktop-wiki/zim-desktop-wiki"
-"https://github.com/UberWriter/uberwriter"
-"https://www.archlinux.org/packages/extra/any/meld/"
-"https://github.com/karlch/vimiv"
-"https://gitlab.gnome.org/GNOME/pitivi"
-"https://www.archlinux.org/packages/community/any/lollypop/"
-"https://www.archlinux.org/packages/community/any/gaupol/"
-"https://www.archlinux.org/packages/community/any/eolie/"
-
 ; pkexec pacman -S gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
 poppler-glib goffice goocanvas
 
 ;sh
 curl --proto '=https' -sSf -o comshell.zip https://github.com/damoonsaghian/Comshell/archive/master.zip
 unzip comshell.zip -d comshell
+cd comshell
 
 cargo build --release
 pkexec cp .cache/target/release/comshell /usr/local/bin/
@@ -52,4 +38,40 @@ printf '[Desktop Entry]\nName=Comshell\nExec=comshell\nIcon=computer\nType=Appli
   ~/.config/autostart/comshell.desktop
 pkexec cp ~/.config/autostart/comshell.desktop /etc/skel/.config/autostart/
 pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/
+;
+
+= prototype
+first we can implement a prototype of Comshell using "node-gtk";
+"https://github.com/romgrk/node-gtk"
+
+https://python-gtk-3-tutorial.readthedocs.io/en/latest/layout.html
+http://zetcode.com/python/gtk/
+"https://bitbucket.org/tiax/gtk-textbuffer-with-undo/src/default/undobuffer.py"
+  "https://stackoverflow.com/questions/76096/undo-with-gtk-textview"
+"https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
+"http://zetcode.com/gui/pygtk/advancedwidgets/"
+"https://github.com/MeanEYE/Sunflower"
+"https://gitlab.gnome.org/GNOME/gnome-documents/-/tree/master/src"
+"https://github.com/zim-desktop-wiki/zim-desktop-wiki"
+"https://github.com/UberWriter/uberwriter"
+"https://github.com/jendrikseipp/rednotebook"
+"https://www.archlinux.org/packages/extra/any/meld/"
+"https://github.com/karlch/vimiv"
+"https://gitlab.gnome.org/GNOME/pitivi"
+"https://gitlab.com/Strit/griffith"
+"https://www.archlinux.org/packages/community/any/lollypop/"
+"https://www.archlinux.org/packages/community/any/gaupol/"
+"https://www.archlinux.org/packages/community/any/eolie/"
+
+;sh
+pkexec pacman -S npm gobject-introspection gcc
+
+npm install
+pkexec mkdir -p /usr/local/share/comshell-proto
+pkexec cp prototype/* /usr/local/share/comshell-proto/
+
+printf '[Desktop Entry]\nName=Comshell proto\nExec=node /usr/local/share/comshell-proto/main.js \nIcon=computer\nType=Application' >
+  ~/.config/autostart/comshell.desktop
+pkexec cp ~/.config/autostart/comshell.desktop /etc/skel/.config/autostart/
+pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/comshell-proto.desktop
 ;
