@@ -44,22 +44,6 @@ pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/
 first we can implement a prototype of Comshell using Gjs;
 "https://gitlab.gnome.org/GNOME/gjs"
 
-"https://bitbucket.org/tiax/gtk-textbuffer-with-undo/src/default/undobuffer.py"
-  "https://stackoverflow.com/questions/76096/undo-with-gtk-textview"
-"https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
-"http://zetcode.com/gui/pygtk/advancedwidgets/"
-"https://github.com/MeanEYE/Sunflower"
-"https://github.com/zim-desktop-wiki/zim-desktop-wiki"
-"https://github.com/jendrikseipp/rednotebook"
-"https://github.com/UberWriter/uberwriter"
-"https://www.archlinux.org/packages/extra/any/meld/"
-"https://github.com/karlch/vimiv"
-"https://gitlab.gnome.org/GNOME/pitivi"
-"https://gitlab.com/Strit/griffith"
-"https://www.archlinux.org/packages/community/any/lollypop/"
-"https://www.archlinux.org/packages/community/any/gaupol/"
-"https://www.archlinux.org/packages/community/any/eolie/"
-
 ;sh
 pkexec mkdir -p /usr/local/share/comshell-proto
 pkexec cp prototype/* /usr/local/share/comshell-proto/
