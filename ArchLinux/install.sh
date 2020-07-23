@@ -120,7 +120,6 @@ echo 'stage {
 ' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css
 cp ./extension.js /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
 
-curl --proto '=https' -sSf -o #1 https://raw.githubusercontent.com/damoonsaghian/Comshell/master/ArchLinux/gtk.css
 mkdir -p /etc/skel/.config/gtk-3.0
 cp ./gtk.css /etc/skel/.config/gtk-3.0/
 mkdir -p /etc/skel/.config/gtk-4.0
@@ -164,5 +163,3 @@ unset HISTFILE
 useradd -m -G wheel user1
 passwd user1
 passwd
-
-rm ./install.sh ./extension.js ./gtk.css
