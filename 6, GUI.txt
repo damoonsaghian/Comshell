@@ -1,0 +1,67 @@
+implementing a complete GUI toolkit is a lot of work;
+existing ones (like GTK) are single threaded;
+thus we can't access GTK widgets (and data structures containing them), from inside actors;
+the solution:
+"https://gtk-rs.org/docs/glib/source/fn.idle_add.html"
+"https://docs.rs/fragile/1.0.0/fragile/struct.Fragile.html"
+"https://docs.rs/send_wrapper/0.4.0/send_wrapper/"
+we deal with Gobjects by wrapping them in a Gsend;
+Gsend embeds a Fragile inside, which will be created in the GTK main thread (using "idle_add"),
+  and then received (and put inside the Gsend) using a channel;
+Gsend.new gets a closure (instead of a Gobject value);
+  the closure's return type is the type of the specific Gobject;
+
+Arc: immutable;
+Actor: mutable;
+
+another problem with GTK is its lack of features;
+for example the SourceView widget lacks indent guides;
+thus we have to implement it, probably using "gtk.TextView.draw_layer";
+"https://github.com/howl-editor/howl/blob/ea6c6acac0b8b7cf72e4a4e01b9a2a4df1d1c84a/lib/aullar/display_lines.moon#L167"
+
+so i'm not sure, maybe it's better to implement a GUI library, based on actors, from scratch;
+
+"https://gtk-rs.org/docs/gtk/"
+"https://gtk-rs.org/docs/sourceview/"
+"https://mmstick.github.io/gtkrs-tutorials/introduction.html"
+"https://github.com/gtk-rs/examples/tree/master/src/bin"
+"https://slomo.pages.freedesktop.org/rustdocs/gstreamer/gstreamer/"
+"https://gitlab.freedesktop.org/gstreamer/gstreamer-rs/tree/master/examples"
+"https://gitlab.freedesktop.org/gstreamer/gstreamer-rs/tree/master/tutorials"
+"https://github.com/fengalin/media-toc"
+
+"https://python-gtk-3-tutorial.readthedocs.io/en/latest/index.html"
+"https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
+"http://zetcode.com/gui/pygtk/advancedwidgets/"
+"https://github.com/MeanEYE/Sunflower"
+"https://gitlab.gnome.org/World/lollypop/-/tree/master/lollypop"
+"https://github.com/karlch/vimiv/tree/master/vimiv"
+"https://gitlab.gnome.org/GNOME/pitivi/-/tree/master/pitivi"
+"https://github.com/otsaloma/gaupol/tree/master/gaupol"
+"https://github.com/zim-desktop-wiki/zim-desktop-wiki"
+"https://gitlab.gnome.org/somas/apostrophe"
+"https://github.com/jendrikseipp/rednotebook"
+"https://github.com/UberWriter/uberwriter"
+"https://gitlab.gnome.org/GNOME/meld/-/tree/master/meld"
+"https://bitbucket.org/tiax/gtk-textbuffer-with-undo/src/default/undobuffer.py"
+  "https://stackoverflow.com/questions/76096/undo-with-gtk-textview"
+draw arrow at cursor position in TextView in GTK3:
+"https://gist.github.com/musiKk/2266946"
+"https://www.archlinux.org/packages/community/any/eolie/"
+
+; pkexec pacman -S gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
+poppler-glib goffice goocanvas
+
+;sh
+curl --proto '=https' -sSf -o comshell.zip https://github.com/damoonsaghian/Comshell/archive/master.zip
+unzip comshell.zip -d Comshell
+cd Comshell
+
+cargo build --release
+pkexec cp .cache/target/release/comshell /usr/local/bin/
+
+printf '[Desktop Entry]\nName=Comshell\nExec=comshell\nIcon=computer\nType=Application' >
+  ~/.config/autostart/comshell.desktop
+pkexec cp ~/.config/autostart/comshell.desktop /etc/skel/.config/autostart/
+pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/
+;
