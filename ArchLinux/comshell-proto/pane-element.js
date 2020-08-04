@@ -52,37 +52,17 @@ class PaneElement extends HTMLElement {
         this.model.blur();
       }
     };
-    const handleDragOver = event => {
-      event.preventDefault();
-      event.stopPropagation();
-    };
-    const handleDrop = event => {
-      event.preventDefault();
-      event.stopPropagation();
-      this.getModel().activate();
-      const pathsToOpen = [...event.dataTransfer.files].map(file => file.path);
-      if (pathsToOpen.length > 0) {
-        this.applicationDelegate.open({ pathsToOpen, here: true });
-      }
-    };
+
     this.addEventListener('focus', handleFocus, true);
     this.addEventListener('blur', handleBlur, true);
-    this.addEventListener('dragover', handleDragOver);
-    this.addEventListener('drop', handleDrop);
   }
 
-  initialize(model, { views, applicationDelegate }) {
+  initialize(model, { views }) {
     this.model = model;
     this.views = views;
-    this.applicationDelegate = applicationDelegate;
     if (this.views == null) {
       throw new Error(
         'Must pass a views parameter when initializing PaneElements'
-      );
-    }
-    if (this.applicationDelegate == null) {
-      throw new Error(
-        'Must pass an applicationDelegate parameter when initializing PaneElements'
       );
     }
     this.subscriptions.add(this.model.onDidActivate(this.activated.bind(this)));

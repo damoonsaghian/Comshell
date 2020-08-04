@@ -86,12 +86,10 @@ module.exports = class Project extends Model {
     notificationManager,
     packageManager,
     config,
-    applicationDelegate,
     grammarRegistry
   }) {
     super();
     this.notificationManager = notificationManager;
-    this.applicationDelegate = applicationDelegate;
     this.grammarRegistry = grammarRegistry;
 
     this.emitter = new Emitter();
@@ -908,12 +906,6 @@ module.exports = class Project extends Model {
   }
 
   subscribeToBuffer(buffer) {
-    buffer.onWillSave(async ({ path }) =>
-      this.applicationDelegate.emitWillSavePath(path)
-    );
-    buffer.onDidSave(({ path }) =>
-      this.applicationDelegate.emitDidSavePath(path)
-    );
     buffer.onDidDestroy(() => this.removeBuffer(buffer));
     buffer.onDidChangePath(() => {
       if (!(this.getPaths().length > 0)) {

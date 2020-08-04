@@ -1,6 +1,6 @@
 const nw = require('nw');
 
-module.exports = ({ commandRegistry, _, config, notificationManager, project, clipboard }) => {
+module.exports = ({ commandRegistry, config, notificationManager, project, clipboard }) => {
   commandRegistry.add(
     'atom-workspace',
     {
@@ -8,7 +8,7 @@ module.exports = ({ commandRegistry, _, config, notificationManager, project, cl
       'pane:show-previous-item': function () {
         this.getModel().getActivePane().activatePreviousItem();
       },
-      'application:quit': () => nw.App.quit(),
+      'application:quit': () => nw.Window.get().close(),
       'window:focus-next-pane': function () { this.getModel().activateNextPane() },
       'window:focus-previous-pane': function () { this.getModel().activatePreviousPane() },
       'window:focus-pane-above': function () { this.focusPaneViewAbove() },

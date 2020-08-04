@@ -4,6 +4,7 @@ const path = require('path');
 const { Emitter, Disposable, CompositeDisposable } = require('event-kit');
 const fs = require('fs-plus');
 const { Directory } = require('pathwatcher');
+const Dialog = require('./dialog');
 
 const RipgrepDirectorySearcher = require('./ripgrep-directory-searcher');
 const Dock = require('./dock');
@@ -289,8 +290,6 @@ module.exports = class Workspace extends Model {
   constructor(params) {
     super(...arguments);
 
-    this.updateWindowTitle = this.updateWindowTitle.bind(this);
-    this.updateDocumentEdited = this.updateDocumentEdited.bind(this);
     this.didDestroyPaneItem = this.didDestroyPaneItem.bind(this);
     this.didChangeActivePaneOnPaneContainer = this.didChangeActivePaneOnPaneContainer.bind(
       this
@@ -480,7 +479,6 @@ module.exports = class Workspace extends Model {
 
   initialize() {
     this.originalFontSize = this.config.get('editor.fontSize');
-    this.project.onDidChangePaths(this.updateWindowTitle);
     this.subscribeToAddedItems();
     this.subscribeToMovedItems();
     this.subscribeToDockToggling();
@@ -552,8 +550,6 @@ module.exports = class Workspace extends Model {
     }
 
     this.hasActiveTextEditor = this.getActiveTextEditor() != null;
-
-    this.updateWindowTitle();
   }
 
   getPackageNamesWithActiveGrammars() {
@@ -636,52 +632,8 @@ module.exports = class Workspace extends Model {
   }
 
   didChangeActivePaneItem(item) {
-    this.updateWindowTitle();
-    this.updateDocumentEdited();
     if (this.activeItemSubscriptions) this.activeItemSubscriptions.dispose();
     this.activeItemSubscriptions = new CompositeDisposable();
-
-    let modifiedSubscription, titleSubscription;
-
-    if (item != null && typeof item.onDidChangeTitle === 'function') {
-      titleSubscription = item.onDidChangeTitle(this.updateWindowTitle);
-    } else if (item != null && typeof item.on === 'function') {
-      titleSubscription = item.on('title-changed', this.updateWindowTitle);
-      if (
-        titleSubscription == null ||
-        typeof titleSubscription.dispose !== 'function'
-      ) {
-        titleSubscription = new Disposable(() => {
-          item.off('title-changed', this.updateWindowTitle);
-        });
-      }
-    }
-
-    if (item != null && typeof item.onDidChangeModified === 'function') {
-      modifiedSubscription = item.onDidChangeModified(
-        this.updateDocumentEdited
-      );
-    } else if (item != null && typeof item.on === 'function') {
-      modifiedSubscription = item.on(
-        'modified-status-changed',
-        this.updateDocumentEdited
-      );
-      if (
-        modifiedSubscription == null ||
-        typeof modifiedSubscription.dispose !== 'function'
-      ) {
-        modifiedSubscription = new Disposable(() => {
-          item.off('modified-status-changed', this.updateDocumentEdited);
-        });
-      }
-    }
-
-    if (titleSubscription != null) {
-      this.activeItemSubscriptions.add(titleSubscription);
-    }
-    if (modifiedSubscription != null) {
-      this.activeItemSubscriptions.add(modifiedSubscription);
-    }
 
     this.cancelStoppedChangingActivePaneItemTimeout();
     this.stoppedChangingActivePaneItemTimeout = setTimeout(() => {
@@ -777,78 +729,6 @@ module.exports = class Workspace extends Model {
         });
       });
     }
-  }
-
-  // Updates the application's title and proxy icon based on whichever file is
-  // open.
-  updateWindowTitle() {
-    let itemPath, itemTitle, projectPath, representedPath;
-    const appName = atom.getAppName();
-    const left = this.project.getPaths();
-    const projectPaths = left != null ? left : [];
-    const item = this.getActivePaneItem();
-    if (item) {
-      itemPath =
-        typeof item.getPath === 'function' ? item.getPath() : undefined;
-      const longTitle =
-        typeof item.getLongTitle === 'function'
-          ? item.getLongTitle()
-          : undefined;
-      itemTitle =
-        longTitle == null
-          ? typeof item.getTitle === 'function'
-            ? item.getTitle()
-            : undefined
-          : longTitle;
-      projectPath = _.find(
-        projectPaths,
-        projectPath =>
-          itemPath === projectPath ||
-          (itemPath != null
-            ? itemPath.startsWith(projectPath + path.sep)
-            : undefined)
-      );
-    }
-    if (itemTitle == null) {
-      itemTitle = 'untitled';
-    }
-    if (projectPath == null) {
-      projectPath = itemPath ? path.dirname(itemPath) : projectPaths[0];
-    }
-    if (projectPath != null) {
-      projectPath = fs.tildify(projectPath);
-    }
-
-    const titleParts = [];
-    if (item != null && projectPath != null) {
-      titleParts.push(itemTitle, projectPath);
-      representedPath = itemPath != null ? itemPath : projectPath;
-    } else if (projectPath != null) {
-      titleParts.push(projectPath);
-      representedPath = projectPath;
-    } else {
-      titleParts.push(itemTitle);
-      representedPath = '';
-    }
-
-    if (process.platform !== 'darwin') {
-      titleParts.push(appName);
-    }
-
-    document.title = titleParts.join(' \u2014 ');
-    this.applicationDelegate.setRepresentedFilename(representedPath);
-    this.emitter.emit('did-change-window-title');
-  }
-
-  // On macOS, fades the application window's proxy icon when the current file
-  // has been modified.
-  updateDocumentEdited() {
-    const activePaneItem = this.getActivePaneItem();
-    const modified =
-      activePaneItem != null && typeof activePaneItem.isModified === 'function'
-        ? activePaneItem.isModified() || false
-        : false;
-    this.applicationDelegate.setWindowDocumentEdited(modified);
   }
 
   /*
@@ -1207,12 +1087,6 @@ module.exports = class Workspace extends Model {
         options.pending = false;
       }
 
-      // Avoid adding URLs as recent documents to work-around this Spotlight crash:
-      // https://github.com/atom/atom/issues/10071
-      if (uri && (!url.parse(uri).protocol || process.platform === 'win32')) {
-        this.applicationDelegate.addRecentDocument(uri);
-      }
-
       let pane, itemExistsInWorkspace;
 
       // Try to find an existing item in the workspace.
@@ -1523,24 +1397,11 @@ module.exports = class Workspace extends Model {
 
     if (fileSize >= this.config.get('core.warnOnLargeFileLimit') * 1048576) {
       // 40MB by default
-      await new Promise((resolve, reject) => {
-        this.applicationDelegate.confirm(
-          {
-            message:
-              'Atom will be unresponsive during the loading of very large files.',
-            detail: 'Do you still want to load this file?',
-            buttons: ['Proceed', 'Cancel']
-          },
-          response => {
-            if (response === 1) {
-              const error = new Error();
-              error.code = 'CANCELLED';
-              reject(error);
-            } else {
-              resolve();
-            }
-          }
-        );
+      await new Promise((_resolve, reject) => {
+        atom.notifications.addWarning("file is too big");
+        const error = new Error();
+        error.code = 'CANCELLED';
+        reject(error);
       });
     }
 
@@ -1690,24 +1551,13 @@ module.exports = class Workspace extends Model {
   // Save the active pane item.
   //
   // If the active pane item currently has a URI according to the item's
-  // `.getURI` method, calls `.save` on the item. Otherwise
-  // {::saveActivePaneItemAs} # will be called instead. This method does nothing
+  // `.getURI` method, calls `.save` on the item.
+  // This method does nothing
   // if the active item does not implement a `.save` method.
   saveActivePaneItem() {
     return this.getCenter()
       .getActivePane()
       .saveActiveItem();
-  }
-
-  // Prompt the user for a path and save the active pane item to it.
-  //
-  // Opens a native dialog where the user selects a path on disk, then calls
-  // `.saveAs` on the item with the selected path. This method does nothing if
-  // the active item does not implement a `.saveAs` method.
-  saveActivePaneItemAs() {
-    this.getCenter()
-      .getActivePane()
-      .saveActiveItemAs();
   }
 
   // Destroy (close) the active pane item.
@@ -2356,16 +2206,19 @@ module.exports = class Workspace extends Model {
       };
 
       if (this.config.get('editor.confirmCheckoutHeadRevision')) {
-        this.applicationDelegate.confirm(
-          {
-            message: 'Confirm Checkout HEAD Revision',
-            detail: `Are you sure you want to discard all changes to "${editor.getFileName()}" since the last Git commit?`,
-            buttons: ['OK', 'Cancel']
-          },
-          response => {
-            if (response === 0) checkoutHead();
+        const message =
+          `discard all changes to "${editor.getFileName()}" since the last Git commit?`
+
+        const saveDialog = new Dialog({ prompt: message });
+        saveDialog.onConfirm = (answer) => {
+          if (answer === 'y' || answer === 'yes') {
+            saveDialog.close();
+            checkoutHead();
+          } else {
+            saveDialog.showError('enter "y" or "yes", or press "escape" to cancle');
           }
-        );
+        };
+        saveDialog.attach();
       } else {
         checkoutHead();
       }

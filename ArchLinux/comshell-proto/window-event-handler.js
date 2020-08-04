@@ -95,13 +95,6 @@ module.exports = class WindowEventHandler {
     this.subscriptions.add(
       listen(this.document, 'submit', 'form', this.handleFormSubmit)
     );
-
-    this.subscriptions.add(
-      this.applicationDelegate.onDidEnterFullScreen(this.handleEnterFullScreen)
-    );
-    this.subscriptions.add(
-      this.applicationDelegate.onDidLeaveFullScreen(this.handleLeaveFullScreen)
-    );
   }
 
   // Wire commands that should be handled by Chromium for elements with the
@@ -246,14 +239,6 @@ module.exports = class WindowEventHandler {
 
   handleWindowResize() {
     this.atomEnvironment.storeWindowDimensions();
-  }
-
-  handleEnterFullScreen() {
-    this.document.body.classList.add('fullscreen');
-  }
-
-  handleLeaveFullScreen() {
-    this.document.body.classList.remove('fullscreen');
   }
 
   handleWindowBeforeunload(event) {

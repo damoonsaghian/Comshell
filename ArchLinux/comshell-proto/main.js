@@ -2,7 +2,6 @@ const url = require('url');
 const path = require('path');
 const fs = require('fs-plus');
 const _ = require('underscore-plus');
-const nw = require('nw');
 const AtomEnvironment = require('./atom-environment');
 const ApplicationDelegate = require('./application-delegate');
 const Clipboard = require('./clipboard');
@@ -28,6 +27,11 @@ global.atom = new AtomEnvironment({
 });
 
 TextEditor.setScheduler(global.atom.views);
+
+win.on('close', async () => {
+  if (await atom.prepareToUnloadEditorWindow())
+    win.close(true);
+});
 
 global.atom.initialize({ window, document });
 
