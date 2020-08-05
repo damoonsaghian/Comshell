@@ -36,10 +36,9 @@ const EDITOR_PARAMS_BY_SETTING_KEY = [
 // done using your editor, be sure to call `dispose` on the returned disposable
 // to avoid leaking editors.
 module.exports = class TextEditorRegistry {
-  constructor({ config, assert, packageManager }) {
+  constructor({ config, assert }) {
     this.config = config;
     this.assert = assert;
-    this.packageManager = packageManager;
     this.clear();
   }
 
@@ -209,8 +208,7 @@ module.exports = class TextEditorRegistry {
     atom.grammars.autoAssignLanguageMode(editor.getBuffer());
   }
 
-  async updateAndMonitorEditorSettings(editor, oldLanguageMode) {
-    await this.packageManager.getActivatePromise();
+  updateAndMonitorEditorSettings(editor, oldLanguageMode) {
     this.updateEditorSettingsForLanguageMode(editor, oldLanguageMode);
     this.subscribeToSettingsForEditorScope(editor);
   }
