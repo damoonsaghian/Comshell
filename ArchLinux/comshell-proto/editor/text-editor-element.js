@@ -333,6 +333,6 @@ class TextEditorElement extends HTMLElement {
   }
 }
 
-module.exports = document.registerElement('atom-text-editor', {
-  prototype: TextEditorElement.prototype
-});
+window.customElements.define('atom-text-editor', TextEditorElement);
+
+module.exports = TextEditorElement;
