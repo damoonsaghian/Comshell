@@ -3,8 +3,6 @@ const path = require('path');
 const fs = require('fs-plus');
 const _ = require('underscore-plus');
 const AtomEnvironment = require('./atom-environment');
-const ApplicationDelegate = require('./application-delegate');
-const Clipboard = require('./clipboard');
 const TextEditor = require('./editor/text-editor');
 
 const win = nw.Window.get();
@@ -17,19 +15,10 @@ if (process.env.NODE_ENV == null) {
   process.env.NODE_ENV = 'production';
 }
 
-const clipboard = new Clipboard();
-TextEditor.setClipboard(clipboard);
-
-global.atom = new AtomEnvironment({
-  clipboard,
-  applicationDelegate: new ApplicationDelegate(),
-  enablePersistence: true
-});
-
-TextEditor.setScheduler(global.atom.views);
+global.atom = new AtomEnvironment();
 
 win.on('close', async () => {
-  if (await atom.prepareToUnloadEditorWindow())
+  if (await global.atom.prepareToUnloadEditorWindow())
     win.close(true);
 });
 

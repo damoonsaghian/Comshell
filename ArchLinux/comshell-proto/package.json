@@ -36,6 +36,6 @@
     "superstring": "^2.4.2",
     "text-buffer": "13.17.3",
     "atom-select-list": "^0.7.2",
-    "nw": "*"
+    "nw": "^0.47.1"
   }
 }

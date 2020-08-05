@@ -405,9 +405,8 @@ class WorkspaceElement extends HTMLElement {
   }
 }
 
-module.exports = document.registerElement('atom-workspace', {
-  prototype: WorkspaceElement.prototype
-});
+window.customElements.define('atom-workspace', WorkspaceElement);
+module.exports = WorkspaceElement;
 
 function isTab(element) {
   let el = element;

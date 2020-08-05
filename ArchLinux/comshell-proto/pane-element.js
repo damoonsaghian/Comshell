@@ -193,6 +193,6 @@ class PaneElement extends HTMLElement {
   }
 }
 
-module.exports = document.registerElement('atom-pane', {
-  prototype: PaneElement.prototype
-});
+window.customElements.define('atom-pane', PaneElement);
+
+module.exports = PaneElement;
