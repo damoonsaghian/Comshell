@@ -131,17 +131,6 @@ module.exports = class StyleManager {
     this.deprecationsBySourcePath = {};
   }
 
-  initialize({ configDirPath }) {
-    this.configDirPath = configDirPath;
-    if (this.configDirPath != null) {
-      this.cacheDirPath = path.join(
-        this.configDirPath,
-        'compile-cache',
-        'style-manager'
-      );
-    }
-  }
-
   /*
   Section: Event Subscription
   */
@@ -333,28 +322,5 @@ module.exports = class StyleManager {
     var stylesElement = new StylesElement();
     stylesElement.initialize(this);
     return stylesElement;
-  }
-
-  /*
-  Section: Paths
-  */
-
-  // Extended: Get the path of the user style sheet in `~/.atom`.
-  //
-  // Returns a {String}.
-  getUserStyleSheetPath() {
-    if (this.configDirPath == null) {
-      return '';
-    } else {
-      const stylesheetPath = fs.resolve(
-        path.join(this.configDirPath, 'styles'),
-        ['css', 'less']
-      );
-      if (fs.isFileSync(stylesheetPath)) {
-        return stylesheetPath;
-      } else {
-        return path.join(this.configDirPath, 'styles.less');
-      }
-    }
   }
 };
