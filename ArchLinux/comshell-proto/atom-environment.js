@@ -1,3 +1,9 @@
+const _ = require('underscore-plus');
+const { CompositeDisposable, Disposable, Emitter } = require('event-kit');
+const fs = require('fs-plus');
+const path = require('path');
+const TextBuffer = require('text-buffer');
+
 const WindowEventHandler = require('./window-event-handler');
 const StateStore = require('./state-store');
 const registerDefaultCommands = require('./register-default-commands');
@@ -6,7 +12,7 @@ const Config = require('./config');
 const DeserializerManager = require('./deserializer-manager');
 const ViewRegistry = require('./view-registry');
 const NotificationManager = require('./notification-manager');
-const KeymapManager = require('./keymap-extensions');
+const KeymapManager = require('atom-keymap');
 const TooltipManager = require('./tooltip-manager');
 const CommandRegistry = require('./command-registry');
 const StyleManager = require('./style-manager');
@@ -21,19 +27,24 @@ const TextEditorRegistry = require('./editor/text-editor-registry');
 const TextEditor = require('./editor/text-editor');
 const Clipboard = require('./clipboard');
 
-const TextBuffer = require('text-buffer');
+KeymapManager.prototype.loadBundledKeymaps = function () {
+  keymapsPath = path.join(this.resourcePath, 'keymaps.json');
+  this.loadKeymap(keymapsPath);
+  this.emitter.emit('did-load-bundled-keymaps');
+};
 
 class ApplicationDelegate {
   constructor() {}
 
   getWindowLoadSettings() {
-    const userDataDir = nw.App.fullArgv['--user-data-dir'];
-    const projectRootPath = userDataDir ? require('path').join(userDataDir, '../..') : null;
+    const args = nw.App.fullArgv;
+    const userDataDir = args[args.indexOf('--user-data-dir') + 1]; // nw.App.dataPath
+    const projectRootPath = userDataDir ? path.join(userDataDir, '../..') : null;
     const initialProjectRoots = projectRootPath ? [projectRootPath] : null;
     return {
       appName: 'Comshell',
-      resourcePath: __dirname,
       atomHome: process.env.ATOM_HOME,
+      resourcePath: __dirname,
       initialProjectRoots
     };
   }
@@ -53,7 +64,6 @@ class ApplicationDelegate {
 
   setTemporaryWindowState(state) {
     nw.Window.get().temporaryState = state;
-    return Promise(resolve => resolve());
   }
 
   getWindowSize() {
@@ -149,18 +159,17 @@ class ApplicationDelegate {
   }
 }
 
-require('util').promisify(fs.stat); // stat 1608
-require('crypto') // crypto 1501
-// if initialProjectRoots is empty show projects list;
-
 // Essential: Atom global.
 //
 // An instance of this class is always available as the `atom` global.
 class AtomEnvironment {
+  static saveStateDebounceInterval = 1000;
+  static enablePersistence = true;
+
   clipboard = new Clipboard();
-  deserializers;
   views;
   notifications = new NotificationManager();
+  deserializers;
   config = new Config();
   keymaps;
   commands = new CommandRegistry();
@@ -169,12 +178,192 @@ class AtomEnvironment {
   project;
   textEditors;
   workspace;
-  history;
 
   constructor() {
     this.applicationDelegate = new ApplicationDelegate();
 
+    this.unloading = false;
+    this.emitter = new Emitter();
+    this.disposables = new CompositeDisposable();
+
+    this.views = new ViewRegistry(this);
+
+    this.deserializers = new DeserializerManager(this);
+    // register default deserializers
+    this.deserializers.add(Workspace);
+    this.deserializers.add(PaneContainer);
+    this.deserializers.add(PaneAxis);
+    this.deserializers.add(Pane);
+    this.deserializers.add(Dock);
+    this.deserializers.add(Project);
+    this.deserializers.add(TextEditor);
+    this.deserializers.add(TextBuffer);
+
+    this.stateStore = new StateStore('AtomEnvironments', 1);
+
+    this.config.setSchema(null, {
+      type: 'object',
+      properties: _.clone(ConfigSchema)
+    });
+
+    this.keymaps = new KeymapManager({
+      notificationManager: this.notifications
+    });
+
+    this.tooltips = new TooltipManager({
+      keymapManager: this.keymaps,
+      viewRegistry: this.views
+    });
+
+    this.grammars = new GrammarRegistry({ config: this.config });
+
+    this.project = new Project({
+      notificationManager: this.notifications,
+      grammarRegistry: this.grammars,
+      config: this.config,
+      applicationDelegate: this.applicationDelegate
+    });
+
+    this.textEditors = new TextEditorRegistry({
+      config: this.config,
+      grammarRegistry: this.grammars,
+      assert: this.assert.bind(this)
+    });
+
+    this.workspace = new Workspace({
+      config: this.config,
+      project: this.project,
+      grammarRegistry: this.grammars,
+      deserializerManager: this.deserializers,
+      notificationManager: this.notifications,
+      applicationDelegate: this.applicationDelegate,
+      viewRegistry: this.views,
+      assert: this.assert.bind(this),
+      textEditorRegistry: this.textEditors,
+      styleManager: this.styles,
+      enablePersistence: this.enablePersistence
+    });
+
+    registerDefaultCommands({
+      commandRegistry: this.commands,
+      config: this.config,
+      notificationManager: this.notifications,
+      project: this.project,
+      clipboard: this.clipboard
+    });
+
+    this.windowEventHandler = new WindowEventHandler({
+      atomEnvironment: this,
+      applicationDelegate: this.applicationDelegate
+    });
+  }
+
+  initialize() {
     TextEditor.setClipboard(this.clipboard);
     TextEditor.setScheduler(this.views);
+    // this will register the custom element, even before opening a buffer;
+    require('./editor/text-editor-element');
+
+    this.window = params.window;
+    this.document = params.document;
+
+    const { resourcePath } = this.applicationDelegate.getWindowLoadSettings();
+
+    this.keymaps.resourcePath = resourcePath;
+    this.keymaps.loadBundledKeymaps();
+
+    this.commands.attach(this.window);
+
+    this.initialStyleElements = this.styles.getSnapshot();
+    this.document.body.classList.add(`platform-${process.platform}`);
+    this.stylesElement = this.styles.buildStylesElement();
+    this.document.head.appendChild(this.stylesElement);
+    const didChangeStyles = this.didChangeStyles.bind(this);
+    this.disposables.add(this.styles.onDidAddStyleElement(didChangeStyles));
+    this.disposables.add(this.styles.onDidUpdateStyleElement(didChangeStyles));
+    this.disposables.add(this.styles.onDidRemoveStyleElement(didChangeStyles));
+
+    this.attachSaveStateListeners();
+
+    this.windowEventHandler.initialize(this.window, this.document);
+
+    this.workspace.initialize();
+  }
+
+  destroy() {
+    if (!this.project) return;
+
+    this.disposables.dispose();
+    if (this.workspace) this.workspace.destroy();
+    this.workspace = null;
+    if (this.project) this.project.destroy();
+    this.project = null;
+    this.commands.clear();
+    if (this.stylesElement) this.stylesElement.remove();
+    if (this.windowEventHandler)
+      this.windowEventHandler.unsubscribe();
+    this.windowEventHandler = null;
+  }
+
+  /*
+  Section: Private
+  */
+
+  assert(condition, message, callbackOrMetadata) {
+    if (condition) return true;
+
+    const error = new Error(`Assertion failed: ${message}`);
+    Error.captureStackTrace(error, this.assert);
+
+    if (callbackOrMetadata) {
+      if (typeof callbackOrMetadata === 'function') {
+        callbackOrMetadata(error);
+      } else {
+        error.metadata = callbackOrMetadata;
+      }
+    }
+
+    if (!this.isReleasedVersion()) throw error;
+
+    return false;
+  }
+
+  attachSaveStateListeners() {
+    const saveState = _.debounce(() => {
+      this.window.requestIdleCallback(() => {
+        if (!this.unloading) this.saveState({ isUnloading: false });
+      });
+    }, this.saveStateDebounceInterval);
+    this.document.addEventListener('mousedown', saveState, true);
+    this.document.addEventListener('keydown', saveState, true);
+    this.disposables.add(
+      new Disposable(() => {
+        this.document.removeEventListener('mousedown', saveState, true);
+        this.document.removeEventListener('keydown', saveState, true);
+      })
+    );
+  }
+
+  async saveState(options, storageKey) {
+    if (this.enablePersistence && this.project) {
+      const state = this.serialize(options);
+      if (!storageKey)
+        storageKey = this.getStateKey(this.project && this.project.getPaths());
+      if (storageKey) {
+        await this.stateStore.save(storageKey, state);
+      } else {
+        this.applicationDelegate.setTemporaryWindowState(state);
+      }
+    }
   }
 }
+
+// stat 1608
+//   require('util').promisify(fs.stat);
+// crypto 1501
+//   require('crypto')
+// registerDefaultTargetForKeymaps:
+//   this.keymaps.defaultTarget = this.workspace.getElement();
+// if initialProjectRoots is empty show projects list;
+
+module.exports = AtomEnvironment;
