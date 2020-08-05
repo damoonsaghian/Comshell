@@ -300,7 +300,6 @@ module.exports = class Workspace extends Model {
     this.didActivatePaneContainer = this.didActivatePaneContainer.bind(this);
 
     this.enablePersistence = params.enablePersistence;
-    this.packageManager = params.packageManager;
     this.config = params.config;
     this.project = params.project;
     this.notificationManager = params.notificationManager;
@@ -321,7 +320,6 @@ module.exports = class Workspace extends Model {
 
     this.scandalDirectorySearcher = new DefaultDirectorySearcher();
     this.ripgrepDirectorySearcher = new RipgrepDirectorySearcher();
-    this.consumeServices(this.packageManager);
 
     this.paneContainers = {
       center: this.createCenter(),
@@ -410,8 +408,7 @@ module.exports = class Workspace extends Model {
     });
   }
 
-  reset(packageManager) {
-    this.packageManager = packageManager;
+  reset() {
     this.emitter.dispose();
     this.emitter = new Emitter();
 
@@ -474,7 +471,6 @@ module.exports = class Workspace extends Model {
       this.element.destroy();
       this.element = null;
     }
-    this.consumeServices(this.packageManager);
   }
 
   initialize() {
@@ -484,18 +480,10 @@ module.exports = class Workspace extends Model {
     this.subscribeToDockToggling();
   }
 
-  consumeServices({ serviceHub }) {
-    this.directorySearchers = [];
-    serviceHub.consume('atom.directory-searcher', '^0.1.0', provider =>
-      this.directorySearchers.unshift(provider)
-    );
-  }
-
   // Called by the Serializable mixin during serialization.
   serialize() {
     return {
       deserializer: 'Workspace',
-      packagesWithActiveGrammars: this.getPackageNamesWithActiveGrammars(),
       destroyedItemURIs: this.destroyedItemURIs.slice(),
       // Ensure deserializing 1.17 state with pre 1.17 Atom does not error
       // TODO: Remove after 1.17 has been on stable for a while
@@ -510,16 +498,6 @@ module.exports = class Workspace extends Model {
   }
 
   deserialize(state, deserializerManager) {
-    const packagesWithActiveGrammars =
-      state.packagesWithActiveGrammars != null
-        ? state.packagesWithActiveGrammars
-        : [];
-    for (let packageName of packagesWithActiveGrammars) {
-      const pkg = this.packageManager.getLoadedPackage(packageName);
-      if (pkg != null) {
-        pkg.loadGrammarsSync();
-      }
-    }
     if (state.destroyedItemURIs != null) {
       this.destroyedItemURIs = state.destroyedItemURIs;
     }
@@ -550,41 +528,6 @@ module.exports = class Workspace extends Model {
     }
 
     this.hasActiveTextEditor = this.getActiveTextEditor() != null;
-  }
-
-  getPackageNamesWithActiveGrammars() {
-    const packageNames = [];
-    const addGrammar = ({ includedGrammarScopes, packageName } = {}) => {
-      if (!packageName) {
-        return;
-      }
-      // Prevent cycles
-      if (packageNames.indexOf(packageName) !== -1) {
-        return;
-      }
-
-      packageNames.push(packageName);
-      for (let scopeName of includedGrammarScopes != null
-        ? includedGrammarScopes
-        : []) {
-        addGrammar(this.grammarRegistry.grammarForScopeName(scopeName));
-      }
-    };
-
-    const editors = this.getTextEditors();
-    for (let editor of editors) {
-      addGrammar(editor.getGrammar());
-    }
-
-    if (editors.length > 0) {
-      for (let grammar of this.grammarRegistry.getGrammars()) {
-        if (grammar.injectionSelector) {
-          addGrammar(grammar);
-        }
-      }
-    }
-
-    return _.uniq(packageNames);
   }
 
   didActivatePaneContainer(paneContainer) {
@@ -672,15 +615,6 @@ module.exports = class Workspace extends Model {
           pane,
           index
         });
-        // It's important to call handleGrammarUsed after emitting the did-add event:
-        // if we activate a package between adding the editor to the registry and emitting
-        // the package may receive the editor twice from `observeTextEditors`.
-        // (Note that the item can be destroyed by an `observeTextEditors` handler.)
-        if (!item.isDestroyed()) {
-          subscriptions.add(
-            item.observeGrammar(this.handleGrammarUsed.bind(this))
-          );
-        }
       }
     });
   }
@@ -1408,18 +1342,6 @@ module.exports = class Workspace extends Model {
     const buffer = await this.project.bufferForPath(filePath, options);
     return this.textEditorRegistry.build(
       Object.assign({ buffer, autoHeight: false }, options)
-    );
-  }
-
-  handleGrammarUsed(grammar) {
-    if (grammar == null) {
-      return;
-    }
-    this.packageManager.triggerActivationHook(
-      `${grammar.scopeName}:root-scope-used`
-    );
-    this.packageManager.triggerActivationHook(
-      `${grammar.packageName}:grammar-used`
     );
   }
 

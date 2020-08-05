@@ -84,7 +84,6 @@ module.exports = class Project extends Model {
 
   constructor({
     notificationManager,
-    packageManager,
     config,
     grammarRegistry
   }) {
@@ -105,7 +104,6 @@ module.exports = class Project extends Model {
     this.retiredBufferIDs = new Set();
     this.retiredBufferPaths = new Set();
     this.subscriptions = new CompositeDisposable();
-    this.consumeServices(packageManager);
   }
 
   destroyed() {
@@ -124,7 +122,7 @@ module.exports = class Project extends Model {
     this.repositories = [];
   }
 
-  reset(packageManager) {
+  reset() {
     this.emitter.dispose();
     this.emitter = new Emitter();
 
@@ -139,7 +137,6 @@ module.exports = class Project extends Model {
     this.loadPromisesByPath = {};
     this.retiredBufferIDs = new Set();
     this.retiredBufferPaths = new Set();
-    this.consumeServices(packageManager);
   }
 
   destroyUnretainedBuffers() {
@@ -704,35 +701,6 @@ module.exports = class Project extends Model {
   /*
   Section: Private
   */
-
-  consumeServices({ serviceHub }) {
-    serviceHub.consume('atom.directory-provider', '^0.1.0', provider => {
-      this.directoryProviders.unshift(provider);
-      return new Disposable(() => {
-        return this.directoryProviders.splice(
-          this.directoryProviders.indexOf(provider),
-          1
-        );
-      });
-    });
-
-    return serviceHub.consume(
-      'atom.repository-provider',
-      '^0.1.0',
-      provider => {
-        this.repositoryProviders.unshift(provider);
-        if (this.repositories.includes(null)) {
-          this.setPaths(this.getPaths());
-        }
-        return new Disposable(() => {
-          return this.repositoryProviders.splice(
-            this.repositoryProviders.indexOf(provider),
-            1
-          );
-        });
-      }
-    );
-  }
 
   // Retrieves all the {TextBuffer}s in the project; that is, the
   // buffers for all open files.
