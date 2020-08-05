@@ -10,10 +10,8 @@ KeymapManager.prototype.onDidLoadUserKeymap = function (callback) {
   this.emitter.on('did-load-user-keymap', callback);
 };
 
-KeymapManager.prototype.canLoadBundledKeymapsFromMemory = () => false;
-
 KeymapManager.prototype.loadBundledKeymaps = function () {
-  keymapsPath = path.join(this.resourcePath, 'keymaps');
+  keymapsPath = path.join(this.resourcePath, 'keymaps.json');
   this.loadKeymap(keymapsPath);
   this.emitter.emit('did-load-bundled-keymaps');
 };
