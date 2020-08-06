@@ -305,7 +305,6 @@ module.exports = class Workspace extends Model {
     this.notificationManager = params.notificationManager;
     this.viewRegistry = params.viewRegistry;
     this.grammarRegistry = params.grammarRegistry;
-    this.applicationDelegate = params.applicationDelegate;
     this.assert = params.assert;
     this.deserializerManager = params.deserializerManager;
     this.textEditorRegistry = params.textEditorRegistry;
@@ -382,7 +381,6 @@ module.exports = class Workspace extends Model {
   createCenter() {
     return new WorkspaceCenter({
       config: this.config,
-      applicationDelegate: this.applicationDelegate,
       notificationManager: this.notificationManager,
       deserializerManager: this.deserializerManager,
       viewRegistry: this.viewRegistry,
@@ -397,7 +395,6 @@ module.exports = class Workspace extends Model {
     return new Dock({
       location,
       config: this.config,
-      applicationDelegate: this.applicationDelegate,
       deserializerManager: this.deserializerManager,
       notificationManager: this.notificationManager,
       viewRegistry: this.viewRegistry,

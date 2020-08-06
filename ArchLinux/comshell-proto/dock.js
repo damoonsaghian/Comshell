@@ -35,7 +35,6 @@ module.exports = class Dock {
     this.location = params.location;
     this.widthOrHeight = getWidthOrHeight(this.location);
     this.config = params.config;
-    this.applicationDelegate = params.applicationDelegate;
     this.deserializerManager = params.deserializerManager;
     this.notificationManager = params.notificationManager;
     this.viewRegistry = params.viewRegistry;
@@ -46,7 +45,6 @@ module.exports = class Dock {
     this.paneContainer = new PaneContainer({
       location: this.location,
       config: this.config,
-      applicationDelegate: this.applicationDelegate,
       deserializerManager: this.deserializerManager,
       notificationManager: this.notificationManager,
       viewRegistry: this.viewRegistry

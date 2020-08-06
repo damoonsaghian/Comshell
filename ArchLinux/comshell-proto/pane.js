@@ -24,7 +24,7 @@ module.exports = class Pane {
 
   static deserialize(
     state,
-    { deserializers, applicationDelegate, config, notifications, views }
+    { deserializers, config, notifications, views }
   ) {
     const { activeItemIndex } = state;
     const activeItemURI = state.activeItemURI || state.activeItemUri;
@@ -50,8 +50,7 @@ module.exports = class Pane {
           deserializerManager: deserializers,
           notificationManager: notifications,
           viewRegistry: views,
-          config,
-          applicationDelegate
+          config
         },
         state
       )
@@ -76,7 +75,6 @@ module.exports = class Pane {
 
     this.activeItem = params.activeItem;
     this.focused = params.focused != null ? params.focused : false;
-    this.applicationDelegate = params.applicationDelegate;
     this.notificationManager = params.notificationManager;
     this.config = params.config;
     this.deserializerManager = params.deserializerManager;
@@ -98,8 +96,7 @@ module.exports = class Pane {
   getElement() {
     if (!this.element) {
       this.element = new PaneElement().initialize(this, {
-        views: this.viewRegistry,
-        applicationDelegate: this.applicationDelegate
+        views: this.viewRegistry
       });
     }
     return this.element;
@@ -1131,7 +1128,6 @@ module.exports = class Pane {
     const newPane = new Pane(
       Object.assign(
         {
-          applicationDelegate: this.applicationDelegate,
           notificationManager: this.notificationManager,
           deserializerManager: this.deserializerManager,
           config: this.config,

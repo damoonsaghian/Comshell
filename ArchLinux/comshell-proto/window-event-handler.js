@@ -4,12 +4,11 @@ const { debounce } = require('underscore-plus');
 
 // Handles low-level events related to the `window`.
 module.exports = class WindowEventHandler {
-  constructor({ atomEnvironment, applicationDelegate }) {
+  constructor({ atomEnvironment }) {
     this.handleDocumentKeyEvent = this.handleDocumentKeyEvent.bind(this);
     this.handleFocusNext = this.handleFocusNext.bind(this);
     this.handleFocusPrevious = this.handleFocusPrevious.bind(this);
     this.handleWindowBlur = this.handleWindowBlur.bind(this);
-    this.handleWindowResize = this.handleWindowResize.bind(this);
     this.handleEnterFullScreen = this.handleEnterFullScreen.bind(this);
     this.handleLeaveFullScreen = this.handleLeaveFullScreen.bind(this);
     this.handleWindowBeforeunload = this.handleWindowBeforeunload.bind(this);
@@ -17,7 +16,6 @@ module.exports = class WindowEventHandler {
       this
     );
     this.handleWindowClose = this.handleWindowClose.bind(this);
-    this.handleWindowReload = this.handleWindowReload.bind(this);
     this.handleWindowToggleDevTools = this.handleWindowToggleDevTools.bind(
       this
     );
@@ -25,11 +23,7 @@ module.exports = class WindowEventHandler {
     this.handleLinkClick = this.handleLinkClick.bind(this);
     this.handleDocumentContextmenu = this.handleDocumentContextmenu.bind(this);
     this.atomEnvironment = atomEnvironment;
-    this.applicationDelegate = applicationDelegate;
-    this.reloadRequested = false;
     this.subscriptions = new CompositeDisposable();
-
-    this.handleNativeKeybindings();
   }
 
   initialize(window, document) {
@@ -39,7 +33,6 @@ module.exports = class WindowEventHandler {
       this.atomEnvironment.commands.add(this.window, {
         'window:toggle-full-screen': this.handleWindowToggleFullScreen,
         'window:close': this.handleWindowClose,
-        'window:reload': this.handleWindowReload,
         'window:toggle-dev-tools': this.handleWindowToggleDevTools
       })
     );
@@ -66,11 +59,6 @@ module.exports = class WindowEventHandler {
     );
     this.addEventListener(this.window, 'focus', this.handleWindowFocus);
     this.addEventListener(this.window, 'blur', this.handleWindowBlur);
-    this.addEventListener(
-      this.window,
-      'resize',
-      debounce(this.handleWindowResize, 500)
-    );
 
     this.addEventListener(this.document, 'keyup', this.handleDocumentKeyEvent);
     this.addEventListener(
@@ -95,29 +83,6 @@ module.exports = class WindowEventHandler {
     this.subscriptions.add(
       listen(this.document, 'submit', 'form', this.handleFormSubmit)
     );
-  }
-
-  // Wire commands that should be handled by Chromium for elements with the
-  // `.native-key-bindings` class.
-  handleNativeKeybindings() {
-    const bindCommandToAction = (command, action) => {
-      this.subscriptions.add(
-        this.atomEnvironment.commands.add(
-          '.native-key-bindings',
-          command,
-          event =>
-            this.applicationDelegate.getCurrentWindow().webContents[action](),
-          false
-        )
-      );
-    };
-
-    bindCommandToAction('core:copy', 'copy');
-    bindCommandToAction('core:paste', 'paste');
-    bindCommandToAction('core:undo', 'undo');
-    bindCommandToAction('core:redo', 'redo');
-    bindCommandToAction('core:select-all', 'selectAll');
-    bindCommandToAction('core:cut', 'cut');
   }
 
   unsubscribe() {
@@ -234,23 +199,10 @@ module.exports = class WindowEventHandler {
 
   handleWindowBlur() {
     this.document.body.classList.add('is-blurred');
-    this.atomEnvironment.storeWindowDimensions();
-  }
-
-  handleWindowResize() {
-    this.atomEnvironment.storeWindowDimensions();
   }
 
   handleWindowBeforeunload(event) {
-    if (
-      !this.reloadRequested &&
-      this.atomEnvironment.getCurrentWindow().isWebViewFocused()
-    ) {
-      this.atomEnvironment.hide();
-    }
-    this.reloadRequested = false;
-    this.atomEnvironment.storeWindowDimensions();
-    this.atomEnvironment.unloadEditorWindow();
+    this.atomEnvironment.hide();
     this.atomEnvironment.destroy();
   }
 
@@ -260,11 +212,6 @@ module.exports = class WindowEventHandler {
 
   handleWindowClose() {
     this.atomEnvironment.close();
-  }
-
-  handleWindowReload() {
-    this.reloadRequested = true;
-    this.atomEnvironment.reload();
   }
 
   handleWindowToggleDevTools() {
@@ -289,7 +236,7 @@ module.exports = class WindowEventHandler {
     const uri = event.currentTarget && event.currentTarget.getAttribute('href');
     if (uri && uri[0] !== '#') {
       if (/^https?:\/\//.test(uri)) {
-        this.applicationDelegate.openExternal(uri);
+        nw.Shell.openExternal(uri);
       } else if (uri.startsWith('atom://')) {
         this.atomEnvironment.uriHandlerRegistry.handleURI(uri);
       }

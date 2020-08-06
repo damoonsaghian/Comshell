@@ -71,10 +71,9 @@ const STOPPED_CHANGING_ACTIVE_PANE_ITEM_DELAY = 100;
 
 module.exports = class PaneContainer {
   constructor(params) {
-    let applicationDelegate, deserializerManager, notificationManager;
+    let deserializerManager, notificationManager;
     ({
       config: this.config,
-      applicationDelegate,
       notificationManager,
       deserializerManager,
       viewRegistry: this.viewRegistry,
@@ -90,7 +89,6 @@ module.exports = class PaneContainer {
       new Pane({
         container: this,
         config: this.config,
-        applicationDelegate,
         notificationManager,
         deserializerManager,
         viewRegistry: this.viewRegistry
