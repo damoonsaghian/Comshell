@@ -28,136 +28,10 @@ const TextEditor = require('./editor/text-editor');
 const Clipboard = require('./clipboard');
 
 KeymapManager.prototype.loadBundledKeymaps = function () {
-  keymapsPath = path.join(this.resourcePath, 'keymaps.json');
+  keymapsPath = path.join(__dirname, 'keymaps.json');
   this.loadKeymap(keymapsPath);
   this.emitter.emit('did-load-bundled-keymaps');
 };
-
-class ApplicationDelegate {
-  constructor() {}
-
-  getWindowLoadSettings() {
-    const args = nw.App.fullArgv;
-    const userDataDir = args[args.indexOf('--user-data-dir') + 1]; // nw.App.dataPath
-    const projectRootPath = userDataDir ? path.join(userDataDir, '../..') : null;
-    const initialProjectRoots = projectRootPath ? [projectRootPath] : null;
-    return {
-      appName: 'Comshell',
-      atomHome: process.env.ATOM_HOME,
-      resourcePath: __dirname,
-      initialProjectRoots
-    };
-  }
-
-  getCurrentWindow() {
-    return nw.Window.get();
-  }
-
-  closeWindow() {
-    nw.Window.get().close();
-    return Promise(resolve => resolve());
-  }
-
-  async getTemporaryWindowState() {
-    return nw.Window.get().temporaryState;
-  }
-
-  setTemporaryWindowState(state) {
-    nw.Window.get().temporaryState = state;
-  }
-
-  getWindowSize() {
-    const win = nw.Window.get();
-    const width = win.width;
-    const height = win.height;
-    return { width, height };
-  }
-
-  setWindowSize(width, height) {
-    const win = nw.Window.get();
-    win.width = width;
-    win.height = height;
-    return Promise(resolve => resolve());
-  }
-
-  getWindowPosition() {
-    const win = nw.Window.get();
-    const x = win.x;
-    const y = win.y;
-    return { x, y };
-  }
-
-  setWindowPosition(x, y) {
-    const win = nw.Window.get();
-    win.x = x;
-    win.y = y;
-    return Promise(resolve => resolve());
-  }
-
-  centerWindow() {
-    nw.Window.get().setPosition('center');
-    return Promise(resolve => resolve());
-  }
-
-  focusWindow() {
-    nw.Window.get().focus();
-    return Promise(resolve => resolve());
-  }
-
-  showWindow() {
-    nw.Window.get().show();
-    return Promise(resolve => resolve());
-  }
-
-  hideWindow() {
-    nw.Window.get().hide();
-    return Promise(resolve => resolve());
-  }
-
-  reloadWindow() {
-    nw.Window.get().reload();
-    return Promise(resolve => resolve());
-  }
-
-  restartApplication() {
-    nw.App.quit();
-    return Promise(resolve => resolve());
-  }
-
-  minimizeWindow() {
-    nw.Window.get().minimize();
-    return Promise(resolve => resolve());
-  }
-
-  isWindowMaximized() {
-    nw.Window.get().maximize();
-    return true;
-  }
-
-  maximizeWindow() {
-    nw.Window.get().maximize();
-    return Promise(resolve => resolve());
-  }
-
-  unmaximizeWindow() {
-    nw.Window.get().unmaximize();
-    return Promise(resolve => resolve());
-  }
-
-  isWindowFullScreen() {
-    return nw.Window.get().isFullscreen();
-  }
-
-  setWindowFullScreen(fullScreen = false) {
-    nw.Window.get().enterFullscreen();
-    return Promise(resolve => resolve());
-  }
-
-  openExternal(url) {
-    nw.Shell.openExternal(url);
-    return Promise(resolve => resolve());
-  }
-}
 
 // Essential: Atom global.
 //
@@ -180,8 +54,6 @@ class AtomEnvironment {
   workspace;
 
   constructor() {
-    this.applicationDelegate = new ApplicationDelegate();
-
     this.unloading = false;
     this.emitter = new Emitter();
     this.disposables = new CompositeDisposable();
@@ -220,8 +92,7 @@ class AtomEnvironment {
     this.project = new Project({
       notificationManager: this.notifications,
       grammarRegistry: this.grammars,
-      config: this.config,
-      applicationDelegate: this.applicationDelegate
+      config: this.config
     });
 
     this.textEditors = new TextEditorRegistry({
@@ -236,7 +107,6 @@ class AtomEnvironment {
       grammarRegistry: this.grammars,
       deserializerManager: this.deserializers,
       notificationManager: this.notifications,
-      applicationDelegate: this.applicationDelegate,
       viewRegistry: this.views,
       assert: this.assert.bind(this),
       textEditorRegistry: this.textEditors,
@@ -253,8 +123,7 @@ class AtomEnvironment {
     });
 
     this.windowEventHandler = new WindowEventHandler({
-      atomEnvironment: this,
-      applicationDelegate: this.applicationDelegate
+      atomEnvironment: this
     });
   }
 
@@ -267,9 +136,6 @@ class AtomEnvironment {
     this.window = params.window;
     this.document = params.document;
 
-    const { resourcePath } = this.applicationDelegate.getWindowLoadSettings();
-
-    this.keymaps.resourcePath = resourcePath;
     this.keymaps.loadBundledKeymaps();
 
     this.commands.attach(this.window);
@@ -278,7 +144,11 @@ class AtomEnvironment {
     this.document.body.classList.add(`platform-${process.platform}`);
     this.stylesElement = this.styles.buildStylesElement();
     this.document.head.appendChild(this.stylesElement);
-    const didChangeStyles = this.didChangeStyles.bind(this);
+    const didChangeStyles = (styleElement) => {
+      TextEditor.didUpdateStyles();
+      if (styleElement.textContent.indexOf('scrollbar') >= 0)
+        TextEditor.didUpdateScrollbarStyles();
+    }
     this.disposables.add(this.styles.onDidAddStyleElement(didChangeStyles));
     this.disposables.add(this.styles.onDidUpdateStyleElement(didChangeStyles));
     this.disposables.add(this.styles.onDidRemoveStyleElement(didChangeStyles));
@@ -305,27 +175,78 @@ class AtomEnvironment {
     this.windowEventHandler = null;
   }
 
-  /*
-  Section: Private
-  */
+  // Extended: Move current window to the center of the screen.
+  center() {
+    nw.Window.get().setPosition('center');
+    return Promise(resolve => resolve());
+  }
 
-  assert(condition, message, callbackOrMetadata) {
-    if (condition) return true;
+  // Extended: Focus the current window.
+  focus() {
+    nw.Window.get().focus();
+    return Promise(resolve => resolve());
+  }
 
-    const error = new Error(`Assertion failed: ${message}`);
-    Error.captureStackTrace(error, this.assert);
+  // Extended: Show the current window.
+  show() {
+    nw.Window.get().show();
+    return Promise(resolve => resolve());
+  }
 
-    if (callbackOrMetadata) {
-      if (typeof callbackOrMetadata === 'function') {
-        callbackOrMetadata(error);
-      } else {
-        error.metadata = callbackOrMetadata;
-      }
+  // Extended: Hide the current window.
+  hide() {
+    nw.Window.get().hide();
+    return Promise(resolve => resolve());
+  }
+
+  // Extended: Returns a {Boolean} that is `true` if the current window is in full screen mode.
+  isFullScreen() {
+    return nw.Window.get().isFullscreen();
+  }
+
+  // Extended: Set the full screen state of the current window.
+  setFullScreen(fullScreen = false) {
+    nw.Window.get().enterFullscreen();
+    return Promise(resolve => resolve());
+  }
+
+  // establishing a real application window;
+  async startEditorWindow() {
+    // await this.stateStore.clear();
+
+    this.unloading = false;
+
+    const loadStatePromise = this.loadState().then(async state => {
+      this.keymaps.defaultTarget = this.workspace.getElement();
+
+      await this.deserialize(state);
+
+      this.document.body.appendChild(this.workspace.getElement());
+
+      // if initialProjectRoots is empty show projects list;
+    });
+
+    const output = await Promise.all([loadStatePromise]);
+    return output;
+  }
+
+  async prepareToUnloadEditorWindow() {
+    try {
+      await this.saveState({ isUnloading: true });
+    } catch (error) {
+      console.error(error);
     }
 
-    if (!this.isReleasedVersion()) throw error;
+    const closing =
+      !this.workspace ||
+      (await this.workspace.confirmClose({
+        windowCloseRequested: true,
+        projectHasPaths: this.project.getPaths().length > 0
+      }));
 
-    return false;
+    if (closing)
+      this.unloading = true;
+    return closing;
   }
 
   attachSaveStateListeners() {
@@ -352,18 +273,97 @@ class AtomEnvironment {
       if (storageKey) {
         await this.stateStore.save(storageKey, state);
       } else {
-        this.applicationDelegate.setTemporaryWindowState(state);
+        nw.Window.get().temporaryState = state;
       }
     }
   }
-}
 
-// stat 1608
-//   require('util').promisify(fs.stat);
-// crypto 1501
-//   require('crypto')
-// registerDefaultTargetForKeymaps:
-//   this.keymaps.defaultTarget = this.workspace.getElement();
-// if initialProjectRoots is empty show projects list;
+  loadState(stateKey) {
+    const args = nw.App.fullArgv;
+    const userDataDir = args[args.indexOf('--user-data-dir') + 1]; // nw.App.dataPath
+    const projectRootPath = userDataDir ? path.join(userDataDir, '../..') : null;
+    const initialProjectRoots = projectRootPath ? [projectRootPath] : null;
+
+    if (this.enablePersistence) {
+      if (!stateKey)
+        stateKey = this.getStateKey(initialProjectRoots);
+      if (stateKey) {
+        return this.stateStore.load(stateKey);
+      } else {
+        return nw.Window.get().temporaryState;
+      }
+    } else {
+      return Promise.resolve(null);
+    }
+  }
+
+  serialize(options) {
+    return {
+      project: this.project.serialize(options),
+      workspace: this.workspace.serialize(),
+      grammars: this.grammars.serialize(),
+      fullScreen: this.isFullScreen()
+    };
+  }
+
+  async deserialize(state) {
+    if (!state) return Promise.resolve();
+
+    this.setFullScreen(state.fullScreen);
+
+    if (state.project) {
+      try {
+        await this.project.deserialize(state.project, this.deserializers);
+      } catch (error) {
+        // We handle the missingProjectPaths case in openLocations().
+        if (!error.missingProjectPaths) {
+          this.notifications.addError('Unable to deserialize project', {
+            description: error.message,
+            stack: error.stack
+          });
+        }
+      }
+    }
+
+    if (state.grammars) this.grammars.deserialize(state.grammars);
+
+    if (state.workspace)
+      this.workspace.deserialize(state.workspace, this.deserializers);
+  }
+
+  getStateKey(paths) {
+    if (paths && paths.length > 0) {
+      const sha1 = require('crypto')
+        .createHash('sha1')
+        .update(
+          paths
+            .slice()
+            .sort()
+            .join('\n')
+        )
+        .digest('hex');
+      return `editor-${sha1}`;
+    } else {
+      return null;
+    }
+  }
+
+  assert(condition, message, callbackOrMetadata) {
+    if (condition) return true;
+
+    const error = new Error(`Assertion failed: ${message}`);
+    Error.captureStackTrace(error, this.assert);
+
+    if (callbackOrMetadata) {
+      if (typeof callbackOrMetadata === 'function') {
+        callbackOrMetadata(error);
+      } else {
+        error.metadata = callbackOrMetadata;
+      }
+    }
+
+    return false;
+  }
+}
 
 module.exports = AtomEnvironment;
