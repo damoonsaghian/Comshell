@@ -244,7 +244,6 @@ module.exports = class WindowEventHandler {
   handleWindowBeforeunload(event) {
     if (
       !this.reloadRequested &&
-      !this.atomEnvironment.inSpecMode() &&
       this.atomEnvironment.getCurrentWindow().isWebViewFocused()
     ) {
       this.atomEnvironment.hide();
