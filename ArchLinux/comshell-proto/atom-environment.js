@@ -15,7 +15,7 @@ const NotificationManager = require('./notification-manager');
 const KeymapManager = require('atom-keymap');
 const TooltipManager = require('./tooltip-manager');
 const CommandRegistry = require('./command-registry');
-const StyleManager = require('./style-manager');
+const StyleManager = require('./style/style-manager');
 const Project = require('./project');
 const Workspace = require('./workspace');
 const PaneContainer = require('./pane-container');
@@ -140,6 +140,7 @@ class AtomEnvironment {
 
     this.commands.attach(this.window);
 
+    this.styles.applyStylesheets();
     this.initialStyleElements = this.styles.getSnapshot();
     this.document.body.classList.add(`platform-${process.platform}`);
     this.stylesElement = this.styles.buildStylesElement();
@@ -222,6 +223,37 @@ class AtomEnvironment {
       await this.deserialize(state);
 
       this.document.body.appendChild(this.workspace.getElement());
+
+      // https://github.com/atom/command-palette
+      // https://github.com/atom/snippets
+      // https://github.com/atom/spell-check
+      // https://github.com/atom/image-view
+      // https://github.com/atom/autocomplete-plus
+      // https://github.com/atom/autocomplete-css
+      // https://github.com/atom/bracket-matcher
+      // https://github.com/atom/wrap-guide
+      // https://github.com/atom/atom/tree/master/packages/link
+      // https://github.com/atom/language-hyperlink
+      // https://github.com/atom/language-json
+      // https://github.com/atom/language-yaml
+      // https://github.com/atom/language-css
+      // https://github.com/atom/language-less
+      // https://github.com/atom/image-view
+      // https://github.com/atom/atom/tree/master/packages/autoflow
+      // https://github.com/atom/fuzzy-finder
+      // https://github.com/atom/atom/tree/master/packages/go-to-line
+      // https://github.com/atom/whitespace
+      // https://github.com/akonwi/git-plus
+      // https://github.com/mauricioszabo/simple-git
+      // https://github.com/atom/atom/tree/master/packages/git-diff
+      // https://github.com/atom/language-git
+      // https://github.com/atom/atom/tree/master/packages/language-rust-bundled
+      // https://github.com/atom/language-toml
+      // https://github.com/atom/language-shellscript
+      // https://github.com/atom/language-python
+      // https://github.com/atom/language-c
+      // https://github.com/atom/language-make
+      // https://github.com/atom/language-property-list
 
       // if initialProjectRoots is empty show projects list;
     });
