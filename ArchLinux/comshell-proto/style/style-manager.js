@@ -4,6 +4,7 @@ const fs = require('fs-plus');
 const path = require('path');
 const postcss = require('postcss');
 const selectorParser = require('postcss-selector-parser');
+const LessCache = require ('less-cache');
 
 class StylesElement extends HTMLElement {
   subscriptions = null;
@@ -131,6 +132,57 @@ module.exports = class StyleManager {
     this.deprecationsBySourcePath = {};
   }
 
+  loadLessStylesheet(lessStylesheetPath) {
+    if (this.lessCache == null) {
+      this.lessCache = new LessCache({
+        importPaths: [
+          fs.resolveOnLoadPath('./base/'),
+          fs.resolveOnLoadPath('./one-light-ui/'),
+          fs.resolveOnLoadPath('./one-light-syntax/')
+        ],
+        cacheDir: path.join(process.env.ATOM_HOME, 'compile-cache', 'less'),
+        fallbackDir: path.join(resourcePath, 'less-compile-cache')
+      })
+    }
+
+    try {
+      return this.lessCache.readFileSync(lessStylesheetPath);
+    } catch (error) {
+      error.less = true;
+      throw error;
+    }
+  }
+
+  loadStylesheet(stylesheetPath) {
+    if (path.extname(stylesheetPath) === '.less') {
+      return this.loadLessStylesheet(stylesheetPath);
+    } else {
+      return fs.readFileSync(stylesheetPath, 'utf8');
+    }
+  }
+
+  requireStylesheet(stylesheetPath, priority) {
+    let fullPath;
+    if (path.extname(stylesheetPath).length > 0) {
+      fullPath = fs.resolveOnLoadPath(stylesheetPath);
+    } else {
+      fullPath = fs.resolveOnLoadPath(stylesheetPath, ['css', 'less']);
+    }
+
+    if (fullPath) {
+      const content = this.loadStylesheet(fullPath);
+      this.addStyleSheet(content, { sourcePath: fullPath, priority });
+    } else {
+      throw new Error(`could not find a file at path '${stylesheetPath}'`);
+    }
+  }
+
+  applyStylesheets() {
+    this.requireStylesheet('./base/index', -2);
+    this.requireStylesheet('./one-light-ui/index', 0);
+    this.requireStylesheet('./one-light-syntax/index', 0);
+  }
+
   /*
   Section: Event Subscription
   */
@@ -244,9 +296,7 @@ module.exports = class StyleManager {
       }
     }
 
-    if (params.skipDeprecatedSelectorsTransformation) {
-      styleElement.textContent = source;
-    }
+    styleElement.textContent = source;
 
     if (updated) {
       this.emitter.emit('did-update-style-element', styleElement);
