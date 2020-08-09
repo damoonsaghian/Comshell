@@ -136,9 +136,10 @@ module.exports = class StyleManager {
     if (this.lessCache == null) {
       this.lessCache = new LessCache({
         importPaths: [
-          fs.resolveOnLoadPath('./base/'),
           fs.resolveOnLoadPath('./one-light-ui/'),
           fs.resolveOnLoadPath('./one-light-syntax/')
+          fs.resolveOnLoadPath('./base/variables/'),
+          fs.resolveOnLoadPath('./base/')
         ],
         cacheDir: path.join(process.env.ATOM_HOME, 'compile-cache', 'less'),
         fallbackDir: path.join(resourcePath, 'less-compile-cache')
