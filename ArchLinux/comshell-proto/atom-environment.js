@@ -111,7 +111,7 @@ class AtomEnvironment {
       assert: this.assert.bind(this),
       textEditorRegistry: this.textEditors,
       styleManager: this.styles,
-      enablePersistence: this.enablePersistence
+      enablePersistence: AtomEnvironment.enablePersistence
     });
 
     registerDefaultCommands({
@@ -286,7 +286,7 @@ class AtomEnvironment {
       this.window.requestIdleCallback(() => {
         if (!this.unloading) this.saveState({ isUnloading: false });
       });
-    }, this.saveStateDebounceInterval);
+    }, AtomEnvironment.saveStateDebounceInterval);
     this.document.addEventListener('mousedown', saveState, true);
     this.document.addEventListener('keydown', saveState, true);
     this.disposables.add(
@@ -298,7 +298,7 @@ class AtomEnvironment {
   }
 
   async saveState(options, storageKey) {
-    if (this.enablePersistence && this.project) {
+    if (AtomEnvironment.enablePersistence && this.project) {
       const state = this.serialize(options);
       if (!storageKey)
         storageKey = this.getStateKey(this.project && this.project.getPaths());
@@ -316,7 +316,7 @@ class AtomEnvironment {
     const projectRootPath = userDataDir ? path.join(userDataDir, '../..') : null;
     const initialProjectRoots = projectRootPath ? [projectRootPath] : null;
 
-    if (this.enablePersistence) {
+    if (AtomEnvironment.enablePersistence) {
       if (!stateKey)
         stateKey = this.getStateKey(initialProjectRoots);
       if (stateKey) {
