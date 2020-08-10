@@ -232,13 +232,21 @@ class AtomEnvironment {
       // https://github.com/atom/autocomplete-css
       // https://github.com/atom/bracket-matcher
       // https://github.com/atom/wrap-guide
+      // https://github.com/wlwl2/window-focus
       // https://github.com/atom/atom/tree/master/packages/link
       // https://github.com/atom/language-hyperlink
       // https://github.com/atom/language-json
       // https://github.com/atom/language-yaml
       // https://github.com/atom/language-css
       // https://github.com/atom/language-less
+      // https://github.com/atom/archive-view
+      // https://github.com/gabceb/atom-web-view
+      // https://github.com/izuzak/atom-pdf-view
+      // https://github.com/Aerijo/atom-pdf-view-plus
+      // https://github.com/allefeld/atom-pdfjs-viewer
       // https://github.com/atom/image-view
+      // https://github.com/mangecoeur/preview-inline
+      // https://atom.io/packages/ogg-preview
       // https://github.com/atom/atom/tree/master/packages/autoflow
       // https://github.com/atom/fuzzy-finder
       // https://github.com/atom/atom/tree/master/packages/go-to-line
@@ -254,6 +262,9 @@ class AtomEnvironment {
       // https://github.com/atom/language-c
       // https://github.com/atom/language-make
       // https://github.com/atom/language-property-list
+      // https://github.com/alibaba/structure-view
+      // https://github.com/ctkjose/atom-nst
+      // https://github.com/apla/atom-jscad
 
       // if initialProjectRoots is empty show projects list;
     });
