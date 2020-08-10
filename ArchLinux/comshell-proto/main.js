@@ -1,9 +1,5 @@
-const url = require('url');
 const path = require('path');
-const fs = require('fs-plus');
-const _ = require('underscore-plus');
 const AtomEnvironment = require('./atom-environment');
-const TextEditor = require('./editor/text-editor');
 
 const win = nw.Window.get();
 win.maximize();
