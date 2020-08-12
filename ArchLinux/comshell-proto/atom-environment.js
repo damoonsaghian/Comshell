@@ -26,6 +26,7 @@ const GrammarRegistry = require('./editor/grammar-registry');
 const TextEditorRegistry = require('./editor/text-editor-registry');
 const TextEditor = require('./editor/text-editor');
 const Clipboard = require('./clipboard');
+const tabs = require('tabs');
 
 KeymapManager.prototype.loadBundledKeymaps = function () {
   keymapsPath = path.join(__dirname, 'keymaps.json');
@@ -224,6 +225,8 @@ class AtomEnvironment {
 
       this.document.body.appendChild(this.workspace.getElement());
 
+      tabs.activate();
+
       // https://github.com/atom/command-palette
       // https://github.com/atom/snippets
       // https://github.com/atom/spell-check
@@ -265,6 +268,7 @@ class AtomEnvironment {
       // https://github.com/alibaba/structure-view
       // https://github.com/ctkjose/atom-nst
       // https://github.com/apla/atom-jscad
+      // https://github.com/hax/atom-elastic-tabstops
 
       // if initialProjectRoots is empty show projects list;
     });
