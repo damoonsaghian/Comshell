@@ -15,19 +15,28 @@ atom-workspace {
 
 .scrollbars-visible-always {
 	::-webkit-scrollbar {
-		width: 10px;
+		width: 12px;
 		height: 10px;
 	}
 
 	::-webkit-scrollbar-track {
 		background: @scrollbar-background-color;
+		//!
+		border: 3px solid transparent;
+		border-radius: 6px;
+		background-clip: content-box;
+		background-color: #bbbbbb;
 	}
 
 	::-webkit-scrollbar-thumb {
 		border-radius: 5px;
-		border: 3px solid @scrollbar-background-color;
+		border: 3px solid transparent; //!
 		background: @scrollbar-color;
-		background-clip: content-box;
+		background-clip: padding-box; //!
+		//!
+		height: 30px;
+		border-radius: 6px;
+		background-color: #777777;
 	}
 
 	::-webkit-scrollbar-corner {
@@ -58,6 +67,11 @@ atom-workspace {
 			background: @scrollbar-color-editor;
 		}
 	}
+}
+
+//!
+.scrollbar-corner, .horizontal-scrollbar {
+  display: none;
 }
 
 // TODO: Move to a better place, not sure where it gets used
