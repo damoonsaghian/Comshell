@@ -254,6 +254,7 @@ class AtomEnvironment {
       // https://github.com/atom/fuzzy-finder
       // https://github.com/atom/atom/tree/master/packages/go-to-line
       // https://github.com/atom/whitespace
+      // https://github.com/file-icons/atom
       // https://github.com/akonwi/git-plus
       // https://github.com/mauricioszabo/simple-git
       // https://github.com/atom/atom/tree/master/packages/git-diff

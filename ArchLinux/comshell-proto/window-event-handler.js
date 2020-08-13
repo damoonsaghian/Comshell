@@ -19,7 +19,6 @@ module.exports = class WindowEventHandler {
     this.handleWindowToggleDevTools = this.handleWindowToggleDevTools.bind(
       this
     );
-    this.handleWindowToggleMenuBar = this.handleWindowToggleMenuBar.bind(this);
     this.handleLinkClick = this.handleLinkClick.bind(this);
     this.handleDocumentContextmenu = this.handleDocumentContextmenu.bind(this);
     this.atomEnvironment = atomEnvironment;
@@ -36,14 +35,6 @@ module.exports = class WindowEventHandler {
         'window:toggle-dev-tools': this.handleWindowToggleDevTools
       })
     );
-
-    if (['win32', 'linux'].includes(process.platform)) {
-      this.subscriptions.add(
-        this.atomEnvironment.commands.add(this.window, {
-          'window:toggle-menu-bar': this.handleWindowToggleMenuBar
-        })
-      );
-    }
 
     this.subscriptions.add(
       this.atomEnvironment.commands.add(this.document, {
@@ -216,19 +207,6 @@ module.exports = class WindowEventHandler {
 
   handleWindowToggleDevTools() {
     this.atomEnvironment.toggleDevTools();
-  }
-
-  handleWindowToggleMenuBar() {
-    this.atomEnvironment.config.set(
-      'core.autoHideMenuBar',
-      !this.atomEnvironment.config.get('core.autoHideMenuBar')
-    );
-
-    if (this.atomEnvironment.config.get('core.autoHideMenuBar')) {
-      const detail =
-        'To toggle, press the Alt key or execute the window:toggle-menu-bar command';
-      this.atomEnvironment.notifications.addInfo('Menu bar hidden', { detail });
-    }
   }
 
   handleLinkClick(event) {

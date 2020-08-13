@@ -7,13 +7,10 @@ const configSchema = {
       ignoredNames: {
         type: 'array',
         default: [
-          '.git',
-          '.hg',
-          '.svn',
-          '.DS_Store',
-          '._*',
-          'Thumbs.db',
-          'desktop.ini'
+          '.*',
+          '*.lock',
+          'target',
+          'node_modules'
         ],
         items: {
           type: 'string'
@@ -89,21 +86,6 @@ const configSchema = {
             description: 'Never become the default atom:// URI handler'
           }
         ]
-      },
-      themes: {
-        type: 'array',
-        default: ['one-dark-ui', 'one-dark-syntax'],
-        items: {
-          type: 'string'
-        },
-        description:
-          'Names of UI and syntax themes which will be used when Atom starts.'
-      },
-      audioBeep: {
-        type: 'boolean',
-        default: true,
-        description:
-          "Trigger the system's beep sound when certain actions cannot be executed or there are no results."
       },
       closeDeletedFileTabs: {
         type: 'boolean',
@@ -293,12 +275,6 @@ const configSchema = {
           }
         ]
       },
-      openEmptyEditorOnStart: {
-        description:
-          'When checked opens an untitled editor when loading a blank environment (such as with _File > New Window_ or when "Restore Previous Windows On Start" is unchecked); otherwise no editor is opened when loading a blank environment. This setting has no effect when restoring a previous state.',
-        type: 'boolean',
-        default: true
-      },
       restorePreviousWindowsOnStart: {
         type: 'string',
         enum: ['no', 'yes', 'always'],
@@ -330,29 +306,6 @@ const configSchema = {
           'Allow items to be previewed without adding them to a pane permanently, such as when single clicking files in the tree view.',
         type: 'boolean',
         default: true
-      },
-      telemetryConsent: {
-        description:
-          'Allow usage statistics and exception reports to be sent to the Atom team to help improve the product.',
-        title: 'Send Telemetry to the Atom Team',
-        type: 'string',
-        default: 'undecided',
-        enum: [
-          {
-            value: 'limited',
-            description:
-              'Allow limited anonymous usage stats, exception and crash reporting'
-          },
-          {
-            value: 'no',
-            description: 'Do not send any telemetry data'
-          },
-          {
-            value: 'undecided',
-            description:
-              'Undecided (Atom will ask again next time it is launched)'
-          }
-        ]
       },
       warnOnLargeFileLimit: {
         description:
@@ -429,7 +382,7 @@ const configSchema = {
       // These can be used as globals or scoped, thus defaults.
       fontFamily: {
         type: 'string',
-        default: 'Menlo, Consolas, DejaVu Sans Mono, monospace',
+        default: 'monospace',
         description: 'The name of the font family used for editor text.'
       },
       fontSize: {
@@ -457,7 +410,7 @@ const configSchema = {
       },
       showIndentGuide: {
         type: 'boolean',
-        default: false,
+        default: true,
         description: 'Show indentation indicators in the editor.'
       },
       showLineNumbers: {
@@ -490,7 +443,7 @@ const configSchema = {
       },
       preferredLineLength: {
         type: 'integer',
-        default: 80,
+        default: 100,
         minimum: 1,
         description:
           'Identifies the length of a line which is used when wrapping text with the `Soft Wrap At Preferred Line Length` setting enabled, in number of characters.'
@@ -510,7 +463,7 @@ const configSchema = {
       },
       softWrap: {
         type: 'boolean',
-        default: false,
+        default: true,
         description:
           'Wraps lines that exceed the width of the window. When `Soft Wrap At Preferred Line Length` is set, it will wrap to the number of characters defined by the `Preferred Line Length` setting.'
       },
@@ -529,13 +482,13 @@ const configSchema = {
       },
       softWrapAtPreferredLineLength: {
         type: 'boolean',
-        default: false,
+        default: true,
         description:
           "Instead of wrapping lines to the window's width, wrap lines to the number of characters defined by the `Preferred Line Length` setting. This will only take effect when the soft wrap config setting is enabled globally or for the current language. **Note:** If you want to hide the wrap guide (the vertical line) you can disable the `wrap-guide` package."
       },
       softWrapHangingIndent: {
         type: 'integer',
-        default: 0,
+        default: 2,
         minimum: 0,
         description:
           'When soft wrap is enabled, defines length of additional indentation applied to wrapped lines, in number of characters.'
@@ -618,15 +571,6 @@ const configSchema = {
     }
   }
 };
-
-if (['win32', 'linux'].includes(process.platform)) {
-  configSchema.core.properties.autoHideMenuBar = {
-    type: 'boolean',
-    default: false,
-    description:
-      'Automatically hide the menu bar and toggle it by pressing Alt. This is only supported on Windows & Linux.'
-  };
-}
 
 if (process.platform === 'darwin') {
   configSchema.core.properties.titleBar = {

@@ -10,7 +10,6 @@ const DEFAULT_INITIAL_SIZE = 300;
 const SHOULD_ANIMATE_CLASS = 'atom-dock-should-animate';
 const VISIBLE_CLASS = 'atom-dock-open';
 const RESIZE_HANDLE_RESIZABLE_CLASS = 'atom-dock-resize-handle-resizable';
-const TOGGLE_BUTTON_VISIBLE_CLASS = 'atom-dock-toggle-button-visible';
 const CURSOR_OVERLAY_VISIBLE_CLASS = 'atom-dock-cursor-overlay-visible';
 
 // Extended: A container at the edges of the editor window capable of holding items.
@@ -27,9 +26,6 @@ module.exports = class Dock {
     this.handleMouseUp = this.handleMouseUp.bind(this);
     this.handleDrag = _.throttle(this.handleDrag.bind(this), 30);
     this.handleDragEnd = this.handleDragEnd.bind(this);
-    this.handleToggleButtonDragEnter = this.handleToggleButtonDragEnter.bind(
-      this
-    );
     this.toggle = this.toggle.bind(this);
 
     this.location = params.location;
@@ -244,24 +240,7 @@ module.exports = class Dock {
             $(ElementComponent, { element: this.paneContainer.getElement() }),
             $.div({ className: cursorOverlayElementClassList.join(' ') })
           )
-        ),
-        $(DockToggleButton, {
-          ref: 'toggleButton',
-          onDragEnter: this.state.draggingItem
-            ? this.handleToggleButtonDragEnter
-            : null,
-          location: this.location,
-          toggle: this.toggle,
-          dockIsVisible: shouldBeVisible,
-          visible:
-            // Don't show the toggle button if the dock is closed and empty...
-            (this.state.hovered &&
-              (this.state.visible || this.getPaneItems().length > 0)) ||
-            // ...or if the item can't be dropped in that dock.
-            (!shouldBeVisible &&
-              this.state.draggingItem &&
-              isItemAllowed(this.state.draggingItem, this.location))
-        })
+        )
       )
     );
   }
@@ -324,12 +303,6 @@ module.exports = class Dock {
     window.removeEventListener('mousemove', this.handleMouseMove);
     window.removeEventListener('mouseup', this.handleMouseUp);
     this.setState({ resizing: false });
-  }
-
-  handleToggleButtonDragEnter() {
-    this.setState({ showDropTarget: true });
-    window.addEventListener('drag', this.handleDrag);
-    window.addEventListener('dragend', this.handleDragEnd);
   }
 
   handleDrag(event) {
@@ -395,34 +368,19 @@ module.exports = class Dock {
     // measurements.
     if (rectContainsPoint(bounds, point)) return true;
 
-    // If we're within the toggle button, we're definitely in the hover area. Unfortunately, we
-    // can't do this measurement conditionally (e.g. only if the toggle button is visible) because
-    // our knowledge of the toggle's button is incomplete due to CSS animations. (We may think the
-    // toggle button isn't visible when in actuality it is, but is animating to its hidden state.)
-    //
-    // Since `point` is always the current mouse position, one possible optimization would be to
-    // remove it as an argument and determine whether we're inside the toggle button using
-    // mouseenter/leave events on it. This class would still need to keep track of the mouse
-    // position (via a mousemove listener) for the other measurements, though.
-    const toggleButtonBounds = this.refs.toggleButton.getBounds();
-    if (rectContainsPoint(toggleButtonBounds, point)) return true;
-
     // The area used when detecting exit is actually larger than when detecting entrances. Expand
     // our bounds and recheck them.
     if (detectingExit) {
       const hoverMargin = 20;
       switch (this.location) {
         case 'right':
-          bounds.left =
-            Math.min(bounds.left, toggleButtonBounds.left) - hoverMargin;
+          bounds.left = bounds.left - hoverMargin;
           break;
         case 'bottom':
-          bounds.top =
-            Math.min(bounds.top, toggleButtonBounds.top) - hoverMargin;
+          bounds.top = bounds.top - hoverMargin;
           break;
         case 'left':
-          bounds.right =
-            Math.max(bounds.right, toggleButtonBounds.right) + hoverMargin;
+          bounds.right = bounds.right + hoverMargin;
           break;
       }
       if (rectContainsPoint(bounds, point)) return true;
@@ -777,56 +735,6 @@ class DockResizeHandle {
     } else if (this.props.dockIsVisible) {
       this.props.onResizeStart();
     }
-  }
-}
-
-class DockToggleButton {
-  constructor(props) {
-    this.props = props;
-    etch.initialize(this);
-  }
-
-  render() {
-    const classList = ['atom-dock-toggle-button', this.props.location];
-    if (this.props.visible) classList.push(TOGGLE_BUTTON_VISIBLE_CLASS);
-
-    return $.div(
-      { className: classList.join(' ') },
-      $.div(
-        {
-          ref: 'innerElement',
-          className: `atom-dock-toggle-button-inner ${this.props.location}`,
-          on: {
-            click: this.handleClick,
-            dragenter: this.props.onDragEnter
-          }
-        },
-        $.span({
-          ref: 'iconElement',
-          className: `icon ${getIconName(
-            this.props.location,
-            this.props.dockIsVisible
-          )}`
-        })
-      )
-    );
-  }
-
-  getElement() {
-    return this.element;
-  }
-
-  getBounds() {
-    return this.refs.innerElement.getBoundingClientRect();
-  }
-
-  update(newProps) {
-    this.props = Object.assign({}, this.props, newProps);
-    return etch.update(this);
-  }
-
-  handleClick() {
-    this.props.toggle();
   }
 }
 
