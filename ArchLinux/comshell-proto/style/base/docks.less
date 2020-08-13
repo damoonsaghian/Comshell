@@ -1,7 +1,6 @@
 @import 'ui-variables';
 @import 'syntax-variables';
 
-@atom-dock-toggle-button-size: 50px;
 @atom-dock-resize-handle-size: 4px;
 
 // Dock --------------
@@ -11,6 +10,11 @@
 atom-dock {
   display: flex;
   position: relative;
+}
+
+//!
+atom-dock .tab-bar {
+	display: none;
 }
 
 .atom-dock-inner {
@@ -75,102 +79,6 @@ atom-dock {
   &.left { flex-direction: row-reverse; }
   &.bottom { flex-direction: column; }
   &.right { flex-direction: row; }
-}
-
-// Toggle button --------------
-
-.atom-dock-toggle-button {
-  position: absolute;
-  overflow: hidden; // Mask half of the circle.
-
-  // Must be > .scrollbar-content and inactive atom-dock
-  z-index: 11;
-
-  // Position the toggle button target at the edge of the dock. It's important
-  // that this is absolutely positioned so that it doesn't expand the area of
-  // its container (which would block mouse events).
-  &.right { right: 100%; }
-  &.bottom { bottom: 100%; }
-  &.left { left: 100%; }
-
-  width: @atom-dock-toggle-button-size;
-  height: @atom-dock-toggle-button-size;
-  &.bottom { height: @atom-dock-toggle-button-size / 2; }
-  &.left, &.right { width: @atom-dock-toggle-button-size / 2; }
-
-  .atom-dock-toggle-button-inner {
-    width: @atom-dock-toggle-button-size;
-    height: @atom-dock-toggle-button-size;
-    border-radius: @atom-dock-toggle-button-size / 2;
-
-    position: absolute;
-    display: flex;
-    text-align: center;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-
-    // Promote to own layer, fixes rendering issue atom/atom#14915
-    will-change: transform;
-
-    &.right {
-      left: 0;
-    }
-    &.bottom {
-      top: 0;
-    }
-    &.left {
-      right: 0;
-    }
-  }
-
-  // Hide the button.
-  &:not(.atom-dock-toggle-button-visible) {
-    .atom-dock-toggle-button-inner {
-      &.right { transform: translateX(50%); }
-      &.bottom { transform: translateY(50%); }
-      &.left { transform: translateX(-50%); }
-    }
-  }
-
-  // Center the icon.
-  @offset: 8px;
-  .atom-dock-toggle-button-inner {
-    &.right .icon { transform: translateX(-@offset); }
-    &.bottom .icon { transform: translateY(-@offset); }
-    &.left .icon { transform: translateX(@offset); }
-  }
-
-  // Animate the icon.
-  .icon {
-    transition: opacity 0.1s ease-in 0.1s; // intro
-    opacity: 1;
-
-    &::before {
-      // Shrink the icon element to the size of the character.
-      width: auto;
-      margin: 0;
-    }
-  }
-  &:not(.atom-dock-toggle-button-visible) .icon {
-    opacity: 0;
-    transition: opacity 0.2s ease-out 0s; // outro
-  }
-
-  .atom-dock-toggle-button-inner {
-    background-color: @tool-panel-background-color;
-    border: 1px solid @pane-item-border-color;
-    transition: transform 0.2s ease-out 0s; // intro
-  }
-
-  &:not(.atom-dock-toggle-button-visible) {
-    // Don't contribute to mouseenter/drag events when not visible.
-    pointer-events: none;
-
-    .atom-dock-toggle-button-inner {
-      transition: transform 0.2s ease-out 0.1s; // outro
-    }
-  }
 }
 
 // Resize handle --------------
