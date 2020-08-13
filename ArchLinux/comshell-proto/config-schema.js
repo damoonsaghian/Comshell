@@ -31,28 +31,6 @@ const configSchema = {
         description:
           'Follow symbolic links when searching files and when opening files with the fuzzy finder.'
       },
-      disabledPackages: {
-        type: 'array',
-        default: [],
-
-        items: {
-          type: 'string'
-        },
-
-        description:
-          'List of names of installed packages which are not loaded at startup.'
-      },
-      versionPinnedPackages: {
-        type: 'array',
-        default: [],
-
-        items: {
-          type: 'string'
-        },
-
-        description:
-          'List of names of installed packages which are not automatically updated.'
-      },
       customFileTypes: {
         type: 'object',
         default: {},
@@ -64,28 +42,6 @@ const configSchema = {
             type: 'string'
           }
         }
-      },
-      uriHandlerRegistration: {
-        type: 'string',
-        default: 'prompt',
-        description:
-          'When should Atom register itself as the default handler for atom:// URIs',
-        enum: [
-          {
-            value: 'prompt',
-            description:
-              'Prompt to register Atom as the default atom:// URI handler'
-          },
-          {
-            value: 'always',
-            description:
-              'Always become the default atom:// URI handler automatically'
-          },
-          {
-            value: 'never',
-            description: 'Never become the default atom:// URI handler'
-          }
-        ]
       },
       closeDeletedFileTabs: {
         type: 'boolean',
@@ -114,130 +70,6 @@ const configSchema = {
         default: 'utf8',
         enum: [
           {
-            value: 'iso88596',
-            description: 'Arabic (ISO 8859-6)'
-          },
-          {
-            value: 'windows1256',
-            description: 'Arabic (Windows 1256)'
-          },
-          {
-            value: 'iso88594',
-            description: 'Baltic (ISO 8859-4)'
-          },
-          {
-            value: 'windows1257',
-            description: 'Baltic (Windows 1257)'
-          },
-          {
-            value: 'iso885914',
-            description: 'Celtic (ISO 8859-14)'
-          },
-          {
-            value: 'iso88592',
-            description: 'Central European (ISO 8859-2)'
-          },
-          {
-            value: 'windows1250',
-            description: 'Central European (Windows 1250)'
-          },
-          {
-            value: 'gb18030',
-            description: 'Chinese (GB18030)'
-          },
-          {
-            value: 'gbk',
-            description: 'Chinese (GBK)'
-          },
-          {
-            value: 'cp950',
-            description: 'Traditional Chinese (Big5)'
-          },
-          {
-            value: 'big5hkscs',
-            description: 'Traditional Chinese (Big5-HKSCS)'
-          },
-          {
-            value: 'cp866',
-            description: 'Cyrillic (CP 866)'
-          },
-          {
-            value: 'iso88595',
-            description: 'Cyrillic (ISO 8859-5)'
-          },
-          {
-            value: 'koi8r',
-            description: 'Cyrillic (KOI8-R)'
-          },
-          {
-            value: 'koi8u',
-            description: 'Cyrillic (KOI8-U)'
-          },
-          {
-            value: 'windows1251',
-            description: 'Cyrillic (Windows 1251)'
-          },
-          {
-            value: 'cp437',
-            description: 'DOS (CP 437)'
-          },
-          {
-            value: 'cp850',
-            description: 'DOS (CP 850)'
-          },
-          {
-            value: 'iso885913',
-            description: 'Estonian (ISO 8859-13)'
-          },
-          {
-            value: 'iso88597',
-            description: 'Greek (ISO 8859-7)'
-          },
-          {
-            value: 'windows1253',
-            description: 'Greek (Windows 1253)'
-          },
-          {
-            value: 'iso88598',
-            description: 'Hebrew (ISO 8859-8)'
-          },
-          {
-            value: 'windows1255',
-            description: 'Hebrew (Windows 1255)'
-          },
-          {
-            value: 'cp932',
-            description: 'Japanese (CP 932)'
-          },
-          {
-            value: 'eucjp',
-            description: 'Japanese (EUC-JP)'
-          },
-          {
-            value: 'shiftjis',
-            description: 'Japanese (Shift JIS)'
-          },
-          {
-            value: 'euckr',
-            description: 'Korean (EUC-KR)'
-          },
-          {
-            value: 'iso885910',
-            description: 'Nordic (ISO 8859-10)'
-          },
-          {
-            value: 'iso885916',
-            description: 'Romanian (ISO 8859-16)'
-          },
-          {
-            value: 'iso88599',
-            description: 'Turkish (ISO 8859-9)'
-          },
-          {
-            value: 'windows1254',
-            description: 'Turkish (Windows 1254)'
-          },
-          {
             value: 'utf8',
             description: 'Unicode (UTF-8)'
           },
@@ -248,30 +80,6 @@ const configSchema = {
           {
             value: 'utf16be',
             description: 'Unicode (UTF-16 BE)'
-          },
-          {
-            value: 'windows1258',
-            description: 'Vietnamese (Windows 1258)'
-          },
-          {
-            value: 'iso88591',
-            description: 'Western (ISO 8859-1)'
-          },
-          {
-            value: 'iso88593',
-            description: 'Western (ISO 8859-3)'
-          },
-          {
-            value: 'iso885915',
-            description: 'Western (ISO 8859-15)'
-          },
-          {
-            value: 'macroman',
-            description: 'Western (Mac Roman)'
-          },
-          {
-            value: 'windows1252',
-            description: 'Western (Windows 1252)'
           }
         ]
       },
@@ -282,30 +90,11 @@ const configSchema = {
         description:
           "When selected 'no', a blank environment is loaded. When selected 'yes' and Atom is started from the icon or `atom` by itself from the command line, restores the last state of all Atom windows; otherwise a blank environment is loaded. When selected 'always', restores the last state of all Atom windows always, no matter how Atom is started."
       },
-      reopenProjectMenuCount: {
-        description:
-          'How many recent projects to show in the Reopen Project menu.',
-        type: 'integer',
-        default: 15
-      },
-      automaticallyUpdate: {
-        description:
-          'Automatically update Atom when a new release is available.',
-        type: 'boolean',
-        default: true
-      },
-      useProxySettingsWhenCallingApm: {
-        title: 'Use Proxy Settings When Calling APM',
-        description:
-          'Use detected proxy settings when calling the `apm` command-line tool.',
-        type: 'boolean',
-        default: true
-      },
       allowPendingPaneItems: {
         description:
           'Allow items to be previewed without adding them to a pane permanently, such as when single clicking files in the tree view.',
         type: 'boolean',
-        default: true
+        default: false
       },
       warnOnLargeFileLimit: {
         description:
@@ -341,22 +130,6 @@ const configSchema = {
         type: 'boolean',
         default: true,
         description: 'Use Tree-sitter parsers for supported languages.'
-      },
-      colorProfile: {
-        description:
-          "Specify whether Atom should use the operating system's color profile (recommended) or an alternative color profile.<br>Changing this setting will require a relaunch of Atom to take effect.",
-        type: 'string',
-        default: 'default',
-        enum: [
-          {
-            value: 'default',
-            description: 'Use color profile configured in the operating system'
-          },
-          {
-            value: 'srgb',
-            description: 'Use sRGB color profile'
-          }
-        ]
       }
     }
   },
@@ -558,7 +331,7 @@ const configSchema = {
       },
       zoomFontWhenCtrlScrolling: {
         type: 'boolean',
-        default: process.platform !== 'darwin',
+        default: false,
         description:
           'Change the editor font size when pressing the Ctrl key and scrolling the mouse up/down.'
       },
@@ -571,15 +344,5 @@ const configSchema = {
     }
   }
 };
-
-if (process.platform === 'darwin') {
-  configSchema.core.properties.titleBar = {
-    type: 'string',
-    default: 'native',
-    enum: ['native', 'custom', 'custom-inset', 'hidden'],
-    description:
-      'Experimental: A `custom` title bar adapts to theme colors. Choosing `custom-inset` adds a bit more padding. The title bar can also be completely `hidden`.<br>Note: Switching to a custom or hidden title bar will compromise some functionality.<br>This setting will require a relaunch of Atom to take effect.'
-  };
-}
 
 module.exports = configSchema;
