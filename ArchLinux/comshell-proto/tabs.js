@@ -1,33 +1,31 @@
 const path = require('path');
-const _ = require('underscore-plus');
 const fs = require('fs-plus');
-const { CompositeDisposable, Disposable } = require('event-kit');
+const { Disposable, CompositeDisposable } = require('event-kit');
 
 // https://github.com/jspiro/tab-smart-sort
 // https://github.com/xixixao/stacked-tabs
 // https://github.com/ericcornelissen/pinned-tabs-for-atom
 // https://github.com/paulpflug/foldername-tabs
 
-function iconClassForPath(filePath, caller) {
-  if (caller !== 'tabs-mru-switcher') return ''
-  if (typeof filePath !== 'string') return 'icon-file-text'
+function iconClassForPath(filePath) {
+  if (typeof filePath !== 'string') return 'icon-file-text';
 
-  const extension = path.extname(filePath)
+  const extension = path.extname(filePath);
 
   if (fs.isSymbolicLinkSync(filePath)) {
-    return 'icon-file-symlink-file'
+    return 'icon-file-symlink-file';
   } else if (fs.isReadmePath(filePath)) {
-    return 'icon-book'
+    return 'icon-book';
   } else if (fs.isCompressedExtension(extension)) {
-    return 'icon-file-zip'
+    return 'icon-file-zip';
   } else if (fs.isImageExtension(extension)) {
-    return 'icon-file-media'
+    return 'icon-file-media';
   } else if (fs.isPdfExtension(extension)) {
-    return 'icon-file-pdf'
+    return 'icon-file-pdf';
   } else if (fs.isBinaryExtension(extension)) {
-    return 'icon-file-binary'
+    return 'icon-file-binary';
   } else {
-    return 'icon-file-text'
+    return 'icon-file-text';
   }
 }
 
@@ -253,7 +251,7 @@ class TabView {
     if (this.iconName) {
       this.itemTitle.classList.add('icon', `icon-${this.iconName}`);
     } else if (this.path != null) {
-      this.iconName = iconClassForPath(this.path, 'tabs');
+      this.iconName = iconClassForPath(this.path);
       if (this.iconName) {
         let names = this.iconName;
         if (!Array.isArray(names)) {
