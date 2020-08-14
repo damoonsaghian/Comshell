@@ -1,6 +1,5 @@
 {
   "name": "comshell",
-  "productName": "Comshell",
   "description": "a unified computing environment, utilizing command based user interface",
   "license": "MIT",
   "main": "main.html",
