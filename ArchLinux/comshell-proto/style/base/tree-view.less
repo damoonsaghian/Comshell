@@ -1,0 +1,69 @@
+@import "ui-variables";
+
+.project-root-header {
+  -webkit-user-drag: element;
+}
+
+.tree-view {
+  contain: size;
+  overflow: auto;
+  z-index: 2;
+  -webkit-user-select: none;
+
+  display: flex;
+  flex-direction: column;
+
+  .icon-large::before {
+    margin-right: 0;
+    margin-bottom: 50px;
+    width: auto;
+    height: auto;
+    font-size: 8em;
+  }
+
+  .tree-view-root {
+    padding-left: @component-icon-padding;
+    padding-right: @component-padding;
+    background-color: inherit;
+
+    /*
+     * Force a new stacking context to prevent a large, duplicate paint layer from
+     * being created for tree-view's scrolling contents that can make the cost of
+     * layer tree updates scale at 3x the size of the layer rather than the
+     * optimal 1x.
+     *
+     * On high resolution displays, Chromium handles layers for scrolling content
+     * differently and inadvertently creates a duplicate paint layer the size of
+     * .tree-view-scroller because descendants of the scroller overlap the
+     * auto-created layer.
+     */
+    isolation: isolate;
+
+    // Expands tree-view root to take up full height.
+    // This makes sure that the context menu can still be openend in the empty
+    // area underneath the files.
+    flex-grow: 1;
+
+    // Expands tree-view root to take up as much width as needed by the content.
+    // This makes sure that the selected item's "bar/background" expands to full width.
+    position: relative;
+    min-width: min-content;
+  }
+
+  .header {
+    position: relative;
+  }
+
+  .tree-view-root .list-tree {
+    // Keeps selections expanded while dragging
+    position: static;
+  }
+
+  .entry {
+    // This fixes #110, see that issue for more details
+    &::before {
+      content: '';
+      position: absolute;
+    }
+  }
+}
