@@ -8,9 +8,7 @@ const configSchema = {
         type: 'array',
         default: [
           '.*',
-          '*.lock',
-          'target',
-          'node_modules'
+          '*.lock'
         ],
         items: {
           type: 'string'
