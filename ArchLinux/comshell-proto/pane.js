@@ -881,12 +881,12 @@ module.exports = class Pane {
       const title =
         (typeof item.getTitle === 'function' && item.getTitle()) || uri;
 
-      const message = `'${title}' has changes, save or discard?`
+      const message = `'${title}' has changes, save or discard?`;
 
       const saveDialog = new Dialog({ prompt: message , defaultAnswer: 'save', select: true });
       saveDialog.onCancel = () => resolve(false);
       saveDialog.onConfirm = (answer) => {
-        if (answer === 'save') {
+        if (answer === 's' || answer === 'save') {
           this.saveItem((item, error) => {
             if (error) {
               saveDialog.showError(
@@ -898,11 +898,11 @@ module.exports = class Pane {
               resolve(true);
             }
           });
-        } else if (answer === 'discard') {
+        } else if (answer === 'd' || answer === 'discard') {
           saveDialog.close();
           resolve(true);
         } else {
-          saveDialog.showError('enter "save" or "discard", or press "escape" to cancel');
+          saveDialog.showError('enter "s" to save, or "d" to discard');
         }
       };
       saveDialog.attach();

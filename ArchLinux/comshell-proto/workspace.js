@@ -2126,7 +2126,7 @@ module.exports = class Workspace extends Model {
 
       if (this.config.get('editor.confirmCheckoutHeadRevision')) {
         const message =
-          `discard all changes to "${editor.getFileName()}" since the last Git commit?`
+          `discard all changes to "${editor.getFileName()}" since the last Git commit?`;
 
         const saveDialog = new Dialog({ prompt: message });
         saveDialog.onConfirm = (answer) => {
