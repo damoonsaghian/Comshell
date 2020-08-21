@@ -26,7 +26,8 @@ const GrammarRegistry = require('./editor/grammar-registry');
 const TextEditorRegistry = require('./editor/text-editor-registry');
 const TextEditor = require('./editor/text-editor');
 const Clipboard = require('./clipboard');
-const tabs = require('tabs');
+const tabs = require('./tabs');
+const treeView = require('./tree-view/tree-view');
 
 KeymapManager.prototype.loadBundledKeymaps = function () {
   keymapsPath = path.join(__dirname, 'keymaps.json');
@@ -226,6 +227,7 @@ class AtomEnvironment {
       this.document.body.appendChild(this.workspace.getElement());
 
       tabs.activate();
+      treeView.activate();
 
       // https://github.com/atom/command-palette
       // https://github.com/atom/snippets
@@ -268,10 +270,13 @@ class AtomEnvironment {
       // https://github.com/atom/language-property-list
       // https://github.com/alibaba/structure-view
       // https://github.com/ctkjose/atom-nst
+      // https://github.com/mrdoob/three.js/
       // https://github.com/apla/atom-jscad
       // https://github.com/hax/atom-elastic-tabstops
 
-      // if initialProjectRoots is empty show projects list;
+      if (!this.projectRootPath) {
+        // show projects list;
+      }
     });
 
     const output = await Promise.all([loadStatePromise]);
@@ -328,13 +333,13 @@ class AtomEnvironment {
 
   loadState(stateKey) {
     const args = nw.App.fullArgv;
-    const userDataDir = args[args.indexOf('--user-data-dir') + 1]; // nw.App.dataPath
-    const projectRootPath = userDataDir ? path.join(userDataDir, '../..') : null;
-    const initialProjectRoots = projectRootPath ? [projectRootPath] : null;
+    const index = args.indexOf('--user-data-dir') + 1;
+    const userDataDir = index === 0 ? null : args[index + 1]; // nw.App.dataPath
+    this.projectRootPath = userDataDir ? path.join(userDataDir, '../..') : null;
 
     if (AtomEnvironment.enablePersistence) {
       if (!stateKey)
-        stateKey = this.getStateKey(initialProjectRoots);
+        stateKey = this.getStateKey(this.projectRootPath ? [this.projectRootPath] : null);
       if (stateKey) {
         return this.stateStore.load(stateKey);
       } else {
