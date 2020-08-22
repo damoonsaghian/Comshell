@@ -9,13 +9,8 @@ module.exports = ({ commandRegistry, config, notificationManager, project, clipb
         this.getModel().getActivePane().activatePreviousItem();
       },
       'application:quit': () => nw.Window.get().close(),
-      'window:focus-next-pane': function () { this.getModel().activateNextPane() },
-      'window:focus-previous-pane': function () { this.getModel().activatePreviousPane() },
-      'window:focus-pane-above': function () { this.focusPaneViewAbove() },
-      'window:focus-pane-below': function () { this.focusPaneViewBelow() },
-      'window:focus-pane-on-left': function () { this.focusPaneViewOnLeft() },
-      'window:focus-pane-on-right': function () { this.focusPaneViewOnRight() },
       'window:save-all': function () { this.getModel().saveAll() },
+      'pane:reopen-closed-item': function () { this.getModel().reopenItem() },
       'core:close': function () { this.getModel().closeActivePaneItemOrEmptyPaneOrWindow() },
       'core:save': function () { this.getModel().saveActivePaneItem() }
     },
