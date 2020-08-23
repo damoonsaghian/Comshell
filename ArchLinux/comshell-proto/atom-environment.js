@@ -217,8 +217,16 @@ class AtomEnvironment {
   // establishing a real application window;
   async startEditorWindow() {
     // await this.stateStore.clear();
-
     this.unloading = false;
+
+    {
+      const args = nw.App.fullArgv;
+      const index = args.indexOf('--user-data-dir') + 1;
+      const userDataDir = index === 0 ? null : args[index + 1]; // nw.App.dataPath
+      this.projectRootPath = userDataDir ? path.join(userDataDir, '../..') : null;
+    }
+    if (this.projectRootPath)
+      atom.project.setPaths([this.projectRootPath]);
 
     const loadStatePromise = this.loadState().then(async state => {
       this.keymaps.defaultTarget = this.workspace.getElement();
@@ -346,11 +354,6 @@ class AtomEnvironment {
   }
 
   loadState(stateKey) {
-    const args = nw.App.fullArgv;
-    const index = args.indexOf('--user-data-dir') + 1;
-    const userDataDir = index === 0 ? null : args[index + 1]; // nw.App.dataPath
-    this.projectRootPath = userDataDir ? path.join(userDataDir, '../..') : null;
-
     if (AtomEnvironment.enablePersistence) {
       if (!stateKey)
         stateKey = this.getStateKey(this.projectRootPath ? [this.projectRootPath] : null);
