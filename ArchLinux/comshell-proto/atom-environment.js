@@ -28,6 +28,7 @@ const TextEditor = require('./editor/text-editor');
 const Clipboard = require('./clipboard');
 const tabs = require('./tabs');
 const treeView = require('./tree-view/tree-view');
+const ProjectsList = require('./projects-list');
 
 KeymapManager.prototype.loadBundledKeymaps = function () {
   keymapsPath = path.join(__dirname, 'keymaps.json');
@@ -274,9 +275,22 @@ class AtomEnvironment {
       // https://github.com/apla/atom-jscad
       // https://github.com/hax/atom-elastic-tabstops
 
-      if (!this.projectRootPath) {
-        // show projects list;
-      }
+      const projectsList = new ProjectsList();
+      atom.commands.add('atom-workspace', {
+        'application:projects-list': () => {
+          if (projectsList.modalPanel.isVisible() && this.projectRootPath) {
+            projectsList.selectList.props.didCancelSelection();
+          } else {
+            projectsList.show();
+          }
+        }
+      });
+
+      // to define keybindings for projectsList:
+      projectsList.selectList.element.classList.add('projects-list');
+
+      if (!this.projectRootPath)
+        projectsList.show();
     });
 
     const output = await Promise.all([loadStatePromise]);
