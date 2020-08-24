@@ -6,7 +6,7 @@
   'down': 'core:move-down'
   'left': 'core:move-left'
   'right': 'core:move-right'
-  'f11': 'window:toggle-full-screen'
+  'ctrl-shift-i': 'window:toggle-dev-tools'
   'alt-shift-left': 'editor:move-selection-left'
   'alt-shift-right': 'editor:move-selection-right'
 

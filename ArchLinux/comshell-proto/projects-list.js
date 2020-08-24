@@ -39,7 +39,7 @@ class ProjectsList {
         require('child_process').exec(
           command,
           (error, _stdout, _stderr) => {
-            // if this a project_less instance (ie the first instance), close it;
+            // if this is a project_less instance (ie the first instance), close it;
             if (!error && !atom.projectRootPath)
               nw.Window.get().close();
           }

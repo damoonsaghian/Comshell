@@ -179,6 +179,11 @@ class AtomEnvironment {
     this.windowEventHandler = null;
   }
 
+  // Essential: Close the current window.
+  close() {
+    nw.Window.get().close();
+  }
+
   // Extended: Move current window to the center of the screen.
   center() {
     nw.Window.get().setPosition('center');
@@ -206,12 +211,6 @@ class AtomEnvironment {
   // Extended: Returns a {Boolean} that is `true` if the current window is in full screen mode.
   isFullScreen() {
     return nw.Window.get().isFullscreen();
-  }
-
-  // Extended: Set the full screen state of the current window.
-  setFullScreen(fullScreen = false) {
-    nw.Window.get().enterFullscreen();
-    return Promise(resolve => resolve());
   }
 
   // establishing a real application window;
@@ -371,15 +370,12 @@ class AtomEnvironment {
     return {
       project: this.project.serialize(options),
       workspace: this.workspace.serialize(),
-      grammars: this.grammars.serialize(),
-      fullScreen: this.isFullScreen()
+      grammars: this.grammars.serialize()
     };
   }
 
   async deserialize(state) {
     if (!state) return Promise.resolve();
-
-    this.setFullScreen(state.fullScreen);
 
     if (state.project) {
       try {

@@ -12,9 +12,6 @@ module.exports = class WindowEventHandler {
     this.handleEnterFullScreen = this.handleEnterFullScreen.bind(this);
     this.handleLeaveFullScreen = this.handleLeaveFullScreen.bind(this);
     this.handleWindowBeforeunload = this.handleWindowBeforeunload.bind(this);
-    this.handleWindowToggleFullScreen = this.handleWindowToggleFullScreen.bind(
-      this
-    );
     this.handleWindowClose = this.handleWindowClose.bind(this);
     this.handleWindowToggleDevTools = this.handleWindowToggleDevTools.bind(
       this
@@ -30,7 +27,6 @@ module.exports = class WindowEventHandler {
     this.document = document;
     this.subscriptions.add(
       this.atomEnvironment.commands.add(this.window, {
-        'window:toggle-full-screen': this.handleWindowToggleFullScreen,
         'window:close': this.handleWindowClose,
         'window:toggle-dev-tools': this.handleWindowToggleDevTools
       })
@@ -197,16 +193,21 @@ module.exports = class WindowEventHandler {
     this.atomEnvironment.destroy();
   }
 
-  handleWindowToggleFullScreen() {
-    this.atomEnvironment.toggleFullScreen();
-  }
-
   handleWindowClose() {
     this.atomEnvironment.close();
   }
 
-  handleWindowToggleDevTools() {
-    this.atomEnvironment.toggleDevTools();
+  async handleWindowToggleDevTools() {
+    // Defer DevTools interaction to the next tick, because using them during
+    // event handling causes some wrong input events to be triggered on
+    // `TextEditorComponent` (Ref.: https://github.com/atom/atom/issues/9697).
+    await new Promise(process.nextTick);
+    const win = nw.Window.get();
+    if(win.isDevToolsOpen()) {
+      win.closeDevTools();
+    } esle {
+      win.showDevTools();
+    }
   }
 
   handleLinkClick(event) {
