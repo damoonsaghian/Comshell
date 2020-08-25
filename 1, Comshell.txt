@@ -38,12 +38,11 @@ Comshell is a unified computing environment, utilizing command based user interf
 projects are directories inside "~/projects/",
   or in non_removable disks, inside a root directory named "projects";
 list of all projects will appear in a floating layer, at the center of screen;
-list of files in the project will be displayed in the left side_bar;
-we can have views of different locations in a project (even of the same file);
-
 projects in removable disks (inside a root directory named "projects"),
   can be accessed from the floating layer showing projects list;
 
+in a project view, list of files will be displayed in the left side_bar;
+we can have views of different locations in a project (even of the same file);
 text files will be opened in a text editor;
 directories with ".g" suffixes, will be opened in a gallery view;
 files and directories inside galleries, will be opened in a floating layer;
@@ -70,4 +69,6 @@ in normal mode we can:
 , undo
 , find
 
-double space, not at the beginning of line: auto_completion
+double space:
+, at the beginning of line: indent
+, otherwise: complete (auto_completion does not disappear with only one space)

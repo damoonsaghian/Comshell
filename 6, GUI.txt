@@ -6,7 +6,7 @@ the solution:
 "https://docs.rs/fragile/1.0.0/fragile/struct.Fragile.html"
 "https://docs.rs/send_wrapper/0.4.0/send_wrapper/"
 we deal with Gobjects by wrapping them in a Gsend;
-Gsend embeds a Fragile inside, which will be created in the GTK main thread (using "idle_add"),
+Gsend embeds a Fragile which will be created in the GTK main thread (using "idle_add"),
   and then received (and put inside the Gsend) using a channel;
 Gsend.new gets a closure (instead of a Gobject value);
   the closure's return type is the type of the specific Gobject;
@@ -30,9 +30,31 @@ so i'm not sure, maybe it's better to implement a GUI library, based on actors, 
 "https://gitlab.freedesktop.org/gstreamer/gstreamer-rs/tree/master/tutorials"
 "https://github.com/fengalin/media-toc"
 
+; pkexec pacman -S gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
+poppler-glib goffice goocanvas
+
+;sh
+curl --proto '=https' -sSf -o comshell.zip https://github.com/damoonsaghian/Comshell/archive/master.zip
+unzip comshell.zip -d Comshell
+cd Comshell
+
+cargo build --release
+pkexec cp .cache/target/release/comshell /usr/local/bin/
+
+printf '[Desktop Entry]\nName=Comshell\nExec=comshell\nIcon=computer\nType=Application' >
+  ~/.config/autostart/comshell.desktop
+pkexec cp ~/.config/autostart/comshell.desktop /etc/skel/.config/autostart/
+pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/
+;
+
+= prototype
+first we can implement a prototype of Comshell using Gjs;
+"https://gitlab.gnome.org/GNOME/gjs"
+
 "https://python-gtk-3-tutorial.readthedocs.io/en/latest/index.html"
 "https://stackoverflow.com/questions/23433819/creating-a-simple-file-browser-using-python-and-gtktreeview"
 "http://zetcode.com/gui/pygtk/advancedwidgets/"
+"https://github.com/howl-editor/howl/tree/master/lib/aullar"
 "https://github.com/MeanEYE/Sunflower"
 "https://gitlab.gnome.org/World/lollypop/-/tree/master/lollypop"
 "https://github.com/karlch/vimiv/tree/master/vimiv"
@@ -49,19 +71,10 @@ draw arrow at cursor position in TextView in GTK3:
 "https://gist.github.com/musiKk/2266946"
 "https://www.archlinux.org/packages/community/any/eolie/"
 
-; pkexec pacman -S gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
-poppler-glib goffice goocanvas
-
 ;sh
-curl --proto '=https' -sSf -o comshell.zip https://github.com/damoonsaghian/Comshell/archive/master.zip
-unzip comshell.zip -d Comshell
-cd Comshell
+pkexec cp -r comshell-proto /usr/local/share/
 
-cargo build --release
-pkexec cp .cache/target/release/comshell /usr/local/bin/
-
-printf '[Desktop Entry]\nName=Comshell\nExec=comshell\nIcon=computer\nType=Application' >
-  ~/.config/autostart/comshell.desktop
+printf '[Desktop Entry]\nName=Comshell proto\nExec=gjs /usr/local/share/comshell-proto/main.js \nIcon=computer\nType=Application' > ~/.config/autostart/comshell.desktop
 pkexec cp ~/.config/autostart/comshell.desktop /etc/skel/.config/autostart/
-pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/
+pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/comshell-proto.desktop
 ;

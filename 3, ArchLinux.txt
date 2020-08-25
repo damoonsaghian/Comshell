@@ -61,21 +61,3 @@ note that due to a bug, "pkexec" does not work with the fallback Polkit agent,
 there is a workaround though (it requires "ctrl+c" to stop):
 ; pkttyagent -p $(echo $$) | pkexec ...
 or you can just use "su" instead;
-
-now we can even have a prototype of Comshell;
-it's basically Atom editor's code, trimmed down and made to run inside NW.js;
-why Nw.js instead of Electron.js:
-1, multiple NW.js instances spend less resources, cause as opposed to Electron.js,
-  the libraries are not embedded inside the executable;
-2, NW.js always uses the latest versions of Node.js and Chromium;
-
-;sh
-pkexec pacman -S npm gcc make
-cd Comshell/ArchLinux/comshell-proto
-npm install
-pkexec cp -r ../comshell-proto /usr/local/share/comshell-proto/
-
-printf '[Desktop Entry]\nName=Comshell proto\nExec=/usr/local/share/comshell-proto/node_modules/.bin/nw --mixed-context /usr/local/share/comshell-proto/ \nIcon=computer\nType=Application' > ~/.config/autostart/comshell.desktop
-pkexec cp ~/.config/autostart/comshell.desktop /etc/skel/.config/autostart/
-pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/comshell-proto.desktop
-;
