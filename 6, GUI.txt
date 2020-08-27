@@ -20,9 +20,8 @@ thus we have to implement it, probably using "gtk.TextView.draw_layer";
 "https://github.com/howl-editor/howl/blob/ea6c6acac0b8b7cf72e4a4e01b9a2a4df1d1c84a/lib/aullar/display_lines.moon#L167"
 
 so i'm not sure, maybe it's better to implement a GUI library, based on actors, from scratch;
-https://github.com/intjelic/byteplug
-https://github.com/kas-gui/kas
-https://github.com/linebender/druid
+"https://github.com/kas-gui/kas"
+"https://github.com/linebender/druid"
 CEF for web (and PDF)
 FFMPEG for video
 
