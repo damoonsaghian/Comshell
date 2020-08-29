@@ -61,3 +61,20 @@ note that due to a bug, "pkexec" does not work with the fallback Polkit agent,
 there is a workaround though (it requires "ctrl+c" to stop):
 ; pkttyagent -p $(echo $$) | pkexec ...
 or you can just use "su" instead;
+
+= Comshell Proto
+now we can even have a prototype of Comshell;
+
+;sh
+curl --proto '=https' -sSf -o comshell.zip https://github.com/damoonsaghian/Comshell/archive/master.zip
+unzip comshell.zip -d Comshell
+
+pkexec pacman -S npm
+cd Comshell/comshell-proto
+NWJS_BUILD_TYPE=sdk npm install
+pkexec cp -r ../comshell-proto /usr/local/share/
+
+printf '[Desktop Entry]\nName=Comshell proto\nExec=/usr/local/share/comshell-proto/node_modules/.bin/nw --mixed-context /usr/local/share/comshell-proto/ \nIcon=computer\nType=Application' > ~/.config/autostart/comshell.desktop
+pkexec cp ~/.config/autostart/comshell.desktop /etc/skel/.config/autostart/
+pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/comshell-proto.desktop
+;
