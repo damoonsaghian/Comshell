@@ -1,0 +1,12 @@
+{
+  "name": "comshell",
+  "description": "a unified computing environment, utilizing command based user interface",
+  "main": "main.html",
+  "chromium-args": "--mixed-context",
+  "window": {
+    "frame": false
+  },
+  "dependencies": {
+    "nw": "^0.47.1"
+  }
+}
