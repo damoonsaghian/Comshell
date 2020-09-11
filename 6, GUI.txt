@@ -1,7 +1,6 @@
 implementing a complete GUI toolkit is a lot of work;
 existing ones (like GTK) are single threaded;
 thus we can't access GTK widgets (and data structures containing them), from inside actors;
-
 solution:
 "https://gtk-rs.org/docs/glib/source/fn.idle_add.html"
 "https://docs.rs/fragile/1.0.0/fragile/struct.Fragile.html"
@@ -13,10 +12,7 @@ Gsend.new gets a closure (instead of a Gobject value);
   the closure's return type is the type of the specific Gobject;
 
 another problem with GTK is its lack of features;
-for example the SourceView widget lacks indent guides;
-thus we have to implement it, probably using "gtk.TextView.draw_layer";
-"https://github.com/howl-editor/howl/blob/ea6c6acac0b8b7cf72e4a4e01b9a2a4df1d1c84a/lib/aullar/display_lines.moon#L167"
-
+  for example the SourceView widget lacks indent guides;
 so i'm not sure, maybe it's better to implement a GUI library, based on actors, from scratch;
 "https://github.com/kas-gui/kas"
 "https://github.com/Julusian/rust-cef"
@@ -25,6 +21,10 @@ so i'm not sure, maybe it's better to implement a GUI library, based on actors, 
 FFMPEG
 
 ;sh
+curl --proto '=https' -sSf -o comshell.zip https://github.com/damoonsaghian/Comshell/archive/master.zip
+unzip comshell.zip -d Comshell
+cd Comshell
+
 cargo build --release
 pkexec cp .cache/target/release/comshell /usr/local/bin/
 
