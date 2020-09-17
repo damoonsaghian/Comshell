@@ -63,7 +63,11 @@ there is a workaround though (it requires "ctrl+c" to stop):
 or you can just use "su" instead;
 
 = Comshell Proto
-now we can even have a prototype of Comshell;
+now we can even have a prototype of Comshell, using NW.js;
+why Nw.js instead of Electron.js:
+1, multiple NW.js instances spend less resources, cause unlike Electron.js,
+  the libraries are not embedded inside the executable;
+2, NW.js always uses the latest versions of Node.js and Chromium;
 
 ;sh
 curl --proto '=https' -sSf -o comshell.zip https://github.com/damoonsaghian/Comshell/archive/master.zip
