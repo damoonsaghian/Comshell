@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html><body><script>
+
+const path = require('path');
+const ProjectsList = require('./projects-list');
+const ProjectViews = require('./project-views');
+const ProjectFiles = require('./project-files');
+
+const win = nw.Window.get();
+win.maximize();
+
+// for each user data directory, there can only be one instance of NW app;
+// if we try to open a second instance, the first one will be notified with "open" signal;
+// we use the signal to focus the window;
+nw.App.on('open', _args => win.focus());
+
+const projectsList = new ProjectsList();
+window.addEventListener('keydown', (key) => {
+  if (key === '')
+    document.appendChild(ProjectsList);
+  if (key === '')
+    document.removeChild(ProjectsList);
+});
+
+const args = nw.App.fullArgv;
+const index = args.indexOf('--user-data-dir') + 1;
+const userDataDir = index === 0 ? null : args[index]; // nw.App.dataPath
+const projectDir = userDataDir ? path.join(userDataDir, '../..') : null;
+
+if (projectDir) {
+  const projectViews = new ProjectViews();
+
+  const projectFiles = new ProjectFiles(projectDir, projectViews);
+
+  document.appendChild(projectFiles);
+  document.appendChild(projectViews);
+
+  projectViews.loadSession(userDataDir);
+
+  win.on('close', async () => {
+    await projectViews.saveSession(userDataDir);
+    win.close(true);
+  });
+} else {
+  document.appendChild(ProjectsList);
+}
+
+</script></body></html>
