@@ -1,20 +1,23 @@
-module.exports =
-class ProjectViews extends HTMLElement {
-  constructor() {
-    super();
+const projectViews = document.createElement('div');
+module.exports = projectViews;
 
-    // set a timer to save session
-  }
+projectViews.views = {};
 
-  async saveSession(userDataDir) {}
+projectViews.initialize = (userDataDir) => {
+  loadSession(userDataDir);
 
-  loadSession(userDataDir) {
-    // if there is a saved session file for the project
-  }
+  // set a timer to save session
+
+  nw.Window.get().on('close', async () => {
+    await saveSession(userDataDir);
+    win.close(true);
+  });
 }
 
-// monaco-editor
-// Ace editor
-// Quill
+projectViews.addView = (view) => {}
 
-// https://github.com/sachinchoolur/lightgallery.js
+function loadSession (userDataDir) {
+  // if there is a saved session file for the project
+}
+
+async function saveSession(userDataDir) => {}
