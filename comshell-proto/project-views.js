@@ -1,6 +1,8 @@
 const projectViews = document.createElement('div');
 module.exports = projectViews;
 
+projectViews.setAttribute('class', 'project-views');
+
 projectViews.views = {};
 
 projectViews.initialize = (userDataDir) => {
