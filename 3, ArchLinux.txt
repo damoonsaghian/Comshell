@@ -78,7 +78,7 @@ cd Comshell/comshell-proto
 NWJS_BUILD_TYPE=sdk npm install
 pkexec cp -r ../comshell-proto /usr/local/share/
 
-printf '[Desktop Entry]\nName=Comshell proto\nExec=/usr/local/share/comshell-proto/node_modules/.bin/nw /usr/local/share/comshell-proto/ \nIcon=computer\nType=Application' > ~/.config/autostart/comshell.desktop
+printf '[Desktop Entry]\nName=Comshell proto\nExec=/usr/local/share/comshell-proto/node_modules/.bin/nw /usr/local/share/comshell-proto/\nIcon=computer\nType=Application' > ~/.config/autostart/comshell.desktop
 pkexec cp ~/.config/autostart/comshell.desktop /etc/skel/.config/autostart/
 pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/comshell-proto.desktop
 ;

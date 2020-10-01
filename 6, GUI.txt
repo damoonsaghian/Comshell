@@ -16,7 +16,6 @@ another problem with GTK is its lack of features;
 so i'm not sure, maybe it's better to implement a GUI library, based on actors, from scratch;
 "https://github.com/kas-gui/kas"
 "https://github.com/Julusian/rust-cef"
-  "https://github.com/jamethy/sdl2-cef"
   "https://github.com/cztomczak/cefpython"
 FFMPEG
 
