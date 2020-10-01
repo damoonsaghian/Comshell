@@ -1,5 +1,6 @@
 // https://github.com/maxogden/tree-view
 // https://github.com/zcbenz/nw-sample-apps/tree/master/file-explorer
+// https://github.com/matthew-matvei/freeman
 // node-watch
 
 // https://github.com/ikorchenov/atom-open-folder

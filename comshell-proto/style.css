@@ -1,5 +1,11 @@
+* {
+	box-sizing: border-box;
+}
+
 :root {
   display: flex;
+  font-size: 14px;
+  background-color: #ffffff;
 }
 
 .project-files {
