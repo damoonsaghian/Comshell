@@ -7,6 +7,6 @@
     "frame": false
   },
   "dependencies": {
-    "nw": "^0.47.1"
+    "nw": "sdk"
   }
 }

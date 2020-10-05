@@ -22,8 +22,8 @@ function addProjectsDir(projectsDir) {
 
 function activateProject(projectName) {
   const command =
-    nwExecPath + ' --user-data-dir ' +
-    path.join(this.projectsDir, projectName, '.cache/atom') + ' ' +
+    nwExecPath + ' --user-data-dir="' +
+    path.join(this.projectsDir, projectName, '.cache/chromium') + '" ' +
     __dirname;
   require('child_process').exec(
     command,
