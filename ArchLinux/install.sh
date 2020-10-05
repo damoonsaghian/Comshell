@@ -3,9 +3,8 @@ locale-gen
 printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
 
 pacman -S grub intel-ucode amd-ucode linux linux-firmware \
-  btrfs-progs e2fsprogs dosfstools unzip nano man-db pulseaudio-alsa networkmanager \
-  ttf-hack noto-fonts materia-gtk-theme \
-  lightdm-gtk-greeter xorg-server light-locker gnome-shell gvfs gnome-terminal
+  btrfs-progs e2fsprogs dosfstools unzip nano man-db pulseaudio-alsa networkmanager physlock \
+  gnome-shell gvfs gnome-terminal ttf-hack noto-fonts materia-gtk-theme
 
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
 printf '\nset superusers=""\n' >> /etc/grub.d/40_custom
@@ -28,19 +27,6 @@ Exec = /usr/bin/grub-mkstandalone -O x86_64-efi -o \"/boot/efi/EFI/BOOT/BOOTX64.
 
 systemctl enable systemd-timesyncd
 systemctl enable NetworkManager
-
-systemctl enable lightdm
-mkdir -p /etc/lightdm/lightdm.conf.d/
-echo '[Seat:*]
-greeter-show-manual-login=true
-[LightDM]
-sessions-directory=/usr/share/wayland-sessions
-' > /etc/lightdm/lightdm.conf.d/50-myconfig.conf
-mkdir -p /etc/lightdm/lightdm-gtk-greeter.conf.d/
-echo '[greeter]
-hide-user-image=true
-indicators=
-' > /etc/lightdm/lightdm-gtk-greeter.conf.d/50-myconfig.conf
 
 # to customize dconf default values:
 mkdir -p /etc/dconf/profile
@@ -159,6 +145,13 @@ echo '
 PS1="\[$(tput setaf 1)\]\w >\[$(tput sgr0)\] "
 unset HISTFILE
 ' >> /etc/skel/.bashrc
+
+echo '
+[[ -f ~/.bashrc ]] && . ~/.bashrc
+if [[ -z $DISPLAY && $(tty) == /dev/tty1 && $XDG_SESSION_TYPE == tty ]]; then
+  XDG_SESSION_TYPE=wayland exec dbus-run-session gnome-session
+fi
+' >> /etc/skel/.bash_profile
 
 useradd -m -G wheel user1
 passwd user1
