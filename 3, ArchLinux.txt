@@ -1,7 +1,7 @@
 using Arch Linux we can easily setup and maintain a Linux system;
 the following shows how to setup a basic graphical environment, using GnomeShell;
 in the installed system you can press "alt-space" to show the list of applications;
-there you can also do power_off/restart, logout, suspend, and lock, by typing them;
+there you can also do power off, logout, suspend, and lock, by typing them;
 press "alt-shift-space" to toggle maximized state of the window;
 press "alt-esc" to close the window;
 
@@ -42,11 +42,11 @@ to connect to a WIFI network:
 to disconnect from a WIFI network:
 ; nmcli con down id <ssid>
 
-you can set "user1" for automatic login:
-; pkexec nano /etc/lightdm/lightdm.conf.d/50-myconfig.conf
-  autologin-user=user1
-; pkexec groupadd -r autologin
-; pkexec gpasswd -a user1 autologin
+if you are the sole user, you can set "user1" for automatic login:
+; pkexec systemctl edit getty@tty1
+  [Service]
+  ExecStart=
+  ExecStart=-/usr/bin/agetty --autologin user1 --noclear %I $TERM
 but to protect the computer from physical attacks, you have to disable automatic login,
   and lock the session when you leave the computer;
 in addition you have to:
@@ -65,17 +65,16 @@ or you can just use "su" instead;
 = Comshell Proto
 now we can even have a prototype of Comshell, using NW.js;
 why Nw.js instead of Electron.js:
-1, multiple NW.js instances spend less resources, cause unlike Electron.js,
-  the libraries are not embedded inside the executable;
+1, NW.js is simpler, without extra features of Electron.js, which i don't need anyway;
 2, NW.js always uses the latest versions of Node.js and Chromium;
 
 ;sh
 curl --proto '=https' -sSf -o comshell.zip https://github.com/damoonsaghian/Comshell/archive/master.zip
 unzip comshell.zip -d Comshell
 
-pkexec pacman -S npm
+pkexec pacman -S yarn
 cd Comshell/comshell-proto
-NWJS_BUILD_TYPE=sdk npm install
+yarn
 pkexec cp -r ../comshell-proto /usr/local/share/
 
 printf '[Desktop Entry]\nName=Comshell proto\nExec=/usr/local/share/comshell-proto/node_modules/.bin/nw /usr/local/share/comshell-proto/\nIcon=computer\nType=Application' > ~/.config/autostart/comshell.desktop
