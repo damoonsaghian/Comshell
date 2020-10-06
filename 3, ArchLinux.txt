@@ -42,11 +42,11 @@ to connect to a WIFI network:
 to disconnect from a WIFI network:
 ; nmcli con down id <ssid>
 
-if you are the sole user, you can set "user1" for automatic login:
-; pkexec systemctl edit getty@tty1
-  [Service]
-  ExecStart=
-  ExecStart=-/usr/bin/agetty --autologin user1 --noclear %I $TERM
+you can set "user1" for automatic login:
+; pkexec nano /etc/gdm/custom.conf
+  [daemon]
+  AutomaticLoginEnable=True
+  AutomaticLogin=user1
 but to protect the computer from physical attacks, you have to disable automatic login,
   and lock the session when you leave the computer;
 in addition you have to:
