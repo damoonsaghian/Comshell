@@ -204,20 +204,6 @@ main.panel.statusArea.aggregateMenu.container.hide();
     }
   );
 }
-
-const systemActions = imports.misc.systemActions.getDefault();
-const systemActionsProto = Object.getPrototypeOf(systemActions);
-
-systemActionsProto.activateLockScreen =
-  () => imports.gi.GLib.spawn_command_line_async("physlock");
-imports.misc.loginManager.canLock = () => true;
-systemActions._updateLockScreen();
-
-const activateSuspendOld = systemActionsProto.activateSuspend;
-systemActionsProto.activateSuspend = function () {
-  systemActionsProto.activateLockScreen();
-  activateSuspendOld.bind(this)();
-}
 }
 function enable() {}
 function disable() {}
