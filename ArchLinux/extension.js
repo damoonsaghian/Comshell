@@ -33,7 +33,9 @@ main.loadTheme();
     });
     const rightPanelBarrier = main.layoutManager._rightPanelBarrier;
     if (rightPanelBarrier) rightPanelBarrier.destroy();
-    panelBox.set_anchor_point(0, (-1)*(monitor.height - panelBox.height));
+    const y = monitor.height - panelBox.height;
+    panelBox.set_pivot_point(0, -y);
+    panelBox.set_position(0, y);
   }
   main.layoutManager.connect("monitors-changed", movePanelToBottom);
   panelBox.connect("notify::height", movePanelToBottom);
@@ -171,14 +173,6 @@ main.panel.statusArea.aggregateMenu.container.hide();
   const overview = main.overview;
   const viewSelector = overview.viewSelector;
   const windowManager = main.wm;
-
-  // apps view simplified;
-  try {
-    // switch to "all apps" view;
-    viewSelector.appDisplay._showView(1);
-    // hide "frequent/all" buttons;
-    viewSelector.appDisplay._controls.hide();
-  } finally {}
 
   // apps view with toggle functionality
   windowManager.removeKeybinding("toggle-application-view");
