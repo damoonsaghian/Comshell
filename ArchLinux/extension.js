@@ -1,9 +1,9 @@
 function init() {
 const main = imports.ui.main;
-const st = imports.gi.St;
-const clutter = imports.gi.Clutter;
-const meta = imports.gi.Meta;
-const shell = imports.gi.Shell;
+const St = imports.gi.St;
+const Clutter = imports.gi.Clutter;
+const Meta = imports.gi.Meta;
+const Shell = imports.gi.Shell;
 
 main.setThemeStylesheet(
   "/usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css");
@@ -20,21 +20,21 @@ main.loadTheme();
   const panelBox = main.layoutManager.panelBox;
   function movePanelToBottom() {
     const monitor = main.layoutManager.primaryMonitor;
-    if (this.rightPanelBarrier) {
-      this.rightPanelBarrier.destroy();
-    }
-    this.rightPanelBarrier = new meta.Barrier({
-      display: global.display,
-      x1: monitor.width,
-      x2: monitor.width,
-      y1: monitor.height - panelBox.height,
-      y2: monitor.height,
-      directions: meta.BarrierDirection.NEGATIVE_Y
-    });
-    const rightPanelBarrier = main.layoutManager._rightPanelBarrier;
-    if (rightPanelBarrier) rightPanelBarrier.destroy();
+    //if (this.rightPanelBarrier) {
+    //  this.rightPanelBarrier.destroy();
+    //}
+    //this.rightPanelBarrier = new Meta.Barrier({
+    //  display: global.display,
+    //  x1: monitor.width,
+    //  x2: monitor.width,
+    //  y1: monitor.height - panelBox.height,
+    //  y2: monitor.height,
+    //  directions: Meta.BarrierDirection.NEGATIVE_Y
+    //});
+    //const rightPanelBarrier = main.layoutManager._rightPanelBarrier;
+    //if (rightPanelBarrier) rightPanelBarrier.destroy();
     const y = monitor.height - panelBox.height;
-    panelBox.set_pivot_point(0, -y);
+    //panelBox.set_pivot_point(0, -y);
     panelBox.set_position(0, y);
   }
   main.layoutManager.connect("monitors-changed", movePanelToBottom);
@@ -55,7 +55,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
 {
   const rightButton = new imports.ui.panelMenu.Button(0.0, null, true);
   main.panel.addToStatusArea("status_right", rightButton, 0, "right");
-  const rightBox = new st.BoxLayout({ style_class: "panel-status-indicators-box" });
+  const rightBox = new St.BoxLayout({ style_class: "panel-status-indicators-box" });
   rightButton.add_child(rightBox);
 
   // install ArchLinux updates as scheduled;
@@ -69,7 +69,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
   }
   /*
   // since screencast implementation is simple, an alternative method is:
-  const screencastIcon = new st.Icon({ style_class: "system-status-icon" });
+  const screencastIcon = new St.Icon({ style_class: "system-status-icon" });
   rightBox.add_child(screencastIcon);
   screencastIcon.icon_name = "media-record-symbolic";
   screencastIcon.add_style_class_name("screencast-indicator");
@@ -93,7 +93,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
     location._syncIndicator();
   }
 
-  const dateTimeLabel = new st.Label({ y_align: clutter.ActorAlign.CENTER });
+  const dateTimeLabel = new St.Label({ y_align: Clutter.ActorAlign.CENTER });
   rightBox.add_child(dateTimeLabel);
   const updateClock = () => {
     const now = imports.gi.GLib.DateTime.new_now_local();
@@ -110,7 +110,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
 {
   const leftButton = new imports.ui.panelMenu.Button(0.0, null, true);
   main.panel.addToStatusArea("status_left", leftButton, 0, "left");
-  const leftBox = new st.BoxLayout({ style_class: "panel-status-indicators-box" });
+  const leftBox = new St.BoxLayout({ style_class: "panel-status-indicators-box" });
   leftButton.add_child(leftBox);
 
   const network = main.panel.statusArea.aggregateMenu._network;
@@ -126,7 +126,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
   // https://github.com/hedayaty/NetSpeed/blob/master/net_speed.js
   // https://github.com/hedayaty/NetSpeed/blob/master/net_speed_status_icon.js
 
-  const rfkillIcon = new st.Icon({ style_class: "system-status-icon" });
+  const rfkillIcon = new St.Icon({ style_class: "system-status-icon" });
   leftBox.add_child(rfkillIcon);
   rfkillIcon.icon_name = "network-wireless-disabled-symbolic";
   const rfkillManager = imports.ui.status.rfkill.getRfkillManager();
@@ -179,8 +179,8 @@ main.panel.statusArea.aggregateMenu.container.hide();
   windowManager.addKeybinding(
     "toggle-application-view",
     new imports.gi.Gio.Settings({ schema_id: imports.ui.windowManager.SHELL_KEYBINDINGS_SCHEMA }),
-    meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-    shell.ActionMode.NORMAL | shell.ActionMode.OVERVIEW,
+    Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+    Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
     () => {
       if (overview.isDummy) return;
       if (overview.visible) overview.hide();
@@ -191,7 +191,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
   // hide apps view when pressing "alt-tab";
   windowManager.setCustomKeybindingHandler(
     "switch-applications",
-    shell.ActionMode.NORMAL | shell.ActionMode.OVERVIEW,
+    Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
     (display, win, binding) => {
       if (overview.visible) { overview.hide(); return; }
       windowManager._startSwitcher(display, win, binding);
