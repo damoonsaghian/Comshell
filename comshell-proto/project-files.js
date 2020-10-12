@@ -12,6 +12,9 @@ https://stackoverflow.com/questions/24653020/does-ace-editor-have-an-api-similar
 https://codemirror.net/doc/manual.html
 https://github.com/sagemathinc/cocalc/issues/2796
 https://github.com/assisrafael/codemirror-addon-indent-guide
+https://github.com/jupyterlab/jupyterlab/tree/master/packages/codemirror
+  https://github.com/jupyterlab/jupyterlab/tree/master/packages/codeeditor
+  https://github.com/jupyterlab/jupyterlab/tree/master/packages/fileeditor
 
 https://microsoft.github.io/monaco-editor/api/index.html
 contentWidget

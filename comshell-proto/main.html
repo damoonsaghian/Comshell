@@ -3,28 +3,46 @@
 <head><link href="style.css" rel="stylesheet"></head>
 <body><script>
 
-const path = require('path');
-const projectsList = require('./projects-list');
-const projectFiles = require('./project-files');
+nw.Window.maximize();
 
-const win = nw.Window.get();
-win.maximize();
+const path = require("path");
+const fs = require("fs");
+const ProjectWorkspace = require("./project-workspace");
 
-// for each user data directory, there can only be one instance of NW app;
-// if we try to open a second instance, the first one will be notified with "open" signal;
-// we use the signal to focus the window;
-nw.App.on('open', _args => win.focus());
+const workspacesContainer = document.createElement("div");
+workspacesContainer.style["display"] = "grid";
+workspacesContainer.style["grid-template-columns"] = "1fr";
+workspacesContainer.style["grid-template-rows"] = "1fr";
+document.appendChild(workspacesContainer);
 
-const args = nw.App.fullArgv;
-const index = args.indexOf('--user-data-dir') + 1;
-const userDataDir = index === 0 ? null : args[index]; // nw.App.dataPath
-const projectDir = userDataDir ? path.join(userDataDir, '../..') : null;
+workspacesContainer.addWorkspace = function (workspace) {
+  workspace.style["grid-area"] = "1 / 1";
+};
 
-if (projectDir) {
-  projectFiles.initialize(userDataDir);
-} else {
-  projectsList.showModal();
+const overview = document.createElement("dialog");
+
+window.addEventListener("keydown", (event) => {
+  const keyName = event.key;
+  if (keyName === "")
+    overview.showModal();
+  if (keyName === "")
+    overview.close();
+});
+
+// create file_managers for directories in "~" and external disks,
+//   then appendChild them to overview;
+
+// when a disk is mounted, add its "projects" directory to the list;
+
+function addProjectsDir(projectsDir) {
+  this.projectsDir.walkDir((file) => {});
 }
+
+function activateProject(projectName) {
+  // hide overview when a project is activated;
+}
+
+overview.showModal();
 
 </script></body>
 </html>
