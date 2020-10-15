@@ -35,10 +35,10 @@ Kinesis Advantage 2 keyboard
 = Comshell
 Comshell is a unified computing environment, utilizing command based user interface;
 
-projects are directories inside "~/projects/",
-  or on non_removable disks, inside a root directory named "projects";
+project directories reside in directories named "projects" or "projects.*",
+  inside home directory or mounted disks;
 list of all projects will appear in a floating layer, at the center of screen;
-projects in removable disks (inside a root directory named "projects") reside in separate tabs;
+each group of projects (which are in the same directory) will be shown in separate tabs;
 
 in a project view, list of files will be displayed in the left side_bar;
 files and directories with names starting with a dot, will be hidden;

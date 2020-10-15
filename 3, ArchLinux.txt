@@ -41,6 +41,9 @@ to connect to a WIFI network:
 ; nmcli --ask dev wifi con <ssid>
 to disconnect from a WIFI network:
 ; nmcli con down id <ssid>
+to turn off all radio devices:
+; rfkill block all
+; nmcli r all off
 
 you can set "user1" for automatic login:
 ; pkexec nano /etc/gdm/custom.conf

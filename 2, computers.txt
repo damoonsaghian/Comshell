@@ -45,6 +45,11 @@ this mess of a design cries out for hidden and quite sophisticated backdoors;
 "https://en.wikipedia.org/wiki/Intel_Management_Engine"
 "https://blog.invisiblethings.org/papers/2015/x86_harmful.pdf"
 
+one read_only ROM, plus a writable ROM:
+, no possibility of bricking the device;
+, no need for complex signing mechanism to make sure a device's firmware is not malicious;
+  just clear the writable flash when you buy a device;
+
 on X86 architecture we can have open source boot_loader, and GPU drivers,
   using Intel with Coreboot+Grub2 for example;
   "https://www.coreboot.org/GRUB2#Scanning_for_grub.cfg_on_local_hard_drives"
