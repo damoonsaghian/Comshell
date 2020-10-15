@@ -4,37 +4,11 @@
 
 :root {
   font-size: 14px;
-  background-color: #ffffff;
 }
 
-.project-files {
-  flex: 1 1 0;
+project-files {
   background-color: #cccccc;
   border-right: 1px solid #aaaaaa;
-}
-
-.views-container {
-  position: relative;
-  flex: 4 1 0;
-  /* prevent contained item from leaking ouside, might improve performance */
-  overflow: hidden;
-}
-
-.views-container > * {
-  display: flex;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
-
-.views-container > * > * {
-  flex: 3 1 0;
-}
-
-.views-container > * > .file-sections {
-  flex: 1 1 0;
 }
 
 ::-webkit-scrollbar {

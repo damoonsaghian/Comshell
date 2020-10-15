@@ -30,17 +30,25 @@ const path = require('path');
 const fs = require('fs');
 const projectViews = require('./project-views');
 
-const projectFiles = document.createElement('div');
-module.exports = projectFiles;
+module.exports =
+class ProjectFiles extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({mode: 'open'});
 
-projectFiles.initialize = (userDataDir) => {
-  const projectDir = userDataDir ? path.join(userDataDir, '../..') : null;
+    const wrapper = document.createElement('div');
+    wrapper.setAttribute('class','wrapper');
 
-  projectViews.initialize(userDataDir);
+    const style = document.createElement('style');
+    style.textContent = `.wrapper {
+      flex: 1 1 0;
+    }`
 
-  document.appendChild(projectFiles);
-  document.appendChild(projectViews);
+    this.shadowRoot.append(style, wrapper);
+  }
+
+  // indicate open files;
+  // move between open files;
 }
 
-// indicate open files by an underline;
-// move between open files;
+window.customElements.define('project-files', ProjectFiles);
