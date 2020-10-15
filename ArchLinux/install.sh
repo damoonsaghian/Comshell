@@ -42,9 +42,6 @@ enabled=true
 automatic-timezone=true
 [org/gnome/desktop/notifications]
 show-banners=false
-[org/gnome/settings-daemon/plugins/power]
-sleep-inactive-ac-type='nothing'
-sleep-inactive-battery-type='nothing'
 [org/gnome/desktop/background]
 primary-color='#222222'
 secondary-color='#222222'

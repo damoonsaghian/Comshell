@@ -20,21 +20,7 @@ main.loadTheme();
   const panelBox = main.layoutManager.panelBox;
   function movePanelToBottom() {
     const monitor = main.layoutManager.primaryMonitor;
-    //if (this.rightPanelBarrier) {
-    //  this.rightPanelBarrier.destroy();
-    //}
-    //this.rightPanelBarrier = new Meta.Barrier({
-    //  display: global.display,
-    //  x1: monitor.width,
-    //  x2: monitor.width,
-    //  y1: monitor.height - panelBox.height,
-    //  y2: monitor.height,
-    //  directions: Meta.BarrierDirection.NEGATIVE_Y
-    //});
-    //const rightPanelBarrier = main.layoutManager._rightPanelBarrier;
-    //if (rightPanelBarrier) rightPanelBarrier.destroy();
     const y = monitor.height - panelBox.height;
-    //panelBox.set_pivot_point(0, -y);
     panelBox.set_position(0, y);
   }
   main.layoutManager.connect("monitors-changed", movePanelToBottom);
@@ -169,12 +155,13 @@ main.panel.statusArea.aggregateMenu.container.hide();
   // https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet
 }
 
+// overview layer
 {
   const overview = main.overview;
   const viewSelector = overview.viewSelector;
   const windowManager = main.wm;
 
-  // apps view with toggle functionality
+  // toggle overview when toggling apps view;
   windowManager.removeKeybinding("toggle-application-view");
   windowManager.addKeybinding(
     "toggle-application-view",
@@ -188,7 +175,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
     }
   );
 
-  // hide apps view when pressing "alt-tab";
+  // hide overview when pressing "alt-tab";
   windowManager.setCustomKeybindingHandler(
     "switch-applications",
     Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
