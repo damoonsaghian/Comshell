@@ -32,6 +32,12 @@ for those who neither can use all their fingers, nor can talk,
 Kinesis Advantage 2 keyboard
 "http://www.allthingsergo.com/the-best-ergonomic-mechanical-keyboards/"
 
+for compatibility with other applications, we still need a touchpad and extra keys:
+, arrow keys, "page up", "page down", "home", "end":
+  which can be implemented as gestures on the touchpad;
+, "alt", "ctrl", "shift", "tab": which can be put in the middle;
+, 10 punctuation keys which can be put above numbers;
+
 = Comshell
 Comshell is a unified computing environment, utilizing command based user interface;
 
@@ -60,7 +66,7 @@ web pages:
 
 modal key_bindings;
 modes (normal mode and insert mode) must be visually distinctive;
-press "esc" to go to normal mode;
+press "esc" or "tab" to go to normal mode;
 in normal mode we can:
 , press "space" to go to insert mode;
 , move the cursor to the next or previous word;
@@ -70,6 +76,10 @@ in normal mode we can:
 , paste
 , undo
 , find
+
+, navigation: move, search
+, selection
+, completion
 
 double space:
 , at the beginning of line: indent

@@ -13,6 +13,8 @@ Gsend.new gets a closure (instead of a Gobject value);
 
 another problem with GTK is its lack of features;
   for example the SourceView widget lacks indent guides;
+also scene graph is a new thing in GTK and still a work in progress;
+
 so i'm not sure, maybe it's better to implement a GUI library, based on actors, from scratch;
 "https://github.com/kas-gui/kas"
 "https://github.com/Julusian/rust-cef"

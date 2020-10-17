@@ -38,6 +38,8 @@ data structure for graphical objects:
 , material
 , cached rasterization (can be none)
 
+with a scene graph we can have fine grained graphical objects which can be combined easily;
+
 "https://en.wikipedia.org/wiki/Midpoint_circle_algorithm"
 "https://en.wikipedia.org/wiki/Xiaolin_Wu%27s_line_algorithm"
 "http://members.chello.at/~easyfilter/bresenham.html"
