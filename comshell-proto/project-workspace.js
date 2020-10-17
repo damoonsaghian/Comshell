@@ -37,7 +37,9 @@ class ProjectWorkspace extends HTMLElement {
     // if there is a saved session file for the project
   }
 
-  async saveSession(projectPath) => {}
+  async saveSession(projectPath) => {
+    // save paths relatively; otherwise renaming/moving project breaks paths;
+  }
 }
 
 window.customElements.define('project-workspace', ProjectWorkspace);

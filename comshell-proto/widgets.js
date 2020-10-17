@@ -1,5 +1,5 @@
 class Stack extends HTMLElement {
-  constructor() {
+  constructor(showTabs = false) {
     super();
     this.attachShadow({mode: 'open'});
 
@@ -14,6 +14,10 @@ class Stack extends HTMLElement {
     }`
 
     this.shadowRoot.append(style, wrapper);
+
+    if (showTabs) {
+      // add a tabs bar to the parent;
+    }
   }
 
   add(title, element) {

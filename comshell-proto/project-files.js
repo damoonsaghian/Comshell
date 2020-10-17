@@ -1,6 +1,7 @@
 // https://github.com/matthew-matvei/freeman
 // node-watch
 // https://github.com/ikorchenov/atom-open-folder
+// fs-admin
 
 /*
 https://github.com/ajaxorg/ace
