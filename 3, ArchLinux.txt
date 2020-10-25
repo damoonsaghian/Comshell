@@ -4,6 +4,8 @@ in the installed system you can press "alt-space" to show the list of applicatio
 there you can also do power off, restart, logout, suspend, and lock, by typing them;
 press "alt-shift-space" to toggle maximized state of the window;
 press "alt-esc" to close the window;
+press "alt-tab" or "alt-`" to switch between
+  recent applications, or recent windows in an application, respectively;
 
 boot Arch Linux live environment;
 to ensure the system clock is accurate:
@@ -59,11 +61,14 @@ in addition you have to:
 these can make physical attacks more difficult, but keep in mind that
   physical access to a computer is root access, given enough time and resources;
 
-note that due to a bug, "pkexec" does not work with the fallback Polkit agent,
+note that "pkexec" does not work with the fallback Polkit agent,
   which is the only one available, in Linux console (ie when GnomeShell is not running);
-there is a workaround though (it requires "ctrl+c" to stop):
+and we have to do this (it requires "ctrl+c" to stop):
 ; pkttyagent -p $(echo $$) | pkexec ...
-or you can just use "su" instead;
+or just use "su";
+but in general it's safer to login as root instead;
+because unlike in GnomeShell there is no way to make a visually distinctive Polkit agent,
+  to prevent malicious programs to steal your password;
 
 = Comshell Proto
 now we can even have a prototype of Comshell, using NW.js;

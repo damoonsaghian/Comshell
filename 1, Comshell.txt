@@ -35,7 +35,7 @@ Kinesis Advantage 2 keyboard
 for compatibility with other applications, we still need a touchpad and extra keys:
 , arrow keys, "page up", "page down", "home", "end":
   which can be implemented as gestures on the touchpad;
-, "alt", "ctrl", "shift", "tab": which can be put in the middle;
+, "alt", "ctrl", "shift", "tab", "`": which can be put in the middle;
 , 10 punctuation keys which can be put above numbers;
 
 = Comshell
