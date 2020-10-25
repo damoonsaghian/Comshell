@@ -42,6 +42,7 @@ enabled=true
 automatic-timezone=true
 [org/gnome/desktop/notifications]
 show-banners=false
+show-in-lock-screen=false
 [org/gnome/desktop/background]
 primary-color='#222222'
 secondary-color='#222222'
@@ -81,16 +82,9 @@ echo 'stage {
   font-size: 10.5pt;
   font-weight: normal;
   color: #ffffff;
-  background-color: #222222;
-}
-#overview {
-  color: #ffffff;
-  background-color: #222222;
 }
 #panel {
   height: 18px;
-  margin-bottom: 0;
-  background-color: #222222;
 }
 #panel .panel-button {
   -natural-hpadding: 4px;
@@ -141,6 +135,60 @@ echo '<?xml version="1.0"?>
   </alias>
 </fontconfig>
 ' > /etc/fonts/local.conf
+
+echo '
+[Desktop Entry]
+Name=Avahi Zeroconf Browser
+Exec=/usr/bin/avahi-discover
+Type=Application
+Icon=network-wired
+NoDisplay=true
+' >> /etc/skel/.local/share/applications/avahi-discover.desktop
+echo '
+[Desktop Entry]
+Name=Avahi SSH Server Browser
+Exec=/usr/bin/bssh
+Type=Application
+Icon=network-wired
+NoDisplay=true
+' >> /etc/skel/.local/share/applications/bssh.desktop
+echo '
+[Desktop Entry]
+Name=Avahi VNC Server Browser
+Exec=/usr/bin/bvnc
+Type=Application
+Icon=network-wired
+NoDisplay=true
+' >> /etc/skel/.local/share/applications/bvnc.desktop
+echo '
+Name=Qt V4L2 test Utility
+Exec=qv4l2
+Type=Application
+Icon=qv4l2
+NoDisplay=true
+' >> /etc/skel/.local/share/applications/qv4l2.desktop
+echo '
+Name=Qt V4L2 video capture utility
+Exec=qvidcap
+Type=Application
+Icon=qvidcap
+NoDisplay=true
+' >> /etc/skel/.local/share/applications/qvidcap.desktop
+echo '
+Name=Hardware Locality lstopo
+Exec=lstopo
+Type=Application
+NoDisplay=true
+' >> /etc/skel/.local/share/applications/lstopo.desktop
+echo '
+[Desktop Entry]
+Name=Extensions
+Exec=/usr/bin/gnome-extensions-app
+Type=Application
+DBusActivatable=true
+Icon=org.gnome.Extensions
+NoDisplay=true
+' >> /etc/skel/.local/share/applications/org.gnome.Extensions.desktop
 
 echo '
 PS1="\[$(tput setaf 1)\]\w >\[$(tput sgr0)\] "
