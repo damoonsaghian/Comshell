@@ -161,8 +161,7 @@ math:
 machine learning:
 methods that their operation depends on adjustable fields;
 
-; pkexec pacman -S rustup gcc
+install "rustup" and "gcc" then:
 ; rustup default stable
-
 to update Rust:
 ; rustup update

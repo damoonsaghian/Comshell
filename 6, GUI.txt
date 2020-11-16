@@ -25,12 +25,10 @@ FFMPEG
 curl --proto '=https' -sSf -o comshell.zip https://github.com/damoonsaghian/Comshell/archive/master.zip
 unzip comshell.zip -d Comshell
 cd Comshell
-
 cargo build --release
-pkexec cp .cache/target/release/comshell /usr/local/bin/
 
-printf '[Desktop Entry]\nName=Comshell\nExec=comshell\nIcon=computer\nType=Application' >
-  ~/.config/autostart/comshell.desktop
-pkexec cp ~/.config/autostart/comshell.desktop /etc/skel/.config/autostart/
-pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/
+mkdir ~/.comshell
+cp .cache/target/release/comshell ~/.comshell/comshell
+printf '[Desktop Entry]\nName=Comshell\nExec=~/.comshell/comshell\nIcon=computer\nType=Application' > ~/.local/share/applications/comshell.desktop
+cp ~/.local/share/applications/comshell.desktop ~/.config/autostart/
 ;

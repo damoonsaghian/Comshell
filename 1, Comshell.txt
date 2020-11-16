@@ -47,16 +47,14 @@ list of all projects will appear in a floating layer, at the center of screen;
 each group of projects (which are in the same directory) will be shown in separate tabs;
 
 in a project view, list of files will be displayed in the left side_bar;
+opened files are indicated by a line below them;
+multiple views of a file are indicated by sections in this line;
 files and directories with names starting with a dot, will be hidden;
 ".cache" directory inside a project is for files we don't want to share or backup;
 
 text files will be opened in a text editor;
 directories with ".g" suffixes, will be opened in a gallery view;
-files and directories inside galleries, will be opened in a floating layer;
-
-we can have views of different locations in a project (even of the same file);
-opened files are indicated by a line below them;
-multiple views of a file are indicated by sections in this line;
+files and directories inside a gallery, will be opened in a floating layer;
 
 non_local projects, web pages, PDF documents, etc,
   accessed from links inside the main project, will be opened in a floating layer;

@@ -43,11 +43,10 @@ to connect to a WIFI network:
 ; nmcli --ask dev wifi con <ssid>
 to disconnect from a WIFI network:
 ; nmcli con down id <ssid>
-to turn off all radio devices:
-; rfkill block all
+to turn off all wireless networks:
 ; nmcli r all off
 
-you can set "user1" for automatic login:
+you can set "user1" for automatic login (using the root terminal):
 ; pkexec nano /etc/gdm/custom.conf
   [daemon]
   AutomaticLoginEnable=True
@@ -61,31 +60,50 @@ in addition you have to:
 these can make physical attacks more difficult, but keep in mind that
   physical access to a computer is root access, given enough time and resources;
 
-note that "pkexec" does not work with the fallback Polkit agent,
-  which is the only one available, in Linux console (ie when GnomeShell is not running);
-and we have to do this (it requires "ctrl+c" to stop):
-; pkttyagent -p $(echo $$) | pkexec ...
-or just use "su";
-but in general it's safer to login as root instead;
-because unlike in GnomeShell there is no way to make a visually distinctive Polkit agent,
-  to prevent malicious programs to steal your password;
+= system administration
+in system administration we must ensure that:
+1, the command executed is explicitly given by the user;
+2, if a program steals a "wheel" user's password, it can't change the system;
+
+"sudo" fails in both cases;
+"https://www.reddit.com/r/linuxquestions/comments/8mlil7/whats_the_point_of_the_sudo_password_prompt_if/"
+
+"pkexec" is safer, but since the Polkit agent doesn't show command arguments,
+  it can be vulnerable too;
+further more, "pkexec" fails in the second case;
+  a fake Polkit agent can be used to send the stolen password to Polkit;
+and since Polkit admin is installed and active by default,
+  we have to disable it to protect the system:
+; mkdir -p /etc/polkit-1/rules.d
+; echo 'polkit.addAdminRule(function(action, subject) { return []; });' >
+  /etc/polkit-1/rules.d/49-rootpw_global.rules
+
+always use a different password for root; because "su" is always present in a Linux system,
+  and since it fails both cases, it can be used to infect the system;
+further more, with "su" password stealing is easier too (using a fake terminal emulator);
+
+the solution is a program which opens a Wayland window with a command prompt;
+if you have given your command as arguments to the program,
+  the prompt shows that command, as default input;
+after pressing "return", it asks for the user's password (user must be in wheel group);
 
 = Comshell Proto
-now we can even have a prototype of Comshell, using NW.js;
-why Nw.js instead of Electron.js:
-1, NW.js is simpler, without extra features of Electron.js, which i don't need anyway;
+now we can even have a prototype of Comshell, built using NW.js;
+why Nw.js instead of Electron:
+1, NW.js is simpler, without extra features of Electron, which i don't need anyway;
 2, NW.js always uses the latest versions of Node.js and Chromium;
 
 ;sh
+pkexec pacman -S yarn
 curl --proto '=https' -sSf -o comshell.zip https://github.com/damoonsaghian/Comshell/archive/master.zip
 unzip comshell.zip -d Comshell
-
-pkexec pacman -S yarn
 cd Comshell/comshell-proto
 yarn
-pkexec cp -r ../comshell-proto /usr/local/share/
 
-printf '[Desktop Entry]\nName=Comshell proto\nExec=/usr/local/share/comshell-proto/node_modules/.bin/nw /usr/local/share/comshell-proto/\nIcon=computer\nType=Application' > ~/.config/autostart/comshell.desktop
-pkexec cp ~/.config/autostart/comshell.desktop /etc/skel/.config/autostart/
-pkexec cp ~/.config/autostart/comshell.desktop /usr/local/share/applications/comshell-proto.desktop
+mkdir ~/.comshell
+cp -r . ~/.comshell
+printf '#!/usr/bin/env sh\nnode_modules/.bin/nw .' > ~/.comshell/comshell;
+chmod +x ~/.comshell/comshell
+printf '[Desktop Entry]\nName=Comshell proto\nExec=~/.comshell/comshell \nIcon=computer\nType=Application' > ~/.local/share/applications/comshell.desktop
+cp ~/.local/share/applications/comshell.desktop ~/.config/autostart/
 ;
