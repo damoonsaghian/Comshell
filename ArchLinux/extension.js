@@ -62,7 +62,10 @@ main.panel.statusArea.aggregateMenu.container.hide();
   */
 
   // install ArchLinux updates as scheduled;
+  // https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html
+  // https://wiki.archlinux.org/index.php/Systemd/Timers
   // a red indicator appears to notify the user that for system to update, it needs a reboot;
+  // https://github.com/RaphaelRochet/arch-update
 
   const remoteAccess = main.panel.statusArea.aggregateMenu._remoteAccess;
   if (remoteAccess && remoteAccess._indicator) {
@@ -153,10 +156,90 @@ main.panel.statusArea.aggregateMenu.container.hide();
   main.panel.addToStatusArea("status_left", leftButton, 0, "left");
   const leftBox = new St.BoxLayout({ style_class: "panel-status-indicators-box" });
   leftButton.add_child(leftBox);
+/*
+  // https://gjs-docs.gnome.org/shell01~0.1_api/
+  // https://gjs-docs.gnome.org/meta7~7_api/
+  // https://gjs-docs.gnome.org/st10~1.0_api/st.widget
+  // https://gjs-docs.gnome.org/clutter7~7_api/clutter.actor
 
-  // https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/master/js/ui/altTab.js
-  // https://gitlab.gnome.org/GNOME/gnome-shell-extensions/-/tree/master/extensions/window-list
-  // https://github.com/c0ldplasma/gnome-shell-extension-taskbar
+  // https://gitlab.gnome.org/GNOME/gnome-shell-extensions/-/blob/master/extensions/window-list/extension.js
+  // https://github.com/home-sweet-gnome/dash-to-panel/blob/master/appIcons.js
+
+  // https://github.com/eonpatapon/gnome-shell-extension-caffeine
+  // https://extensions.gnome.org/extension/672/disable-screen-shield/
+
+  const AppButton = GObject.registerClass(
+  class AppButton extends St.Button {
+    app;
+    _init(app) {
+      super._init();
+      this.app = app;
+    }
+  });
+
+  const app_switcher = new St.Widget({
+    reactive: true,
+    layout_manager: new Clutter.BoxLayout({ homogeneous: true }),
+    x_align: Clutter.ActorAlign.START,
+    x_expand: true,
+    y_expand: true,
+  });
+  leftBox.add_child(app_switcher);
+
+  Shell.AppSystem.get_default().connect("app-state-changed", (_appSys, app) => {
+    if (app.state === Shell.AppState.RUNNING) {
+      const button = new AppButton(app);
+      app_switcher.add_child(button);
+    }
+    else if (app.state === Shell.AppState.STOPPED) {
+      const children = this.app_switcher.get_children();
+      const child = children.find(c => c.app === app);
+      if (child) child.destroy();
+    }
+  });
+
+  const workspace_manager = global.workspace_manager;
+  const connect_workspace = (i) => {
+    const workspace = workspace_manager.get_workspace_by_index(i);
+    workspace.connect("window-added", (_ws, win) => {
+      const button = new WindowButton(win, this._perMonitor, this._monitor.index);
+      this._settings.bind('display-all-workspaces',
+        button, 'ignore-workspace', Gio.SettingsBindFlags.GET);
+      this._windowList.add_child(button);
+    });
+    workspace.connect("window-removed", (_ws, win) => {});
+  };
+  for (let i = 0; i < workspace_manager.n_workspaces; i++) {
+    connect_workspace(i);
+  }
+  workspace_manager.connect("workspace-added", (_wsm, i) => connect_workspace(i));
+
+  // focused window changes
+
+  //populateWindowList
+
+  {
+    const list = St.BoxLayout({
+      vertical: false,
+      //clip_to_allocation: false,
+      x_align: Clutter.ActorAlign.START,
+      y_align: Clutter.ActorAlign.CENTER,
+      x_expand: true,
+      y_expand: true
+    });
+
+    app_switcher.add_actor(this.scrollView);
+  }
+
+  // for all app windows
+  app_switcher.add_child();
+
+  global.workspace_manager.get_active_workspace().connect("window-added", (win) => {
+    const app_button = new AppButton();
+    app_button.connect("clicked", );
+    app_switcher.add_child(appButton);
+  });
+*/
 }
 
 // overview layer
@@ -226,6 +309,6 @@ main.panel.statusArea.aggregateMenu.container.hide();
   // hide dash;
   overview.connect("showing", () => overview.dash.hide());
 }
+
+return { enable: () => {}, disable: () => {} };
 }
-function enable() {}
-function disable() {}

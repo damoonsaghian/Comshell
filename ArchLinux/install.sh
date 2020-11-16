@@ -3,8 +3,9 @@ locale-gen
 printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
 
 pacman -S grub intel-ucode amd-ucode linux linux-firmware \
-  btrfs-progs e2fsprogs dosfstools unzip nano man-db pulseaudio-alsa networkmanager \
-  gnome-shell gdm gvfs gnome-terminal ttf-hack noto-fonts materia-gtk-theme
+  btrfs-progs e2fsprogs dosfstools udisks2 networkmanager pulseaudio-alsa \
+  nano man-db unzip ttf-hack noto-fonts materia-gtk-theme \
+  gnome-shell gdm gvfs gnome-terminal
 
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
 printf '\nset superusers=""\n' >> /etc/grub.d/40_custom
@@ -101,11 +102,6 @@ echo 'stage {
 ' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css
 cp ./extension.js /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
 
-mkdir -p /etc/skel/.config/gtk-3.0
-cp ./gtk.css /etc/skel/.config/gtk-3.0/
-mkdir -p /etc/skel/.config/gtk-4.0
-cp ./gtk.css /etc/skel/.config/gtk-4.0/
-
 echo '<?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
 <fontconfig>
@@ -136,59 +132,60 @@ echo '<?xml version="1.0"?>
 </fontconfig>
 ' > /etc/fonts/local.conf
 
-echo '
-[Desktop Entry]
+echo '[Desktop Entry]
 Name=Avahi Zeroconf Browser
 Exec=/usr/bin/avahi-discover
 Type=Application
 Icon=network-wired
 NoDisplay=true
-' >> /etc/skel/.local/share/applications/avahi-discover.desktop
-echo '
-[Desktop Entry]
+' > /etc/skel/.local/share/applications/avahi-discover.desktop
+echo '[Desktop Entry]
 Name=Avahi SSH Server Browser
 Exec=/usr/bin/bssh
 Type=Application
 Icon=network-wired
 NoDisplay=true
-' >> /etc/skel/.local/share/applications/bssh.desktop
-echo '
-[Desktop Entry]
+' > /etc/skel/.local/share/applications/bssh.desktop
+echo '[Desktop Entry]
 Name=Avahi VNC Server Browser
 Exec=/usr/bin/bvnc
 Type=Application
 Icon=network-wired
 NoDisplay=true
-' >> /etc/skel/.local/share/applications/bvnc.desktop
-echo '
+' > /etc/skel/.local/share/applications/bvnc.desktop
+echo '[Desktop Entry]
 Name=Qt V4L2 test Utility
 Exec=qv4l2
 Type=Application
 Icon=qv4l2
 NoDisplay=true
-' >> /etc/skel/.local/share/applications/qv4l2.desktop
-echo '
+' > /etc/skel/.local/share/applications/qv4l2.desktop
+echo '[Desktop Entry]
 Name=Qt V4L2 video capture utility
 Exec=qvidcap
 Type=Application
 Icon=qvidcap
 NoDisplay=true
-' >> /etc/skel/.local/share/applications/qvidcap.desktop
-echo '
+' > /etc/skel/.local/share/applications/qvidcap.desktop
+echo '[Desktop Entry]
 Name=Hardware Locality lstopo
 Exec=lstopo
 Type=Application
 NoDisplay=true
-' >> /etc/skel/.local/share/applications/lstopo.desktop
-echo '
-[Desktop Entry]
+' > /etc/skel/.local/share/applications/lstopo.desktop
+echo '[Desktop Entry]
 Name=Extensions
 Exec=/usr/bin/gnome-extensions-app
 Type=Application
 DBusActivatable=true
 Icon=org.gnome.Extensions
 NoDisplay=true
-' >> /etc/skel/.local/share/applications/org.gnome.Extensions.desktop
+' > /etc/skel/.local/share/applications/org.gnome.Extensions.desktop
+
+mkdir -p /etc/skel/.config/gtk-3.0
+cp ./gtk.css /etc/skel/.config/gtk-3.0/
+mkdir -p /etc/skel/.config/gtk-4.0
+cp ./gtk.css /etc/skel/.config/gtk-4.0/
 
 echo '
 PS1="\[$(tput setaf 1)\]\w >\[$(tput sgr0)\] "
