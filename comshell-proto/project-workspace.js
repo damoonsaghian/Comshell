@@ -29,7 +29,7 @@ class ProjectWorkspace extends HTMLElement {
 
     nw.Window.get().on('close', async () => {
       await this.saveSession(projectPath);
-      win.close(true);
+      nw.App.quit();
     });
   }
 
