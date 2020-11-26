@@ -1,11 +1,9 @@
 using Arch Linux we can easily setup and maintain a Linux system;
-the following shows how to setup a basic graphical environment, using GnomeShell;
+the following shows how to setup a basic graphical environment;
 in the installed system you can press "alt-space" to show the list of applications;
 there you can also do power off, restart, logout, suspend, and lock, by typing them;
-press "alt-shift-space" to toggle maximized state of the window;
-press "alt-esc" to close the window;
-press "alt-tab" or "alt-`" to switch between
-  recent applications, or recent windows in an application, respectively;
+press "alt-esc" to close the focused window;
+press "alt-tab" or "alt-`" to cycle through workspaces or windows, respectively;
 
 boot Arch Linux live environment;
 to ensure the system clock is accurate:
@@ -47,10 +45,10 @@ to turn off all wireless networks:
 ; nmcli r all off
 
 you can set "user1" for automatic login (using the root terminal):
-; pkexec nano /etc/gdm/custom.conf
-  [daemon]
-  AutomaticLoginEnable=True
-  AutomaticLogin=user1
+; systemctl edit getty@tty1
+  [Service]
+  ExecStart=
+  ExecStart=-/usr/bin/agetty --autologin user1 --noclear %I $TERM
 but to protect the computer from physical attacks, you have to disable automatic login,
   and lock the session when you leave the computer;
 in addition you have to:
@@ -79,7 +77,7 @@ and since Polkit admin is installed and active by default,
   /etc/polkit-1/rules.d/49-rootpw_global.rules
 
 always use a different password for root; because "su" is always present in a Linux system,
-  and since it fails both cases, it can be used to infect the system;
+  and since it fails both cases, it can be used to take over the system;
 further more, with "su" password stealing is easier too (using a fake terminal emulator);
 
 the solution is a program which opens a Wayland window with a command prompt;
@@ -87,14 +85,29 @@ if you have given your command as arguments to the program,
   the prompt shows that command, as default input;
 after pressing "return", it asks for the user's password (user must be in wheel group);
 
+= automatic online atomic upgrades
+"https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
+"https://wiki.archlinux.org/index.php/Systemd/Timers"
+
+to have reliable automatic updates, they must be atomic;
+
+"usr", "etc" and "boot" must be symlinks to subvolumes;
+create a base directory;
+create snapshots of "usr", "etc" and "boot", then mount them in the base directory;
+for the rest of system root directories make symlinks in the base directory;
+chroot and upgrade;
+remove the base directory;
+change the "usr", "etc" and "boot" symlinks in the system root,
+  to point to the new snapshots;
+
 = Comshell Proto
 now we can even have a prototype of Comshell, built using NW.js;
 why Nw.js instead of Electron:
 1, NW.js is simpler, without extra features of Electron, which i don't need anyway;
 2, NW.js always uses the latest versions of Node.js and Chromium;
 
+first install "yarn" then:
 ;sh
-pkexec pacman -S yarn
 curl --proto '=https' -sSf -o comshell.zip https://github.com/damoonsaghian/Comshell/archive/master.zip
 unzip comshell.zip -d Comshell
 cd Comshell/comshell-proto
