@@ -1,13 +1,15 @@
 using Arch Linux we can easily setup and maintain a Linux system;
-the following shows how to setup a basic graphical environment;
+the following shows how to setup a basic graphical environment, using GnomeShell;
 in the installed system, there is only one application, a terminal emulator;
 other applications can be installed using "pacman";
 you can press "alt-space" to show the list of applications;
 selecting an application from the list shows it in a dedicated workspace;
-other than applications, there are entries to
-  power off, restart, logout, suspend, or lock the system;
+also you can power off, restart, logout, suspend, or lock the system,
+  from the applications list, just by typing those commands;
 press "alt-esc" to close the focused window;
-press "alt-tab" or "alt-a" to cycle through workspaces or windows, respectively;
+press "alt-shift-space" to toggle maximized state of a window;
+press "alt-tab" or "alt-a" to switch between
+  recent applications, or recent windows in an application, respectively;
 
 boot Arch Linux live environment;
 to ensure the system clock is accurate:
@@ -47,10 +49,10 @@ to disconnect from a WIFI network:
 ; nmcli con down id <ssid>
 
 you can set "user1" for automatic login (using the root terminal):
-; systemctl edit getty@tty1
-  [Service]
-  ExecStart=
-  ExecStart=-/usr/bin/agetty --autologin user1 --noclear %I $TERM
+; pkexec nano /etc/gdm/custom.conf
+  [daemon]
+  AutomaticLoginEnable=True
+  AutomaticLogin=user1
 but to protect the computer from physical attacks, you have to disable automatic login,
   and lock the session when you leave the computer;
 in addition you have to:

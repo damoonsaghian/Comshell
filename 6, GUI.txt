@@ -30,4 +30,5 @@ cargo build --release
 mkdir ~/.comshell
 cp .cache/target/release/comshell ~/.comshell/comshell
 printf '[Desktop Entry]\nName=Comshell\nExec=~/.comshell/comshell\nIcon=computer\nType=Application' > ~/.local/share/applications/comshell.desktop
+cp ~/.local/share/applications/comshell.desktop ~/.config/autostart/
 ;
