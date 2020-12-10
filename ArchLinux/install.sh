@@ -107,6 +107,10 @@ echo 'stage {
 ' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css
 cp ./extension.js /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
 
+printf '[Desktop Entry]\nNoDisplay=true' |
+tee /etc/skel/.local/share/applications/{avahi-discover,bssh,bvnc,qv4l2,qvidcap,lstopo}.desktop >
+  /dev/null
+
 echo '<?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
 <fontconfig>
@@ -139,45 +143,13 @@ echo '<?xml version="1.0"?>
 
 mkdir -p /etc/skel/.config/gtk-3.0
 cp ./gtk.css /etc/skel/.config/gtk-3.0/
-echo '[Settings]
-gtk-theme-name = Materia-light-compact
-gtk-font-name = Sans
-' > /etc/skel/.config/gtk-3.0/settings.ini
 mkdir -p /etc/skel/.config/gtk-4.0
 cp ./gtk.css /etc/skel/.config/gtk-4.0/
-echo '[Settings]
-gtk-theme-name = Materia-light-compact
-gtk-font-name = Sans
-' > /etc/skel/.config/gtk-4.0/settings.ini
 
 echo '
 PS1="\[$(tput setaf 1)\]\w >\[$(tput sgr0)\] "
 unset HISTFILE
 ' >> /etc/skel/.bashrc
-
-echo '
-if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
-  exec sway
-fi
-' >> /etc/skel/.bash_profile
-
-mkdir -p /etc/skel/.config/sway
-cp ./sway /etc/skel/.config/sway/config
-cp ./swayshell.js /usr/local/share/
-
-printf '[Desktop Entry]\nNoDisplay=true' |
-tee /etc/skel/.local/share/applications/{avahi-discover,bssh,bvnc,qv4l2,qvidcap,lstopo}.desktop >
-  /dev/null
-
-mkdir -p /etc/skel/.config/alacritty
-echo 'window:
-  dynamic_padding: true
-font:
-  size: 10.5
-key_bindings:
-  - { key: N, mods: Control, command: { program: "alacritty" } }
-  - { key: Enter, mods: Alt, command: { program: "alacritty" } }
-' > /etc/skel/.config/alacritty/alacritty.yml
 
 useradd -m -G wheel user1
 passwd user1
