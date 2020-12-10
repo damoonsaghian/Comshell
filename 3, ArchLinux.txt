@@ -1,9 +1,13 @@
 using Arch Linux we can easily setup and maintain a Linux system;
 the following shows how to setup a basic graphical environment;
-in the installed system you can press "alt-space" to show the list of applications;
-there you can also do power off, restart, logout, suspend, and lock, by typing them;
+in the installed system, there is only one application, a terminal emulator;
+other applications can be installed using "pacman";
+you can press "alt-space" to show the list of applications;
+selecting an application from the list shows it in a dedicated workspace;
+other than applications, there are entries to
+  power off, restart, logout, suspend, or lock the system;
 press "alt-esc" to close the focused window;
-press "alt-tab" or "alt-`" to cycle through workspaces or windows, respectively;
+press "alt-tab" or "alt-a" to cycle through workspaces or windows, respectively;
 
 boot Arch Linux live environment;
 to ensure the system clock is accurate:
@@ -41,8 +45,6 @@ to connect to a WIFI network:
 ; nmcli --ask dev wifi con <ssid>
 to disconnect from a WIFI network:
 ; nmcli con down id <ssid>
-to turn off all wireless networks:
-; nmcli r all off
 
 you can set "user1" for automatic login (using the root terminal):
 ; systemctl edit getty@tty1
@@ -77,8 +79,7 @@ and since Polkit admin is installed and active by default,
   /etc/polkit-1/rules.d/49-rootpw_global.rules
 
 always use a different password for root; because "su" is always present in a Linux system,
-  and since it fails both cases, it can be used to take over the system;
-further more, with "su" password stealing is easier too (using a fake terminal emulator);
+  and since it fails in both cases, it can be used to take over the system;
 
 the solution is a program which opens a Wayland window with a command prompt;
 if you have given your command as arguments to the program,
@@ -99,24 +100,3 @@ chroot and upgrade;
 remove the base directory;
 change the "usr", "etc" and "boot" symlinks in the system root,
   to point to the new snapshots;
-
-= Comshell Proto
-now we can even have a prototype of Comshell, built using NW.js;
-why Nw.js instead of Electron:
-1, NW.js is simpler, without extra features of Electron, which i don't need anyway;
-2, NW.js always uses the latest versions of Node.js and Chromium;
-
-first install "yarn" then:
-;sh
-curl --proto '=https' -sSf -o comshell.zip https://github.com/damoonsaghian/Comshell/archive/master.zip
-unzip comshell.zip -d Comshell
-cd Comshell/comshell-proto
-yarn
-
-mkdir ~/.comshell
-cp -r . ~/.comshell
-printf '#!/usr/bin/env sh\nnode_modules/.bin/nw .' > ~/.comshell/comshell;
-chmod +x ~/.comshell/comshell
-printf '[Desktop Entry]\nName=Comshell proto\nExec=~/.comshell/comshell \nIcon=computer\nType=Application' > ~/.local/share/applications/comshell.desktop
-cp ~/.local/share/applications/comshell.desktop ~/.config/autostart/
-;

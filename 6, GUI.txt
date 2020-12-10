@@ -11,15 +11,15 @@ Gsend embeds a Fragile which will be created in the GTK main thread (using "idle
 Gsend.new gets a closure (instead of a Gobject value);
   the closure's return type is the type of the specific Gobject;
 
-another problem with GTK is its lack of features;
-  for example the SourceView widget lacks indent guides;
-also scene graph is a new thing in GTK and still a work in progress;
+"https://gtk-rs.org/docs/gtk/"
+"https://mmstick.github.io/gtkrs-tutorials/introduction.html"
+"https://github.com/gtk-rs/examples/tree/master/src/bin"
 
-so i'm not sure, maybe it's better to implement a GUI library, based on actors, from scratch;
-"https://github.com/kas-gui/kas"
-"https://github.com/Julusian/rust-cef"
-  "https://github.com/cztomczak/cefpython"
-FFMPEG
+gvfs gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
+poppler-glib goffice goocanvas
+
+https://arcolinuxiso.com/how-to-create-your-own-online-arch-linux-repository-on-github-and-use-it-on-any-arcolinux/
+https://wiki.archlinux.org/index.php/unofficial_user_repositories
 
 ;sh
 curl --proto '=https' -sSf -o comshell.zip https://github.com/damoonsaghian/Comshell/archive/master.zip
@@ -30,5 +30,4 @@ cargo build --release
 mkdir ~/.comshell
 cp .cache/target/release/comshell ~/.comshell/comshell
 printf '[Desktop Entry]\nName=Comshell\nExec=~/.comshell/comshell\nIcon=computer\nType=Application' > ~/.local/share/applications/comshell.desktop
-cp ~/.local/share/applications/comshell.desktop ~/.config/autostart/
 ;
