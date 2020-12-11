@@ -4,8 +4,8 @@ printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
 
 pacman -S grub intel-ucode amd-ucode linux linux-firmware \
   btrfs-progs e2fsprogs dosfstools udisks2 networkmanager pulseaudio-alsa \
-  nano man-db unzip ttf-hack noto-fonts materia-gtk-theme \
-  gnome-shell gdm gvfs gnome-terminal
+  nano man-db unzip alacritty ttf-hack noto-fonts materia-gtk-theme \
+  gnome-shell gdm gvfs
 
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
 printf '\nset superusers=""\n' >> /etc/grub.d/40_custom
@@ -61,6 +61,7 @@ center-new-windows=true
 [org/gnome/desktop/wm/preferences]
 button-layout=''
 [org/gnome/desktop/wm/keybindings]
+cycle-group=['<Alt>a', '<Alt>Above_Tab']
 close=['<Alt>Escape']
 toggle-maximized=['<Alt><Shift>Space']
 activate-window-menu=['']
@@ -145,6 +146,18 @@ mkdir -p /etc/skel/.config/gtk-3.0
 cp ./gtk.css /etc/skel/.config/gtk-3.0/
 mkdir -p /etc/skel/.config/gtk-4.0
 cp ./gtk.css /etc/skel/.config/gtk-4.0/
+
+mkdir -p /etc/skel/.config/alacritty
+echo 'window:
+  dynamic_padding: true
+  decorations: none
+  startup_mode: Maximized
+font:
+  size: 10.5
+key_bindings:
+  - { key: N, mods: Control, command: { program: "alacritty" } }
+  - { key: Return, mods: Alt, command: { program: "alacritty" } }
+' > /etc/skel/.config/alacritty/alacritty.yml
 
 echo '
 PS1="\[$(tput setaf 1)\]\w >\[$(tput sgr0)\] "
