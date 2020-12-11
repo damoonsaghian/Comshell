@@ -7,9 +7,8 @@ selecting an application from the list shows it in a dedicated workspace;
 also you can power off, restart, logout, suspend, or lock the system,
   from the applications list, just by typing those commands;
 press "alt-esc" to close the focused window;
-press "alt-shift-space" to toggle maximized state of a window;
-press "alt-tab" or "alt-a" to switch between
-  recent applications, or recent windows in an application, respectively;
+press "alt-tab" to switch between recent workspaces;
+press "alt-a" to switch between the main window of the workspace, and other windows;
 
 boot Arch Linux live environment;
 to ensure the system clock is accurate:
