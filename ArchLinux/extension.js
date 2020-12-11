@@ -10,9 +10,6 @@ main.setThemeStylesheet(
   "/usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css");
 main.loadTheme();
 
-// https://github.com/eonpatapon/gnome-shell-extension-caffeine
-// https://extensions.gnome.org/extension/672/disable-screen-shield/
-
 // hide notification banners;
 {
   const bannerBin = main.messageTray._bannerBin;
@@ -65,10 +62,8 @@ main.panel.statusArea.aggregateMenu.container.hide();
   );
   */
 
-  // install ArchLinux updates as scheduled;
-  // https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html
-  // https://wiki.archlinux.org/index.php/Systemd/Timers
-  // a red indicator appears to notify the user that for system to update, it needs a reboot;
+  // show a red indicator to notify the user that for system to update, it needs a reboot;
+  // compare the running kernel and system services, with the ones on the disk;
   // https://github.com/RaphaelRochet/arch-update
 
   const remoteAccess = main.panel.statusArea.aggregateMenu._remoteAccess;
@@ -94,7 +89,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
 
   const rfkillIcon = new St.Icon({ style_class: "system-status-icon" });
   rightBox.add_child(rfkillIcon);
-  rfkillIcon.icon_name = "network-wireless-disabled-symbolic";
+  rfkillIcon.icon_name = "airplane-mode-symbolic";
   const rfkillManager = imports.ui.status.rfkill.getRfkillManager();
   rfkillIcon.visible = rfkillManager.airplaneMode;
   rfkillManager.connect("airplane-mode-changed",
@@ -160,13 +155,6 @@ main.panel.statusArea.aggregateMenu.container.hide();
   main.panel.addToStatusArea("status_left", leftButton, 0, "left");
   const leftBox = new St.BoxLayout({ style_class: "panel-status-indicators-box" });
   leftButton.add_child(leftBox);
-
-  // https://github.com/home-sweet-gnome/dash-to-panel/blob/master/appIcons.js
-  // https://gjs-docs.gnome.org/clutter7~7_api/
-  // https://gjs-docs.gnome.org/st10~1.0_api/
-  // https://gjs-docs.gnome.org/meta7~7_api/
-  // https://gjs-docs.gnome.org/shell01~0.1_api/
-  // https://gitlab.gnome.org/GNOME/gnome-shell/-/tree/master/js
 /*
   const windowList = new St.Widget({
     layout_manager: new Clutter.BoxLayout({ homogeneous: true , spacing: 8}),
@@ -410,6 +398,9 @@ main.panel.statusArea.aggregateMenu.container.hide();
 
   // hide dash;
   overview.connect("showing", () => overview.dash.hide());
+
+  // https://github.com/rliang/gnome-shell-extension-overview-when-empty
+  // https://extensions.gnome.org/extension/2036/show-application-view-when-workspace-empty/
 }
 
 return { enable: () => {}, disable: () => {} };
