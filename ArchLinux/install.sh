@@ -4,7 +4,7 @@ printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
 
 pacman -S grub intel-ucode amd-ucode linux linux-firmware \
   btrfs-progs e2fsprogs dosfstools udisks2 networkmanager pulseaudio-alsa \
-  nano man-db unzip alacritty ttf-hack noto-fonts materia-gtk-theme \
+  nano man-db unzip termite ttf-hack noto-fonts materia-gtk-theme \
   gnome-shell gdm gvfs
 
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
@@ -61,7 +61,7 @@ center-new-windows=true
 [org/gnome/desktop/wm/preferences]
 button-layout=''
 [org/gnome/desktop/wm/keybindings]
-cycle-group=['<Alt>a', '<Alt>Above_Tab']
+cycle-windows=['<Alt>a']
 close=['<Alt>Escape']
 toggle-maximized=['<Alt><Shift>Space']
 activate-window-menu=['']
@@ -147,17 +147,38 @@ cp ./gtk.css /etc/skel/.config/gtk-3.0/
 mkdir -p /etc/skel/.config/gtk-4.0
 cp ./gtk.css /etc/skel/.config/gtk-4.0/
 
-mkdir -p /etc/skel/.config/alacritty
-echo 'window:
-  dynamic_padding: true
-  decorations: none
-  startup_mode: Maximized
-font:
-  size: 10.5
-key_bindings:
-  - { key: N, mods: Control, command: { program: "alacritty" } }
-  - { key: Return, mods: Alt, command: { program: "alacritty" } }
-' > /etc/skel/.config/alacritty/alacritty.yml
+mkdir -p /etc/skel/.config/termite
+echo '[options]
+font = Monospace 10.5
+[colors]
+foreground          = #c5c8c6
+foreground_bold     = #c5c8c6
+cursor              = #c5c8c6
+cursor_foreground   = #1d1f21
+background          = #1d1f21
+color0  = #1d1f21
+color1  = #cc6666
+color2  = #b5bd68
+color3  = #f0c674
+color4  = #81a2be
+color5  = #b294bb
+color6  = #8abeb7
+color7  = #c5c8c6
+color8  = #969896
+color9  = #cc6666
+color10 = #b5bd68
+color11 = #f0c674
+color12 = #81a2be
+color13 = #b294bb
+color14 = #8abeb7
+color15 = #ffffff
+color16 = #de935f
+color17 = #a3685a
+color18 = #282a2e
+color19 = #373b41
+color20 = #b4b7b4
+color21 = #e0e0e0
+' > /etc/skel/.config/termite/config
 
 echo '
 PS1="\[$(tput setaf 1)\]\w >\[$(tput sgr0)\] "
