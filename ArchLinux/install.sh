@@ -62,6 +62,7 @@ center-new-windows=true
 button-layout=''
 [org/gnome/desktop/wm/keybindings]
 cycle-windows=['<Alt>a']
+cycle-windows-backward=['<Shift><Alt>a']
 close=['<Alt>Escape']
 toggle-maximized=['<Alt><Shift>Space']
 activate-window-menu=['']
