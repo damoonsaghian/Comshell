@@ -155,54 +155,147 @@ main.panel.statusArea.aggregateMenu.container.hide();
   main.panel.addToStatusArea("status_left", leftButton, 0, "left");
   const leftBox = new St.BoxLayout({ style_class: "panel-status-indicators-box" });
   leftButton.add_child(leftBox);
-
-  const workspacesIndicator = new St.Widget({
+/*
+  const windowList = new St.Widget({
     layout_manager: new Clutter.BoxLayout({ homogeneous: true , spacing: 8}),
     x_align: Clutter.ActorAlign.START,
     x_expand: true,
     y_expand: true,
   });
-  leftBox.add_child(workspacesIndicator);
+  leftBox.add_child(windowList);
 
-  const WindowsIndicator = GObject.registerClass(
-  class WindowsIndicator extends St.Label {
-    _init(workspace) {
-      super._init("");
-
-      let indicator = "";
-      workspace.getWindows().for_each(win => {
-        if (win.isFocused()) {
-          indicator.append("");
-        } else {
-          indicator.append("");
-        }
+  const AppButton = GObject.registerClass(
+  class AppButton extends St.Button {
+    _init(app) {
+      super._init({
+        can_focus: true,
+        x_expand: true,
+        button_mask: St.ButtonMask.ONE | St.ButtonMask.THREE,
       });
-      this.set_text(indicator);
 
-      workspace.connect("", onWindowsChanged)
+      this.connect('notify::allocation', this._updateIconGeometry.bind(this));
+      this.connect('destroy', this._onDestroy.bind(this));
+
+      this.app = app;
+
+      this._multiWindowTitle = new St.BoxLayout({
+        x_expand: true,
+      });
+      this.set_child(this._multiWindowTitle);
+
+      this._icon = new St.Bin({
+        style_class: 'window-button-icon',
+        child: app.create_icon_texture(ICON_TEXTURE_SIZE),
+      });
+      this._multiWindowTitle.add(this._icon);
+
+      let label = new St.Label({
+        text: app.get_name(),
+        y_align: Clutter.ActorAlign.CENTER,
+      });
+      this._multiWindowTitle.add(label);
+      this._multiWindowTitle.label_actor = label;
+
+      this._textureCache = St.TextureCache.get_default();
+      this._iconThemeChangedId =
+        this._textureCache.connect('icon-theme-changed', () => {
+          this._icon.child = app.create_icon_texture(24);
+        });
+
+      this._windowsChangedId = this.app.connect(
+        'windows-changed', this._windowsChanged.bind(this));
+      this._windowsChanged();
+
+      this._windowTracker = Shell.WindowTracker.get_default();
+      this._notifyFocusId = this._windowTracker.connect(
+        'notify::focus-app', this._updateStyle.bind(this));
+      this._updateStyle();
     }
 
-    onWindowsChanged(windows) {}
+    activate() {
+      let windows = this.getWindowList();
+      windows[0].activate(global.get_current_time());
+      if (!windows.length === 1) {
+        for (let i = 0; i < windows.length; i++) {
+          let windowTitle = new WindowTitle(windows[i]);
+        }
+      }
+    }
+
+    _updateStyle() {
+      if (this._isFocused())
+        this.add_style_class_name('focused');
+      else
+        this.remove_style_class_name('focused');
+    }
+
+    _isWindowVisible(window) {
+      let workspace = global.workspace_manager.get_active_workspace();
+
+      return !window.skip_taskbar;
+    }
+
+    _getIconGeometry() {
+      let rect = new Meta.Rectangle();
+
+      [rect.x, rect.y] = this.get_transformed_position();
+      [rect.width, rect.height] = this.get_transformed_size();
+
+      return rect;
+    }
+
+    //
+
+    _isFocused() {
+      return this._windowTracker.focus_app === this.app;
+    }
+
+    _updateIconGeometry() {
+      let rect = this._getIconGeometry();
+
+      let windows = this.app.get_windows();
+      windows.forEach(w => w.set_icon_geometry(rect));
+    }
+
+    getWindowList() {
+      return this.app.get_windows().filter(win => this._isWindowVisible(win));
+    }
+
+    _windowsChanged() {
+      if (this._windowTitle) {
+        this.metaWindow = null;
+        this._windowTitle = null;
+      }
+      this.label_actor = this._multiWindowTitle.label_actor;
+    }
+
+    _onMenuActivate(menu, child) {
+      child._window.activate(global.get_current_time());
+    }
+
+    _onDestroy() {
+      this._textureCache.disconnect(this._iconThemeChangedId);
+      this._windowTracker.disconnect(this._notifyFocusId);
+      this.app.disconnect(this._windowsChangedId);
+    }
   });
-
-
 
   const onWindowAdded = (_ws, win) => {
     if (win.get_monitor() !== 0) return;
 
     const app = Shell.WindowTracker.get_default().get_window_app(win);
-    const children = workspacesIndicator.get_children();
+    const children = windowList.get_children();
     const child = children.find(c => c.app === app);
 
     // activate app
 
     if (child) {
       // move app button to the first place;
-      workspacesIndicator.set_child_at_index(child, 0);
+      windowList.set_child_at_index(child, 0);
       // add an indicator to the app button;
     } else {
-      const button = new WorkspaceButton(app);
-      workspacesIndicator.insert_child_at_index(button, 0);
+      const button = new AppButton(app);
+      windowList.insert_child_at_index(button, 0);
       // move app button to the first place;
     }
   };
@@ -211,7 +304,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
     if (win.get_monitor() !== 0) return;
 
     const app = Shell.WindowTracker.get_default().get_window_app(win);
-    const children = workspacesIndicator.get_children();
+    const children = windowList.get_children();
     const child = children.find(c => c.app === app);
 
     // if child exists and without indicators
@@ -236,20 +329,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
   });
   for (let i = 0; i < windows.length; i++)
     onWindowAdded(null, windows[i].metaWindow);
-
-  windowManager.setCustomKeybindingHandler(
-    "switch-applications",
-    Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-    (display, win, binding) => {
-      if (overview.visible) { overview.hide(); return; }
-      // start workspace switcher
-      //windowManager._startSwitcher(display, win, binding);
-    }
-  );
-
-  // when workspace is empty, go to the previous workspace;
-  // https://github.com/rliang/gnome-shell-extension-overview-when-empty
-  // https://extensions.gnome.org/extension/2036/show-application-view-when-workspace-empty/
+*/
 }
 
 // overview layer
@@ -276,6 +356,16 @@ main.panel.statusArea.aggregateMenu.container.hide();
 
   // toggle overview when clicking on an empty area on the panel;
   main.panel.connect("button-press-event", toggleOverview);
+
+  // hide overview when pressing "alt-tab";
+  windowManager.setCustomKeybindingHandler(
+    "switch-applications",
+    Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+    (display, win, binding) => {
+      if (overview.visible) { overview.hide(); return; }
+      windowManager._startSwitcher(display, win, binding);
+    }
+  );
 
   // close overview by pressing "esc" key only once;
   // based on _onStageKeyPress function from:
@@ -308,6 +398,9 @@ main.panel.statusArea.aggregateMenu.container.hide();
 
   // hide dash;
   overview.connect("showing", () => overview.dash.hide());
+
+  // https://github.com/rliang/gnome-shell-extension-overview-when-empty
+  // https://extensions.gnome.org/extension/2036/show-application-view-when-workspace-empty/
 }
 
 return { enable: () => {}, disable: () => {} };
