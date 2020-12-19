@@ -4,8 +4,8 @@ printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
 
 pacman -S grub intel-ucode amd-ucode linux linux-firmware \
   btrfs-progs e2fsprogs dosfstools udisks2 networkmanager pulseaudio-alsa \
-  nano man-db unzip termite ttf-hack noto-fonts materia-gtk-theme \
-  gnome-shell gdm gvfs
+  nano man-db unzip ttf-hack noto-fonts materia-gtk-theme \
+  gnome-shell gdm gvfs gnome-terminal
 
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
 printf '\nset superusers=""\n' >> /etc/grub.d/40_custom
@@ -61,8 +61,19 @@ center-new-windows=true
 [org/gnome/desktop/wm/preferences]
 button-layout=''
 [org/gnome/desktop/wm/keybindings]
-cycle-windows=['<Alt>a']
-cycle-windows-backward=['<Shift><Alt>a']
+cycle-windows=['<Alt>q']
+cycle-windows-backward=['']
+cycle-group=['']
+cycle-group-backward=['']
+switch-group=['']
+switch-group-backward=['']
+switch-applications-backward=['']
+move-to-workspace-left=['']
+move-to-workspace-right=['']
+move-to-workspace-up=['']
+move-to-workspace-down=['']
+move-to-workspace-1=['']
+move-to-workspace-last=['']
 close=['<Alt>Escape']
 toggle-maximized=['<Alt><Shift>Space']
 activate-window-menu=['']
@@ -71,6 +82,15 @@ toggle-application-view=['<Alt>Space', '<Super>a']
 [org/gnome/shell]
 disable-extension-version-validation=true
 enabled-extensions=['gnome-shell-improved']
+[org/gnome/terminal/legacy]
+default-show-menubar=false
+headerbar=just false
+[org/gnome/terminal/legacy/keybindings]
+new-window='<Alt>Return'
+[org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9]
+default-size-columns=130
+default-size-rows=50
+scrollbar-policy='never'
 " > /etc/dconf/db/local.d/00-mykeyfile
 dconf update
 
@@ -110,8 +130,8 @@ echo 'stage {
 cp ./extension.js /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
 
 printf '[Desktop Entry]\nNoDisplay=true' |
-tee /etc/skel/.local/share/applications/{avahi-discover,bssh,bvnc,qv4l2,qvidcap,lstopo}.desktop >
-  /dev/null
+tee /etc/skel/.local/share/applications/\
+{avahi-discover,bssh,bvnc,qv4l2,qvidcap,lstopo,org.gnome.Extensions}.desktop > /dev/null
 
 echo '<?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
@@ -147,39 +167,6 @@ mkdir -p /etc/skel/.config/gtk-3.0
 cp ./gtk.css /etc/skel/.config/gtk-3.0/
 mkdir -p /etc/skel/.config/gtk-4.0
 cp ./gtk.css /etc/skel/.config/gtk-4.0/
-
-mkdir -p /etc/skel/.config/termite
-echo '[options]
-font = Monospace 10.5
-[colors]
-foreground          = #c5c8c6
-foreground_bold     = #c5c8c6
-cursor              = #c5c8c6
-cursor_foreground   = #1d1f21
-background          = #1d1f21
-color0  = #1d1f21
-color1  = #cc6666
-color2  = #b5bd68
-color3  = #f0c674
-color4  = #81a2be
-color5  = #b294bb
-color6  = #8abeb7
-color7  = #c5c8c6
-color8  = #969896
-color9  = #cc6666
-color10 = #b5bd68
-color11 = #f0c674
-color12 = #81a2be
-color13 = #b294bb
-color14 = #8abeb7
-color15 = #ffffff
-color16 = #de935f
-color17 = #a3685a
-color18 = #282a2e
-color19 = #373b41
-color20 = #b4b7b4
-color21 = #e0e0e0
-' > /etc/skel/.config/termite/config
 
 echo '
 PS1="\[$(tput setaf 1)\]\w >\[$(tput sgr0)\] "
