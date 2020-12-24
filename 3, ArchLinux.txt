@@ -7,8 +7,8 @@ selecting an application from the list shows it in a dedicated workspace;
 also you can power off, restart, logout, suspend, or lock the system,
   from the applications list, just by typing those commands;
 press "alt-esc" to close the focused window;
-press "alt-tab" to switch between recent workspaces;
-press "alt-q" to switch between the windows of a workspace;
+press "alt-tab" to switch between workspaces;
+press "alt-a" to switch between the windows of a workspace;
 
 boot Arch Linux live environment;
 to ensure the system clock is accurate:
