@@ -176,18 +176,14 @@ main.panel.statusArea.aggregateMenu.container.hide();
 
   const endWorkspaceSwitch = () => {
     const firstWorkspace = workspaceManager.get_workspace_by_index(0);
-    if (firstWorkspace.distinct_) {
+    if (firstWorkspace.name_?.startsWith("*")) {
       // minus 2 is to exclude the last worksace which is always empty;
       const lastWorkspaceIndex = workspaceManager.get_n_workspaces() - 2;
       workspaceManager.reorder_workspace(firstWorkspace, lastWorkspaceIndex);
-      const indicator = firstWorkspace.indicator_;
-      if (indicator) workspacesIndicator.set_child_at_index(indicator, -1);
     }
 
     const activeWorkspace = workspaceManager.get_active_workspace();
     workspaceManager.reorder_workspace(activeWorkspace, 0);
-    const indicator = activeWorkspace.indicator_;
-    if (indicator) workspacesIndicator.set_child_at_index(indicator, 0);
   };
 
   main.wm.setCustomKeybindingHandler(
@@ -198,37 +194,39 @@ main.panel.statusArea.aggregateMenu.container.hide();
       if (overview.visible) { overview.hide(); return; }
 
       nextWorkspace();
-      if (!global.begin_modal(global.get_current_time(), 0))
-        // probably someone else has a pointer grab, try again with keyboard only;
-        global.begin_modal(global.get_current_time(), Meta.ModalOptions.POINTER_ALREADY_GRABBED);
+
+      if (main.modalCount === 0) {
+        if (!global.begin_modal(global.get_current_time(), 0)) {
+          // probably someone else has a pointer grab, try again with keyboard only;
+          if (!global.begin_modal(global.get_current_time(), Meta.ModalOptions.POINTER_ALREADY_GRABBED))
+            return;
+        }
+        main.modalCount = 1;
+      }
 
       const stage = global.get_stage();
 
-      const pressHandler = stage.connect("key-press-event", (_s, keyEvent) => {
-        let action = global.display.get_keybinding_action(keyEvent.hardware_keycode, keyEvent.modifier_state);
-        if (action == Meta.KeyBindingAction.SWITCH_APPLICATIONS)
-          nextWorkspace();
-        return true;
-      });
-
-      const releaseHandler = stage.connect("key-release-event", (_s, _keyEvent) => {
+      let releaseHandler;
+      releaseHandler = stage.connect("key-release-event", (_s, _keyEvent) => {
         const [_x, _y, mods] = global.get_pointer();
         if (!mods) {
-          endWorkspaceSwitch();
+          main.modalCount -= 1;
           global.end_modal(global.get_current_time());
-          stage.disconnect(pressHandler);
+          //stage.disconnect(pressHandler);
+          endWorkspaceSwitch();
           stage.disconnect(releaseHandler);
         }
-        return true;
+        return false;
       });
 
       // there's a race condition;
       // if the user released Alt before we got the grab, then we won't be notified; so we check now;
       const [_x, _y, mods] = global.get_pointer();
       if (!mods) {
-        endWorkspaceSwitch();
+        main.modalCount -= 1;
         global.end_modal(global.get_current_time());
-        stage.disconnect(pressHandler);
+        //stage.disconnect(pressHandler);
+        endWorkspaceSwitch();
         stage.disconnect(releaseHandler);
       }
     }
@@ -260,6 +258,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
           this.onWindowsChanged(workspace);
         }
       });
+
       workspace.connect("window-removed", (workspace, win) => {
         const i = workspace.windows_.indexOf(win);
         if (i !== -1) {
@@ -271,6 +270,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
           );
         }
       });
+
       global.display.connect("notify::focus-window", () => this.onWindowsChanged(workspace));
       this.onWindowsChanged(workspace);
     }
@@ -304,11 +304,10 @@ main.panel.statusArea.aggregateMenu.container.hide();
     }
 
     workspace = workspaceManager.append_new_workspace(true, global.get_current_time());
-    if (appName.startsWith("*")) workspace.distinct_ = true;
     workspaces.set(appName, workspace);
+    workspace.name_ = appName;
 
     const indicator = new St.BoxLayout({ x_expand: true });
-    workspacesIndicator.add_child(indicator);
     workspace.indicator_ = indicator;
     const icon = new St.Icon();
     icon.set_icon_size(16);
@@ -353,12 +352,25 @@ main.panel.statusArea.aggregateMenu.container.hide();
     app.open_new_window(-1);
   };
 
+  const fillWorkspacesIndicator = () => {
+    workspacesIndicator.remove_all_children();
+    // minus 1 is to exclude the last worksace which is always empty;
+    const n_workspaces = workspaceManager.get_n_workspaces() - 1;
+    for (let i = 0; i < n_workspaces; i++) {
+      const workspace = workspaceManager.get_workspace_by_index(i);
+      const indicator = workspace.indicator_;
+      if (indicator) workspacesIndicator.add_child(indicator);
+    }
+  };
+  workspaceManager.connect("notify::n-workspaces", fillWorkspacesIndicator);
+  workspaceManager.connect("workspaces-reordered", fillWorkspacesIndicator);
+
   Shell.App.prototype.activate = function() { openApp(this); };
 
   // autostart
   global.run_at_leisure(() => {
     const apps = ["comshell.desktop", "atom.desktop", "code-oss.desktop", "emacs.desktop",
-      "nvim-qt.desktop", "nvim.desktop", "vim.desktop"];
+      "nvim-qt.desktop", "nvim.desktop", "vim.desktop", "org.gnome.Terminal.desktop"];
     for (const appId of apps) {
       const app = Shell.AppSystem.get_default().lookup_app(appId);
       if (app) {
