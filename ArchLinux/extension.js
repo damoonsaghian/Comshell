@@ -186,6 +186,8 @@ main.panel.statusArea.aggregateMenu.container.hide();
     workspaceManager.reorder_workspace(activeWorkspace, 0);
   };
 
+  let workspaceSwitchMode = false;
+
   main.wm.setCustomKeybindingHandler(
     "switch-applications",
     Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
@@ -194,14 +196,13 @@ main.panel.statusArea.aggregateMenu.container.hide();
       if (overview.visible) { overview.hide(); return; }
 
       nextWorkspace();
+      if (workspaceSwitchMode) return;
+      workspaceSwitchMode = true;
 
-      if (main.modalCount === 0) {
-        if (!global.begin_modal(global.get_current_time(), 0)) {
-          // probably someone else has a pointer grab, try again with keyboard only;
-          if (!global.begin_modal(global.get_current_time(), Meta.ModalOptions.POINTER_ALREADY_GRABBED))
-            return;
-        }
-        main.modalCount = 1;
+      if (!global.begin_modal(global.get_current_time(), 0)) {
+        // probably someone else has a pointer grab, try again with keyboard only;
+        if (!global.begin_modal(global.get_current_time(), Meta.ModalOptions.POINTER_ALREADY_GRABBED))
+          return;
       }
 
       const stage = global.get_stage();
@@ -210,24 +211,24 @@ main.panel.statusArea.aggregateMenu.container.hide();
       releaseHandler = stage.connect("key-release-event", (_s, _keyEvent) => {
         const [_x, _y, mods] = global.get_pointer();
         if (!mods) {
-          main.modalCount -= 1;
-          global.end_modal(global.get_current_time());
-          //stage.disconnect(pressHandler);
-          endWorkspaceSwitch();
           stage.disconnect(releaseHandler);
+          global.end_modal(global.get_current_time());
+          workspaceSwitchMode = false;
+          // had to put it in "run_at_leisure", otherwise when overview is activated, it jumps to the next workspace;
+          // don't know why!
+          global.run_at_leisure(() => endWorkspaceSwitch());
         }
-        return false;
+        return true;
       });
 
       // there's a race condition;
       // if the user released Alt before we got the grab, then we won't be notified; so we check now;
       const [_x, _y, mods] = global.get_pointer();
       if (!mods) {
-        main.modalCount -= 1;
-        global.end_modal(global.get_current_time());
-        //stage.disconnect(pressHandler);
-        endWorkspaceSwitch();
         stage.disconnect(releaseHandler);
+        global.end_modal(global.get_current_time());
+        workspaceSwitchMode = false;
+        global.run_at_leisure(() => endWorkspaceSwitch());
       }
     }
   );
