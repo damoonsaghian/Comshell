@@ -15,7 +15,7 @@ Gsend.new gets a closure (instead of a Gobject value);
 "https://mmstick.github.io/gtkrs-tutorials/introduction.html"
 "https://github.com/gtk-rs/examples/tree/master/src/bin"
 
-gvfs gtksourceview4 webkit2gtk gst-plugins-{base,good,bad} gst-libav
+gtksourceview4 webkit2gtk
 poppler-glib goffice goocanvas
 
 https://arcolinuxiso.com/how-to-create-your-own-online-arch-linux-repository-on-github-and-use-it-on-any-arcolinux/
