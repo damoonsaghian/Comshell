@@ -3,14 +3,13 @@ locale-gen
 printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
 
 pacman -S grub intel-ucode amd-ucode linux linux-firmware \
-  btrfs-progs e2fsprogs dosfstools udisks2 networkmanager pulseaudio-alsa \
+  btrfs-progs e2fsprogs dosfstools udisks2 networkmanager pulseaudio-alsa alsa-utils \
   nano man-db unzip ttf-hack noto-fonts materia-gtk-theme \
-  gnome-shell gdm gvfs gnome-terminal
+  gnome-shell gdm gvfs gst-plugins-{base,good,bad} gst-libav gnome-terminal
 
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
 printf '\nset superusers=""\n' >> /etc/grub.d/40_custom
-printf '\nCLASS="--class gnu-linux --class gnu --class os --unrestricted"\n' >
-  /etc/grub.d/10_linux
+printf '\nCLASS="--class gnu-linux --class gnu --class os --unrestricted"\n' > /etc/grub.d/10_linux
 grub-mkconfig -o /boot/grub/grub.cfg
 grub-mkstandalone -O x86_64-efi -o '/boot/efi/EFI/BOOT/BOOTX64.EFI' \
   'boot/grub/grub.cfg=/boot/grub/grub.cfg'
@@ -30,6 +29,11 @@ systemctl enable systemd-timesyncd
 systemctl enable NetworkManager
 systemctl enable NetworkManager-dispatcher
 systemctl enable gdm
+
+amixer sset Master unmute
+amixer sset Master 0dB
+amixer sset Capture cap
+alsactl store
 
 # to customize dconf default values:
 mkdir -p /etc/dconf/profile
@@ -77,6 +81,10 @@ move-to-workspace-last=['']
 close=['<Alt>Escape']
 toggle-maximized=['<Alt><Shift>Space']
 activate-window-menu=['']
+[org/gnome/settings-daemon/plugins/media-keys]
+screenshot=['<Alt><Shift>s']
+screencast=['<Alt><Shift>r']
+max-screencast-length=300
 [org/gnome/shell/keybindings]
 toggle-application-view=['<Alt>Space', '<Super>a']
 [org/gnome/shell]
@@ -129,6 +137,13 @@ echo 'stage {
 ' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css
 cp ./extension.js /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
 
+# this is for gnome-shell's screenshot and screencast to work;
+mkdir -p /etc/skel/.config
+echo 'XDG_PICTURES_DIR="$HOME/Pictures"
+XDG_VIDEOS_DIR="$HOME/Videos"
+' > /etc/skel/.config/user-dirs.dirs
+
+mkdir -p /etc/skel/.local/share/applications
 printf '[Desktop Entry]\nNoDisplay=true' |
 tee /etc/skel/.local/share/applications/\
 {avahi-discover,bssh,bvnc,qv4l2,qvidcap,lstopo,org.gnome.Extensions}.desktop > /dev/null
