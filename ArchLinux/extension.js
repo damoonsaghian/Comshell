@@ -1,6 +1,6 @@
 function init() {
 const main = imports.ui.main;
-const GObject = imports.gi.GObject;
+const GLib = imports.gi.GLib;
 const St = imports.gi.St;
 const Clutter = imports.gi.Clutter;
 const Meta = imports.gi.Meta;
@@ -45,34 +45,9 @@ main.panel.statusArea.aggregateMenu.container.hide();
   const rightBox = new St.BoxLayout({ style_class: "panel-status-indicators-box" });
   rightButton.add_child(rightBox);
 
-  const screencast = main.panel.statusArea.aggregateMenu._screencast;
-  if (screencast && screencast._indicator) {
-    screencast.remove_child(screencast._indicator);
-    rightBox.add_child(screencast._indicator);
-    screencast._sync();
-  }
-  /*
-  // since screencast implementation is simple, an alternative method is:
-  const screencastIcon = new St.Icon({ style_class: "system-status-icon" });
-  rightBox.add_child(screencastIcon);
-  screencastIcon.icon_name = "media-record-symbolic";
-  screencastIcon.add_style_class_name("screencast-indicator");
-  main.screencastService.connect("updated",
-    () => screencastIcon.visible = main.screencastService.isRecording
-  );
-  */
-
   // show a red indicator to notify the user that for system to update, it needs a reboot;
   // compare the running kernel and system services, with the ones on the disk;
   // https://github.com/RaphaelRochet/arch-update
-
-  const remoteAccess = main.panel.statusArea.aggregateMenu._remoteAccess;
-  if (remoteAccess && remoteAccess._indicator) {
-    remoteAccess._ensureControls();
-    remoteAccess.remove_child(remoteAccess._indicator);
-    rightBox.add_child(remoteAccess._indicator);
-    remoteAccess._sync();
-  }
 
   const network = main.panel.statusArea.aggregateMenu._network;
   if (network && network._primaryIndicator) {
@@ -96,17 +71,6 @@ main.panel.statusArea.aggregateMenu.container.hide();
     () => rfkillIcon.visible = rfkillManager.airplaneMode
   );
 
-  const volume = main.panel.statusArea.aggregateMenu._volume;
-  if (volume && volume._primaryIndicator) {
-    volume.remove_child(volume._primaryIndicator);
-    rightBox.add_child(volume._primaryIndicator);
-    if (volume._inputIndicator) {
-      volume.remove_child(volume._inputIndicator);
-      rightBox.add_child(volume._inputIndicator);
-      volume._inputIndicator.visible = true;
-    }
-  }
-
   const power = main.panel.statusArea.aggregateMenu._power;
   if (power && power._indicator) {
     power.remove_child(power._indicator);
@@ -129,6 +93,27 @@ main.panel.statusArea.aggregateMenu.container.hide();
   // https://github.com/corecoding/Vitals
   // https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet
 
+  const volume = main.panel.statusArea.aggregateMenu._volume;
+  if (volume && volume._primaryIndicator) {
+    volume.remove_child(volume._primaryIndicator);
+    rightBox.add_child(volume._primaryIndicator);
+    if (volume._inputIndicator) {
+      volume.remove_child(volume._inputIndicator);
+      rightBox.add_child(volume._inputIndicator);
+      volume._inputIndicator.visible = true;
+    }
+  }
+
+  const remoteAccess = main.panel.statusArea.aggregateMenu._remoteAccess;
+  if (remoteAccess) {
+    remoteAccess._ensureControls();
+    if (remoteAccess._recordingIndicator) {
+      remoteAccess.remove_child(remoteAccess._recordingIndicator);
+      rightBox.add_child(remoteAccess._recordingIndicator);
+      remoteAccess._sync();
+    }
+  }
+
   const location = main.panel.statusArea.aggregateMenu._location;
   if (location && location._indicator) {
     location.remove_child(location._indicator);
@@ -139,7 +124,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
   const dateTimeLabel = new St.Label({ y_align: Clutter.ActorAlign.CENTER });
   rightBox.add_child(dateTimeLabel);
   const updateClock = () => {
-    const now = imports.gi.GLib.DateTime.new_now_local();
+    const now = GLib.DateTime.new_now_local();
     const nowFormated = now ? now.format("%F %a %p %I:%M") : "";
     // https://github.com/omid/Persian-Calendar-for-Gnome-Shell/blob/master/PersianCalendar%40oxygenws.com/PersianDate.js
     dateTimeLabel.set_text(nowFormated);
@@ -157,7 +142,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
   leftButton.add_child(leftBox);
 
   const workspacesIndicator = new St.Widget({
-    layout_manager: new Clutter.BoxLayout({ spacing: 20 }),
+    layout_manager: new Clutter.BoxLayout({ spacing: 18 }),
     x_align: Clutter.ActorAlign.START,
     x_expand: true,
     y_expand: true,
@@ -165,25 +150,31 @@ main.panel.statusArea.aggregateMenu.container.hide();
   leftBox.add_child(workspacesIndicator);
 
   const workspaceManager = global.workspace_manager;
+  const workspaceList = [];
+  let activeWorkspaceIndex = 0;
 
   const nextWorkspace = () => {
-    const activeWorkspaceIndex = workspaceManager.get_active_workspace_index();
-    // minus 1 is to exclude the last worksace which is always empty;
-    const n = workspaceManager.get_n_workspaces() - 1;
-    const nextWorkspace = workspaceManager.get_workspace_by_index((activeWorkspaceIndex + 1) % n);
+    const nextGroupIndex = (activeWorkspaceIndex + 1) % workspaceList.length;
+    const nextWorkspace = workspaceList[nextGroupIndex];
+    if (!nextWorkspace) return;
     nextWorkspace.activate(global.get_current_time());
+    activeWorkspaceIndex = nextGroupIndex;
   };
 
   const endWorkspaceSwitch = () => {
-    const firstWorkspace = workspaceManager.get_workspace_by_index(0);
-    if (firstWorkspace.name_?.startsWith("*")) {
-      // minus 2 is to exclude the last worksace which is always empty;
-      const lastWorkspaceIndex = workspaceManager.get_n_workspaces() - 2;
-      workspaceManager.reorder_workspace(firstWorkspace, lastWorkspaceIndex);
+    if (workspaceList[0]?.name_.startsWith("*")) {
+      const indicator = firstWorkspace.indicator_;
+      workspacesIndicator.remove_child(indicator);
+      workspacesIndicator.add_child(indicator);
     }
 
-    const activeWorkspace = workspaceManager.get_active_workspace();
-    workspaceManager.reorder_workspace(activeWorkspace, 0);
+    const activeWorkspace = workspaceList.splice(activeWorkspaceIndex, 1)[0];
+    workspaceList.unshift(activeWorkspace);
+    activeWorkspaceIndex = 0;
+
+    const indicator = activeWorkspace.indicator_;
+    workspacesIndicator.set_child_at_index(indicator, 0);
+    indicator?.set_background_color(Clutter.Color.new(255, 255, 255, 0));
   };
 
   let workspaceSwitchMode = false;
@@ -214,9 +205,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
           stage.disconnect(releaseHandler);
           global.end_modal(global.get_current_time());
           workspaceSwitchMode = false;
-          // had to put it in "run_at_leisure", otherwise when overview is activated, it jumps to the next workspace;
-          // don't know why!
-          global.run_at_leisure(() => endWorkspaceSwitch());
+          endWorkspaceSwitch();
         }
         return true;
       });
@@ -228,7 +217,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
         stage.disconnect(releaseHandler);
         global.end_modal(global.get_current_time());
         workspaceSwitchMode = false;
-        global.run_at_leisure(() => endWorkspaceSwitch());
+        endWorkspaceSwitch();
       }
     }
   );
@@ -245,7 +234,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
     }
   );
 
-  const WindowsIndicator = GObject.registerClass(
+  const WindowsIndicator = imports.gi.GObject.registerClass(
   class WindowsIndicator extends St.Label {
     _init(workspace) {
       super._init();
@@ -253,8 +242,6 @@ main.panel.statusArea.aggregateMenu.container.hide();
 
       workspace.connect("window-added", (workspace, win) => {
         if (win.get_window_type() === Meta.WindowType.NORMAL) {
-          // if this is the firt window of the workspace, maximize it;
-          if (workspace.windows_.length === 0) win.maximize(Meta.MaximizeFlags.BOTH);
           workspace.windows_.push(win);
           this.onWindowsChanged(workspace);
         }
@@ -262,14 +249,9 @@ main.panel.statusArea.aggregateMenu.container.hide();
 
       workspace.connect("window-removed", (workspace, win) => {
         const i = workspace.windows_.indexOf(win);
-        if (i !== -1) {
-          workspace.windows_.splice(i, 1); // remove "win" from the list;
-          this.onWindowsChanged(workspace);
-          // if the closed window is the main window, close other windows of the workspace too;
-          if (i === 0) workspace.list_windows().forEach(
-            win => win.delete(global.get_current_time())
-          );
-        }
+        if (i === -1) return;
+        workspace.windows_.splice(i, 1); // remove "win" from the list;
+        this.onWindowsChanged(workspace);
       });
 
       global.display.connect("notify::focus-window", () => this.onWindowsChanged(workspace));
@@ -295,18 +277,16 @@ main.panel.statusArea.aggregateMenu.container.hide();
 
   const openApp = (app) => {
     const appName = app.get_name();
-    let workspace = workspaces.get(appName);
 
-    const windows = workspace?.windows_;
-    if (workspace && windows && windows.length !== 0) {
+    if (workspaces.get(appName)) {
       workspace.activate(global.get_current_time());
       endWorkspaceSwitch();
       return;
     }
 
-    workspace = workspaceManager.append_new_workspace(true, global.get_current_time());
-    workspaces.set(appName, workspace);
-    workspace.name_ = appName;
+    const workspace = workspaceManager.append_new_workspace(true, global.get_current_time());
+    main.wm._workspaceTracker.blockUpdates();
+    app.open_new_window(workspace.index());
 
     const indicator = new St.BoxLayout({ x_expand: true });
     workspace.indicator_ = indicator;
@@ -315,56 +295,52 @@ main.panel.statusArea.aggregateMenu.container.hide();
     icon.set_gicon(app.get_icon());
     indicator.add(icon);
     const windowsIndicator = new WindowsIndicator(workspace);
+    windowsIndicator.set_style("color: #00CCFF"); // #99FFFF #87CEEB
     indicator.add(windowsIndicator);
     const label = St.Label.new(appName.replace(/ .*/,'')); // first word of "appName"
-    label.set_style("color: #dddddd");
     indicator.add(label);
 
     workspace.connect("notify::active", () => {
-      if (workspace.active && workspace.workspace_index !== 0) {
+      if (workspace.active && workspaceList.indexOf(workspace) !== 0) {
         // highlight
         workspace.indicator_?.set_background_color(Clutter.Color.new(255, 255, 255, 150));
       } else {
         // clear highlight
-        workspace.indicator_?.set_background_color(Clutter.Color.new(0, 0, 0, 0));
+        workspace.indicator_?.set_background_color(Clutter.Color.new(255, 255, 255, 0));
       }
     });
-    workspace.connect("notify::workspace-index", () => {
-      if (workspace.workspace_index === 0)
-        workspace.indicator_?.set_background_color(Clutter.Color.new(0, 0, 0, 0));
-    });
 
-    workspace.connect("notify::n-windows", () => {
-      if (workspace.n_windows === 0) {
-        workspacesIndicator.remove_child(workspace.indicator_);
-        workspaces.delete(appName);
-
-        // go to the previous workspace (or next, if it's the first workspace)
-        const i = workspaceManager.get_active_workspace_index();
-        if (i > 0) {
-          workspaceManager.get_workspace_by_index(i-1)?.activate(global.get_current_time());
-        } else {
-          workspaceManager.get_workspace_by_index(1)?.activate(global.get_current_time());
+    workspace.connect("window-added", (workspace, win) => {
+      if (workspace.n_windows === 1) {
+        main.wm._workspaceTracker.unblockUpdates();
+        if (workspaces.get(appName)) {
+          win.kill();
+          return;
         }
+
+        workspace.name_ = appName;
+        workspace.activate(global.get_current_time());
+        workspacesIndicator.insert_child_at_index(workspace.indicator_, 0);
+        workspaces.set(appName, workspace);
+        if (!appName.startsWith("*")) workspaceList.unshift(workspace);
+
+        win.maximize(Meta.MaximizeFlags.BOTH);
       }
     });
 
-    endWorkspaceSwitch();
-    app.open_new_window(-1);
-  };
+    workspace.connect("window-removed", (workspace, _win) => {
+      if (workspace.n_windows === 0) {
+        if (!workspace.name_) return;
+        workspacesIndicator.remove_child(workspace.indicator_);
+        workspaces.delete(workspace.name_);
+        const i = workspaceList.indexOf(workspace);
+        workspaceList.splice(i, 1);
 
-  const fillWorkspacesIndicator = () => {
-    workspacesIndicator.remove_all_children();
-    // minus 1 is to exclude the last worksace which is always empty;
-    const n_workspaces = workspaceManager.get_n_workspaces() - 1;
-    for (let i = 0; i < n_workspaces; i++) {
-      const workspace = workspaceManager.get_workspace_by_index(i);
-      const indicator = workspace.indicator_;
-      if (indicator) workspacesIndicator.add_child(indicator);
-    }
+        const firstWorkspace = workspaceList[0];
+        if (firstWorkspace) firstWorkspace.activate(global.get_current_time());
+      }
+    });
   };
-  workspaceManager.connect("notify::n-workspaces", fillWorkspacesIndicator);
-  workspaceManager.connect("workspaces-reordered", fillWorkspacesIndicator);
 
   Shell.App.prototype.activate = function() { openApp(this); };
 
@@ -375,7 +351,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
     for (const appId of apps) {
       const app = Shell.AppSystem.get_default().lookup_app(appId);
       if (app) {
-          openApp(app);
+        openApp(app);
         break;
       }
     }
