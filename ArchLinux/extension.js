@@ -278,13 +278,14 @@ main.panel.statusArea.aggregateMenu.container.hide();
   const openApp = (app) => {
     const appName = app.get_name();
 
-    if (workspaces.get(appName)) {
+    let workspace = workspaces.get(appName);
+    if (workspace) {
       workspace.activate(global.get_current_time());
       endWorkspaceSwitch();
       return;
     }
 
-    const workspace = workspaceManager.append_new_workspace(true, global.get_current_time());
+    workspace = workspaceManager.append_new_workspace(true, global.get_current_time());
     main.wm._workspaceTracker.blockUpdates();
     app.open_new_window(workspace.index());
 
@@ -322,7 +323,8 @@ main.panel.statusArea.aggregateMenu.container.hide();
         workspace.activate(global.get_current_time());
         workspacesIndicator.insert_child_at_index(workspace.indicator_, 0);
         workspaces.set(appName, workspace);
-        if (!appName.startsWith("*")) workspaceList.unshift(workspace);
+        workspaceList.unshift(workspace);
+        endWorkspaceSwitch();
 
         win.maximize(Meta.MaximizeFlags.BOTH);
       }
