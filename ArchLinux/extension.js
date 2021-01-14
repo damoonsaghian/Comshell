@@ -151,14 +151,14 @@ main.panel.statusArea.aggregateMenu.container.hide();
 
   const workspaceManager = global.workspace_manager;
   const workspaceList = [];
-  let activeWorkspaceIndex = 0;
 
   const nextWorkspace = () => {
-    const nextGroupIndex = (activeWorkspaceIndex + 1) % workspaceList.length;
-    const nextWorkspace = workspaceList[nextGroupIndex];
+    const activeWorkspaceIndex = workspaceList.indexOf(workspaceManager.get_active_workspace());
+
+    const nextWorkspaceIndex = (activeWorkspaceIndex + 1) % workspaceList.length;
+    const nextWorkspace = workspaceList[nextWorkspaceIndex];
     if (!nextWorkspace) return;
     nextWorkspace.activate(global.get_current_time());
-    activeWorkspaceIndex = nextGroupIndex;
   };
 
   const endWorkspaceSwitch = () => {
@@ -168,9 +168,11 @@ main.panel.statusArea.aggregateMenu.container.hide();
       workspacesIndicator.add_child(indicator);
     }
 
+    let activeWorkspaceIndex = workspaceList.indexOf(workspaceManager.get_active_workspace());
+    if (activeWorkspaceIndex <= 0) return;
+
     const activeWorkspace = workspaceList.splice(activeWorkspaceIndex, 1)[0];
     workspaceList.unshift(activeWorkspace);
-    activeWorkspaceIndex = 0;
 
     const indicator = activeWorkspace.indicator_;
     workspacesIndicator.set_child_at_index(indicator, 0);
