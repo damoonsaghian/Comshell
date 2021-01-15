@@ -89,9 +89,10 @@ main.panel.statusArea.aggregateMenu.container.hide();
     }
   }
 
+  // https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet
   // https://github.com/Ory0n/Resource_Monitor/
   // https://github.com/corecoding/Vitals
-  // https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet
+  // https://github.com/elvetemedve/gnome-shell-extension-system-monitor
 
   const volume = main.panel.statusArea.aggregateMenu._volume;
   if (volume && volume._primaryIndicator) {
@@ -148,6 +149,15 @@ main.panel.statusArea.aggregateMenu.container.hide();
     y_expand: true,
   });
   leftBox.add_child(workspacesIndicator);
+
+  //disable workspace switch animation;
+  global.window_manager.connect('switch-workspace', (shellwm, from, to, direction) => {
+    let switchData = main.wm._switchData;
+    if (!switchData) return;
+    switchData.container.remove_all_transitions();
+    // we've removed the onComplete call so we must call it explicitly;
+    main.wm._switchWorkspaceDone(shellwm);
+  });
 
   const workspaceManager = global.workspace_manager;
   const workspaceList = [];
