@@ -162,18 +162,17 @@ main.panel.statusArea.aggregateMenu.container.hide();
   };
 
   const endWorkspaceSwitch = () => {
+    const activeWorkspaceIndex = workspaceList.indexOf(workspaceManager.get_active_workspace());
+    if (activeWorkspaceIndex === -1) return;
+
     if (workspaceList[0]?.name_.startsWith("*")) {
       const indicator = firstWorkspace.indicator_;
       workspacesIndicator.remove_child(indicator);
       workspacesIndicator.add_child(indicator);
     }
 
-    let activeWorkspaceIndex = workspaceList.indexOf(workspaceManager.get_active_workspace());
-    if (activeWorkspaceIndex <= 0) return;
-
     const activeWorkspace = workspaceList.splice(activeWorkspaceIndex, 1)[0];
     workspaceList.unshift(activeWorkspace);
-
     const indicator = activeWorkspace.indicator_;
     workspacesIndicator.set_child_at_index(indicator, 0);
     indicator?.set_background_color(Clutter.Color.new(255, 255, 255, 0));
@@ -314,6 +313,9 @@ main.panel.statusArea.aggregateMenu.container.hide();
     });
 
     workspace.connect("window-added", (workspace, win) => {
+      workspace.activate(global.get_current_time());
+      endWorkspaceSwitch();
+
       if (workspace.n_windows === 1) {
         main.wm._workspaceTracker.unblockUpdates();
         if (workspaces.get(appName)) {
@@ -326,7 +328,6 @@ main.panel.statusArea.aggregateMenu.container.hide();
         workspacesIndicator.insert_child_at_index(workspace.indicator_, 0);
         workspaces.set(appName, workspace);
         workspaceList.unshift(workspace);
-        endWorkspaceSwitch();
 
         win.maximize(Meta.MaximizeFlags.BOTH);
       }
@@ -338,7 +339,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
         workspacesIndicator.remove_child(workspace.indicator_);
         workspaces.delete(workspace.name_);
         const i = workspaceList.indexOf(workspace);
-        workspaceList.splice(i, 1);
+        if (i > -1) workspaceList.splice(i, 1);
 
         const firstWorkspace = workspaceList[0];
         if (firstWorkspace) firstWorkspace.activate(global.get_current_time());
