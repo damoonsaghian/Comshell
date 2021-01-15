@@ -59,8 +59,11 @@ main.panel.statusArea.aggregateMenu.container.hide();
     }
   }
 
+  // chart
+  // https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet/blob/master/system-monitor%40paradoxxx.zero.gmail.com/extension.js
+
+  // net
   // https://github.com/hedayaty/NetSpeed/blob/master/net_speed.js
-  // https://github.com/hedayaty/NetSpeed/blob/master/net_speed_status_icon.js
 
   const rfkillIcon = new St.Icon({ style_class: "system-status-icon" });
   rightBox.add_child(rfkillIcon);
@@ -89,7 +92,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
     }
   }
 
-  // https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet
+  // cpu, mem, disk
   // https://github.com/Ory0n/Resource_Monitor/
   // https://github.com/corecoding/Vitals
   // https://github.com/elvetemedve/gnome-shell-extension-system-monitor
@@ -309,7 +312,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
     const windowsIndicator = new WindowsIndicator(workspace);
     windowsIndicator.set_style("color: #00CCFF"); // #99FFFF #87CEEB
     indicator.add(windowsIndicator);
-    const label = St.Label.new(appName.replace(/ .*/,'')); // first word of "appName"
+    const label = St.Label.new(appName.replace(/ /g, ''));
     indicator.add(label);
 
     workspace.connect("notify::active", () => {
