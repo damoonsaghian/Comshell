@@ -250,13 +250,15 @@ main.panel.statusArea.aggregateMenu.container.hide();
 
   const WindowsIndicator = imports.gi.GObject.registerClass(
   class WindowsIndicator extends St.Label {
+    currentWindowIndex = 0;
+
     _init(workspace) {
       super._init();
       workspace.windows_ = [];
 
       workspace.connect("window-added", (workspace, win) => {
         if (win.get_window_type() === Meta.WindowType.NORMAL) {
-          workspace.windows_.push(win);
+          workspace.windows_.splice(this.currentWindowIndex + 1, 0, win);
           this.onWindowsChanged(workspace);
         }
       });
@@ -273,10 +275,13 @@ main.panel.statusArea.aggregateMenu.container.hide();
     }
 
     onWindowsChanged(workspace) {
-      let indicator = "";
       const windows = workspace.windows_;
+      this.currentWindowIndex = 0;
+      let indicator = "";
+
       for (let i = 1; i < windows.length; i++) {
         if (windows[i].appears_focused) {
+          this.currentWindowIndex = i;
           indicator += "┃";
         } else {
           indicator += "┇";
@@ -343,6 +348,8 @@ main.panel.statusArea.aggregateMenu.container.hide();
         workspaceList.unshift(workspace);
 
         win.maximize(Meta.MaximizeFlags.BOTH);
+      } else {
+        win.unmaximize(Meta.MaximizeFlags.BOTH);
       }
     });
 
