@@ -1,5 +1,7 @@
 using Arch Linux we can easily setup and maintain a Linux system;
 the following shows how to setup a basic graphical environment, using GnomeShell;
+".data/gnome-shell.png"
+
 in the installed system, there is only one application, a terminal emulator;
 other applications can be installed using "pacman";
 you can press "alt-space" to show the list of applications;
