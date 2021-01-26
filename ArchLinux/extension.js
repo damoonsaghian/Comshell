@@ -276,15 +276,14 @@ main.panel.statusArea.aggregateMenu.container.hide();
 
     onWindowsChanged(workspace) {
       const windows = workspace.windows_;
-      this.currentWindowIndex = 0;
       let indicator = "";
 
-      for (let i = 1; i < windows.length; i++) {
+      for (let i = 0; i < windows.length; i++) {
         if (windows[i].appears_focused) {
           this.currentWindowIndex = i;
-          indicator += "┃";
+          if (i !== 0) indicator += "┃";
         } else {
-          indicator += "┇";
+          if (i !== 0) indicator += "┇";
         }
       }
       this.set_text(indicator);
