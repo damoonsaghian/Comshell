@@ -87,14 +87,13 @@ screencast=['<Alt><Shift>r']
 max-screencast-length=300
 [org/gnome/shell/keybindings]
 toggle-application-view=['<Alt>Space', '<Super>a']
+switch-to-application-9=['<Alt>Return', '<Super>9']
 [org/gnome/shell]
 disable-extension-version-validation=true
 enabled-extensions=['gnome-shell-improved']
 [org/gnome/terminal/legacy]
 default-show-menubar=false
 headerbar=just false
-[org/gnome/terminal/legacy/keybindings]
-new-window='<Alt>Return'
 [org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9]
 default-size-columns=130
 default-size-rows=50

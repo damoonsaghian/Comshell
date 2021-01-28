@@ -304,6 +304,7 @@ main.panel.statusArea.aggregateMenu.container.hide();
     }
 
     workspace = workspaceManager.append_new_workspace(true, global.get_current_time());
+    // stop removing empty workspaces for now;
     main.wm._workspaceTracker.blockUpdates();
     app.open_new_window(workspace.index());
 
@@ -381,6 +382,24 @@ main.panel.statusArea.aggregateMenu.container.hide();
     }
   });
 }
+
+const openTerminal = () => {
+  const overview = main.overview;
+  if (overview.visible) overview.hide();
+
+  const workspace = global.workspace_manager.get_active_workspace();
+  const app = Shell.AppSystem.get_default().lookup_app("org.gnome.Terminal.desktop");
+  app.open_new_window(workspace.index());
+};
+
+main.wm.removeKeybinding("switch-to-application-9");
+main.wm.addKeybinding(
+  "switch-to-application-9",
+  new imports.gi.Gio.Settings({ schema_id: imports.ui.windowManager.SHELL_KEYBINDINGS_SCHEMA }),
+  Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+  Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+  openTerminal
+);
 
 // overview layer
 {
