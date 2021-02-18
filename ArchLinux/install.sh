@@ -65,7 +65,7 @@ center-new-windows=true
 [org/gnome/desktop/wm/preferences]
 button-layout=''
 [org/gnome/desktop/wm/keybindings]
-cycle-windows=['<Alt>a']
+cycle-windows=['<Alt>Comma', '<Alt>a', '<Alt>o', '<Alt>i', '<Alt>u']
 cycle-windows-backward=['']
 cycle-group=['']
 cycle-group-backward=['']
