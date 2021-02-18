@@ -20,23 +20,20 @@ for those who neither can use all their fingers, nor can talk,
   gesture based (2d) input can be implemented;
 
 ".data/keyboard.png"
-, two commas -> ;
-, ";" followed by comma -> .
-, comma followed by "(" -> {
-, ";" followed by "(" -> [
-, comma followed by "c" followed by space or comma -> ":" followed by one space or nothing
-, comma followed by "psi" followed by space or comma -> "ψ" followed by one space or nothing
+, two commas -> .
+, comma followed by "t" -> "("
+, ";" followed by "psi" followed by space or comma -> "ψ" followed by one space or nothing
 , "_ab_c" then two underscores -> AbC (followed by one space)
 , "__ab_c" then two underscores -> __ab_c__
 "https://github.com/adereth/dactyl-keyboard"
 Kinesis Advantage 2 keyboard
 "http://www.allthingsergo.com/the-best-ergonomic-mechanical-keyboards/"
 
-for compatibility with other applications, we still need a touchpad and extra keys:
-, arrow keys, "page up", "page down", "home", "end":
-  which can be implemented as gestures on the touchpad;
-, "alt", "ctrl", "shift", "tab", "`": which can be put in the middle;
-, 10 punctuation keys which can be put above numbers;
+for compatibility with other applications, we may still need a mouse,
+  and these extra keys which can be put in the middle of keyboard:
+, arrow keys, "page up", "page down", "home", "end", "tab";
+, "alt", "ctrl", "shift", "punctuations";
+also we can have a row of function keys, plus the "delete" key, at the top;
 
 = Comshell
 Comshell is a unified computing environment, utilizing command based user interface;
