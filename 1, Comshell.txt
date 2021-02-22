@@ -20,7 +20,7 @@ for those who neither can use all their fingers, nor can talk,
   gesture based (2d) input can be implemented;
 
 ".data/keyboard.png"
-, two commas -> .
+, two commas -> ";"
 , comma followed by "t" -> "("
 , ";" followed by "psi" followed by space or comma -> "ψ" followed by one space or nothing
 , "_ab_c" then two underscores -> AbC (followed by one space)
