@@ -20,9 +20,9 @@ for those who neither can use all their fingers, nor can talk,
   gesture based (2d) input can be implemented;
 
 ".data/keyboard.png"
-, two commas -> ";"
-, comma followed by "t" -> "("
-, ";" followed by "psi" followed by space or comma -> "ψ" followed by one space or nothing
+, two semicolons -> ","
+, semicolon followed by a letter -> the symbol on its bottom right corner
+, "," followed by "psi" followed by space or semicolon -> "ψ" followed by one space or nothing
 , "_ab_c" then two underscores -> AbC (followed by one space)
 , "__ab_c" then two underscores -> __ab_c__
 "https://github.com/adereth/dactyl-keyboard"
@@ -63,7 +63,7 @@ modal key_bindings;
 modes (normal mode and insert mode) must be visually distinctive;
 press "esc" or "tab" to go to normal mode;
 in normal mode we can:
-, press "space" to go to insert mode;
+, press "enter" to go to insert mode;
 , move the cursor to the next or previous word;
 , move the cursor to the next or previous lines or table cells;
 , move the cursor to the next or previous paragraph;
