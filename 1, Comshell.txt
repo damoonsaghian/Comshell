@@ -20,9 +20,9 @@ for those who neither can use all their fingers, nor can talk,
   gesture based (2d) input can be implemented;
 
 ".data/keyboard.png"
-, two semicolons -> ","
-, semicolon followed by a letter -> the symbol on its bottom right corner
-, "," followed by "psi" followed by space or semicolon -> "ψ" followed by one space or nothing
+, two commas -> ";"
+, comma followed by a letter -> the symbol on its bottom right corner
+, ";" followed by "psi" followed by space or comma -> "ψ" followed by one space or nothing
 , "_ab_c" then two underscores -> AbC (followed by one space)
 , "__ab_c" then two underscores -> __ab_c__
 "https://github.com/adereth/dactyl-keyboard"
