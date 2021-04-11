@@ -1,4 +1,4 @@
-<pre><h1>Comshell</h1>
+<code><h1>Comshell</h1>
 <h2>1, Comshell</h2><b>command based user interface</b>
 command based user interfaces (using keyboard, voice, gesture) are
   faster, more convenient and more powerful,
@@ -591,4 +591,4 @@ poppler-glib goffice goocanvas
 
 <a href='https://arcolinuxiso.com/how-to-create-your-own-online-arch-linux-repository-on-github-and-use-it-on-any-arcolinux/'>https://arcolinuxiso.com/how-to-create-your-own-online-arch-linux-repository-on-github-and-use-it-on-any-arcolinux/</a>
 <a href='https://wiki.archlinux.org/index.php/unofficial_user_repositories'>https://wiki.archlinux.org/index.php/unofficial_user_repositories</a>
-</pre>
+</code>
