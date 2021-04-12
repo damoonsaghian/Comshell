@@ -37,12 +37,10 @@ list available block devices using "lsblk", then on the intended block device,
 ;sh
 pacstrap /mnt base
 arch-chroot /mnt
-curl --proto '=https' -sSf -o comshell.zip https://github.com/damoonsaghian/Comshell/archive/master.zip
-pacman -S unzip
-unzip comshell.zip -d Comshell
+curl https://damoonsaghian/Comshell/archive/master.tar.gz | tar -xz
+cd Comshell/ArchLinux
 ;
-ensure the downloaded files aren't malicious, then:
-; cd Comshell/ArchLinux
+ensure that the files aren't malicious, then:
 ; sh install.sh
 ; exit; reboot
 

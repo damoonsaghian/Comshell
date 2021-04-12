@@ -1,0 +1,24 @@
+implementing a complete GUI toolkit is a lot of work;
+existing ones (like GTK) are single threaded;
+thus we can't access GTK widgets (and data structures containing them), from inside actors;
+solution:
+"https://gtk-rs.org/docs/glib/source/fn.idle_add.html"
+"https://docs.rs/fragile/1.0.0/fragile/struct.Fragile.html"
+"https://docs.rs/send_wrapper/0.4.0/send_wrapper/"
+we deal with Gobjects by wrapping them in a Gsend;
+Gsend embeds a Fragile which will be created in the GTK main thread (using "idle_add"),
+  and then received (and put inside the Gsend) using a channel;
+Gsend.new gets a closure (instead of a Gobject value);
+  the closure's return type is the type of the specific Gobject;
+
+"https://gtk-rs.org/docs/gtk/"
+"https://mmstick.github.io/gtkrs-tutorials/introduction.html"
+"https://github.com/gtk-rs/examples/tree/master/src/bin"
+
+gtksourceview4 webkit2gtk
+poppler-glib goffice goocanvas
+
+"https://pijul.org/"
+
+"https://arcolinuxiso.com/how-to-create-your-own-online-arch-linux-repository-on-github-and-use-it-on-any-arcolinux/"
+"https://wiki.archlinux.org/index.php/unofficial_user_repositories"
