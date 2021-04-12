@@ -1,2 +1,0 @@
-"https://github.com/damoonsaghian/Comshell"
-this project is public domain;
