@@ -1,0 +1,33 @@
+the problem of shared mutable data is so pervasive in the computing world;
+we can also see it in file synchronization tools like Git:
+, there can be conflicts when pushing or pulling, that must be resolved manually;
+, the history just grows indefinitely cause change in the history of the repository can be catastrophic;
+
+solution:
+only the owner can mutate the repository;
+each file or directory can have an owner;
+owner can mutably borrow the repository for a defined duration, or move ownership;
+others have to send messages:
+, in the form of to_dos define by the owner;
+, corrections
+
+immutable repositories can apply corrections and to_dos, and test them,
+  but they can't push it to remote, only the owner can;
+automatic sync at the immutable ends;
+sync before sending to_dos or corrections;
+
+IBM cloud (no credit card required), Vagrant cloud
+Heroku, Vercel, Glitch, Netlifty
+free hostsL profreehost.com, awardspace
+
+Rsync, Rdiff-backup, Duplicity: and don't handle renames;
+Bita, Knoxite: i don't know if they handle renames;
+Unison: it handles renames but instead of moving it copies and deletes in remote;
+Kopia: and handles renames, but only supports:
+, SFTP which has complicated verification for server identity;
+, cloud storage which has no proper way to share a definite URL for a repo to the public;
+Rclone: handles renames only when using SFTP or cloud storage;
+Bup, Borg: and they handle renames;
+Restic: it handles renames even without the cloud storage backends, using its REST server;
+
+save files separately (not archived) in the remote;
