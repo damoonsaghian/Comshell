@@ -153,15 +153,6 @@ main.panel.statusArea.aggregateMenu.container.hide();
   });
   leftBox.add_child(workspacesIndicator);
 
-  //disable workspace switch animation;
-  global.window_manager.connect('switch-workspace', (shellwm, from, to, direction) => {
-    let switchData = main.wm._switchData;
-    if (!switchData) return;
-    switchData.container.remove_all_transitions();
-    // we've removed the onComplete call so we must call it explicitly;
-    main.wm._switchWorkspaceDone(shellwm);
-  });
-
   const workspaceManager = global.workspace_manager;
   const workspaceList = [];
 
@@ -383,6 +374,18 @@ main.panel.statusArea.aggregateMenu.container.hide();
   });
 }
 
+// disable workspace switch animation;
+/*
+global.window_manager.connect('switch-workspace', (shellwm, from, to, direction) => {
+  const switchData = main.wm._workspaceAnimation._switchData;
+  if (!switchData) return;
+  switchData.monitors.forEach(m => m.remove_all_transitions());
+  //switchData.monitors[0].remove_all_transitions();
+  // we've removed the onComplete call so we must call it explicitly;
+  //main.wm._switchWorkspaceDone(shellwm);
+});
+*/
+
 const openTerminal = () => {
   const overview = main.overview;
   if (overview.visible) overview.hide();
@@ -404,6 +407,13 @@ main.wm.addKeybinding(
 // overview layer
 {
   const overview = main.overview;
+
+  // no overview at start_up;
+  let signal;
+  signal = overview.connect('shown', () => {
+    overview.hide();
+    overview.disconnect(signal);
+  });
 
   const toggleOverview = () => {
     if (overview.isDummy) return;
@@ -446,8 +456,11 @@ main.wm.addKeybinding(
     return Clutter.EVENT_PROPAGATE;
   }
 
-  // hide dash;
-  overview.connect("showing", () => overview.dash.hide());
+  // hide dash and workspaces display in the overview;
+  overview.connect("showing", () => {
+    overview.dash.hide();
+    overview._overview._controls._workspacesDisplay.hide();
+  });
 }
 
 return { enable: () => {}, disable: () => {} };
