@@ -404,12 +404,11 @@ main.wm.addKeybinding(
 // overview layer
 {
   const overview = main.overview;
-  const viewSelector = overview.viewSelector;
 
   const toggleOverview = () => {
     if (overview.isDummy) return;
     if (overview.visible) overview.hide();
-    else viewSelector.showApps();
+    else overview.showApps();
   }
 
   // toggle overview when toggling apps view;
@@ -422,13 +421,14 @@ main.wm.addKeybinding(
     toggleOverview
   );
 
-  // toggle overview when clicking on an empty area on the panel;
+  // toggle overview when clicking on the panel;
   main.panel.connect("button-press-event", toggleOverview);
 
   // close overview by pressing "esc" key only once;
   // based on _onStageKeyPress function from:
-  //   https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/master/js/ui/viewSelector.js
-  viewSelector._onStageKeyPress = function (actor, event) {
+  //   https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/master/js/ui/searchController.js
+  overview._overview._controls._searchController._onStageKeyPress = function (actor, event) {
+    // ignore events while anything but the overview has pushed a modal (system modals, looking glass, ...);
     if (main.modalCount > 1)
       return Clutter.EVENT_PROPAGATE;
 
@@ -438,18 +438,10 @@ main.wm.addKeybinding(
       if (this._searchActive)
         this.reset();
       else
-        main.overview.hide();
+        overview.hide();
       return Clutter.EVENT_STOP;
     } else if (this._shouldTriggerSearch(symbol)) {
         this.startSearch(event);
-    } else if (!this._searchActive && !global.stage.key_focus) {
-      if (symbol === Clutter.KEY_Tab || symbol === Clutter.KEY_Down) {
-        this._activePage.navigate_focus(null, St.DirectionType.TAB_FORWARD, false);
-        return Clutter.EVENT_STOP;
-      } else if (symbol === Clutter.KEY_ISO_Left_Tab) {
-        this._activePage.navigate_focus(null, St.DirectionType.TAB_BACKWARD, false);
-        return Clutter.EVENT_STOP;
-      }
     }
     return Clutter.EVENT_PROPAGATE;
   }
