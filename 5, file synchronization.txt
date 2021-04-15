@@ -16,15 +16,12 @@ immutable repositories can apply corrections and to_dos, and test them,
 automatic sync at the immutable ends;
 sync before sending to_dos or corrections;
 
-Rsync, Rdiff-backup, Duplicity: they don't handle renames, and they only support SSH
-  which has complicated verification for server identity;
-Unison: it handles renames but instead of moving it copies and deletes in remote, and only supports SSH;
-Bup, Borg: they handle renames, but only supports SSH;
-Kopia: it handles renames, but only supports:
-, SFTP which like SSH has complicated verification for server identity;
-, cloud storage which has no proper way to share a definite URL for a repo to the public;
-Rclone: it handles renames only when using SFTP or cloud storage;
-Restic: it handles renames even without the cloud storage backends, using its REST server;
+Rclone is the only option which:
+, provides file synchronization (as opposed to backup tools which save archives at the destination)
+, and handles renames/moves properly
+
+we can make a WebDAV server (with NodeJS) which supports modification times and hashes for files;
+this way Rclone will support renames/moves;
 
 Heroku, Vercel, Glitch, Netlifty
 IBM cloud (no credit card required), Vagrant cloud
