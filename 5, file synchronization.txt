@@ -16,13 +16,9 @@ immutable repositories can apply corrections and to_dos, and test them,
 automatic sync at the immutable ends;
 sync before sending to_dos or corrections;
 
-Rclone is the only option which:
-, provides file synchronization (as opposed to backup tools which save archives at the destination)
-, and handles renames/moves properly
-
-we can make a WebDAV server (with NodeJS) which supports modification times and hashes for files;
-this way Rclone will support renames/moves;
-
-Heroku, Vercel, Glitch, Netlifty
-IBM cloud (no credit card required), Vagrant cloud
-free hosts: profreehost.com, awardspace
+https://github.com/gilbertchen/duplicacy
+https://github.com/gilbertchen/duplicacy/wiki
+https://github.com/gilbertchen/duplicacy/wiki/Chunk-Size
+https://github.com/gilbertchen/duplicacy/wiki/Managing-Passwords
+https://github.com/gilbertchen/duplicacy/wiki/Lock-Free-Deduplication
+https://github.com/gilbertchen/duplicacy/wiki/Snapshot-Format
