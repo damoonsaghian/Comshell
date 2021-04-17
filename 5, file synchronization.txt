@@ -16,9 +16,25 @@ immutable repositories can apply corrections and to_dos, and test them,
 automatic sync at the immutable ends;
 sync before sending to_dos or corrections;
 
-https://github.com/gilbertchen/duplicacy
-https://github.com/gilbertchen/duplicacy/wiki
-https://github.com/gilbertchen/duplicacy/wiki/Chunk-Size
-https://github.com/gilbertchen/duplicacy/wiki/Managing-Passwords
-https://github.com/gilbertchen/duplicacy/wiki/Lock-Free-Deduplication
-https://github.com/gilbertchen/duplicacy/wiki/Snapshot-Format
+a WebDAVS or FTPS server for remote storage;
+
+Duplicacy: consistent, lockless and simple repository
+WebDAV backend is still in beta;
+"https://github.com/gilbertchen/duplicacy"
+"https://github.com/gilbertchen/duplicacy/wiki"
+"https://github.com/gilbertchen/duplicacy/wiki/Chunk-Size"
+"https://github.com/gilbertchen/duplicacy/wiki/Managing-Passwords"
+"https://github.com/gilbertchen/duplicacy/wiki/Lock-Free-Deduplication"
+"https://github.com/gilbertchen/duplicacy/wiki/Snapshot-Format"
+
+because of the License of Duplicacy it would be great to make something similar to it in Rust:
+"https://github.com/oll3/bita"
+"https://github.com/sourcefrog/conserve"
+"https://github.com/dpc/rdedup"
+
+Restic:
+, needs to enter repository every time;
+, can't disable encryption;
+, locks repository when mutating;
+, prune is very slow and it locks repository;
+, high CPU and memory usage;
