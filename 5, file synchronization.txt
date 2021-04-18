@@ -18,6 +18,8 @@ sync before sending to_dos or corrections;
 
 a WebDAVS or FTPS server for remote storage;
 
+Restic + Rclone (WebDAV or FTPS)
+
 Duplicacy: consistent, lockless and simple repository
 WebDAV backend is still in beta;
 "https://github.com/gilbertchen/duplicacy"
@@ -31,10 +33,3 @@ because of the License of Duplicacy it would be great to make something similar 
 "https://github.com/oll3/bita"
 "https://github.com/sourcefrog/conserve"
 "https://github.com/dpc/rdedup"
-
-Restic:
-, needs to enter repository every time;
-, can't disable encryption;
-, locks repository when mutating;
-, prune is very slow and it locks repository;
-, high CPU and memory usage;
