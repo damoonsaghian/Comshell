@@ -46,13 +46,13 @@ echo "[org/gnome/system/location]
 enabled=true
 [org/gnome/desktop/datetime]
 automatic-timezone=true
+[org/gnome/mutter]
+center-new-windows=true
 [org/gnome/desktop/notifications]
 show-banners=false
 show-in-lock-screen=false
-[org/gnome/desktop/background]
-primary-color='#222222'
-secondary-color='#222222'
 [org/gnome/desktop/interface]
+clock-format='12h'
 overlay-scrolling=false
 document-font-name='sans 10.5'
 font-name='sans 10.5'
@@ -60,40 +60,34 @@ monospace-font-name='monospace 10.5'
 gtk-theme='Materia-light-compact'
 cursor-blink-timeout=1000
 enable-hot-corners=false
-[org/gnome/mutter]
-center-new-windows=true
+[org/gnome/desktop/session]
+idle-delay=600
 [org/gnome/desktop/wm/preferences]
 button-layout=''
+[org/gnome/desktop/background]
+primary-color='#282828'
+secondary-color='#282828'
 [org/gnome/desktop/wm/keybindings]
-cycle-windows=['<Alt>Comma', '<Alt>a', '<Alt>o', '<Alt>i', '<Alt>u']
-cycle-windows-backward=['']
-cycle-group=['']
-cycle-group-backward=['']
-switch-group=['']
-switch-group-backward=['']
-switch-applications-backward=['']
-move-to-workspace-left=['']
-move-to-workspace-right=['']
-move-to-workspace-up=['']
-move-to-workspace-down=['']
-move-to-workspace-1=['']
-move-to-workspace-last=['']
-close=['<Alt>Escape']
+cycle-group=['<Alt>Comma', '<Alt>Above_Tab', '<Alt>a', '<Alt>o']
 toggle-maximized=['<Alt><Shift>Space']
+close=['<Alt>Escape']
+cycle-windows=['']
+cycle-windows-backward=['']
 activate-window-menu=['']
-[org/gnome/settings-daemon/plugins/media-keys]
-screenshot=['<Alt><Shift>s']
-screencast=['<Alt><Shift>r']
-max-screencast-length=300
 [org/gnome/shell/keybindings]
-toggle-application-view=['<Alt>Space', '<Super>a']
-switch-to-application-9=['<Alt>Return', '<Super>9']
+toggle-application-view=['<Alt>Space']
 [org/gnome/shell]
 disable-extension-version-validation=true
 enabled-extensions=['gnome-shell-improved']
+favorite-apps=[]
 [org/gnome/terminal/legacy]
 default-show-menubar=false
 headerbar=just false
+new-terminal-mode='tab'
+[org/gnome/terminal/legacy/keybindings]
+close-tab='<Control>w'
+close-window='<Control>q'
+new-tab='<Control>t'
 [org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9]
 default-size-columns=130
 default-size-rows=50
@@ -102,6 +96,7 @@ scrollbar-policy='never'
 dconf update
 
 mkdir -p /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
+cp ./extension.js /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
 echo '{
   "uuid": "gnome-shell-improved",
   "name": "GnomeShellImproved",
@@ -111,36 +106,20 @@ echo '{
 echo 'stage {
   font-family: sans;
   font-size: 10.5pt;
-  font-weight: normal;
-  color: #ffffff;
 }
 #panel {
-  height: 18px;
+  background-color: transparent;
 }
 #panel .panel-button {
-  -natural-hpadding: 4px;
-  -minimum-hpadding: 4px;
-  margin: 1px 0px 0px 0px;
-  font-family: monospace;
+  font-family: sans;
   font-size: 10.5pt;
   font-weight: normal;
   color: #ffffff;
 }
-.panel-status-indicators-box {
-  spacing: 8px;
-}
-.window-button-icon {
-  height: 16px;
-  padding: 0px 2px 0 0;
+#panel #panelActivities {
+  -natural-hpadding: 0;
 }
 ' > /usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css
-cp ./extension.js /usr/local/share/gnome-shell/extensions/gnome-shell-improved/
-
-# this is for gnome-shell's screenshot and screencast to work;
-mkdir -p /etc/skel/.config
-echo 'XDG_PICTURES_DIR="$HOME/Pictures"
-XDG_VIDEOS_DIR="$HOME/Videos"
-' > /etc/skel/.config/user-dirs.dirs
 
 mkdir -p /etc/skel/.local/share/applications
 printf '[Desktop Entry]\nNoDisplay=true' |

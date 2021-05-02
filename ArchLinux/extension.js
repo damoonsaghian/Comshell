@@ -1,14 +1,55 @@
 function init() {
 const main = imports.ui.main;
 const GLib = imports.gi.GLib;
+const GObject = imports.gi.GObject;
 const St = imports.gi.St;
 const Clutter = imports.gi.Clutter;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
+const appSystem = Shell.AppSystem.get_default();
+const windowTracker = Shell.WindowTracker.get_default()
 
-main.setThemeStylesheet(
-  "/usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css");
+main.setThemeStylesheet("/usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css");
 main.loadTheme();
+
+// autostart
+global.run_at_leisure(() => {
+  const apps = ["comshell.desktop", "atom.desktop", "code-oss.desktop", "emacs.desktop",
+    "nvim-qt.desktop", "nvim.desktop", "vim.desktop", "org.gnome.Terminal.desktop"];
+  for (const appId of apps) {
+    const app = appSystem.lookup_app(appId);
+    if (app) {
+      app.activate();
+      break;
+    }
+  }
+});
+
+// no overview at start_up;
+{
+  let signal;
+  signal = main.overview.connect('shown', (overview) => {
+    overview.hide();
+    overview.disconnect(signal);
+  });
+}
+// hide dash in the overview;
+main.overview.connect("showing", (overview) => overview.dash.hide());
+
+// toggle applications view instead of overview;
+main.overview.toggle = function () {
+  if (this.isDummy) return;
+  if (this.visible) this.hide();
+  else this.showApps();
+};
+main.wm.removeKeybinding("toggle-application-view");
+main.wm.addKeybinding(
+  "toggle-application-view",
+  new imports.gi.Gio.Settings({ schema_id: imports.ui.windowManager.SHELL_KEYBINDINGS_SCHEMA }),
+  Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+  Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+  () => main.overview.toggle()
+);
 
 // hide notification banners;
 {
@@ -29,439 +70,255 @@ main.loadTheme();
   movePanelToBottom();
 }
 
-main.panel.statusArea.activities.container.connect("show", c => c.hide());
-main.panel.statusArea.activities.container.hide();
 main.panel.statusArea.appMenu.container.connect("show", c => c.hide());
 main.panel.statusArea.appMenu.container.hide();
 main.panel.statusArea.dateMenu.container.connect("show", c => c.hide());
 main.panel.statusArea.dateMenu.container.hide();
-main.panel.statusArea.aggregateMenu.container.connect("show", c => c.hide());
-main.panel.statusArea.aggregateMenu.container.hide();
 
-// right side of status_bar;
-{
-  const rightButton = new imports.ui.panelMenu.Button(0.0, null, true);
-  main.panel.addToStatusArea("status_right", rightButton, 0, "right");
-  const rightBox = new St.BoxLayout({ style_class: "panel-status-indicators-box" });
-  rightButton.add_child(rightBox);
-
-  // show a red indicator to notify the user that for system to update, it needs a reboot;
-  // compare the running kernel and system services, with the ones on the disk;
-  // https://github.com/RaphaelRochet/arch-update
-
-  const network = main.panel.statusArea.aggregateMenu._network;
-  if (network && network._primaryIndicator) {
-    network.remove_child(network._primaryIndicator);
-    rightBox.add_child(network._primaryIndicator);
-    if (network._vpnIndicator) {
-      network.remove_child(network._vpnIndicator);
-      rightBox.add_child(network._vpnIndicator);
-    }
-  }
-
-  // chart
-  // https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet/blob/master/system-monitor%40paradoxxx.zero.gmail.com/extension.js
-
-  // net
-  // https://github.com/hedayaty/NetSpeed/blob/master/net_speed.js
-
-  const rfkillIcon = new St.Icon({ style_class: "system-status-icon" });
-  rightBox.add_child(rfkillIcon);
-  rfkillIcon.icon_name = "airplane-mode-symbolic";
-  const rfkillManager = imports.ui.status.rfkill.getRfkillManager();
-  rfkillIcon.visible = rfkillManager.airplaneMode;
-  rfkillManager.connect("airplane-mode-changed",
-    () => rfkillIcon.visible = rfkillManager.airplaneMode
-  );
-
-  const power = main.panel.statusArea.aggregateMenu._power;
-  if (power && power._indicator) {
-    power.remove_child(power._indicator);
-    rightBox.add_child(power._indicator);
-    if (power._percentageLabel) {
-      power.remove_child(power._percentageLabel);
-      rightBox.add_child(power._percentageLabel);
-    }
-    // over_write "_sync" method, to hide the power icon, if there's no battery;
-    if (power._sync && power._proxy) {
-      power._sync = function() {
-        imports.ui.status.power.Indicator.prototype._sync.call(this);
-        if (!this._proxy.IsPresent) this._indicator.hide();
-      };
-      power._sync();
-    }
-  }
-
-  // cpu, mem, disk
-  // https://github.com/Ory0n/Resource_Monitor/
-  // https://github.com/corecoding/Vitals
-  // https://github.com/elvetemedve/gnome-shell-extension-system-monitor
-
-  const volume = main.panel.statusArea.aggregateMenu._volume;
-  if (volume && volume._primaryIndicator) {
-    volume.remove_child(volume._primaryIndicator);
-    rightBox.add_child(volume._primaryIndicator);
-    if (volume._inputIndicator) {
-      volume.remove_child(volume._inputIndicator);
-      rightBox.add_child(volume._inputIndicator);
-      volume._inputIndicator.visible = true;
-    }
-  }
-
-  const remoteAccess = main.panel.statusArea.aggregateMenu._remoteAccess;
-  if (remoteAccess) {
-    remoteAccess._ensureControls();
-    if (remoteAccess._recordingIndicator) {
-      remoteAccess.remove_child(remoteAccess._recordingIndicator);
-      rightBox.add_child(remoteAccess._recordingIndicator);
-      remoteAccess._sync();
-    }
-  }
-
-  const location = main.panel.statusArea.aggregateMenu._location;
-  if (location && location._indicator) {
-    location.remove_child(location._indicator);
-    rightBox.add_child(location._indicator);
-    location._syncIndicator();
-  }
-
-  const dateTimeLabel = new St.Label({ y_align: Clutter.ActorAlign.CENTER });
-  rightBox.add_child(dateTimeLabel);
-  const updateClock = () => {
-    const now = GLib.DateTime.new_now_local();
-    const nowFormated = now ? now.format("%F %a %p %I:%M") : "";
-    // https://github.com/omid/Persian-Calendar-for-Gnome-Shell/blob/master/PersianCalendar%40oxygenws.com/PersianDate.js
-    dateTimeLabel.set_text(nowFormated);
+// over_write "_sync" method, to hide the power icon, if there's no battery;
+const power = main.panel.statusArea.aggregateMenu._power;
+if (power._sync && power._proxy) {
+  power._sync = function() {
+    imports.ui.status.power.Indicator.prototype._sync.call(this);
+    if (!this._proxy.IsPresent) this._indicator.hide();
   };
-  updateClock();
-  const wallClock = main.panel.statusArea.dateMenu._clock;
-  if (wallClock) wallClock.connect("notify::clock", updateClock);
+  power._sync();
 }
 
-// left side of status_bar;
-{
-  const leftButton = new imports.ui.panelMenu.Button(0.0, null, true);
-  main.panel.addToStatusArea("status_left", leftButton, 0, "left");
-  const leftBox = new St.BoxLayout({ style_class: "panel-status-indicators-box" });
-  leftButton.add_child(leftBox);
+const dateTimeLabel = new St.Label({ y_align: Clutter.ActorAlign.CENTER });
+main.panel.statusArea.aggregateMenu._indicators?.add_child(dateTimeLabel);
+const updateClock = () => {
+  const now = GLib.DateTime.new_now_local();
+  const nowFormated = now ? now.format(" %F  %a  %p  %I:%M") : "";
+  // https://github.com/omid/Persian-Calendar-for-Gnome-Shell/blob/master/PersianCalendar%40oxygenws.com/PersianDate.js
+  dateTimeLabel.set_text(nowFormated);
+};
+updateClock();
+const wallClock = main.panel.statusArea.dateMenu._clock;
+if (wallClock) wallClock.connect("notify::clock", updateClock);
 
-  const workspacesIndicator = new St.Widget({
-    layout_manager: new Clutter.BoxLayout({ spacing: 18 }),
-    x_align: Clutter.ActorAlign.START,
-    x_expand: true,
-    y_expand: true,
-  });
-  leftBox.add_child(workspacesIndicator);
+// show a red indicator to notify the user that for system to update, it needs a reboot;
+// compare the running kernel and system services, with the ones on the disk;
+// https://github.com/RaphaelRochet/arch-update
 
-  const workspaceManager = global.workspace_manager;
-  const workspaceList = [];
+// chart
+// https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet/blob/master/system-monitor%40paradoxxx.zero.gmail.com/extension.js
+// net
+// https://github.com/hedayaty/NetSpeed/blob/master/net_speed.js
+// cpu, mem, disk
+// https://github.com/Ory0n/Resource_Monitor/
+// https://github.com/corecoding/Vitals
+// https://github.com/elvetemedve/gnome-shell-extension-system-monitor
 
-  const nextWorkspace = () => {
-    const activeWorkspaceIndex = workspaceList.indexOf(workspaceManager.get_active_workspace());
+// running apps list
+//------------------
+const activitiesButton = main.panel.statusArea.activities;
+activitiesButton.remove_all_children();
+const runningAppsBox = new St.BoxLayout({ x_align: Clutter.ActorAlign.CENTER });
+activitiesButton.add_child(runningAppsBox);
+runningAppsBox.add_child(new St.Icon({
+  icon_name: "view-app-grid-symbolic",
+  y_align: Clutter.ActorAlign.CENTER
+}));
 
-    const nextWorkspaceIndex = (activeWorkspaceIndex + 1) % workspaceList.length;
-    const nextWorkspace = workspaceList[nextWorkspaceIndex];
-    if (!nextWorkspace) return;
-    nextWorkspace.activate(global.get_current_time());
-  };
+let appSwitchMode = false;
+let appIndex = 0;
 
-  const endWorkspaceSwitch = () => {
-    const activeWorkspaceIndex = workspaceList.indexOf(workspaceManager.get_active_workspace());
-    if (activeWorkspaceIndex === -1) return;
+main.wm.setCustomKeybindingHandler(
+  "switch-applications",
+  Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+  (_display, _win, _binding) => {
+    const overview = main.overview;
+    if (overview.visible) { overview.hide(); return; }
 
-    if (workspaceList[0]?.name_.startsWith("*")) {
-      const indicator = firstWorkspace.indicator_;
-      workspacesIndicator.remove_child(indicator);
-      workspacesIndicator.add_child(indicator);
+    const apps = appSystem.get_running();
+    if (apps.length === 0) return;
+
+    const nextAppIndex = (appIndex + 1) % apps.length;
+
+    // show window without focusing it;
+    const win = apps[nextAppIndex].get_windows()[0];
+    global.window_group.set_child_above_sibling(win.get_compositor_private(), null);
+
+    // update highlight;
+    apps[appIndex].indicator_.set_background_color(Clutter.Color.new(255, 255, 255, 0));
+    apps[nextAppIndex].indicator_.set_background_color(Clutter.Color.new(255, 255, 255, 150));
+
+    appIndex = nextAppIndex;
+
+    if (appSwitchMode) return;
+    appSwitchMode = true;
+
+    if (!global.begin_modal(global.get_current_time(), 0)) {
+      // probably someone else has a pointer grab, try again with keyboard only;
+      if (!global.begin_modal(global.get_current_time(), Meta.ModalOptions.POINTER_ALREADY_GRABBED))
+        return;
     }
 
-    const activeWorkspace = workspaceList.splice(activeWorkspaceIndex, 1)[0];
-    workspaceList.unshift(activeWorkspace);
-    const indicator = activeWorkspace.indicator_;
-    workspacesIndicator.set_child_at_index(indicator, 0);
-    indicator?.set_background_color(Clutter.Color.new(255, 255, 255, 0));
-  };
+    const stage = global.get_stage();
 
-  let workspaceSwitchMode = false;
+    const endAppSwitch = () => {
+      const app = appSystem.get_running()[appIndex];
+      app?.activate();
 
-  main.wm.setCustomKeybindingHandler(
-    "switch-applications",
-    Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-    (_display, _win, _binding) => {
-      const overview = main.overview;
-      if (overview.visible) { overview.hide(); return; }
+      // remove highlight;
+      app?.indicator_.set_background_color(Clutter.Color.new(255, 255, 255, 0));
 
-      nextWorkspace();
-      if (workspaceSwitchMode) return;
-      workspaceSwitchMode = true;
+      appSwitchMode = false;
+      appIndex = 0;
+    };
 
-      if (!global.begin_modal(global.get_current_time(), 0)) {
-        // probably someone else has a pointer grab, try again with keyboard only;
-        if (!global.begin_modal(global.get_current_time(), Meta.ModalOptions.POINTER_ALREADY_GRABBED))
-          return;
-      }
-
-      const stage = global.get_stage();
-
-      let releaseHandler;
-      releaseHandler = stage.connect("key-release-event", (_s, _keyEvent) => {
-        const [_x, _y, mods] = global.get_pointer();
-        if (!mods) {
-          stage.disconnect(releaseHandler);
-          global.end_modal(global.get_current_time());
-          workspaceSwitchMode = false;
-          endWorkspaceSwitch();
-        }
-        return true;
-      });
-
-      // there's a race condition;
-      // if the user released Alt before we got the grab, then we won't be notified; so we check now;
+    let releaseHandler;
+    releaseHandler = stage.connect("key-release-event", (_s, _keyEvent) => {
       const [_x, _y, mods] = global.get_pointer();
       if (!mods) {
         stage.disconnect(releaseHandler);
         global.end_modal(global.get_current_time());
-        workspaceSwitchMode = false;
-        endWorkspaceSwitch();
+        endAppSwitch();
       }
-    }
-  );
-
-  main.wm.setCustomKeybindingHandler(
-    "cycle-windows",
-    Shell.ActionMode.NORMAL,
-    (_display, _win, _binding) => {
-      const activeWorkspace = workspaceManager.get_active_workspace();
-      const windows = activeWorkspace.windows_;
-      const win = global.display.get_focus_window();
-      const i = windows.indexOf(win);
-      windows[(i + 1) % windows.length].activate(global.get_current_time());
-    }
-  );
-
-  const WindowsIndicator = imports.gi.GObject.registerClass(
-  class WindowsIndicator extends St.Label {
-    currentWindowIndex = 0;
-
-    _init(workspace) {
-      super._init();
-      workspace.windows_ = [];
-
-      workspace.connect("window-added", (workspace, win) => {
-        if (win.get_window_type() === Meta.WindowType.NORMAL) {
-          workspace.windows_.splice(this.currentWindowIndex + 1, 0, win);
-          this.onWindowsChanged(workspace);
-        }
-      });
-
-      workspace.connect("window-removed", (workspace, win) => {
-        const i = workspace.windows_.indexOf(win);
-        if (i === -1) return;
-        workspace.windows_.splice(i, 1); // remove "win" from the list;
-        this.onWindowsChanged(workspace);
-      });
-
-      global.display.connect("notify::focus-window", () => this.onWindowsChanged(workspace));
-      this.onWindowsChanged(workspace);
-    }
-
-    onWindowsChanged(workspace) {
-      const windows = workspace.windows_;
-      let indicator = "";
-
-      for (let i = 0; i < windows.length; i++) {
-        if (windows[i].appears_focused) {
-          this.currentWindowIndex = i;
-          if (i !== 0) indicator += "┃";
-        } else {
-          if (i !== 0) indicator += "┇";
-        }
-      }
-      this.set_text(indicator);
-    }
-  });
-
-  // a map from names to workspaces;
-  const workspaces = new Map();
-
-  const openApp = (app) => {
-    const appName = app.get_name();
-
-    let workspace = workspaces.get(appName);
-    if (workspace) {
-      workspace.activate(global.get_current_time());
-      endWorkspaceSwitch();
-      return;
-    }
-
-    workspace = workspaceManager.append_new_workspace(true, global.get_current_time());
-    // stop removing empty workspaces for now;
-    main.wm._workspaceTracker.blockUpdates();
-    app.open_new_window(workspace.index());
-
-    const indicator = new St.BoxLayout({ x_expand: true });
-    workspace.indicator_ = indicator;
-    const icon = new St.Icon();
-    icon.set_icon_size(16);
-    icon.set_gicon(app.get_icon());
-    indicator.add(icon);
-    const windowsIndicator = new WindowsIndicator(workspace);
-    windowsIndicator.set_style("color: #00CCFF"); // #99FFFF #87CEEB
-    indicator.add(windowsIndicator);
-    const label = St.Label.new(appName.replace(/ /g, ''));
-    indicator.add(label);
-
-    workspace.connect("notify::active", () => {
-      if (workspace.active && workspaceList.indexOf(workspace) !== 0) {
-        // highlight
-        workspace.indicator_?.set_background_color(Clutter.Color.new(255, 255, 255, 150));
-      } else {
-        // clear highlight
-        workspace.indicator_?.set_background_color(Clutter.Color.new(255, 255, 255, 0));
-      }
+      return true;
     });
 
-    workspace.connect("window-added", (workspace, win) => {
-      workspace.activate(global.get_current_time());
-      endWorkspaceSwitch();
-
-      if (workspace.n_windows === 1) {
-        main.wm._workspaceTracker.unblockUpdates();
-        if (workspaces.get(appName)) {
-          win.kill();
-          return;
-        }
-
-        workspace.name_ = appName;
-        workspace.activate(global.get_current_time());
-        workspacesIndicator.insert_child_at_index(workspace.indicator_, 0);
-        workspaces.set(appName, workspace);
-        workspaceList.unshift(workspace);
-
-        win.maximize(Meta.MaximizeFlags.BOTH);
-      } else {
-        win.unmaximize(Meta.MaximizeFlags.BOTH);
-      }
-    });
-
-    workspace.connect("window-removed", (workspace, _win) => {
-      if (workspace.n_windows === 0) {
-        if (!workspace.name_) return;
-        workspacesIndicator.remove_child(workspace.indicator_);
-        workspaces.delete(workspace.name_);
-        const i = workspaceList.indexOf(workspace);
-        if (i > -1) workspaceList.splice(i, 1);
-
-        const firstWorkspace = workspaceList[0];
-        if (firstWorkspace) firstWorkspace.activate(global.get_current_time());
-      }
-    });
-  };
-
-  Shell.App.prototype.activate = function() { openApp(this); };
-
-  // autostart
-  global.run_at_leisure(() => {
-    const apps = ["comshell.desktop", "atom.desktop", "code-oss.desktop", "emacs.desktop",
-      "nvim-qt.desktop", "nvim.desktop", "vim.desktop", "org.gnome.Terminal.desktop"];
-    for (const appId of apps) {
-      const app = Shell.AppSystem.get_default().lookup_app(appId);
-      if (app) {
-        openApp(app);
-        break;
-      }
+    // there's a race condition;
+    // if the user released Alt before we got the grab, then we won't be notified; so we check now;
+    const [_x, _y, mods] = global.get_pointer();
+    if (!mods) {
+      stage.disconnect(releaseHandler);
+      global.end_modal(global.get_current_time());
+      endAppSwitch();
     }
-  });
-}
-
-// disable workspace switch animation;
-/*
-global.window_manager.connect('switch-workspace', (shellwm, from, to, direction) => {
-  const switchData = main.wm._workspaceAnimation._switchData;
-  if (!switchData) return;
-  switchData.monitors.forEach(m => m.remove_all_transitions());
-  //switchData.monitors[0].remove_all_transitions();
-  // we've removed the onComplete call so we must call it explicitly;
-  //main.wm._switchWorkspaceDone(shellwm);
-});
-*/
-
-const openTerminal = () => {
-  const overview = main.overview;
-  if (overview.visible) overview.hide();
-
-  const workspace = global.workspace_manager.get_active_workspace();
-  const app = Shell.AppSystem.get_default().lookup_app("org.gnome.Terminal.desktop");
-  app.open_new_window(workspace.index());
-};
-
-main.wm.removeKeybinding("switch-to-application-9");
-main.wm.addKeybinding(
-  "switch-to-application-9",
-  new imports.gi.Gio.Settings({ schema_id: imports.ui.windowManager.SHELL_KEYBINDINGS_SCHEMA }),
-  Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-  Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-  openTerminal
+  }
 );
 
-// overview layer
-{
-  const overview = main.overview;
+let windowSwitchMode = false;
+let windowIndex = 0;
 
-  // no overview at start_up;
-  let signal;
-  signal = overview.connect('shown', () => {
-    overview.hide();
-    overview.disconnect(signal);
-  });
+main.wm.setCustomKeybindingHandler(
+  "cycle-group",
+  Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+  (_display, _win, _binding) => {
+    const overview = main.overview;
+    if (overview.visible) { overview.hide(); return; }
 
-  const toggleOverview = () => {
-    if (overview.isDummy) return;
-    if (overview.visible) overview.hide();
-    else overview.showApps();
-  }
+    const app = appSystem.get_running()[0];
+    if (!app) return;
+    const windows = app.get_windows();
+    if (windows.length === 0) return;
 
-  // toggle overview when toggling apps view;
-  main.wm.removeKeybinding("toggle-application-view");
-  main.wm.addKeybinding(
-    "toggle-application-view",
-    new imports.gi.Gio.Settings({ schema_id: imports.ui.windowManager.SHELL_KEYBINDINGS_SCHEMA }),
-    Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-    Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-    toggleOverview
-  );
+    const nextWindowIndex = (windowIndex + 1) % windows.length;
 
-  // toggle overview when clicking on the panel;
-  main.panel.connect("button-press-event", toggleOverview);
+    // show window without focusing it;
+    global.window_group.set_child_above_sibling(windows[nextWindowIndex].get_compositor_private(), null);
 
-  // close overview by pressing "esc" key only once;
-  // based on _onStageKeyPress function from:
-  //   https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/master/js/ui/searchController.js
-  overview._overview._controls._searchController._onStageKeyPress = function (actor, event) {
-    // ignore events while anything but the overview has pushed a modal (system modals, looking glass, ...);
-    if (main.modalCount > 1)
-      return Clutter.EVENT_PROPAGATE;
+    // update the windows indicator of the app;
+    app.indicator_.updateWindowsIndicator(nextWindowIndex);
 
-    let symbol = event.get_key_symbol();
+    windowIndex = nextWindowIndex;
 
-    if (symbol === Clutter.KEY_Escape) {
-      if (this._searchActive)
-        this.reset();
-      else
-        overview.hide();
-      return Clutter.EVENT_STOP;
-    } else if (this._shouldTriggerSearch(symbol)) {
-        this.startSearch(event);
+    if (windowSwitchMode) return;
+    windowSwitchMode = true;
+
+    if (!global.begin_modal(global.get_current_time(), 0)) {
+      // probably someone else has a pointer grab, try again with keyboard only;
+      if (!global.begin_modal(global.get_current_time(), Meta.ModalOptions.POINTER_ALREADY_GRABBED))
+        return;
     }
-    return Clutter.EVENT_PROPAGATE;
+
+    const stage = global.get_stage();
+
+    const endWindowSwitch = () => {
+      const app = appSystem.get_running()[0];
+      app.get_windows()[windowIndex]?.activate(global.get_current_time());
+
+      // reset the windows indicator of the app;
+      app?.indicator_.updateWindowsIndicator();
+
+      windowSwitchMode = false;
+      windowIndex = 0;
+    };
+
+    let releaseHandler;
+    releaseHandler = stage.connect("key-release-event", (_s, _keyEvent) => {
+      const [_x, _y, mods] = global.get_pointer();
+      if (!mods) {
+        stage.disconnect(releaseHandler);
+        global.end_modal(global.get_current_time());
+        endWindowSwitch();
+      }
+      return true;
+    });
+
+    // there's a race condition;
+    // if the user released Alt before we got the grab, then we won't be notified; so we check now;
+    const [_x, _y, mods] = global.get_pointer();
+    if (!mods) {
+      stage.disconnect(releaseHandler);
+      global.end_modal(global.get_current_time());
+      endWindowSwitch();
+    }
+  }
+);
+
+const AppIndicator = GObject.registerClass(
+class AppIndicator extends St.BoxLayout {
+  _init(app) {
+    super._init({ x_expand: true });
+    this.set_style("spacing: 0");
+    this.app = app;
+
+    const icon = new St.Icon();
+    icon.set_gicon(app.get_icon());
+    this.add_child(icon);
+
+    this.windowsIndicator = new St.Label({ y_align: Clutter.ActorAlign.CENTER });
+    this.add_child(this.windowsIndicator);
+    this.updateWindowsIndicator();
   }
 
-  // hide dash and workspaces display in the overview;
-  overview.connect("showing", () => {
-    overview.dash.hide();
-    overview._overview._controls._workspacesDisplay.hide();
+  updateWindowsIndicator(index = 0) {
+    const nWindows = this.app.get_n_windows();
+    let indicator;
+    if (index <= 0) {
+      indicator = "O".repeat(nWindows - 1);
+    } else {
+      indicator = "O".repeat(index - 1) + "X" + "O".repeat(nWindows - index - 1);
+    }
+    this.windowsIndicator.set_text(indicator);
+  }
+});
+
+global.display.connect("restacked", () => {
+  runningAppsBox.remove_all_children();
+  const apps = appSystem.get_running();
+
+  if (apps.length === 0) {
+    const appsGridIcon = new St.Icon({
+      icon_name: "view-app-grid-symbolic",
+      y_align: Clutter.ActorAlign.CENTER
+    });
+    runningAppsBox.add_child(appsGridIcon);
+    return;
+  }
+
+  apps.forEach(app => {
+    const indicator = app.indicator_;
+    if (indicator) {
+      runningAppsBox.add_child(indicator);
+    } else {
+      const indicator = new AppIndicator(app);
+      app.indicator_ = indicator;
+      runningAppsBox.add_child(indicator);
+    }
   });
-}
+
+  // to deal with windows launched during switching:
+  apps[appIndex]?.indicator_.set_background_color(Clutter.Color.new(255, 255, 255, 0));
+  appSwitchMode = false;
+  appIndex = 0;
+  apps[0]?.indicator_.updateWindowsIndicator();
+  windowSwitchMode = false;
+  windowIndex = 0;
+});
 
 return { enable: () => {}, disable: () => {} };
 }
