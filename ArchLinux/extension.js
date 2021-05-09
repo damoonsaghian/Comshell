@@ -114,11 +114,12 @@ if (wallClock) wallClock.connect("notify::clock", updateClock);
 //------------------
 const activitiesButton = main.panel.statusArea.activities;
 activitiesButton.remove_all_children();
-const runningAppsBox = new St.BoxLayout({ x_align: Clutter.ActorAlign.CENTER });
+const runningAppsBox = new St.BoxLayout({ x_align: Clutter.ActorAlign.CENTER, style: "padding: 0 4px" });
 activitiesButton.add_child(runningAppsBox);
 runningAppsBox.add_child(new St.Icon({
   icon_name: "view-app-grid-symbolic",
-  y_align: Clutter.ActorAlign.CENTER
+  y_align: Clutter.ActorAlign.CENTER,
+  icon_size: 30
 }));
 
 let appSwitchMode = false;
@@ -262,16 +263,19 @@ main.wm.setCustomKeybindingHandler(
 const AppIndicator = GObject.registerClass(
 class AppIndicator extends St.BoxLayout {
   _init(app) {
-    super._init({ x_expand: true });
-    this.set_style("spacing: 0");
+    super._init({ x_expand: true, style: "padding: 1px 4px" });
     this.app = app;
 
-    const icon = new St.Icon();
+    const icon = new St.Icon({ icon_size: 30 });
     icon.set_gicon(app.get_icon());
     this.add_child(icon);
 
-    this.windowsIndicator = new St.Label({ y_align: Clutter.ActorAlign.CENTER });
+    this.windowsIndicator = new St.Label({
+      y_align: Clutter.ActorAlign.CENTER,
+      style: "color: #00CCFF; font-family: monospace"
+    });
     this.add_child(this.windowsIndicator);
+    app.connect("windows-changed", () => this.updateWindowsIndicator());
     this.updateWindowsIndicator();
   }
 
@@ -279,22 +283,23 @@ class AppIndicator extends St.BoxLayout {
     const nWindows = this.app.get_n_windows();
     let indicator;
     if (index <= 0) {
-      indicator = "O".repeat(nWindows - 1);
+      indicator = "◻".repeat(nWindows - 1);
     } else {
-      indicator = "O".repeat(index - 1) + "X" + "O".repeat(nWindows - index - 1);
+      indicator = "◻".repeat(index - 1) + "◼" + "◻".repeat(nWindows - index - 1);
     }
     this.windowsIndicator.set_text(indicator);
   }
 });
 
-global.display.connect("restacked", () => {
+const updateAppsIndicators = () => {
   runningAppsBox.remove_all_children();
   const apps = appSystem.get_running();
 
   if (apps.length === 0) {
     const appsGridIcon = new St.Icon({
       icon_name: "view-app-grid-symbolic",
-      y_align: Clutter.ActorAlign.CENTER
+      y_align: Clutter.ActorAlign.CENTER,
+      icon_size: 30
     });
     runningAppsBox.add_child(appsGridIcon);
     return;
@@ -318,7 +323,10 @@ global.display.connect("restacked", () => {
   apps[0]?.indicator_.updateWindowsIndicator();
   windowSwitchMode = false;
   windowIndex = 0;
-});
+}
+
+global.display.connect("restacked", updateAppsIndicators);
+global.display.connect("notify::focus-window", updateAppsIndicators);
 
 return { enable: () => {}, disable: () => {} };
 }
