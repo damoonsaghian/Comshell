@@ -305,6 +305,19 @@ const updateAppsIndicators = () => {
     return;
   }
 
+  // this is due to a bug in gnome-shell which causes some apps icons appear 10 seconds after launch;
+  const focusedApp = windowTracker.get_window_app(global.display.get_focus_window());
+  if (focusedApp && apps[0] !== focusedApp) {
+    const indicator = focusedApp.indicator_;
+    if (indicator) {
+      runningAppsBox.add_child(indicator);
+    } else {
+      const indicator = new AppIndicator(focusedApp);
+      focusedApp.indicator_ = indicator;
+      runningAppsBox.add_child(indicator);
+    }
+  }
+
   apps.forEach(app => {
     const indicator = app.indicator_;
     if (indicator) {
@@ -326,7 +339,8 @@ const updateAppsIndicators = () => {
 }
 
 global.display.connect("restacked", updateAppsIndicators);
-global.display.connect("notify::focus-window", updateAppsIndicators);
+// this is because "restacked" does not work correctly when an app's window is closed;
+windowTracker.connect("notify::focus-app", updateAppsIndicators);
 
 return { enable: () => {}, disable: () => {} };
 }
