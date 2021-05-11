@@ -122,6 +122,9 @@ runningAppsBox.add_child(new St.Icon({
   icon_size: 30
 }));
 
+const CyclerHighlight = imports.ui.altTab.CyclerHighlight;
+let highlight = null;
+
 let appSwitchMode = false;
 let appIndex = 0;
 
@@ -132,16 +135,26 @@ main.wm.setCustomKeybindingHandler(
     const overview = main.overview;
     if (overview.visible) { overview.hide(); return; }
 
-    const apps = appSystem.get_running();
+    // could not use "appSystem.get_running()" due to a bug in gnome-shell
+    //   which causes some apps icons appear 10 seconds after launch;
+    let apps = global.display.get_tab_list(0, null)
+      .map(win => windowTracker.get_window_app(win));
+    // remove duplicates (this method preserves the order of the original array):
+    apps = Array.from(new Set(apps));
+
     if (apps.length === 0) return;
 
     const nextAppIndex = (appIndex + 1) % apps.length;
 
-    // show window without focusing it;
-    const win = apps[nextAppIndex].get_windows()[0];
-    global.window_group.set_child_above_sibling(win.get_compositor_private(), null);
+    // show app's window without focusing it;
+    if (!highlight) {
+      highlight = new CyclerHighlight();
+      global.window_group.add_actor(highlight);
+    }
+    highlight.window = apps[nextAppIndex].get_windows()[0];
+    global.window_group.set_child_above_sibling(highlight, null);
 
-    // update highlight;
+    // update indicator's highlight;
     apps[appIndex].indicator_.set_background_color(Clutter.Color.new(255, 255, 255, 0));
     apps[nextAppIndex].indicator_.set_background_color(Clutter.Color.new(255, 255, 255, 150));
 
@@ -159,10 +172,13 @@ main.wm.setCustomKeybindingHandler(
     const stage = global.get_stage();
 
     const endAppSwitch = () => {
-      const app = appSystem.get_running()[appIndex];
+      highlight.destroy();
+      highlight = null;
+
+      const app = apps[appIndex];
       app?.activate();
 
-      // remove highlight;
+      // remove indicator's highlight;
       app?.indicator_.set_background_color(Clutter.Color.new(255, 255, 255, 0));
 
       appSwitchMode = false;
@@ -201,15 +217,20 @@ main.wm.setCustomKeybindingHandler(
     const overview = main.overview;
     if (overview.visible) { overview.hide(); return; }
 
-    const app = appSystem.get_running()[0];
+    const app = windowTracker.get_window_app(global.display.focus_window);
     if (!app) return;
-    const windows = app.get_windows();
+    const windows = app.get_windows().filter((win) => win.window_type === Meta.WindowType.NORMAL);
     if (windows.length === 0) return;
 
     const nextWindowIndex = (windowIndex + 1) % windows.length;
 
     // show window without focusing it;
-    global.window_group.set_child_above_sibling(windows[nextWindowIndex].get_compositor_private(), null);
+    if (!highlight) {
+      highlight = new CyclerHighlight();
+      global.window_group.add_actor(highlight);
+    }
+    highlight.window = windows[nextWindowIndex];
+    global.window_group.set_child_above_sibling(highlight, null);
 
     // update the windows indicator of the app;
     app.indicator_.updateWindowsIndicator(nextWindowIndex);
@@ -228,7 +249,10 @@ main.wm.setCustomKeybindingHandler(
     const stage = global.get_stage();
 
     const endWindowSwitch = () => {
-      const app = appSystem.get_running()[0];
+      highlight.destroy();
+      highlight = null;
+
+      const app = windowTracker.get_window_app(global.display.focus_window);
       app.get_windows()[windowIndex]?.activate(global.get_current_time());
 
       // reset the windows indicator of the app;
@@ -264,6 +288,7 @@ const AppIndicator = GObject.registerClass(
 class AppIndicator extends St.BoxLayout {
   _init(app) {
     super._init({ x_expand: true, style: "padding: 1px 4px" });
+    app.indicator_ = this;
     this.app = app;
 
     const icon = new St.Icon({ icon_size: 30 });
@@ -275,12 +300,12 @@ class AppIndicator extends St.BoxLayout {
       style: "color: #00CCFF; font-family: monospace"
     });
     this.add_child(this.windowsIndicator);
-    app.connect("windows-changed", () => this.updateWindowsIndicator());
+    this.signal = app.connect("windows-changed", () => this.updateWindowsIndicator());
     this.updateWindowsIndicator();
   }
 
   updateWindowsIndicator(index = 0) {
-    const nWindows = this.app.get_n_windows();
+    const nWindows = this.app.get_windows().filter((win) => win.window_type === Meta.WindowType.NORMAL).length;
     let indicator;
     if (index <= 0) {
       indicator = "◻".repeat(nWindows - 1);
@@ -288,12 +313,22 @@ class AppIndicator extends St.BoxLayout {
       indicator = "◻".repeat(index - 1) + "◼" + "◻".repeat(nWindows - index - 1);
     }
     this.windowsIndicator.set_text(indicator);
+
+    if (this.app.get_n_windows() > 0) return;
+    this.app.disconnect(this.signal);
+    delete this.app.indicator_;
   }
 });
 
 const updateAppsIndicators = () => {
+  let apps = global.display.get_tab_list(0, null)
+    .map(win => windowTracker.get_window_app(win));
+  // remove duplicates (this method preserves the order of the original array):
+  apps = Array.from(new Set(apps));
+
+  apps[0]?.activate();
+
   runningAppsBox.remove_all_children();
-  const apps = appSystem.get_running();
 
   if (apps.length === 0) {
     const appsGridIcon = new St.Icon({
@@ -305,27 +340,12 @@ const updateAppsIndicators = () => {
     return;
   }
 
-  // this is due to a bug in gnome-shell which causes some apps icons appear 10 seconds after launch;
-  const focusedApp = windowTracker.get_window_app(global.display.get_focus_window());
-  if (focusedApp && apps[0] !== focusedApp) {
-    const indicator = focusedApp.indicator_;
-    if (indicator) {
-      runningAppsBox.add_child(indicator);
-    } else {
-      const indicator = new AppIndicator(focusedApp);
-      focusedApp.indicator_ = indicator;
-      runningAppsBox.add_child(indicator);
-    }
-  }
-
   apps.forEach(app => {
     const indicator = app.indicator_;
     if (indicator) {
       runningAppsBox.add_child(indicator);
     } else {
-      const indicator = new AppIndicator(app);
-      app.indicator_ = indicator;
-      runningAppsBox.add_child(indicator);
+      runningAppsBox.add_child(new AppIndicator(app));
     }
   });
 
@@ -336,10 +356,8 @@ const updateAppsIndicators = () => {
   apps[0]?.indicator_.updateWindowsIndicator();
   windowSwitchMode = false;
   windowIndex = 0;
-}
+};
 
-global.display.connect("restacked", updateAppsIndicators);
-// this is because "restacked" does not work correctly when an app's window is closed;
 windowTracker.connect("notify::focus-app", updateAppsIndicators);
 
 return { enable: () => {}, disable: () => {} };
