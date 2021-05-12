@@ -35,6 +35,8 @@ global.run_at_leisure(() => {
 }
 // hide dash in the overview;
 main.overview.connect("showing", (overview) => overview.dash.hide());
+// hide workspaces display in the overview;
+main.overview.connect("showing", (overview) => overview._overview._controls._workspacesDisplay.hide());
 
 // toggle applications view instead of overview;
 main.overview.toggle = function () {
@@ -50,6 +52,28 @@ main.wm.addKeybinding(
   Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
   () => main.overview.toggle()
 );
+
+// close overview by pressing "esc" key only once;
+// based on _onStageKeyPress function from:
+//   https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/master/js/ui/searchController.js
+main.overview._overview._controls._searchController._onStageKeyPress = function (actor, event) {
+  // ignore events while anything but the overview has pushed a modal (system modals, looking glass, ...);
+  if (main.modalCount > 1)
+    return Clutter.EVENT_PROPAGATE;
+
+  let symbol = event.get_key_symbol();
+
+  if (symbol === Clutter.KEY_Escape) {
+    if (this._searchActive)
+      this.reset();
+    else
+      main.overview.hide();
+    return Clutter.EVENT_STOP;
+  } else if (this._shouldTriggerSearch(symbol)) {
+      this.startSearch(event);
+  }
+  return Clutter.EVENT_PROPAGATE;
+}
 
 // hide notification banners;
 {
@@ -110,8 +134,9 @@ if (wallClock) wallClock.connect("notify::clock", updateClock);
 // https://github.com/corecoding/Vitals
 // https://github.com/elvetemedve/gnome-shell-extension-system-monitor
 
+// -----------------
 // running apps list
-//------------------
+// -----------------
 const activitiesButton = main.panel.statusArea.activities;
 activitiesButton.remove_all_children();
 const runningAppsBox = new St.BoxLayout({ x_align: Clutter.ActorAlign.CENTER, style: "padding: 0 4px" });
@@ -137,7 +162,7 @@ main.wm.setCustomKeybindingHandler(
 
     // could not use "appSystem.get_running()" due to a bug in gnome-shell
     //   which causes some apps icons appear 10 seconds after launch;
-    let apps = global.display.get_tab_list(0, null)
+    let apps = global.display.get_tab_list(Meta.TabList.NORMAL, null)
       .map(win => windowTracker.get_window_app(win));
     // remove duplicates (this method preserves the order of the original array):
     apps = Array.from(new Set(apps));
@@ -320,13 +345,11 @@ class AppIndicator extends St.BoxLayout {
   }
 });
 
-const updateAppsIndicators = () => {
-  let apps = global.display.get_tab_list(0, null)
+windowTracker.connect("notify::focus-app", () => {
+  let apps = global.display.get_tab_list(Meta.TabList.NORMAL, null)
     .map(win => windowTracker.get_window_app(win));
   // remove duplicates (this method preserves the order of the original array):
   apps = Array.from(new Set(apps));
-
-  apps[0]?.activate();
 
   runningAppsBox.remove_all_children();
 
@@ -356,9 +379,7 @@ const updateAppsIndicators = () => {
   apps[0]?.indicator_.updateWindowsIndicator();
   windowSwitchMode = false;
   windowIndex = 0;
-};
-
-windowTracker.connect("notify::focus-app", updateAppsIndicators);
+});
 
 return { enable: () => {}, disable: () => {} };
 }
