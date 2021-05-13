@@ -244,7 +244,7 @@ main.wm.setCustomKeybindingHandler(
 
     const app = windowTracker.get_window_app(global.display.focus_window);
     if (!app) return;
-    const windows = app.get_windows().filter((win) => win.window_type === Meta.WindowType.NORMAL);
+    const windows = app.get_windows().filter((win) => win.window_type !== Meta.WindowType.MODAL_DIALOG);
     if (windows.length === 0) return;
 
     const nextWindowIndex = (windowIndex + 1) % windows.length;
@@ -330,7 +330,7 @@ class AppIndicator extends St.BoxLayout {
   }
 
   updateWindowsIndicator(index = 0) {
-    const nWindows = this.app.get_windows().filter((win) => win.window_type === Meta.WindowType.NORMAL).length;
+    const nWindows = this.app.get_windows().filter((win) => win.window_type !== Meta.WindowType.MODAL_DIALOG).length;
     let indicator;
     if (index <= 0) {
       indicator = "◻".repeat(nWindows - 1);
