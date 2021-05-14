@@ -125,11 +125,8 @@ if (wallClock) wallClock.connect("notify::clock", updateClock);
 // compare the running kernel and system services, with the ones on the disk;
 // https://github.com/RaphaelRochet/arch-update
 
-// chart
 // https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet/blob/master/system-monitor%40paradoxxx.zero.gmail.com/extension.js
-// net
 // https://github.com/hedayaty/NetSpeed/blob/master/net_speed.js
-// cpu, mem, disk
 // https://github.com/Ory0n/Resource_Monitor/
 // https://github.com/corecoding/Vitals
 // https://github.com/elvetemedve/gnome-shell-extension-system-monitor
@@ -244,7 +241,7 @@ main.wm.setCustomKeybindingHandler(
 
     const app = windowTracker.get_window_app(global.display.focus_window);
     if (!app) return;
-    const windows = app.get_windows().filter((win) => win.window_type !== Meta.WindowType.MODAL_DIALOG);
+    const windows = app.get_windows().filter((win) => win.get_transient_for() === null);
     if (windows.length === 0) return;
 
     const nextWindowIndex = (windowIndex + 1) % windows.length;
@@ -330,7 +327,7 @@ class AppIndicator extends St.BoxLayout {
   }
 
   updateWindowsIndicator(index = 0) {
-    const nWindows = this.app.get_windows().filter((win) => win.window_type !== Meta.WindowType.MODAL_DIALOG).length;
+    const nWindows = this.app.get_windows().filter((win) => win.get_transient_for() === null).length;
     let indicator;
     if (index <= 0) {
       indicator = "◻".repeat(nWindows - 1);
