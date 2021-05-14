@@ -122,7 +122,15 @@ echo 'stage {
 mkdir -p /etc/skel/.local/share/applications
 printf '[Desktop Entry]\nNoDisplay=true' |
 tee /etc/skel/.local/share/applications/\
-{avahi-discover,bssh,bvnc,qv4l2,qvidcap,lstopo,nm-connection-editor,org.gnome.Extensions}.desktop > /dev/null
+{avahi-discover,bssh,bvnc,qv4l2,qvidcap,lstopo,nm-connection-editor}.desktop > /dev/null
+echo '[Desktop Entry]
+Name=Extensions
+Exec=/usr/bin/gnome-extensions-app
+Type=Application
+DBusActivatable=true
+Icon=org.gnome.Extensions
+NoDisplay=true
+' > /etc/skel/.local/share/applications/org.gnome.Extensions.desktop
 
 echo '<?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
