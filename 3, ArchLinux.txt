@@ -108,5 +108,4 @@ create snapshots of "usr", "etc" and "boot", then mount them in the base directo
 for the rest of system root directories make symlinks in the base directory;
 chroot and upgrade;
 remove the base directory;
-change the "usr", "etc" and "boot" symlinks in the system root,
-  to point to the new snapshots;
+change the "usr", "etc" and "boot" symlinks in the system root, to point to the new snapshots;
