@@ -171,7 +171,7 @@ main.wm.setCustomKeybindingHandler(
     // show app's window without focusing it;
     if (!highlight) {
       highlight = new CyclerHighlight();
-      global.window_group.add_actor(highlight);
+      global.window_group.add_child(highlight);
     }
     highlight.window = apps[nextAppIndex].get_windows()[0];
     global.window_group.set_child_above_sibling(highlight, null);
@@ -191,8 +191,6 @@ main.wm.setCustomKeybindingHandler(
         return;
     }
 
-    const stage = global.get_stage();
-
     const endAppSwitch = () => {
       highlight.destroy();
       highlight = null;
@@ -206,6 +204,8 @@ main.wm.setCustomKeybindingHandler(
       appSwitchMode = false;
       appIndex = 0;
     };
+
+    const stage = global.get_stage();
 
     let releaseHandler;
     releaseHandler = stage.connect("key-release-event", (_s, _keyEvent) => {
@@ -249,7 +249,7 @@ main.wm.setCustomKeybindingHandler(
     // show window without focusing it;
     if (!highlight) {
       highlight = new CyclerHighlight();
-      global.window_group.add_actor(highlight);
+      global.window_group.add_child(highlight);
     }
     highlight.window = windows[nextWindowIndex];
     global.window_group.set_child_above_sibling(highlight, null);
@@ -328,10 +328,10 @@ class AppIndicator extends St.BoxLayout {
 
   updateWindowsIndicator(index = 0) {
     const nWindows = this.app.get_windows().filter((win) => win.get_transient_for() === null).length;
-    let indicator;
-    if (index <= 0) {
+    let indicator = "";
+    if (nWindows > 0 && index <= 0) {
       indicator = "◻".repeat(nWindows - 1);
-    } else {
+    } else if (index > 0 && nWindows - index > 0) {
       indicator = "◻".repeat(index - 1) + "◼" + "◻".repeat(nWindows - index - 1);
     }
     this.windowsIndicator.set_text(indicator);
@@ -357,6 +357,7 @@ windowTracker.connect("notify::focus-app", () => {
       icon_size: 30
     });
     runningAppsBox.add_child(appsGridIcon);
+    main.overview.showApps();
     return;
   }
 
