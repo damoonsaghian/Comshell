@@ -1,7 +1,7 @@
 software rendering gives us a lot more flexibility,
   because we won't be limited by a hardware implementation,
   with triangle only rasterization, isolated shader programs, and fixed size buffers;
-GPU equivalent performance can be achieved using SIMD;
+GPU equivalent performance can be achieved using SIMD ("https://en.wikipedia.org/wiki/SIMD");
 
 graphical objects are made of primitives;
   each primitive has a specific algorithm for rasterization;

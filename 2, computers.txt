@@ -63,11 +63,8 @@ ARM architecture is closed source too, but we can have open source GPU driver (Q
 ARM TrustZone can host an open source operating system too, apparently;
 "https://news.ycombinator.com/item?id=17783357"
 
-open source CPU:
-, RISC_V: no adequate hardware available yet;
-, PowerPc: no adequate hardware available yet;
-, MIPS: bad old design (relative to other alternatives, not X86),
-  no suitable hardware available yet;
+open source CPU: RISC_V, Power ISA;
+no adequate hardware available yet;
 
 programs usually do not run directly on computer hardware;
 instead they run on a more sophisticated software machine (a virtual machine) called the kernel;

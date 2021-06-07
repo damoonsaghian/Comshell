@@ -1,5 +1,6 @@
 using Arch Linux we can easily setup and maintain a Linux system;
-the following shows how to setup a basic graphical environment, using GnomeShell;
+the following shows how to setup a basic graphical environment;
+
 ".data/gnome-shell.png"
 
 in the installed system, there is only one application, a terminal emulator;
@@ -8,12 +9,10 @@ you can press "alt-space" to show the list of applications;
 selecting an application from the list shows it in a dedicated workspace;
 also you can power off, reboot, logout, suspend, or lock the system,
   from the applications list, just by typing those commands;
-press "alt-enter" to open a terminal window;
 press "alt-esc" to close the focused window;
-press "alt-tab" to switch between recent workspaces;
-press "alt-a" to switch between the windows of a workspace;
+press "alt-tab" to switch between applications;
+press "alt-a" or "alt-`" to switch between the windows of an application;
 press "alt-shift-space" to toggle maximized state;
-press "alt-shift-s" or "alt-shift-r" to take a screen_shot or record a screen_cast;
 
 boot Arch Linux live environment;
 to ensure the system clock is accurate:
@@ -31,11 +30,10 @@ list available block devices using "lsblk", then on the intended block device,
 ; mount /dev/<partition2> /mnt
 ; mkdir -p /mnt/boot/efi
 ; mount /dev/<partition1> /mnt/boot/efi
-; mkdir /mnt/etc
-; genfstab -U /mnt >> /mnt/etc/fstab
 
 ;sh
 pacstrap /mnt base
+genfstab -U /mnt >> /mnt/etc/fstab
 arch-chroot /mnt
 curl https://damoonsaghian/Comshell/archive/master.tar.gz | tar -xz
 cd Comshell/ArchLinux
@@ -44,19 +42,16 @@ ensure that the files aren't malicious, then:
 ; sh install.sh
 ; exit; reboot
 
+the system automatically updates itself; and to do it reliably the "/usr" is immutable;
+when you install or update an application, the system must be restarted for it to take effect;
+
 to connect to a WIFI network:
 ; nmcli dev wifi
 ; nmcli --ask dev wifi con <ssid>
 to disconnect from a WIFI network:
 ; nmcli con down id <ssid>
 
-if your combined headset jack is not detected correctly, you can try this:
-; pkexec echo 'options snd_hda_intel index=0 model=dell-headset-multi' > /etc/modprobe.d/alsa-base.conf
-"https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture#Correctly_detect_microphone_plugged_in_a_4-pin_3.5mm_(TRRS)_jack"
-this made the microphone available, but with a very bad static noise;
-so maybe it's better to use a USB/Bluetooth sound card;
-
-you can set "user1" for automatic login (using the root terminal):
+you can set "user1" for automatic login:
 ; pkexec nano /etc/gdm/custom.conf
   [daemon]
   AutomaticLoginEnable=True
@@ -65,47 +60,38 @@ but to protect the computer from physical attacks, you have to disable automatic
   and lock the session when you leave the computer;
 in addition you have to:
 , somehow prevent tampering with hardware;
-, disable boot from USB (and other external ports);
-, protect boot firmware by a password;
+, protect boot firmware by a password; which also prevents others to change the boot device;
 these can make physical attacks more difficult, but keep in mind that
   physical access to a computer is root access, given enough time and resources;
+
+if your combined headset jack is not detected correctly, you can try this:
+; pkexec echo 'options snd_hda_intel index=0 model=dell-headset-multi' > /etc/modprobe.d/alsa-base.conf
+"https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture#Correctly_detect_microphone_plugged_in_a_4-pin_3.5mm_(TRRS)_jack"
+this made the microphone available, but with a very bad static noise;
+so maybe it's better to use a USB/Bluetooth sound card;
 
 = system administration
 in system administration we must ensure that:
 1, the command executed is explicitly given by the user;
-2, if a program steals a "wheel" user's password, it can't change the system;
+2, even if a program steals the root password, it still can't change the system;
 
 "sudo" fails in both cases;
 "https://www.reddit.com/r/linuxquestions/comments/8mlil7/whats_the_point_of_the_sudo_password_prompt_if/"
 
-"pkexec" is safer, but since the Polkit agent doesn't show command arguments,
-  it can be vulnerable too;
+"pkexec" is safer, but since the Polkit agent doesn't show command arguments, it can be vulnerable too;
 further more, "pkexec" fails in the second case;
   a fake Polkit agent can be used to send the stolen password to Polkit;
 and since Polkit admin is installed and active by default,
-  we have to disable it to protect the system:
+  we have to disable it to protect the system (after we have a secure alternative):
 ; mkdir -p /etc/polkit-1/rules.d
 ; echo 'polkit.addAdminRule(function(action, subject) { return []; });' >
   /etc/polkit-1/rules.d/49-rootpw_global.rules
 
-always use a different password for root; because "su" is always present in a Linux system,
-  and since it fails in both cases, it can be used to take over the system;
+"su" fails in the second case too;
+so we have to disable root login (after we have a secure alternative):
+; passwd -l root
 
 the solution is a program which opens a Wayland window with a command prompt;
 if you have given your command as arguments to the program,
   the prompt shows that command, as default input;
-after pressing "return", it asks for the user's password (user must be in wheel group);
-
-= automatic online atomic upgrades
-"https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
-"https://wiki.archlinux.org/index.php/Systemd/Timers"
-
-to have reliable automatic updates, they must be atomic;
-
-"usr", "etc" and "boot" must be symlinks to subvolumes;
-create a base directory;
-create snapshots of "usr", "etc" and "boot", then mount them in the base directory;
-for the rest of system root directories make symlinks in the base directory;
-chroot and upgrade;
-remove the base directory;
-change the "usr", "etc" and "boot" symlinks in the system root, to point to the new snapshots;
+after pressing "return", it asks for root password;
