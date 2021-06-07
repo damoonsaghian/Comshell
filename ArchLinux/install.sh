@@ -26,14 +26,13 @@ When = PostTransaction
 Exec = /usr/bin/grub-mkstandalone -O x86_64-efi -o "/boot/efi/EFI/BOOT/BOOTX64.EFI" "boot/grub/grub.cfg=/boot/grub/grub.cfg"
 ' > /etc/pacman.d/hooks/100-grub.hook
 
-# immutable "/usr"
+# package management and system updater service;
 # create a base directory;
 # create snapshots of "usr", and mount it in the base directory;
 # for the rest of system root directories make symlinks in the base directory;
 # chroot and upgrade;
 # generate fstab
 #
-# this also means that we can have reliable automatic updates;
 # "https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
 # "https://wiki.archlinux.org/index.php/Systemd/Timers"
 
