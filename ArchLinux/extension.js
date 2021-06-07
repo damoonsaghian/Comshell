@@ -121,15 +121,11 @@ updateClock();
 const wallClock = main.panel.statusArea.dateMenu._clock;
 if (wallClock) wallClock.connect("notify::clock", updateClock);
 
-// show a red indicator to notify the user that for system to update, it needs a reboot;
-// compare the running kernel and system services, with the ones on the disk;
-// https://github.com/RaphaelRochet/arch-update
-
 // https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet/blob/master/system-monitor%40paradoxxx.zero.gmail.com/extension.js
-// https://github.com/hedayaty/NetSpeed/blob/master/net_speed.js
 // https://github.com/Ory0n/Resource_Monitor/
 // https://github.com/corecoding/Vitals
 // https://github.com/elvetemedve/gnome-shell-extension-system-monitor
+// https://github.com/hedayaty/NetSpeed/blob/master/net_speed.js
 
 // -----------------
 // running apps list

@@ -8,11 +8,12 @@ pacman -S grub intel-ucode amd-ucode linux linux-firmware \
   gnome-shell gdm gvfs gst-plugins-{base,good,bad} gst-libav gnome-terminal
 
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
-printf '\nset superusers=""\n' >> /etc/grub.d/40_custom
-printf '\nCLASS="--class gnu-linux --class gnu --class os --unrestricted"\n' > /etc/grub.d/10_linux
+# disable menu editing and other admin operations in Grub (to prevent root access using "rd.break" boot option):
+printf 'cat <<EOF\nset superusers=""\nset menuentry_id_option="--unrestricted $menuentry_id_option"\nEOF' >
+  /etc/grub.d/01_users
+chmod +x /etc/grub.d/01_users
 grub-mkconfig -o /boot/grub/grub.cfg
-grub-mkstandalone -O x86_64-efi -o '/boot/efi/EFI/BOOT/BOOTX64.EFI' \
-  'boot/grub/grub.cfg=/boot/grub/grub.cfg'
+grub-mkstandalone -O x86_64-efi -o '/boot/efi/EFI/BOOT/BOOTX64.EFI' 'boot/grub/grub.cfg=/boot/grub/grub.cfg'
 # automatically update Grub every time "grub" package is upgraded:
 mkdir -p /etc/pacman.d/hooks
 echo '[Trigger]
@@ -24,6 +25,17 @@ Description = Updating grub
 When = PostTransaction
 Exec = /usr/bin/grub-mkstandalone -O x86_64-efi -o "/boot/efi/EFI/BOOT/BOOTX64.EFI" "boot/grub/grub.cfg=/boot/grub/grub.cfg"
 ' > /etc/pacman.d/hooks/100-grub.hook
+
+# immutable "/usr"
+# create a base directory;
+# create snapshots of "usr", and mount it in the base directory;
+# for the rest of system root directories make symlinks in the base directory;
+# chroot and upgrade;
+# generate fstab
+#
+# this also means that we can have reliable automatic updates;
+# "https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
+# "https://wiki.archlinux.org/index.php/Systemd/Timers"
 
 systemctl enable systemd-timesyncd
 systemctl enable NetworkManager
@@ -44,8 +56,6 @@ system-db:local
 mkdir -p /etc/dconf/db/local.d
 echo "[org/gnome/system/location]
 enabled=true
-[org/gnome/desktop/datetime]
-automatic-timezone=true
 [org/gnome/desktop/notifications]
 show-banners=false
 show-in-lock-screen=false
@@ -66,7 +76,7 @@ button-layout=''
 primary-color='#282828'
 secondary-color='#282828'
 [org/gnome/desktop/wm/keybindings]
-cycle-group=['<Alt>Comma', '<Alt>Above_Tab', '<Alt>a', '<Alt>o']
+cycle-group=['<Alt>Above_Tab', '<Alt>a', '<Alt>Comma']
 toggle-maximized=['<Alt><Shift>Space']
 close=['<Alt>Escape']
 cycle-windows=['']
@@ -87,9 +97,9 @@ close-tab='<Control>w'
 close-window='<Control>q'
 new-tab='<Control>t'
 [org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9]
+scrollbar-policy='never'
 default-size-columns=130
 default-size-rows=50
-scrollbar-policy='never'
 " > /etc/dconf/db/local.d/00-mykeyfile
 dconf update
 
@@ -172,6 +182,6 @@ PS1="\[$(tput setaf 1)\]\w >\[$(tput sgr0)\] "
 unset HISTFILE
 ' >> /etc/skel/.bashrc
 
+passwd
 useradd -m -G wheel user1
 passwd user1
-passwd
