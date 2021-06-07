@@ -42,8 +42,10 @@ ensure that the files aren't malicious, then:
 ; sh install.sh
 ; exit; reboot
 
-the system automatically updates itself; and to do it reliably the "/usr" is immutable;
-when you install or update an application, the system must be restarted for it to take effect;
+note that changes to "/usr" are atomic, and does not interfere with the running system;
+when you install an application or update the system, the system must be restarted for it to take effect;
+but removing is done live (otherwise managing "/etc" would be complicated)
+all these mean that we can have reliable automatic updates;
 
 to connect to a WIFI network:
 ; nmcli dev wifi
