@@ -1,51 +1,42 @@
 using Arch Linux we can easily setup and maintain a Linux system;
 the following shows how to setup a basic graphical environment;
 
-".data/gnome-shell.png"
-
-in the installed system, there is only one application, a terminal emulator;
-other applications can be installed using "pacman";
-you can press "alt-space" to show the list of applications;
-selecting an application from the list shows it in a dedicated workspace;
-also you can power off, reboot, logout, suspend, or lock the system,
-  from the applications list, just by typing those commands;
-press "alt-esc" to close the focused window;
-press "alt-tab" to switch between applications;
-press "alt-a" or "alt-`" to switch between the windows of an application;
-press "alt-shift-space" to toggle maximized state;
-
-boot Arch Linux live environment;
-to ensure the system clock is accurate:
-; timedatectl set-ntp true
+boot the Arch Linux live environment;
 if you need to connect to a WIFI network:
 ; iwctl
   device list
   station <device> get-networks
   station <device> connect <SSID>
 
-list available block devices using "lsblk", then on the intended block device,
-  create the needed partitions, and finally format and mount them:
-; printf "label: gpt\n,260MiB,U,*\n;" | sfdisk /dev/<device>
-; mkfs.fat -F32 /dev/<partition1>; mkfs.btrfs /dev/<partition2>
-; mount /dev/<partition2> /mnt
-; mkdir -p /mnt/boot/efi
-; mount /dev/<partition1> /mnt/boot/efi
+; curl https://damoonsaghian/Comshell/archive/master.tar.gz | tar -xz
+; cd Comshell/ArchLinux
+ensure that the files aren't malicious;
 
-;sh
-pacstrap /mnt base
-genfstab -U /mnt >> /mnt/etc/fstab
-arch-chroot /mnt
-curl https://damoonsaghian/Comshell/archive/master.tar.gz | tar -xz
-cd Comshell/ArchLinux
-;
-ensure that the files aren't malicious, then:
-; sh install.sh
+find the device you want to install ArchLinux on with "lsblk";
+then run these (replace "sdx" with your device):
+; sh install.sh sdx
+; arch-chroot /mnt
+; sh config.sh
 ; exit; reboot
 
-note that changes to "/usr" are atomic, and does not interfere with the running system;
-when you install an application or update the system, the system must be restarted for it to take effect;
-but removing is done live (otherwise managing "/etc" would be complicated)
-all these mean that we can have reliable automatic updates;
+".data/gnome-shell.png"
+
+in the installed system, you can press "alt-space" to show the list of applications;
+a terminal emulator is installed by default;
+here you can power off, reboot, logout, suspend, or lock the system,
+  from the applications list, just by typing those commands;
+press "alt-esc" to close the focused window;
+press "alt-tab" to switch between applications;
+press "alt-a" or "alt-`" to switch between the windows of an application;
+press "alt-shift-space" to toggle maximized state;
+
+additional applications can be installed using "arc add package_name";
+"arc" uses "pacman" and BTRFS snapshots to manage packages in such a way that
+  changes to "/usr" and "/boot" would be atomic, and does not interfere with the running system;
+as a result when you install an application, or update the system using "arc",
+  the system must be restarted for it to take effect;
+note that removing packages is done live (otherwise managing "/etc" would be complicated);
+all of this means that we can have reliable automatic updates;
 
 to connect to a WIFI network:
 ; nmcli dev wifi
@@ -62,7 +53,8 @@ but to protect the computer from physical attacks, you have to disable automatic
   and lock the session when you leave the computer;
 in addition you have to:
 , somehow prevent tampering with hardware;
-, protect boot firmware by a password; which also prevents others to change the boot device;
+, protect boot firmware by a password;
+  which also prevents others to select another device (eg a usb drive) to boot;
 these can make physical attacks more difficult, but keep in mind that
   physical access to a computer is root access, given enough time and resources;
 
