@@ -67,7 +67,7 @@ button-layout=''
 primary-color='#282828'
 secondary-color='#282828'
 [org/gnome/desktop/wm/keybindings]
-cycle-group=['<Alt>Above_Tab', '<Alt>a', '<Alt>Comma']
+switch-group=['<Alt>Above_Tab', '<Alt>a', '<Alt>Comma']
 toggle-maximized=['<Alt><Shift>Space']
 close=['<Alt>Escape']
 cycle-windows=['']
@@ -78,7 +78,7 @@ toggle-application-view=['<Alt>Space']
 [org/gnome/shell]
 disable-extension-version-validation=true
 enabled-extensions=['gnome-shell-improved']
-favorite-apps=[]
+favorite-apps=['']
 [org/gnome/terminal/legacy]
 default-show-menubar=false
 headerbar=just false

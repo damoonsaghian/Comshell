@@ -229,7 +229,7 @@ let windowSwitchMode = false;
 let windowIndex = 0;
 
 main.wm.setCustomKeybindingHandler(
-  "cycle-group",
+  "switch-group",
   Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
   (_display, _win, _binding) => {
     const overview = main.overview;
