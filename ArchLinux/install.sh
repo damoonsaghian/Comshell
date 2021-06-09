@@ -16,27 +16,35 @@ btrfs subvolume create /mnt/@/srv
 btrfs subvolume create /mnt/@/tmp
 btrfs subvolume create /mnt/@/var
 
-# disable copy_on_write on "var" to improve performance of any databases and VM images within:
-chattr +C /mnt/@/var
+umount /mnt
+mount /dev/"$1"2 /mnt -o subvol=@
 
 # "arc" service does automatic updates, and accepts add and remove requests from wheel users;
-# if there is nothing mounted to "/var/arc/usr",
+#
+# auto update:
+# if there is nothing mounted to "/var/arc/",
 #   create a snapshot of "/", and mount it to "/var/arc/";
-# for the rest of root directories make symlinks in "/var/arc/";
-# chroot to "/var/arc", update, and (in the case add requests) install packages;
+# arch-chroot to "/var/arc", update, and (in the case add requests) install packages;
 # grub-mkconfig -o /boot/grub/grub.cfg
 #
 # "https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
 # "https://wiki.archlinux.org/index.php/Systemd/Timers"
-
-umount /mnt
-mount /dev/"$1"2 /mnt -o subvol=@
+#
+# clear cache: pacman -Sc
+# clear orphaned packages: pacman -Qttd
+# remove package: pacman -Rns ...
 
 mkdir -p /mnt/boot/efi
 mount /dev/"$1"1 /mnt/boot/efi
 
 pacstrap /mnt base
 genfstab -U /mnt >> /mnt/etc/fstab
+
+# disable copy_on_write for databases
+# autodefrag mount options (disabled by default);
+# ; btrfs fi defragment
+# chattr (+C): disable COW for databases (Firefox, systemd /var/log/journal/, ...);
+# ; lsattr
 
 # to customize dconf default values:
 mkdir -p /mnt/etc/dconf/profile
