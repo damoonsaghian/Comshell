@@ -13,11 +13,9 @@ if you need to connect to a WIFI network:
 ensure that the files aren't malicious;
 
 find the device you want to install ArchLinux on with "lsblk";
-then run these (replace "sdx" with your device):
+note that the content of the device you want to install ArchLinux on, will be deleted;
+then run this (replace "sdx" with your chosen device):
 ; sh install.sh sdx
-; arch-chroot /mnt
-; sh config.sh
-; exit; reboot
 
 ".data/gnome-shell.png"
 
@@ -35,7 +33,7 @@ additional applications can be installed using "arc add package_name";
   changes to "/usr" and "/boot" would be atomic, and does not interfere with the running system;
 as a result when you install an application, or update the system using "arc",
   the system must be restarted for it to take effect;
-note that removing packages is done live (otherwise managing "/etc" would be complicated);
+removing packages is done live though (otherwise managing "/etc" would be complicated);
 all of this means that we can have reliable automatic updates;
 
 to connect to a WIFI network:
