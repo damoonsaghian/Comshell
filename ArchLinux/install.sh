@@ -14,39 +14,42 @@ btrfs subvolume create /mnt/local
 btrfs subvolume create /mnt/srv
 btrfs subvolume create /mnt/tmp
 btrfs subvolume create /mnt/var
-
 umount /mnt
+
 mount /dev/"$1"2 /mnt -o subvol=0
 mkdir /mnt/etc
 mkdir /mnt/home
 mkdir /mnt/root
 mkdir /mnt/opt
-mkdir -p /mnt/usr/local
+mkdir -p /mnt/0/usr/local
 mkdir /mnt/srv
 mkdir /mnt/tmp
 mkdir /mnt/var
-mount /dev/"$1"2 /mnt/etc -o subvol=etc
-mount /dev/"$1"2 /mnt/home -o subvol=home
-mount /dev/"$1"2 /mnt/root -o subvol=root
-mount /dev/"$1"2 /mnt/opt -o subvol=opt
-mount /dev/"$1"2 /mnt/usr/local -o subvol=local
-mount /dev/"$1"2 /mnt/srv -o subvol=srv
-mount /dev/"$1"2 /mnt/tmp -o subvol=tmp
-mount /dev/"$1"2 /mnt/var -o subvol=var
+mkdir /mnt/subvols
+mount -o subvol=etc /dev/"$1"2 /mnt/etc
+mount -o subvol=home /dev/"$1"2 /mnt/home
+mount -o subvol=root /dev/"$1"2 /mnt/root
+mount -o subvol=opt /dev/"$1"2 /mnt/opt
+mount -o subvol=local /dev/"$1"2 /mnt/usr/local
+mount -o subvol=srv /dev/"$1"2 /mnt/srv
+mount -o subvol=tmp /dev/"$1"2 /mnt/tmp
+mount -o subvol=var /dev/"$1"2 /mnt/var
+mount /dev/"$1"2 /mnt/subvols
 
 # "arc" service does automatic updates, and accepts add and remove requests from wheel users;
 #
-# auto update:
-# if there is nothing mounted to "/var/arc/",
-#   create a snapshot of "/", and mount it to "/var/arc/";
+# create a snapshot of "/" in "/subvols/1";
 # if we are in "0" subvolume, name the snapshot "1", otherwise name it "0";
-#   (if a snapshot with the same name already exists, first delete it);
+# if a snapshot with the same name already exists, first delete it;
 # bind_mount "etc home root opt usr/local srv tmp var";
 # arch-chroot to "/var/arc", update, and (in the case add requests) install packages;
-# grub-mkconfig -o /boot/grub/grub.cfg
 #
-# after boot, if we are in "0" subvolume, delete subvolume "1", and vice versa;
-# btrfs subvolume delete ...
+# btrfs subvolume snapshot / /subvols/1
+# arch-chroot /subvols/1 << EOF
+# pacman -Syu
+# grub-mkconfig -o /boot/grub/grub.cfg
+# btrfs subvolume delete /subvols/0
+# EOF
 #
 # "https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
 # "https://wiki.archlinux.org/index.php/Systemd/Timers"
