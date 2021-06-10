@@ -5,27 +5,32 @@ mkfs.fat -F32 /dev/"$1"1; mkfs.btrfs /dev/"$1"2
 
 mount /dev/"$1"2 /mnt
 # create and mount subvolumes for "/ etc home root opt usr/local srv tmp var":
-btrfs subvolume create /mnt/@
-btrfs subvolume create /mnt/@/etc
-btrfs subvolume create /mnt/@/home
-btrfs subvoulme create /mnt/@/root
-btrfs subvolume create /mnt/@/opt
-mkdir /mnt/@/usr
-btrfs subvolume create /mnt/@/usr/local
-btrfs subvolume create /mnt/@/srv
-btrfs subvolume create /mnt/@/tmp
-btrfs subvolume create /mnt/@/var
+btrfs subvolume create /mnt/0
+btrfs subvolume create /mnt/0/etc
+btrfs subvolume create /mnt/0/home
+btrfs subvoulme create /mnt/0/root
+btrfs subvolume create /mnt/0/opt
+mkdir /mnt/0/usr
+btrfs subvolume create /mnt/0/usr/local
+btrfs subvolume create /mnt/0/srv
+btrfs subvolume create /mnt/0/tmp
+btrfs subvolume create /mnt/0/var
 
 umount /mnt
-mount /dev/"$1"2 /mnt -o subvol=@
+mount /dev/"$1"2 /mnt -o subvol=0
 
 # "arc" service does automatic updates, and accepts add and remove requests from wheel users;
 #
 # auto update:
 # if there is nothing mounted to "/var/arc/",
 #   create a snapshot of "/", and mount it to "/var/arc/";
+# if we are in "0" subvolume, name the snapshot "1", otherwise name it "0";
+#   (if a snapshot with the same name already exists, first delete it);
 # arch-chroot to "/var/arc", update, and (in the case add requests) install packages;
 # grub-mkconfig -o /boot/grub/grub.cfg
+#
+# after boot, if we are in "0" subvolume, delete subvolume "1", and vice versa;
+# btrfs subvolume delete ... .f/we
 #
 # "https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
 # "https://wiki.archlinux.org/index.php/Systemd/Timers"
