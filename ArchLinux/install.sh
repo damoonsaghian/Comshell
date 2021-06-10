@@ -36,27 +36,29 @@ mount -o subvol=tmp /dev/"$1"2 /mnt/tmp
 mount -o subvol=var /dev/"$1"2 /mnt/var
 mount /dev/"$1"2 /mnt/subvols
 
-# "arc" service does automatic updates, and accepts add and remove requests from wheel users;
+## "arc" service does automatic updates, and accepts add and remove requests from wheel users;
 #
-# create a snapshot of "/" in "/subvols/1";
-# if we are in "0" subvolume, name the snapshot "1", otherwise name it "0";
-# if a snapshot with the same name already exists, first delete it;
-# bind_mount "etc home root opt usr/local srv tmp var";
-# arch-chroot to "/var/arc", update, and (in the case add requests) install packages;
+## if "/" is "/subvols/0", if "/subvols/1" is older, delete it,
+##   and create a snapshot of "/subvols/0" in "/subvols/1";
+## if "/" is "/subvols/1", if "/subvols/0" is older, delete it,
+##   and create a snapshot of "/subvols/1" in "/subvols/0";
+#btrfs subvolume snapshot /subvols/0 /subvols/1
 #
-# btrfs subvolume snapshot / /subvols/1
-# arch-chroot /subvols/1 << EOF
-# pacman -Syu
-# grub-mkconfig -o /boot/grub/grub.cfg
-# btrfs subvolume delete /subvols/0
-# EOF
+#bind_mount "etc home root opt usr/local srv tmp var";
 #
-# "https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
-# "https://wiki.archlinux.org/index.php/Systemd/Timers"
+#arch-chroot /subvols/1 << EOF
+#pacman -Syu
+## in the case of add requests, install packages;
+#grub-mkconfig -o /boot/grub/grub.cfg
+#btrfs subvolume delete /subvols/0
+#EOF
 #
-# clear cache: pacman -Sc
-# clear orphaned packages: pacman -Qttd
-# remove package: pacman -Rns ...
+## "https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
+## "https://wiki.archlinux.org/index.php/Systemd/Timers"
+#
+## clear cache: pacman -Sc
+## clear orphaned packages: pacman -Qttd
+## remove package: pacman -Rns ...
 
 mkdir -p /mnt/boot/efi
 mount /dev/"$1"1 /mnt/boot/efi
