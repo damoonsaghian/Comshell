@@ -54,8 +54,7 @@ genfstab -U /mnt >> /mnt/etc/fstab
 #arch-chroot /subvols/1 << EOF
 #pacman -Syu --noconfirm
 ## in the case of add requests, install packages;
-#grub-mkconfig -o /boot/grub/grub.cfg
-#grub-mkstandalone -O x86_64-efi -o '/boot/efi/EFI/BOOT/BOOTX64.EFI' 'boot/grub/grub.cfg=/boot/grub/grub.cfg'
+#grub-mkconfig -o /boot/efi/EFI/BOOT/grub.cfg
 #btrfs subvolume delete /subvols/0
 #EOF
 #
@@ -253,8 +252,19 @@ printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /mnt/etc/default/gru
 printf '#! /bin/sh\nset superusers=""\nset menuentry_id_option="--unrestricted $menuentry_id_option"\n' >
   /mnt/etc/grub.d/09_user
 chmod +x /mnt/etc/grub.d/09_user
+# automatically update Grub every time "grub" package is upgraded:
+mkdir -p /mnt/etc/pacman.d/hooks
+echo '[Trigger]
+Type = Package
+Operation = Upgrade
+Target = grub
+[Action]
+Description = Updating grub
+When = PostTransaction
+Exec = /usr/bin/grub-mkstandalone -O x86_64-efi -o "/boot/efi/EFI/BOOT/BOOTX64.EFI" "boot/grub/grub.cfg=/boot/grub.cfg"
+' > /mnt/etc/pacman.d/hooks/100-grub.hook
 
-arch-chroot /mnt /usr/bin/sh << EOF
+arch-chroot /mnt /usr/bin/sh << 'EOF'
 printf '\nen_US.UTF-8 UTF-8\n' >> /etc/locale.gen
 locale-gen
 printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
@@ -276,8 +286,9 @@ passwd
 useradd -m -G wheel user1
 passwd user1
 
-grub-mkconfig -o /boot/grub/grub.cfg
-grub-mkstandalone -O x86_64-efi -o '/boot/efi/EFI/BOOT/BOOTX64.EFI' 'boot/grub/grub.cfg=/boot/grub/grub.cfg'
+echo 'configfile ${cmdpath}/grub.cfg' > /boot/grub.cfg
+grub-mkstandalone -O x86_64-efi -o "/boot/efi/EFI/BOOT/BOOTX64.EFI" "boot/grub/grub.cfg=/boot/grub.cfg"
+grub-mkconfig -o /boot/efi/EFI/BOOT/grub.cfg
 EOF
 
 echo "installation completed; do you want to reboot?"
