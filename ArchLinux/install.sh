@@ -55,6 +55,7 @@ genfstab -U /mnt >> /mnt/etc/fstab
 #pacman -Syu --noconfirm
 ## in the case of add requests, install packages;
 #grub-mkconfig -o /boot/grub/grub.cfg
+#grub-mkstandalone -O x86_64-efi -o '/boot/efi/EFI/BOOT/BOOTX64.EFI' 'boot/grub/grub.cfg=/boot/grub/grub.cfg'
 #btrfs subvolume delete /subvols/0
 #EOF
 #
@@ -192,29 +193,73 @@ PS1="\[$(tput setaf 1)\]\w >\[$(tput sgr0)\] "
 unset HISTFILE
 ' >> /mnt/etc/skel/.bashrc
 
+tee /mnt/usr/local/bin/dracut-install.sh << 'EOF'
+#!/usr/bin/env bash
+args=('--force' '--no-hostonly-cmdline')
+while read -r line; do
+	if [[ "$line" == 'usr/lib/modules/'+([^/])'/pkgbase' ]]; then
+		read -r pkgbase < "/${line}"
+		kver="${line#'usr/lib/modules/'}"
+		kver="${kver%'/pkgbase'}"
+
+		install -Dm0644 "/${line%'/pkgbase'}/vmlinuz" "/boot/vmlinuz-${pkgbase}"
+		dracut "${args[@]}" --hostonly "/boot/initramfs-${pkgbase}.img" --kver "$kver"
+		dracut "${args[@]}" --no-hostonly "/boot/initramfs-${pkgbase}-fallback.img" --kver "$kver"
+	fi
+done
+EOF
+tee /mnt/usr/local/bin/dracut-remove.sh << 'EOF'
+#!/usr/bin/env bash
+while read -r line; do
+	if [[ "$line" == 'usr/lib/modules/'+([^/])'/pkgbase' ]]; then
+		read -r pkgbase < "/${line}"
+		rm -f "/boot/vmlinuz-${pkgbase}" "/boot/initramfs-${pkgbase}.img" "/boot/initramfs-${pkgbase}-fallback.img"
+	fi
+done
+EOF
+chmod +x /mnt/usr/local/bin/dracut-install.sh
+chmod +x /mnt/usr/local/bin/dracut-remove.sh
+echo '
+[Trigger]
+Type = Path
+Operation = Install
+Operation = Upgrade
+Target = usr/lib/modules/*/pkgbase
+Target = usr/lib/dracut/*
+Target = usr/lib/systemd/systemd
+
+[Action]
+Description = Updating linux initcpios...
+When = PostTransaction
+Exec = /usr/local/bin/dracut-install.sh
+Depends = dracut
+NeedsTargets
+' > /mnt/etc/pacman.d/hooks/90-dracut-install.hook
+echo '
+[Trigger]
+Type = Path
+Operation = Remove
+Target = usr/lib/modules/*/pkgbase
+
+[Action]
+Description = Removing linux initcpios...
+When = PreTransaction
+Exec = /usr/local/bin/dracut-remove.sh
+NeedsTargets
+' > /mnt/etc/pacman.d/hooks/60-dracut-remove.hook
+
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /mnt/etc/default/grub
 # disable menu editing and other admin operations in Grub:
 printf '#! /bin/sh\nset superusers=""\nset menuentry_id_option="--unrestricted $menuentry_id_option"\n' >
   /mnt/etc/grub.d/09_user
 chmod +x /mnt/etc/grub.d/09_user
-# automatically update Grub every time "grub" package is upgraded:
-mkdir -p /mnt/etc/pacman.d/hooks
-echo '[Trigger]
-Type = Package
-Operation = Upgrade
-Target = grub
-[Action]
-Description = Updating grub
-When = PostTransaction
-Exec = /usr/bin/grub-install --target=x86_64-efi --efi-directory=/boot/efi --removable
-' > /mnt/etc/pacman.d/hooks/100-grub.hook
 
 arch-chroot /mnt /usr/bin/sh << EOF
 printf '\nen_US.UTF-8 UTF-8\n' >> /etc/locale.gen
 locale-gen
 printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
 
-pacman --noconfirm -S grub intel-ucode amd-ucode linux linux-firmware \
+pacman --noconfirm -S grub intel-ucode amd-ucode dracut linux linux-firmware \
   btrfs-progs e2fsprogs dosfstools udisks2 reflector networkmanager pipewire-pulse pipewire-alsa \
   nano man-db unzip ttf-hack noto-fonts materia-gtk-theme \
   gnome-shell gdm gvfs gst-plugins-{base,good,bad} gst-libav gnome-terminal
@@ -232,6 +277,7 @@ useradd -m -G wheel user1
 passwd user1
 
 grub-mkconfig -o /boot/grub/grub.cfg
+grub-mkstandalone -O x86_64-efi -o '/boot/efi/EFI/BOOT/BOOTX64.EFI' 'boot/grub/grub.cfg=/boot/grub/grub.cfg'
 EOF
 
 echo "installation completed; do you want to reboot?"
