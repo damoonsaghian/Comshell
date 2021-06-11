@@ -3,8 +3,8 @@ timedatectl set-ntp true
 printf "label: gpt\n,260MiB,U,*\n;" | sfdisk /dev/"$1"
 mkfs.fat -F32 /dev/"$1"1; mkfs.btrfs /dev/"$1"2
 
-mount /dev/"$1"2 /mnt
 # create subvolumes for "/ etc home root opt usr/local srv tmp var":
+mount /dev/"$1"2 /mnt
 btrfs subvolume create /mnt/0
 btrfs subvolume create /mnt/etc
 btrfs subvolume create /mnt/home
@@ -21,11 +21,12 @@ mkdir /mnt/etc
 mkdir /mnt/home
 mkdir /mnt/root
 mkdir /mnt/opt
-mkdir -p /mnt/0/usr/local
+mkdir -p /mnt/usr/local
 mkdir /mnt/srv
 mkdir /mnt/tmp
 mkdir /mnt/var
 mkdir /mnt/subvols
+mkdir -p /mnt/boot/efi
 mount -o subvol=etc /dev/"$1"2 /mnt/etc
 mount -o subvol=home /dev/"$1"2 /mnt/home
 mount -o subvol=root /dev/"$1"2 /mnt/root
@@ -35,6 +36,10 @@ mount -o subvol=srv /dev/"$1"2 /mnt/srv
 mount -o subvol=tmp /dev/"$1"2 /mnt/tmp
 mount -o subvol=var /dev/"$1"2 /mnt/var
 mount /dev/"$1"2 /mnt/subvols
+mount /dev/"$1"1 /mnt/boot/efi
+
+pacstrap /mnt base
+genfstab -U /mnt >> /mnt/etc/fstab
 
 ## "arc" service does automatic updates, and accepts add and remove requests from wheel users;
 #
@@ -47,7 +52,7 @@ mount /dev/"$1"2 /mnt/subvols
 #bind_mount "etc home root opt usr/local srv tmp var";
 #
 #arch-chroot /subvols/1 << EOF
-#pacman -Syu
+#pacman -Syu --noconfirm
 ## in the case of add requests, install packages;
 #grub-mkconfig -o /boot/grub/grub.cfg
 #btrfs subvolume delete /subvols/0
@@ -56,21 +61,9 @@ mount /dev/"$1"2 /mnt/subvols
 ## "https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
 ## "https://wiki.archlinux.org/index.php/Systemd/Timers"
 #
-## clear cache: pacman -Sc
-## clear orphaned packages: pacman -Qttd
-## remove package: pacman -Rns ...
-
-mkdir -p /mnt/boot/efi
-mount /dev/"$1"1 /mnt/boot/efi
-
-pacstrap /mnt base
-genfstab -U /mnt >> /mnt/etc/fstab
-
-# disable copy_on_write for databases
-# autodefrag mount options (disabled by default);
-# ; btrfs fi defragment
-# chattr (+C): disable COW for databases (Firefox, systemd /var/log/journal/, ...);
-# ; lsattr
+## clear cache: pacman -Sc --noconfirm
+## clear orphaned packages: pacman -Qttdq | pacman -Rns --noconfirm - 2>/dev/null
+## remove package: pacman -Rns --noconfirm ...
 
 # to customize dconf default values:
 mkdir -p /mnt/etc/dconf/profile
@@ -156,15 +149,7 @@ echo 'stage {
 mkdir -p /mnt/etc/skel/.local/share/applications
 printf '[Desktop Entry]\nNoDisplay=true' |
 tee /mnt/etc/skel/.local/share/applications/\
-{avahi-discover,bssh,bvnc,qv4l2,qvidcap,lstopo,nm-connection-editor}.desktop > /dev/null
-echo '[Desktop Entry]
-Name=Extensions
-Exec=/usr/bin/gnome-extensions-app
-Type=Application
-DBusActivatable=true
-Icon=org.gnome.Extensions
-NoDisplay=true
-' > /mnt/etc/skel/.local/share/applications/org.gnome.Extensions.desktop
+{avahi-discover,bssh,bvnc,qv4l2,qvidcap,lstopo,nm-connection-editor,org.gnome.Extensions}.desktop > /dev/null
 
 mkdir -p /mnt/etc/fonts
 echo '<?xml version="1.0"?>
@@ -207,27 +192,13 @@ PS1="\[$(tput setaf 1)\]\w >\[$(tput sgr0)\] "
 unset HISTFILE
 ' >> /mnt/etc/skel/.bashrc
 
-arch-chroot /mnt /usr/bin/sh << "EOF"
-tzselect
-
-printf '\nen_US.UTF-8 UTF-8\n' >> /etc/locale.gen
-locale-gen
-printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
-
-pacman -S grub intel-ucode amd-ucode linux linux-firmware \
-  btrfs-progs e2fsprogs dosfstools udisks2 networkmanager pulseaudio-alsa alsa-utils reflector \
-  nano man-db unzip ttf-hack noto-fonts materia-gtk-theme \
-  gnome-shell gdm gvfs gst-plugins-{base,good,bad} gst-libav gnome-terminal
-
-printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /etc/default/grub
+printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /mnt/etc/default/grub
 # disable menu editing and other admin operations in Grub:
 printf '#! /bin/sh\nset superusers=""\nset menuentry_id_option="--unrestricted $menuentry_id_option"\n' >
-  /etc/grub.d/09_user
-chmod +x /etc/grub.d/09_user
-grub-install --target=x86_64-efi --efi-directory=/boot/efi --removable
-grub-mkconfig -o /boot/grub/grub.cfg
+  /mnt/etc/grub.d/09_user
+chmod +x /mnt/etc/grub.d/09_user
 # automatically update Grub every time "grub" package is upgraded:
-mkdir -p /etc/pacman.d/hooks
+mkdir -p /mnt/etc/pacman.d/hooks
 echo '[Trigger]
 Type = Package
 Operation = Upgrade
@@ -235,25 +206,32 @@ Target = grub
 [Action]
 Description = Updating grub
 When = PostTransaction
-Exec = grub-install --target=x86_64-efi --efi-directory=/boot/efi --removable
-' > /etc/pacman.d/hooks/100-grub.hook
+Exec = /usr/bin/grub-install --target=x86_64-efi --efi-directory=/boot/efi --removable
+' > /mnt/etc/pacman.d/hooks/100-grub.hook
 
+arch-chroot /mnt /usr/bin/sh << EOF
+printf '\nen_US.UTF-8 UTF-8\n' >> /etc/locale.gen
+locale-gen
+printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
+
+pacman --noconfirm -S grub intel-ucode amd-ucode linux linux-firmware \
+  btrfs-progs e2fsprogs dosfstools udisks2 reflector networkmanager pipewire-pulse pipewire-alsa \
+  nano man-db unzip ttf-hack noto-fonts materia-gtk-theme \
+  gnome-shell gdm gvfs gst-plugins-{base,good,bad} gst-libav gnome-terminal
+
+tzselect
 systemctl enable systemd-timesyncd
+systemctl enable reflector
 systemctl enable NetworkManager
 systemctl enable NetworkManager-dispatcher
-systemctl enable reflector
 systemctl enable gdm
-
-amixer sset Master unmute
-amixer sset Master 0dB
-amixer sset Capture cap
-alsactl store
-
 dconf update
 
 passwd
 useradd -m -G wheel user1
 passwd user1
+
+grub-mkconfig -o /boot/grub/grub.cfg
 EOF
 
 echo "installation completed; do you want to reboot?"
