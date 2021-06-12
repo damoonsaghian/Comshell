@@ -63,3 +63,9 @@ Kopia: weird UI (what does "connecting to a repo" means)
 knoxite: weired UI (what's the point of volumes)
 Duplicacy: really good; consistent, lockless and simple repository;
   i think the only problem is it's license;
+
+files in ".cache" directory will no be synced;
+so build directories must be put inside ".cache"; eg for Rust:
+; nano ~/.cargo/config
+  [build]
+  target-dir = ".cache/cargo"
