@@ -214,7 +214,7 @@ printf '\nen_US.UTF-8 UTF-8\n' >> /etc/locale.gen
 locale-gen
 printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
 
-pacman --noconfirm -S grub intel-ucode amd-ucode dracut linux linux-firmware \
+pacman --noconfirm -S grub intel-ucode amd-ucode booster linux linux-firmware \
   btrfs-progs e2fsprogs dosfstools udisks2 reflector networkmanager pipewire-pulse pipewire-alsa \
   nano man-db unzip ttf-hack noto-fonts materia-gtk-theme \
   gnome-shell gdm gvfs gst-plugins-{base,good,bad} gst-libav gnome-terminal
