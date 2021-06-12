@@ -192,61 +192,6 @@ PS1="\[$(tput setaf 1)\]\w >\[$(tput sgr0)\] "
 unset HISTFILE
 ' >> /mnt/etc/skel/.bashrc
 
-tee /mnt/usr/local/bin/dracut-install.sh << 'EOF'
-#!/usr/bin/env bash
-args=('--force' '--no-hostonly-cmdline')
-while read -r line; do
-	if [[ "$line" == 'usr/lib/modules/'+([^/])'/pkgbase' ]]; then
-		read -r pkgbase < "/${line}"
-		kver="${line#'usr/lib/modules/'}"
-		kver="${kver%'/pkgbase'}"
-
-		install -Dm0644 "/${line%'/pkgbase'}/vmlinuz" "/boot/vmlinuz-${pkgbase}"
-		dracut "${args[@]}" --hostonly "/boot/initramfs-${pkgbase}.img" --kver "$kver"
-		dracut "${args[@]}" --no-hostonly "/boot/initramfs-${pkgbase}-fallback.img" --kver "$kver"
-	fi
-done
-EOF
-tee /mnt/usr/local/bin/dracut-remove.sh << 'EOF'
-#!/usr/bin/env bash
-while read -r line; do
-	if [[ "$line" == 'usr/lib/modules/'+([^/])'/pkgbase' ]]; then
-		read -r pkgbase < "/${line}"
-		rm -f "/boot/vmlinuz-${pkgbase}" "/boot/initramfs-${pkgbase}.img" "/boot/initramfs-${pkgbase}-fallback.img"
-	fi
-done
-EOF
-chmod +x /mnt/usr/local/bin/dracut-install.sh
-chmod +x /mnt/usr/local/bin/dracut-remove.sh
-echo '
-[Trigger]
-Type = Path
-Operation = Install
-Operation = Upgrade
-Target = usr/lib/modules/*/pkgbase
-Target = usr/lib/dracut/*
-Target = usr/lib/systemd/systemd
-
-[Action]
-Description = Updating linux initcpios...
-When = PostTransaction
-Exec = /usr/local/bin/dracut-install.sh
-Depends = dracut
-NeedsTargets
-' > /mnt/etc/pacman.d/hooks/90-dracut-install.hook
-echo '
-[Trigger]
-Type = Path
-Operation = Remove
-Target = usr/lib/modules/*/pkgbase
-
-[Action]
-Description = Removing linux initcpios...
-When = PreTransaction
-Exec = /usr/local/bin/dracut-remove.sh
-NeedsTargets
-' > /mnt/etc/pacman.d/hooks/60-dracut-remove.hook
-
 printf '\nGRUB_TIMEOUT=0\nGRUB_DISABLE_OS_PROBER=true\n' >> /mnt/etc/default/grub
 # disable menu editing and other admin operations in Grub:
 printf '#! /bin/sh\nset superusers=""\nset menuentry_id_option="--unrestricted $menuentry_id_option"\n' >
@@ -278,7 +223,6 @@ tzselect
 systemctl enable systemd-timesyncd
 systemctl enable reflector
 systemctl enable NetworkManager
-systemctl enable NetworkManager-dispatcher
 systemctl enable gdm
 dconf update
 
