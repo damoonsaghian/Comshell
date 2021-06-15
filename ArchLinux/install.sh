@@ -42,28 +42,56 @@ pacstrap /mnt base
 genfstab -U /mnt >> /mnt/etc/fstab
 
 ## "arc" service does automatic updates, and accepts add and remove requests from wheel users;
-#
-## if "/" is "/subvols/0", if "/subvols/1" is older, delete it,
-##   and create a snapshot of "/subvols/0" in "/subvols/1";
-## if "/" is "/subvols/1", if "/subvols/0" is older, delete it,
-##   and create a snapshot of "/subvols/1" in "/subvols/0";
+## "https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
+## "https://wiki.archlinux.org/index.php/Systemd/Timers"
+## remove package: pacman -Rns --noconfirm ...
+echo '
+[Unit]
+Description=automatic update
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/pacman -Syu --noconfirm
+TimeoutStopSec=180
+KillMode=process
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target
+' > /mnt/etc/systemd/system/autoupdate.service
+echo '
+[Unit]
+Description=automatic Update when booted up after 5 minutes, then check the system for updates every 60 minutes;
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=60min
+Unit=autoupdate.service
+
+[Install]
+WantedBy=multi-user.target
+' > /mnt/etc/systemd/system/autoupdate.timer
+# delete "/subvols/2";
+## if "/" is "/subvols/0", if "/subvols/1" exists move it to "/subvols/2",
+##   create a snapshot of "/subvols/0" in "/subvols/2";
+## if "/" is "/subvols/1", if "/subvols/0" exists move it to "/subvols/2"
+##   create a snapshot of "/subvols/1" in "/subvols/2";
 #btrfs subvolume snapshot /subvols/0 /subvols/1
 #
 #bind_mount "etc home root opt usr/local srv tmp var";
 #
-#arch-chroot /subvols/1 << EOF
+#arch-chroot /subvols/2 << EOF
 #pacman -Syu --noconfirm
 ## in the case of add requests, install packages;
-#grub-mkconfig -o /boot/efi/EFI/BOOT/grub.cfg
-#btrfs subvolume delete /subvols/0
+## clear orphaned packages:
+#pacman -Qttdq | pacman -Rns --noconfirm - 2>/dev/null
+## clear cache:
+#pacman -Sc --noconfirm
 #EOF
-#
-## "https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
-## "https://wiki.archlinux.org/index.php/Systemd/Timers"
-#
-## clear cache: pacman -Sc --noconfirm
-## clear orphaned packages: pacman -Qttdq | pacman -Rns --noconfirm - 2>/dev/null
-## remove package: pacman -Rns --noconfirm ...
+#mv /subvols/2 /subvols/1
+#arch-chroot /subvols/1 "grub-mkconfig -o /boot/efi/EFI/BOOT/grub.cfg"
+#btrfs subvolume delete /subvols/0
 
 # to customize dconf default values:
 mkdir -p /mnt/etc/dconf/profile
@@ -221,6 +249,7 @@ pacman --noconfirm -S grub intel-ucode amd-ucode booster linux linux-firmware \
 
 tzselect
 systemctl enable systemd-timesyncd
+systemctl enable /etc/systemd/system/autoupdate.timer
 systemctl enable reflector
 systemctl enable NetworkManager
 systemctl enable gdm
