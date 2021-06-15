@@ -41,57 +41,31 @@ mount /dev/"$1"1 /mnt/boot/efi
 pacstrap /mnt base
 genfstab -U /mnt >> /mnt/etc/fstab
 
-## "arc" service does automatic updates, and accepts add and remove requests from wheel users;
-## "https://www.techrapid.uk/2017/04/automatically-update-arch-linux-with-systemd.html"
-## "https://wiki.archlinux.org/index.php/Systemd/Timers"
-## remove package: pacman -Rns --noconfirm ...
+cp ./arc /mnt/usr/local/bin/
+chmod +x /mnt/usr/local/bin/arc
 echo '
 [Unit]
 Description=automatic update
 After=network-online.target
-
 [Service]
 Type=simple
-ExecStart=/usr/bin/pacman -Syu --noconfirm
-TimeoutStopSec=180
+ExecStart=/usr/local/bin/arc update
 KillMode=process
 KillSignal=SIGINT
-
 [Install]
 WantedBy=multi-user.target
 ' > /mnt/etc/systemd/system/autoupdate.service
 echo '
 [Unit]
-Description=automatic Update when booted up after 5 minutes, then check the system for updates every 60 minutes;
-
+Description=automatic update timer
 [Timer]
 OnBootSec=5min
-OnUnitActiveSec=60min
+OnUnitInctiveSec=60min
+RandomizedDelaySec=10min
 Unit=autoupdate.service
-
 [Install]
 WantedBy=multi-user.target
 ' > /mnt/etc/systemd/system/autoupdate.timer
-# delete "/subvols/2";
-## if "/" is "/subvols/0", if "/subvols/1" exists move it to "/subvols/2",
-##   create a snapshot of "/subvols/0" in "/subvols/2";
-## if "/" is "/subvols/1", if "/subvols/0" exists move it to "/subvols/2"
-##   create a snapshot of "/subvols/1" in "/subvols/2";
-#btrfs subvolume snapshot /subvols/0 /subvols/1
-#
-#bind_mount "etc home root opt usr/local srv tmp var";
-#
-#arch-chroot /subvols/2 << EOF
-#pacman -Syu --noconfirm
-## in the case of add requests, install packages;
-## clear orphaned packages:
-#pacman -Qttdq | pacman -Rns --noconfirm - 2>/dev/null
-## clear cache:
-#pacman -Sc --noconfirm
-#EOF
-#mv /subvols/2 /subvols/1
-#arch-chroot /subvols/1 "grub-mkconfig -o /boot/efi/EFI/BOOT/grub.cfg"
-#btrfs subvolume delete /subvols/0
 
 # to customize dconf default values:
 mkdir -p /mnt/etc/dconf/profile
