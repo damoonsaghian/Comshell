@@ -41,28 +41,25 @@ mount /dev/"$1"1 /mnt/boot/efi
 pacstrap /mnt base
 genfstab -U /mnt >> /mnt/etc/fstab
 
-cp ./arc /mnt/usr/local/bin/
-chmod +x /mnt/usr/local/bin/arc
+cp ./arch /mnt/usr/local/bin/
+chmod +x /mnt/usr/local/bin/arch
 echo '
 [Unit]
 Description=automatic update
 After=network-online.target
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/arc update
+ExecStart=/usr/local/bin/arch update
 KillMode=process
 KillSignal=SIGINT
-[Install]
-WantedBy=multi-user.target
 ' > /mnt/etc/systemd/system/autoupdate.service
 echo '
 [Unit]
 Description=automatic update timer
 [Timer]
 OnBootSec=5min
-OnUnitInctiveSec=60min
+OnUnitInactiveSec=600min
 RandomizedDelaySec=10min
-Unit=autoupdate.service
 [Install]
 WantedBy=multi-user.target
 ' > /mnt/etc/systemd/system/autoupdate.timer

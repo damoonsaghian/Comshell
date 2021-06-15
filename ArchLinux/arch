@@ -1,0 +1,29 @@
+#! /bin/bash
+
+# update, add, and remove packages
+
+# in the case of add or remove command, if another pacman process (like automatic update) is running,
+#   notify the user, wait for it to end, then add or remove package;
+
+# remove package: pacman --noconfirm -Rns ...
+
+# delete "/subvols/2";
+## if "/" is "/subvols/0", if "/subvols/1" exists move it to "/subvols/2",
+##   create a snapshot of "/subvols/0" in "/subvols/2";
+## if "/" is "/subvols/1", if "/subvols/0" exists move it to "/subvols/2"
+##   create a snapshot of "/subvols/1" in "/subvols/2";
+#btrfs subvolume snapshot /subvols/0 /subvols/1
+#
+#bind_mount "etc home root opt usr/local srv tmp var";
+#
+#arch-chroot /subvols/2 << EOF
+#pacman -Syu --noconfirm
+## in the case of add requests, install packages;
+## clear orphaned packages:
+#pacman -Qttdq | pacman -Rns --noconfirm - 2>/dev/null
+## clear cache:
+#pacman -Sc --noconfirm
+#EOF
+#mv /subvols/2 /subvols/1
+#arch-chroot /subvols/1 "grub-mkconfig -o /boot/efi/EFI/BOOT/grub.cfg"
+#btrfs subvolume delete /subvols/0
