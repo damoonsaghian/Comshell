@@ -141,7 +141,7 @@ runningAppsBox.add_child(new St.Icon({
 }));
 
 const CyclerHighlight = imports.ui.altTab.CyclerHighlight;
-let highlight = null;
+let highlights = [];
 
 let appSwitchMode = false;
 let appIndex = 0;
@@ -164,13 +164,16 @@ main.wm.setCustomKeybindingHandler(
 
     const nextAppIndex = (appIndex + 1) % apps.length;
 
-    // show app's window without focusing it;
-    if (!highlight) {
-      highlight = new CyclerHighlight();
+    // show app's windows without focusing it;
+    highlights.forEach(highlight => highlight.destroy());
+    highlights = [];
+    apps[nextAppIndex].get_windows().forEach(win => {
+      const highlight = new CyclerHighlight();
+      highlight.window = win;
       global.window_group.add_child(highlight);
-    }
-    highlight.window = apps[nextAppIndex].get_windows()[0];
-    global.window_group.set_child_above_sibling(highlight, null);
+      highlights.unshift(highlight);
+    });
+    highlights.forEach(highlight => global.window_group.set_child_above_sibling(highlight, null));
 
     // update indicator's highlight;
     apps[appIndex].indicator_.set_background_color(Clutter.Color.new(255, 255, 255, 0));
@@ -188,11 +191,13 @@ main.wm.setCustomKeybindingHandler(
     }
 
     const endAppSwitch = () => {
-      highlight.destroy();
-      highlight = null;
+      highlights.forEach(highlight => highlight.destroy());
+      highlights = [];
 
       const app = apps[appIndex];
       app?.activate();
+      // due to a bug in gnome-shell (mentioned above)
+      app.get_windows()[0]?.activate(global.get_current_time());
 
       // remove indicator's highlight;
       app?.indicator_.set_background_color(Clutter.Color.new(255, 255, 255, 0));
@@ -227,6 +232,7 @@ main.wm.setCustomKeybindingHandler(
 
 let windowSwitchMode = false;
 let windowIndex = 0;
+let highlight = null;
 
 main.wm.setCustomKeybindingHandler(
   "switch-group",
@@ -338,7 +344,7 @@ class AppIndicator extends St.BoxLayout {
   }
 });
 
-windowTracker.connect("notify::focus-app", () => {
+const updateAppsIndicators = () => {
   let apps = global.display.get_tab_list(Meta.TabList.NORMAL, null)
     .map(win => windowTracker.get_window_app(win));
   // remove duplicates (this method preserves the order of the original array):
@@ -373,7 +379,9 @@ windowTracker.connect("notify::focus-app", () => {
   apps[0]?.indicator_.updateWindowsIndicator();
   windowSwitchMode = false;
   windowIndex = 0;
-});
+}
+
+windowTracker.connect("notify::focus-app", updateAppsIndicators);
 
 return { enable: () => {}, disable: () => {} };
 }
