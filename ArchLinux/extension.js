@@ -345,7 +345,7 @@ class AppIndicator extends St.BoxLayout {
 });
 
 windowTracker.connect("notify::focus-app", () => {
-  // this is due to a bug which causes "activate" to not move the app in "tab_list" correctly;
+  // this is due to a bug: apps with a transient window are not moved to the head of "tab_list", when activated;
   windowTracker.focus_app?.get_windows()
     .filter((win) => win.get_transient_for() === null)[0]
     .activate(global.get_current_time());
