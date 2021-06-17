@@ -344,7 +344,12 @@ class AppIndicator extends St.BoxLayout {
   }
 });
 
-const updateAppsIndicators = () => {
+windowTracker.connect("notify::focus-app", () => {
+  // this is due to a bug which causes "activate" to not move the app in "tab_list" correctly;
+  windowTracker.focus_app?.get_windows()
+    .filter((win) => win.get_transient_for() === null)[0]
+    .activate(global.get_current_time());
+
   let apps = global.display.get_tab_list(Meta.TabList.NORMAL, null)
     .map(win => windowTracker.get_window_app(win));
   // remove duplicates (this method preserves the order of the original array):
@@ -379,9 +384,7 @@ const updateAppsIndicators = () => {
   apps[0]?.indicator_.updateWindowsIndicator();
   windowSwitchMode = false;
   windowIndex = 0;
-}
-
-windowTracker.connect("notify::focus-app", updateAppsIndicators);
+});
 
 return { enable: () => {}, disable: () => {} };
 }

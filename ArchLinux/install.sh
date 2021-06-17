@@ -127,16 +127,11 @@ echo '{
   "description": "GnomeShell improved",
   "shell-version": []
 }' > /mnt/usr/local/share/gnome-shell/extensions/gnome-shell-improved/metadata.json
-echo 'stage {
-  font-family: sans;
-  font-size: 10.5pt;
-}
+echo '
 #panel {
   background-color: transparent;
 }
 #panel .panel-button {
-  font-family: sans;
-  font-size: 10.5pt;
   font-weight: normal;
   color: #ffffff;
 }
