@@ -113,7 +113,7 @@ const dateTimeLabel = new St.Label({ y_align: Clutter.ActorAlign.CENTER });
 main.panel.statusArea.aggregateMenu._indicators?.add_child(dateTimeLabel);
 const updateClock = () => {
   const now = GLib.DateTime.new_now_local();
-  const nowFormated = now ? now.format(" %F  %a  %p  %I:%M") : "";
+  const nowFormated = now ? now.format(" %F  %a  %p  %I:%M ") : "";
   // https://github.com/omid/Persian-Calendar-for-Gnome-Shell/blob/master/PersianCalendar%40oxygenws.com/PersianDate.js
   dateTimeLabel.set_text(nowFormated);
 };

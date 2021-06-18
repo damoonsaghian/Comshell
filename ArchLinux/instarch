@@ -1,6 +1,6 @@
 #! /bin/bash
 
-if [[ $1 == clear ]]; then
+if [[ $1 == format ]]; then
   printf "label: gpt\n,260MiB,U,*\n;" | sfdisk /dev/"$2" &&
   mkfs.fat -F32 /dev/"$2"1 && mkfs.btrfs /dev/"$2"2 &&
   mount /dev/"$2"2 /mnt && {
@@ -135,10 +135,14 @@ echo '{
   "shell-version": []
 }' > /mnt/usr/local/share/gnome-shell/extensions/gnome-shell-improved/metadata.json
 echo '
+stage {
+  font-size: 10.5pt;
+}
 #panel {
   background-color: transparent;
 }
 #panel .panel-button {
+  font-size: 10.5pt;
   font-weight: normal;
   color: #ffffff;
 }
@@ -211,8 +215,7 @@ Exec = /usr/bin/grub-mkstandalone -O x86_64-efi -o "/boot/efi/EFI/BOOT/BOOTX64.E
 ' > /mnt/etc/pacman.d/hooks/100-grub.hook
 echo 'configfile ${cmdpath}/grub.cfg' > /mnt/boot/grub.cfg
 
-arch-chroot /mnt /usr/bin/sh << EOF
-tzselect
+arch-chroot /mnt /usr/bin/sh << 'EOF'
 set -e
 
 printf '\nen_US.UTF-8 UTF-8\n' >> /etc/locale.gen
@@ -230,10 +233,14 @@ systemctl enable NetworkManager
 systemctl enable gdm
 dconf update
 
+until timedatectl set-timezone $( tzselect ); do
+  echo "try again"
+done
+
 until passwd; do
   echo "try again"
 done
-useradd -m -G wheel user1
+useradd -m -g wheel user1
 until passwd user1; do
   echo "try again"
 done
@@ -243,4 +250,4 @@ grub-mkconfig -o /boot/efi/EFI/BOOT/grub.cfg
 EOF
 
 umount -R /mnt
-reboot
+poweroff

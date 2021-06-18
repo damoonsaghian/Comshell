@@ -1,5 +1,7 @@
 #! /bin/bash
 
+set -e
+
 # update, add, and remove packages
 
 # in the case of add or remove command, if another pacman process (like automatic update) is running,
