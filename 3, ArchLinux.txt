@@ -1,5 +1,5 @@
 using Arch Linux we can easily setup and maintain a Linux system;
-the following shows how to setup a basic graphical environment;
+the following instructions are for installing it on an x86_64 system with UEFI firmware;
 
 boot the Arch Linux live environment;
 if you need to connect to a WIFI network:
@@ -10,12 +10,18 @@ if you need to connect to a WIFI network:
 
 ; curl https://damoonsaghian/Comshell/archive/master.tar.gz | tar -xz
 ; cd Comshell/ArchLinux
+; chmod +x install
 ensure that the files aren't malicious;
 
 find the device you want to install ArchLinux on with "lsblk";
-note that the content of the device you want to install ArchLinux on, will be deleted;
-then run this (replace "sdx" with your chosen device):
-; sh install.sh sdx
+let's assume that the chosen device is "sdx";
+first prepare the disk (note that the content of the disk will be deleted):
+; instarch format sdx
+now install Arch Linux on it:
+; instarch sdx
+
+if the installation gets interrupted, just run the last command again (no need to reformat the disk);
+after installation, the system will turn off; remove the installation media, and turn the system on;
 
 ".data/gnome-shell.png"
 
@@ -42,6 +48,15 @@ to connect to a WIFI network:
 to disconnect from a WIFI network:
 ; nmcli con down id <ssid>
 
+if your combined headset jack is not detected correctly, you can try this:
+; pkexec echo 'options snd_hda_intel index=0 model=dell-headset-multi' > /etc/modprobe.d/alsa-base.conf
+"https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture#Correctly_detect_microphone_plugged_in_a_4-pin_3.5mm_(TRRS)_jack"
+this made the microphone available, but with a very bad static noise;
+so maybe it's better to use a USB/Bluetooth sound card;
+
+to set a password for "user1":
+; passwd user1
+
 you can set "user1" for automatic login:
 ; pkexec nano /etc/gdm/custom.conf
   [daemon]
@@ -52,15 +67,9 @@ but to protect the computer from physical attacks, you have to disable automatic
 in addition you have to:
 , somehow prevent tampering with hardware;
 , protect boot firmware by a password;
-  which also prevents others to select another device (eg a usb drive) to boot;
+, disable boot from external devices;
 these can make physical attacks more difficult, but keep in mind that
   physical access to a computer is root access, given enough time and resources;
-
-if your combined headset jack is not detected correctly, you can try this:
-; pkexec echo 'options snd_hda_intel index=0 model=dell-headset-multi' > /etc/modprobe.d/alsa-base.conf
-"https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture#Correctly_detect_microphone_plugged_in_a_4-pin_3.5mm_(TRRS)_jack"
-this made the microphone available, but with a very bad static noise;
-so maybe it's better to use a USB/Bluetooth sound card;
 
 = system administration
 in system administration we must ensure that:
