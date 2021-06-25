@@ -50,16 +50,22 @@ one read_only ROM, plus a writable ROM:
 , no need for complex signing mechanism to make sure a device's firmware is not malicious;
   just clear the writable flash when you buy a device;
 
-on X86 architecture we can have open source boot_loader, and GPU drivers,
-  using Intel with Coreboot+Grub2 for example;
-  "https://www.coreboot.org/GRUB2#Scanning_for_grub.cfg_on_local_hard_drives"
-  though there sill will be closed source parts (Intel FSP);
-but there is no easy way to get rid of Intel ME (or AMD PSP);
+boot firmware reads a file named "boot.cfg" on all BTRFS formated partition_less disks (mkfs.btrfs /dev/sdx);
+"boot.cfg" contains the path of the kernel, plus the kernel options;
+Coreboot/Oreboot with LinuxBoot or Grub2 as payload;
+"https://www.linuxboot.org/"
+"https://www.coreboot.org/GRUB2#Scanning_for_grub.cfg_on_local_hard_drives"
+
+on X86 architecture we can have a GPU with open source driver;
+but the default boot firmware on nearly all systems are closed source;
+flashing a CoreBoot based boot firmware is possible, but there still will be closed source parts (Intel FSP);
+regardless there is no easy way to get rid of Intel ME (or AMD PSP);
 though there are some hacks for disabling (but not completely remove) Intel ME:
   "https://puri.sm/posts/deep-dive-into-intel-me-disablement/"
 
-ARM architecture is closed source too, but we can have open source GPU driver (Qualcomm/Adreno),
-  and Coreboot+Grub2 bootloader;
+ARM architecture is closed source too, but we can have a GPU with open source driver (Qualcomm/Adreno);
+the most used boot firmware is the open source implementation of UEFI called EDK2;
+flashing LinuxBoot as a UEFI DXE, or flashing a CoreBoot based boot firmware is possible;
 ARM TrustZone can host an open source operating system too, apparently;
 "https://news.ycombinator.com/item?id=17783357"
 
