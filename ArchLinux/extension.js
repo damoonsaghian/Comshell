@@ -113,7 +113,7 @@ const dateTimeLabel = new St.Label({ y_align: Clutter.ActorAlign.CENTER });
 main.panel.statusArea.aggregateMenu._indicators?.add_child(dateTimeLabel);
 const updateClock = () => {
   const now = GLib.DateTime.new_now_local();
-  const nowFormated = now ? now.format(" %F  %a  %p  %I:%M ") : "";
+  const nowFormated = now ? now.format(" %F  %a  %p  %I:%M") : "";
   // https://github.com/omid/Persian-Calendar-for-Gnome-Shell/blob/master/PersianCalendar%40oxygenws.com/PersianDate.js
   dateTimeLabel.set_text(nowFormated);
 };
@@ -121,11 +121,7 @@ updateClock();
 const wallClock = main.panel.statusArea.dateMenu._clock;
 if (wallClock) wallClock.connect("notify::clock", updateClock);
 
-// https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet/blob/master/system-monitor%40paradoxxx.zero.gmail.com/extension.js
-// https://github.com/Ory0n/Resource_Monitor/
-// https://github.com/corecoding/Vitals
-// https://github.com/elvetemedve/gnome-shell-extension-system-monitor
-// https://github.com/hedayaty/NetSpeed/blob/master/net_speed.js
+imports.misc.extensionUtils.getCurrentExtension().imports.system_monitor;
 
 // -----------------
 // running apps list
