@@ -109,11 +109,11 @@ if (power._sync && power._proxy) {
   power._sync();
 }
 
-const dateTimeLabel = new St.Label({ y_align: Clutter.ActorAlign.CENTER });
+const dateTimeLabel = new St.Label({ y_align: Clutter.ActorAlign.CENTER, style: "padding: 0 2px 0 4px;" });
 main.panel.statusArea.aggregateMenu._indicators?.add_child(dateTimeLabel);
 const updateClock = () => {
   const now = GLib.DateTime.new_now_local();
-  const nowFormated = now ? now.format(" %F  %a  %p  %I:%M") : "";
+  const nowFormated = now ? now.format("%F  %a  %p  %I:%M") : "";
   // https://github.com/omid/Persian-Calendar-for-Gnome-Shell/blob/master/PersianCalendar%40oxygenws.com/PersianDate.js
   dateTimeLabel.set_text(nowFormated);
 };
