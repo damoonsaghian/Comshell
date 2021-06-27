@@ -1,4 +1,4 @@
-// code extracts from:
+// code extracted from:
 // https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet
 
 const Clutter = imports.gi.Clutter;
@@ -18,15 +18,14 @@ try {
   return;
 }
 
-const Main = imports.ui.main;
+const main = imports.ui.main;
+const mainloop = imports.mainloop;
 
-const ByteArray = imports.byteArray;
-const Mainloop = imports.mainloop;
-
-function parse_bytearray(bytearray) {
-  if (!ByteArray.toString(bytearray).match(/GjsModule byteArray/))
-    return ByteArray.toString(bytearray);
-  return bytearray;
+function parse_bytearray(byteArray) {
+  const string = imports.byteArray.toString(byteArray);
+  if (!string.match(/GjsModule byteArray/))
+    return string;
+  return byteArray;
 }
 
 function color_from_string(color) {
@@ -42,7 +41,7 @@ function color_from_string(color) {
 
 class Chart {
   constructor(width, height, parent) {
-    this.actor = new St.DrawingArea({ style_class: 'sm-chart', reactive: false });
+    this.actor = new St.DrawingArea({ style: 'padding: 0 2px; margin: 3px 0;', reactive: false });
     this.parentC = parent;
     this.actor.set_width(this.width = width);
     this.actor.set_height(this.height = height);
@@ -93,7 +92,7 @@ class Chart {
   }
   resize(schema, key) {
     let old_width = this.width;
-    this.width = 50;
+    this.width = 40;
     if (old_width === this.width) return;
     this.actor.set_width(this.width);
     if (this.width < this.data[0].length) {
@@ -243,13 +242,13 @@ class ElementBase {
 
     this.actor.visible = true;
     this.interval = 2000;
-    this.timeout = Mainloop.timeout_add(
+    this.timeout = mainloop.timeout_add(
       this.interval,
       this.update.bind(this),
       GLib.PRIORITY_DEFAULT_IDLE
     );
 
-    this.chart = new Chart(50, Main.layoutManager.panelBox.height - 4, this);
+    this.chart = new Chart(40, main.layoutManager.panelBox.height - 4, this);
     this.actor.add_actor(this.chart.actor);
     this.chart.actor.visible = true;
   }
@@ -264,7 +263,7 @@ class ElementBase {
 
   destroy() {
     if (this.timeout) {
-      Mainloop.source_remove(this.timeout);
+      mainloop.source_remove(this.timeout);
       this.timeout = null;
     }
   }
@@ -565,10 +564,8 @@ class Net extends ElementBase {
   _apply() {}
 }
 
-const tray = new imports.ui.panelMenu.Button(0.5);
-Main.panel._addToPanelBox('system-monitor', tray, 1, Main.panel._rightBox);
-const box = new St.BoxLayout({style: 'spacing: 4px;'});
-tray.add_actor(box);
+const box = new St.BoxLayout({ style: 'spacing: 4px; padding: 0 8px 0 4px;' });
+main.panel.statusArea.aggregateMenu._indicators?.insert_child_at_index(box, 0);
 const elts = [new Cpu(-1), new Mem(), new Disk(), new Net()];
 for (let elt in elts)
   box.add_actor(elts[elt].actor);

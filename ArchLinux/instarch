@@ -149,10 +149,6 @@ stage {
 #panel #panelActivities {
   -natural-hpadding: 0;
 }
-.sm-chart {
-  padding: 0 2px;
-  margin: 3px 0;
-}
 ' > /mnt/usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css
 
 mkdir -p /mnt/etc/skel/.local/share/applications
