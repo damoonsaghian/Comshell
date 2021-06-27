@@ -1,6 +1,6 @@
 #! /bin/bash
 
-if [[ $1 == format ]]; then
+if [[ "$1" == "format" ]]; then
   printf "label: gpt\n,260MiB,U,*\n;" | sfdisk /dev/"$2" &&
   mkfs.fat -F32 /dev/"$2"1 && mkfs.btrfs /dev/"$2"2 &&
   mount /dev/"$2"2 /mnt && {
