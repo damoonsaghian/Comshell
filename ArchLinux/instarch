@@ -56,7 +56,7 @@ Description=automatic update
 After=network-online.target
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/arch update
+ExecStart=/usr/local/bin/arch autoupdate
 KillMode=process
 KillSignal=SIGINT
 ' > /mnt/etc/systemd/system/autoupdate.service

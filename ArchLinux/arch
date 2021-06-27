@@ -1,7 +1,25 @@
 #! /bin/bash
 
+# https://github.com/cmuench/pacman-auto-update/blob/master/root/usr/lib/pacman-auto-update/pacman-auto-update
+
 # exit if "/usr/local/bin/arch" has more than one instances;
 if [[ $(pgrep -c /usr/local/bin/arch) -gt 1 ]]; then
+  exit
+fi
+
+# remove orphan lock
+if [[ -f /var/lib/pacman/db.lck && $(pgrep -c /usr/local/bin/arch) == 0 ]]; then
+  rm /var/lib/pacman/db.lck
+fi
+
+batteryIsEmpty () {
+  local capacity="/sys/class/power_supply/BAT1/capacity"
+	[[ -f "${capacity}" && "$(cat "${capacity}")" -le 20 ]]
+}
+connectionIsMetered () {
+	nmcli --terse --fields GENERAL.METERED dev show | grep --quiet "yes"
+}
+if [[ "$1" == "autoupdate" && ( $(batteryIsEmpty) || $(connectionIsMetered) ) ]]; then
   exit
 fi
 
@@ -18,7 +36,9 @@ if [[ "$1" == "remove" ]]; then
   exit
 fi
 
-function run {
+set -e
+
+run () {
   mount --bind /etc /subvols/2/etc
   mount --bind /home /subvols/2/home
   mount --bind /root /subvols/2/root
@@ -41,7 +61,7 @@ function run {
 EOF
 }
 
-if [[ "$1" == "update" || "$1" == "add" ]]; then
+if [[ "$1" == "update" || "$1" == "autoupdate" || "$1" == "add" ]]; then
   if [[ -d /subvols/2 ]]; then
     btrfs subvolume delete /subvols/2
   fi
