@@ -10,7 +10,7 @@ if you need to connect to a WIFI network:
 
 ; curl https://damoonsaghian/Comshell/archive/master.tar.gz | tar -xz
 ; cd Comshell/ArchLinux
-; chmod +x install
+; chmod +x instarch
 ensure that the files aren't malicious;
 
 find the device you want to install ArchLinux on with "lsblk";
@@ -54,9 +54,6 @@ if your combined headset jack is not detected correctly, you can try this:
 this made the microphone available, but with a very bad static noise;
 so maybe it's better to use a USB/Bluetooth sound card;
 
-to set a password for "user1":
-; passwd user1
-
 you can set "user1" for automatic login:
 ; pkexec nano /etc/gdm/custom.conf
   [daemon]
@@ -74,23 +71,24 @@ these can make physical attacks more difficult, but keep in mind that
 = system administration
 in system administration we must ensure that:
 1, the command executed is explicitly given by the user;
-2, even if a program steals the root password, it still can't change the system;
+2, even if a program steals a wheel user's password, it still can't change the system;
 
 "sudo" fails in both cases;
 "https://www.reddit.com/r/linuxquestions/comments/8mlil7/whats_the_point_of_the_sudo_password_prompt_if/"
 
 "pkexec" is safer, but since the Polkit agent doesn't show command arguments, it can be vulnerable too;
 further more, "pkexec" fails in the second case;
-  a fake Polkit agent can be used to send the stolen password to Polkit;
-and since Polkit admin is installed and active by default,
+  the fallback Polkit agent can be used to send the stolen password to Polkit;
+  ; pkttyagent -p $(echo $$) | pkexec ...
+since Polkit admin is installed and active by default,
   we have to disable it to protect the system (after we have a secure alternative):
 ; mkdir -p /etc/polkit-1/rules.d
 ; echo 'polkit.addAdminRule(function(action, subject) { return []; });' >
   /etc/polkit-1/rules.d/49-rootpw_global.rules
 
-"su" fails in the second case too;
-so we have to disable root login (after we have a secure alternative):
-; passwd -l root
+note that you must have a separate password for root, which must only be used to login to root,
+  at the Linux console, when GnomeShell fails to start;
+do not use "su";
 
 the solution is a program which opens a Wayland window with a command prompt;
 if you have given your command as arguments to the program,
