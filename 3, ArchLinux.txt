@@ -34,10 +34,10 @@ press "alt-tab" to switch between applications;
 press "alt-a" or "alt-`" to switch between the windows of an application;
 press "alt-shift-space" to toggle maximized state;
 
-additional applications can be installed using "arc add package_name";
-"arc" uses "pacman" and BTRFS snapshots to manage packages in such a way that
+additional applications can be installed using "arch add package_name";
+"arch" uses "pacman" and BTRFS snapshots to manage packages in such a way that
   changes to "/usr" and "/boot" would be atomic, and does not interfere with the running system;
-as a result when you install an application, or update the system using "arc",
+as a result when you install an application, or update the system using "arch",
   the system must be restarted for it to take effect;
 removing packages is done live though (otherwise managing "/etc" would be complicated);
 all of this means that we can have reliable automatic updates;
