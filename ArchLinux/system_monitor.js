@@ -513,7 +513,7 @@ class Net extends ElementBase {
         this.NMsigID[j] = iface_list[j].connect('state-changed', this.update_iface_list.bind(this));
       }
     } catch (e) {
-      global.logError('Please install Network Manager Gobject Introspection Bindings: ' + e);
+      global.logError('please install Network Manager Gobject introspection bindings: ' + e);
     }
     this.update();
   }
@@ -526,7 +526,7 @@ class Net extends ElementBase {
           this.ifs.push(iface_list[j].get_ip_iface() || iface_list[j].get_iface());
       }
     } catch (e) {
-      global.logError('Please install Network Manager Gobject Introspection Bindings');
+      global.logError('please install Network Manager Gobject introspection bindings');
     }
   }
   refresh() {
@@ -564,7 +564,7 @@ class Net extends ElementBase {
   _apply() {}
 }
 
-const box = new St.BoxLayout({ style: 'spacing: 4px; padding: 0 8px 0 4px;' });
+const box = new St.BoxLayout({ style: 'spacing: 4px; margin: 0 8px 0 12px' });
 main.panel.statusArea.aggregateMenu._indicators?.insert_child_at_index(box, 0);
 const elts = [new Cpu(-1), new Mem(), new Disk(), new Net()];
 for (let elt in elts)

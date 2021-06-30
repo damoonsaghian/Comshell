@@ -109,11 +109,11 @@ if (power._sync && power._proxy) {
   power._sync();
 }
 
-const dateTimeLabel = new St.Label({ y_align: Clutter.ActorAlign.CENTER, style_class: "system-status-icon" });
+const dateTimeLabel = new St.Label({ y_align: Clutter.ActorAlign.CENTER, style: "margin: 0 0 0 8px" });
 main.panel.statusArea.aggregateMenu._indicators?.add_child(dateTimeLabel);
 const updateClock = () => {
   const now = GLib.DateTime.new_now_local();
-  const nowFormated = now ? now.format("%F  %a  %p  %I:%M") : "";
+  const nowFormated = now ? now.format("%F  %a  %p  %I:%M  ") : "";
   dateTimeLabel.set_text(nowFormated);
 };
 updateClock();
@@ -127,7 +127,7 @@ imports.misc.extensionUtils.getCurrentExtension().imports.system_monitor;
 // -----------------
 const activitiesButton = main.panel.statusArea.activities;
 activitiesButton.remove_all_children();
-const runningAppsBox = new St.BoxLayout({ x_align: Clutter.ActorAlign.CENTER, style: "padding: 0 4px" });
+const runningAppsBox = new St.BoxLayout({ x_align: Clutter.ActorAlign.CENTER });
 activitiesButton.add_child(runningAppsBox);
 runningAppsBox.add_child(new St.Icon({
   icon_name: "view-app-grid-symbolic",

@@ -146,6 +146,7 @@ stage {
   font-size: 10.5pt;
   font-weight: normal;
   color: #ffffff;
+  -natural-hpadding: 0;
 }
 #panel #panelActivities {
   -natural-hpadding: 0;
