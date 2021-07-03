@@ -517,6 +517,7 @@ class Net extends ElementBase {
     }
     this.update();
   }
+
   update_iface_list() {
     try {
       this.ifs = [];
@@ -529,8 +530,12 @@ class Net extends ElementBase {
       global.logError('please install Network Manager Gobject introspection bindings');
     }
   }
+
   refresh() {
     let accum = [0, 0, 0, 0, 0];
+
+    if (!this.ifs.length)
+      this.update_iface_list();
 
     for (let ifn in this.ifs) {
       GTop.glibtop_get_netload(this.gtop, this.ifs[ifn]);
