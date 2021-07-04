@@ -86,7 +86,7 @@ main.overview._overview._controls._searchController._onStageKeyPress = function 
   const panelBox = main.layoutManager.panelBox;
   function movePanelToBottom() {
     const monitor = main.layoutManager.primaryMonitor;
-    const y = monitor.height - panelBox.height;
+    const y = monitor?.height - panelBox.height;
     panelBox.set_position(0, y);
   }
   main.layoutManager.connect("monitors-changed", movePanelToBottom);
@@ -109,11 +109,11 @@ if (power._sync && power._proxy) {
   power._sync();
 }
 
-const dateTimeLabel = new St.Label({ y_align: Clutter.ActorAlign.CENTER, style: "margin: 0 0 0 8px" });
+const dateTimeLabel = new St.Label({ y_align: Clutter.ActorAlign.CENTER, style: "margin: 0 8px" });
 main.panel.statusArea.aggregateMenu._indicators?.add_child(dateTimeLabel);
 const updateClock = () => {
   const now = GLib.DateTime.new_now_local();
-  const nowFormated = now ? now.format("%F  %a  %p  %I:%M  ") : "";
+  const nowFormated = now ? now.format("%F  %a  %p  %I:%M") : "";
   dateTimeLabel.set_text(nowFormated);
 };
 updateClock();
