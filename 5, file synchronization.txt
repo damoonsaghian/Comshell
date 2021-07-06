@@ -1,6 +1,6 @@
 the problem of shared mutable data is so pervasive in the computing world;
 we can also see it in file synchronization tools like Git:
-, there can be conflicts when pushing or pulling, that must be resolved manually;
+, there can be conflicts when pushing or pulling, which needs to be resolved manually;
 , the history just grows indefinitely cause change in the history of the repository can be catastrophic;
 
 solution:
@@ -8,7 +8,7 @@ only the owner can mutate the repository;
 each file or directory can have an owner;
 owner can mutably borrow its content for a defined duration, or move ownership;
 others have to send messages:
-, in the form of to_dos define by the owner;
+, in the form of to_dos defined by the owner;
 , corrections
 
 immutable repositories can apply corrections and to_dos, and test them,
@@ -28,7 +28,7 @@ why not cloud storage services?
   cause they have no proper way to present a URL of the repository to the public;
 
 write a file synchronization in Rust or NodeJS;
-files are scanned and their paths, hashes and modification times are store in an index file;
+files are scanned and their paths, hashes and modification times are stored in an index file;
 this index file is compared with the one in the destination;
 a list of the files which must be removed is written in the destination
   (if there is an old one, it will be appended to it);

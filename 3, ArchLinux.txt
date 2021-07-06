@@ -34,7 +34,8 @@ press "alt-tab" to switch between applications;
 press "alt-a" or "alt-`" to switch between the windows of an application;
 press "alt-shift-space" to toggle maximized state;
 
-additional applications can be installed using "arch add package_name";
+to install packages: "pkexec arch add package_names";
+to remove packages: "pkexec arch remove package_names";
 "arch" uses "pacman" and BTRFS snapshots to manage packages in such a way that
   changes to "/usr" and "/boot" would be atomic, and does not interfere with the running system;
 as a result when you install an application, or update the system using "arch",
@@ -67,30 +68,3 @@ in addition you have to:
 , disable boot from external devices;
 these can make physical attacks more difficult, but keep in mind that
   physical access to a computer is root access, given enough time and resources;
-
-= system administration
-in system administration we must ensure that:
-1, the command executed is explicitly given by the user;
-2, even if a program steals a wheel user's password, it still can't change the system;
-
-"sudo" fails in both cases;
-"https://www.reddit.com/r/linuxquestions/comments/8mlil7/whats_the_point_of_the_sudo_password_prompt_if/"
-
-"pkexec" is safer, but since the Polkit agent doesn't show command arguments, it can be vulnerable too;
-further more, "pkexec" fails in the second case;
-  the fallback Polkit agent can be used to send the stolen password to Polkit;
-  ; pkttyagent -p $(echo $$) | pkexec ...
-since Polkit admin is installed and active by default,
-  we have to disable it to protect the system (after we have a secure alternative):
-; mkdir -p /etc/polkit-1/rules.d
-; echo 'polkit.addAdminRule(function(action, subject) { return []; });' >
-  /etc/polkit-1/rules.d/49-rootpw_global.rules
-
-note that you must have a separate password for root, which must only be used to login to root,
-  at the Linux console, when GnomeShell fails to start;
-do not use "su";
-
-the solution is a program which opens a Wayland window with a command prompt;
-if you have given your command as arguments to the program,
-  the prompt shows that command, as default input;
-after pressing "return", it asks for root password;
