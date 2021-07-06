@@ -4,6 +4,7 @@
 
 # exit if "/usr/local/bin/arch" has more than one instances;
 if [[ $(pgrep -c /usr/local/bin/arch) -gt 1 ]]; then
+  echo 'another instance is running;'
   exit
 fi
 
@@ -23,87 +24,62 @@ if [[ "$1" == "autoupdate" && ( $(batteryIsEmpty) || $(connectionIsMetered) ) ]]
   exit
 fi
 
+if [[ -d /subvols/1 ]]; then
+  btrfs subvolume delete /subvols/1
+fi
+
 if [[ "$1" == "remove" ]]; then
-  # if "/" is "/subvols/0", and "/subvols/1" exists:
-  if [[ "/" -ef "/subvols/0" && -d /subvols/1 ]]; then
-    arch-chroot /subvols/1 "pacman --noconfirm -Rns ${@:2}"
-  fi
-  # if "/" is "/subvols/1", and "/subvols/0" exists:
-  if [[ "/" -ef "/subvols/1" && -d /subvols/0 ]]; then
+  primaryPackages=" base grub intel-ucode amd-ucode booster linux linux-firmware reflector networkmanager gnome-shell gdm gvfs gnome-terminal "
+  for p in "${@:2}"; do
+    if [[ "$primaryPackages" == *" $p "* ]]; then
+      echo "can't remove primary packages; try this instead:"
+      echo 'pkexec pacman -Rns package_names'
+      exit
+    fi
+  done
+
+  pacman -Rns ${@:2}
+  # if "/" is not "/subvols/0":
+  if [[ ! "/" -ef "/subvols/0" ]]; then
     arch-chroot /subvols/0 "pacman --noconfirm -Rns ${@:2}"
   fi
-  pacman --noconfirm -Rns ${@:2}
+  exit
+fi
+
+if [[ "$1" != "update" && "$1" != "autoupdate" && "$1" != "add" ]]; then
+  echo 'usage:
+  arch add package_names
+  arch remove package_names
+  arch update'
   exit
 fi
 
 set -e
 
-run () {
-  mount --bind /etc /subvols/2/etc
-  mount --bind /home /subvols/2/home
-  mount --bind /root /subvols/2/root
-  mount --bind /opt /subvols/2/opt
-  mount --bind /usr/local /subvols/2/usr/local
-  mount --bind /srv /subvols/2/srv
-  mount --bind /tmp /subvols/2/tmp
-  mount --bind /var /subvols/2/var
-  mount --bind /boot/efi /subvols/2/boot/efi
+# create a snapshot of "/subvols/0" in "/subvols/1";
+btrfs subvolume snapshot /subvols/0 /subvols/1
 
-  arch-chroot /subvols/2 /usr/bin/sh << EOF
+mount --bind /etc /subvols/1/etc
+mount --bind /home /subvols/1/home
+mount --bind /root /subvols/1/root
+mount --bind /opt /subvols/1/opt
+mount --bind /usr/local /subvols/1/usr/local
+mount --bind /srv /subvols/1/srv
+mount --bind /tmp /subvols/1/tmp
+mount --bind /var /subvols/1/var
+mount --bind /boot/efi /subvols/1/boot/efi
+
+arch-chroot /subvols/1 /usr/bin/bash << EOF
+set -e
+if [[ "$1" == "autoupdate" ]]; then
   pacman -Syu --noconfirm
-  if [[ "$1" == "add" ]]; then
-    pacman --noconfirm -S ${@:2}
-  fi
-  # clear orphaned packages:
-  pacman -Qttdq | pacman -Rns --noconfirm - 2>/dev/null
-  # clear cache:
-  pacman -Sc --noconfirm
-EOF
-}
-
-if [[ "$1" == "update" || "$1" == "autoupdate" || "$1" == "add" ]]; then
-  if [[ -d /subvols/2 ]]; then
-    btrfs subvolume delete /subvols/2
-  fi
-
-  # if "/" is "/subvols/0":
-  if [[ "/" -ef "/subvols/0" ]]; then
-    if [[ -d /subvols/1 ]]; then
-      mv /subvols/1 /subvols/2
-    else
-      # create a snapshot of "/subvols/0" in "/subvols/2";
-      btrfs subvolume snapshot /subvols/0 /subvols/2
-    fi
-
-    run $@
-    mv /subvols/2 /subvols/1
-    arch-chroot /subvols/1 "grub-mkconfig -o /boot/efi/EFI/BOOT/grub.cfg"
-    btrfs subvolume delete /subvols/0
-    exit
-  fi
-
-  # if "/" is "/subvols/1":
-  if [[ "/" -ef "/subvols/1" ]]; then
-    if [[ -d /subvols/0 ]]; then
-      mv /subvols/0 /subvols/2
-    else
-      # create a snapshot of "/subvols/1" in "/subvols/2";
-      btrfs subvolume snapshot /subvols/1 /subvols/2
-    fi
-
-    run $@
-    mv /subvols/2 /subvols/0
-    arch-chroot /subvols/0 "grub-mkconfig -o /boot/efi/EFI/BOOT/grub.cfg"
-    btrfs subvolume delete /subvols/1
-    exit
-  fi
-
-  echo 'error: "/" is not "/subvols/0" nor "/subvols/1"'
-  exit
+else
+  pacman -Syu ${@:2}
 fi
+# clear orphaned packages:
+pacman -Qttdq | pacman --noconfirm -Rns - 2>/dev/null
+# clear cache:
+pacman --noconfirm -Sc
+EOF
 
-echo 'usage:
-arch add package_name
-arch remove package_name
-arch update
-'
+mv /subvols/1 /subvols/0

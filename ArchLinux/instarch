@@ -72,6 +72,28 @@ RandomizedDelaySec=5min
 WantedBy=timers.target
 ' > /mnt/usr/local/lib/systemd/system/autoupdate.timer
 
+echo '
+polkit.addRule(function(action, subject) {
+  var subjectIsAdmin = subject.local && subject.active && subject.isInGroup("wheel");
+
+  if (
+    action.id == "org.freedesktop.policykit.exec" &&
+    action.lookup("program") == "/usr/local/bin/arch" &&
+    subjectIsAdmin
+  ) {
+    return polkit.Result.YES;
+  }
+
+  if (
+    action.id == "org.freedesktop.systemd1.manage-units" &&
+    action.lookup("unit") == "tor.service" &&
+    subjectIsAdmin
+  ) {
+    return polkit.Result.YES;
+  }
+});
+' > /mnt/etc/polkit-1/rules.d/49-nopassword.rules
+
 # to customize dconf default values:
 mkdir -p /mnt/etc/dconf/profile
 echo 'user-db:user
@@ -146,9 +168,6 @@ stage {
   font-size: 10.5pt;
   font-weight: normal;
   color: #ffffff;
-  -natural-hpadding: 0;
-}
-#panel #panelActivities {
   -natural-hpadding: 0;
 }
 ' > /mnt/usr/local/share/gnome-shell/extensions/gnome-shell-improved/style.css
