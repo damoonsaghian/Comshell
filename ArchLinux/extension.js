@@ -109,7 +109,7 @@ if (power._sync && power._proxy) {
   power._sync();
 }
 
-const dateTimeLabel = new St.Label({ y_align: Clutter.ActorAlign.CENTER, style: "margin: 0 8px" });
+const dateTimeLabel = new St.Label({ y_align: Clutter.ActorAlign.CENTER, style: "margin: 0 8px 0 4px" });
 main.panel.statusArea.aggregateMenu._indicators?.add_child(dateTimeLabel);
 const updateClock = () => {
   const now = GLib.DateTime.new_now_local();
