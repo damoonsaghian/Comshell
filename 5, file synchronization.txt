@@ -4,8 +4,8 @@ we can also see it in file synchronization tools like Git:
 , the history just grows indefinitely cause change in the history of the repository can be catastrophic;
 
 solution:
-only the owner can mutate the repository;
-each file or directory can have an owner;
+all the files and directories in a repository have an owner, which is by default the creator of the repository;
+only the owner can mutate that file or directory;
 owner can mutably borrow its content for a defined duration, or move ownership;
 others have to send messages:
 , in the form of to_dos defined by the owner;
@@ -16,16 +16,15 @@ immutable repositories can apply corrections and to_dos, and test them,
 automatic sync at the immutable ends;
 sync before sending to_dos or corrections;
 
-a WebDAVS or FTPS server for remote storage;
-why not SFTP? because SSH fingerprint verification is complicated; we have 2 chocies:
-, DNSSEC: in addition to being complex and not widely deployed,
-  the identity verification is done at the recursive resolvers, not a the person's computer;
-  so the resolver must be trusted;
-  "https://www.redpill-linpro.com/techblog/2019/05/06/sshfp-and-dnssec.html"
-  "https://www.cloudflare.com/dns/dnssec/how-dnssec-works/"
-, using a separate HTTPS URL, which can add a little complexity;
-why not cloud storage services?
-  cause they have no proper way to present a URL of the repository to the public;
+SFTP:
+, create a user with a temporary password;
+, login, then disable multi login;
+, reset ssh;
+, login, remove ssh keys, add your ssh key;
+, change password;
+, enable multi login;
+
+multi_user functionality:
 
 write a file synchronization in Rust or NodeJS;
 files are scanned and their paths, hashes and modification times are stored in an index file;
@@ -39,9 +38,9 @@ the files which must be removed will be deleted;
 to download from the destination, first
 
 chunking files is useless; mutable files must be kept small;
-databases are bad for syncing; chunking does not work for them;
-we can implement an algorithm for each type of database;
-but diffing is bad idea, because it doubles the needed storage;
+databases are bad for syncing; chunking does not work for them anyway;
+we could implement an algorithm for each type of database;
+regardless, diffing is bad idea, because it doubles the required storage;
 
 alternatives and there problems:
 Git doubles the storage needed:
@@ -50,9 +49,10 @@ Git doubles the storage needed:
 Rsync, Rdiff-backup, Duplicity: they don't handle renames, and they only support SSH;
 Unison: it handles renames but instead of moving it copies and deletes in remote, and only supports SSH;
 Bup, Borg, Snebu: they handle renames, but only supports SSH;
+"https://borgbackup.readthedocs.io/en/stable/quickstart.html#important-note-about-files-changing-during-the-backup-process"
 Rclone: it handles renames only when using SFTP or cloud storage; in addition:
 , inconsistent repository is possible, unless a lock mechanism is implemented;
-, download/upload resume not supported (since it does not split files to chunks, it can be problematic);
+, download/upload resume not supported (and since it does not split files to chunks, it can be problematic);
 Restic:
 , weired UI (eg one has to type repository every time);
 , can't disable encryption;
