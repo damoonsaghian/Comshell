@@ -1,68 +1,48 @@
 the problem of shared mutable data is so pervasive in the computing world;
 we can also see it in file synchronization tools like Git:
 , there can be conflicts when pushing or pulling, which needs to be resolved manually;
-, the history just grows indefinitely cause change in the history of the repository can be catastrophic;
+, to allow shared mutability we have to keep the whole history in the repository;
 
 solution:
-all the files and directories in a repository have an owner, which is by default the creator of the repository;
-only the owner can mutate that file or directory;
-owner can mutably borrow its content for a defined duration, or move ownership;
+only the owner of the repository can mutate it;
 others have to send messages:
 , in the form of to_dos defined by the owner;
 , corrections
+any one can apply corrections and to_dos locally, and test them,
+  but they can't mutate the repository, only the owner can;
 
-immutable repositories can apply corrections and to_dos, and test them,
-  but they can't push it to remote, only the owner can;
-automatic sync at the immutable ends;
-sync before sending to_dos or corrections;
+corrections and to_dos can created by editing a file using a special syntax;
+when the user wants to send them, for any applied correction/to_do
+  a file will be created in the public folder (if there is none),
+  then the public folder will be synced;
 
 SFTP:
 , create a user with a temporary password;
 , login, then disable multi login;
 , reset ssh;
-, login, remove ssh keys, add your ssh key;
+, login;
+, make a homepage;
+, put the fingerprint in "ssh_fingerprint.txt";
 , change password;
-, enable multi login;
+, logout
+, each time before login download the ssh key fingerprint, and append it to "~/.ssh/known_hosts";
 
-multi_user functionality:
+to always have a consistent instance of files we use snapshots;
 
-write a file synchronization in Rust or NodeJS;
-files are scanned and their paths, hashes and modification times are stored in an index file;
-this index file is compared with the one in the destination;
-a list of the files which must be removed is written in the destination
-  (if there is an old one, it will be appended to it);
-changed files and new files are written to the root directory of the destination,
-  using their hash as the file name;
-the index file is written to the destination;
-the files which must be removed will be deleted;
-to download from the destination, first
+upload to remote:
+, create a snapshot on the local machine;
+, for each local file (except the public directory) calculate its hash, rename it to its hash;
+, put the hash and path in the "index" file;
+, sync using lftp;
+, delete the local snapshot;
 
-chunking files is useless; mutable files must be kept small;
-databases are bad for syncing; chunking does not work for them anyway;
-we could implement an algorithm for each type of database;
-regardless, diffing is bad idea, because it doubles the required storage;
-
-alternatives and there problems:
-Git doubles the storage needed:
-, working directoy;
-, local repository (or the cache directory if you use Git LFS);
-Rsync, Rdiff-backup, Duplicity: they don't handle renames, and they only support SSH;
-Unison: it handles renames but instead of moving it copies and deletes in remote, and only supports SSH;
-Bup, Borg, Snebu: they handle renames, but only supports SSH;
-"https://borgbackup.readthedocs.io/en/stable/quickstart.html#important-note-about-files-changing-during-the-backup-process"
-Rclone: it handles renames only when using SFTP or cloud storage; in addition:
-, inconsistent repository is possible, unless a lock mechanism is implemented;
-, download/upload resume not supported (and since it does not split files to chunks, it can be problematic);
-Restic:
-, weired UI (eg one has to type repository every time);
-, can't disable encryption;
-, locks repository when mutating;
-, prune is very slow and it locks repository;
-, high CPU and memory usage;
-Kopia: weird UI (what does "connecting to a repo" means)
-knoxite: weired UI (what's the point of volumes)
-Duplicacy: really good; consistent, lockless and simple repository;
-  i think the only problem is it's license;
+download from remote:
+, create a snapshot on the local machine;
+, for each file (except the public directory) calculate its hash, rename it to its hash;
+, sync using lftp;
+, rename the files to the original path, based on the "index" file;
+, move the snapshot to the destination;
+, if the downloaded files are inconsistent (according to the "index" file) try again;
 
 files in ".cache" directory will no be synced;
 so build directories must be put inside ".cache"; eg for Rust:
