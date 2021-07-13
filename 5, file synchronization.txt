@@ -1,21 +1,3 @@
-the problem of shared mutable data is so pervasive in the computing world;
-we can also see it in file synchronization tools like Git:
-, there can be conflicts when pushing or pulling, which needs to be resolved manually;
-, to allow shared mutability we have to keep the whole history in the repository;
-
-solution:
-only the owner of the repository can mutate it;
-others have to send messages:
-, in the form of to_dos defined by the owner;
-, corrections
-any one can apply corrections and to_dos locally, and test them,
-  but they can't mutate the repository, only the owner can;
-
-corrections and to_dos can created by editing a file using a special syntax;
-when the user wants to send them, for any applied correction/to_do
-  a file will be created in the public folder (if there is none),
-  then the public folder will be synced;
-
 SFTP:
 , create a user with a temporary password;
 , login, then disable multi login;
@@ -27,24 +9,39 @@ SFTP:
 , logout
 , each time before login download the ssh key fingerprint, and append it to "~/.ssh/known_hosts";
 
-to always have a consistent instance of files we use snapshots;
+index file:
+".cache/sync/index"
+entries are separated with empty lines;
+each entry has 3 lines:
+1, path
+2, modification time
+3, hash
 
-upload to remote:
-, create a snapshot on the local machine;
-, for each local file (except the public directory) calculate its hash, rename it to its hash;
-, put the hash and path in the "index" file;
-, sync using lftp;
-, delete the local snapshot;
+".cache/messages/"
 
-download from remote:
-, create a snapshot on the local machine;
-, for each file (except the public directory) calculate its hash, rename it to its hash;
-, sync using lftp;
-, rename the files to the original path, based on the "index" file;
+sync up:
+, create a snapshot of the project in ".cache/sync/snapshot/";
+  snapshots are used to always have a consistent destination;
+, put all files at root and use their hashes for the file names;
+  if the file's modification time is the same as the one in the index file,
+  take the hash from the index file, otherwise calculate the hash;
+, create new index file, inside the snapshot;
+, sync the snapshot to remote, using LFTP;
+, delete the snapshot;
+
+sync down:
+, create a snapshot of the project in ".cache/sync/snapshot/";
+  snapshots are used to always have a consistent destination;
+, put all files at root and use their hashes for the file names;
+  if the file's modification time is the same as the one in the index file,
+  take the hash from the index file, otherwise calculate the hash;
+, sync the remote to snapshot, using LFTP;
+, if the downloaded files are inconsistent with the index files, sync again and again;
+, move the index file to ".cache/sync/index" (inside the snapshot);
+, rename the files in the snapshot to the paths mentioned in the index file;
 , move the snapshot to the destination;
-, if the downloaded files are inconsistent (according to the "index" file) try again;
 
-files in ".cache" directory will no be synced;
+files in ".cache" directory will not be synced;
 so build directories must be put inside ".cache"; eg for Rust:
 ; nano ~/.cargo/config
   [build]
