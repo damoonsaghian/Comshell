@@ -1,38 +1,47 @@
 collaborative development
 
-we will have three BTRFS snapshots:
-".cache/sync/pristine"
-".cache/sync/indexed"
-".cache/sync/remote"
+we will have three BTRFS snapshots in a project's ".cache/coldev" directory:
+, pristine
+, indexed
+, remote
 
 index file:
-".cache/sync/index"
+".cache/coldev/indexed/index"
 entries are separated with empty lines;
 each entry has 3 lines:
-1, path
-2, modification time
-3, hash
+, path
+, modification time
+, hash
 
 push:
-, lock remote
-, pull, and if something must be done, unlock and exit;
-, snapshot working directory into ;
-, flatten the paths of all files in ".cache/sync/indexed" using their hashes for the file names;
+, if a file named "lock" exists at the remote, and it's younger than 20 seconds, exit;
+, create a Cron job at the server that after this process finishes,
+  it deletes files which are not in the index file;
+, pull then if something must be done, unlock the remote and exit;
+, snapshot the working directory into ".cache/coldev/remote" and ".cache/coldev/temp";
+, flatten the paths of all files in ".cache/coldev/temp" using their hashes for the file names;
   if the file's modification time is the same as the one in the index file,
   take the hash from the index file, otherwise calculate the hash;
-, create the index file, inside ".cache/sync/indexed";
-, sync up ".cache/sync/indexed", using LFTP;
-, delete the snapshot;
+, move ".cache/coldev/temp" to ".cache/coldev/indexed";
+, sync up ".cache/coldev/indexed" (using LFTP), without deleting any file at the remote;
+, create the index file inside ".cache/coldev/indexed";
+, create a file named "lock" in the remote;
+, if index file in remote is not the same as the one in ".cache/coldev/remote", exit;
+  because it means that some one else has pushed sooner, and you must pull it before pushing;
+, send ".cache/coldev/indexed" to the remote;
+, remove the lock file;
+, delete those remote files which are not in index file;
+, snapshot the ".cache/coldev/remote" into ".cache/coldev/pristine";
 
 pull:
-, sync down ".cache/sync/indexed", snapshot it into ".cache/sync/remote", and rename file;
+, sync down into ".cache/coldev/indexed", snapshot it to ".cache/coldev/temp";
+, rename the files in ".cache/coldev/temp" based on the index file;
+, delete the index file;
+, move ".cache/coldev/temp" to ".cache/coldev/remote";
 , show the diff based on the working directory, pristine and remote;
 
-, move the index file to ".cache/sync/index" (inside the snapshot);
-, rename the files in the snapshot to the paths mentioned in the index file;
-, move the snapshot to the working directory;
-
 backup:
+, copy the
 
 SFTP:
 , create a user with a temporary password;
@@ -43,9 +52,12 @@ SFTP:
 , put the fingerprint in "ssh_fingerprint.txt";
 , change password;
 , logout
-, each time before login download the ssh key fingerprint, and append it to "~/.ssh/known_hosts";
+create a key pair, and copy the public key to the server:
+"https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server"
+each time before login download the ssh key fingerprint, and append it to "~/.ssh/known_hosts";
 
-messages are attached to tags which are placed in files;
+we can put tags like "//tag_name//" or "#tag_name#" in different places inside files;
+messages are attached to these tags;
 ".cache/messages/"
 
 files in ".cache" directory will not be synced;
