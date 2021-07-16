@@ -17,16 +17,18 @@ push:
 , if a file named "lock" exists at the remote, and it's younger than 20 seconds, exit;
 , create a Cron job at the server that after this process finishes,
   it deletes files which are not in the index file;
-, pull then if something must be done, unlock the remote and exit;
+, if index file in remote is not the same as the one in ".cache/coldev/indexed", exit;
+  because it means that some one else has pushed sooner, and you must pull it before pushing;
 , snapshot the working directory into ".cache/coldev/remote" and ".cache/coldev/temp";
 , flatten the paths of all files in ".cache/coldev/temp" using their hashes for the file names;
-  if the file's modification time is the same as the one in the index file,
+  if the file's modification time is the same as the one in the index file in ".cache/coldev/indexed",
   take the hash from the index file, otherwise calculate the hash;
+  and add the file to the index file;
 , move ".cache/coldev/temp" to ".cache/coldev/indexed";
-, sync up ".cache/coldev/indexed" (using LFTP), without deleting any file at the remote;
-, create the index file inside ".cache/coldev/indexed";
+, sync up ".cache/coldev/indexed", except the index file,
+  and without deleting any file at the remote;
 , create a file named "lock" in the remote;
-, if index file in remote is not the same as the one in ".cache/coldev/remote", exit;
+, if index file in remote is not the same as the one in ".cache/coldev/indexed", exit;
   because it means that some one else has pushed sooner, and you must pull it before pushing;
 , send ".cache/coldev/indexed" to the remote;
 , remove the lock file;
@@ -39,9 +41,12 @@ pull:
 , delete the index file;
 , move ".cache/coldev/temp" to ".cache/coldev/remote";
 , show the diff based on the working directory, pristine and remote;
+, merge the remote into the working directory;
 
 backup:
 , copy the
+
+syncing is done using Rsync if it's available on the server otherwise LFTP will be used;
 
 SFTP:
 , create a user with a temporary password;
@@ -55,10 +60,6 @@ SFTP:
 create a key pair, and copy the public key to the server:
 "https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server"
 each time before login download the ssh key fingerprint, and append it to "~/.ssh/known_hosts";
-
-we can put tags like "//tag_name//" or "#tag_name#" in different places inside files;
-messages are attached to these tags;
-".cache/messages/"
 
 files in ".cache" directory will not be synced;
 so build directories must be put inside ".cache"; eg for Rust:
