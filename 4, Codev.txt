@@ -1,0 +1,33 @@
+collaborative development without the need to keep it's whole history (as is done in version control systems);
+
+we will have three BTRFS snapshots in a project's ".data/codev/" directory:
+, pristine
+, indexed
+, remote
+
+files will be synced up/down to/from the the remote from/to ".data/codev/indexed";
+there is no directory tree here, instead we have an index file;
+"project_path/.data/codev/indexed/index"
+entries are separated with empty lines;
+each entry has 3 lines:
+, path
+, modification time
+, hash
+
+; codev push remote_path
+remote path will be kept in "project_path/.data/codev/remote_path";
+
+; codev pull
+the shown diff will be based on the working directory, pristine and remote;
+after merging:
+; codev push
+
+Codev also automatically backs up your projects;
+"project_path/.cache/backup_path"
+; codev backup backup_path
+
+files in ".cache" directory will not be synced;
+so build directories must be put inside ".cache"; eg for Rust:
+; nano ~/.cargo/config
+  [build]
+  target-dir = ".cache/cargo"
