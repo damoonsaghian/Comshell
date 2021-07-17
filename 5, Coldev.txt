@@ -13,35 +13,38 @@ each entry has 3 lines:
 , modification time
 , hash
 
-push:
+push to remote:
 , if a file named "lock" exists at the remote, and it's younger than 20 seconds, exit;
-, create a Cron job at the server that after this process finishes,
-  it deletes files which are not in the index file;
-, if index file in remote is not the same as the one in ".cache/coldev/indexed", exit;
-  because it means that some one else has pushed sooner, and you must pull it before pushing;
-, snapshot the working directory into ".cache/coldev/remote" and ".cache/coldev/temp";
+, if the index file in remote is not the same as ".cache/coldev/indexed/index", exit;
+  because it means that someone else has already pushed to the remote before you,
+  and you must pull and merge it before pushing;
+, snapshot ".cache/coldev/remote" into ".cache/coldev/temp";
 , flatten the paths of all files in ".cache/coldev/temp" using their hashes for the file names;
-  if the file's modification time is the same as the one in the index file in ".cache/coldev/indexed",
+  if the file's modification time is the same as the one in the index file ".cache/coldev/indexed/index",
   take the hash from the index file, otherwise calculate the hash;
   and add the file to the index file;
 , move ".cache/coldev/temp" to ".cache/coldev/indexed";
+, create a Cron job at the server that after this process finishes,
+  it deletes files which are not in the index file;
 , sync up ".cache/coldev/indexed", except the index file,
   and without deleting any file at the remote;
 , create a file named "lock" in the remote;
 , if index file in remote is not the same as the one in ".cache/coldev/indexed", exit;
-  because it means that some one else has pushed sooner, and you must pull it before pushing;
+  because it means that someone else has already pushed to the remote before you,
+  and you must pull it before pushing;
 , send ".cache/coldev/indexed" to the remote;
 , remove the lock file;
 , delete those remote files which are not in index file;
 , snapshot the ".cache/coldev/remote" into ".cache/coldev/pristine";
 
-pull:
+pull from remote:
 , sync down into ".cache/coldev/indexed", snapshot it to ".cache/coldev/temp";
-, rename the files in ".cache/coldev/temp" based on the index file;
 , delete the index file;
+, rename the files in ".cache/coldev/temp" based on the index file ".cache/coldev/indexed/index";
 , move ".cache/coldev/temp" to ".cache/coldev/remote";
 , show the diff based on the working directory, pristine and remote;
 , merge the remote into the working directory;
+, snapshot the working directory into ".cache/coldev/remote"
 
 backup:
 , copy the
