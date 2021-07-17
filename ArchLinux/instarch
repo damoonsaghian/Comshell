@@ -272,5 +272,8 @@ grub-mkstandalone -O x86_64-efi -o "/boot/efi/EFI/BOOT/BOOTX64.EFI" "boot/grub/g
 grub-mkconfig -o /boot/efi/EFI/BOOT/grub.cfg
 EOF
 
+cp ./codev /mnt/usr/local/bin/
+chmod +x /mnt/usr/local/bin/codev
+
 umount -R /mnt
 poweroff
