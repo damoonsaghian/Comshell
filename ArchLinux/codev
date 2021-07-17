@@ -26,7 +26,7 @@
 #
 # pull from remote:
 # , sync down into ".cache/codev/indexed", snapshot it to ".cache/codev/temp";
-# , delete the index file;
+# , delete the index file and ".cache/codev/tmp/.cache/";
 # , rename the files in ".cache/codev/temp" based on the index file ".cache/codev/indexed/index";
 # , move ".cache/codev/temp" to ".cache/codev/remote";
 # , show the diff based on the working directory, pristine and remote;
@@ -38,7 +38,7 @@
 #
 # syncing is done using Rsync if it's available on the server, otherwise LFTP will be used;
 #
-# SFTP:
+# SSH:
 # , create a user with a temporary password;
 # , login, then disable multi login;
 # , reset ssh;
