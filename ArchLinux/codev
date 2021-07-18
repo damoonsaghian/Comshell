@@ -11,21 +11,21 @@
 #   take the hash from the index file, otherwise calculate the hash;
 #   and add the file to the index file;
 # , move ".cache/codev/temp" to ".cache/codev/indexed";
-# , create a Cron job at the server that after this process finishes,
-#   it deletes files which are not in the index file;
-# , sync up ".cache/codev/indexed", except the index file,
-#   and without deleting any file at the remote;
+# , sync up ".cache/codev/indexed" to the public_html directory of the remote (using LFTP),
+#   except the index file, and without deleting any file at the remote;
 # , create a file named "lock" in the remote;
 # , if index file in remote is not the same as the one in ".cache/codev/indexed", exit;
 #   because it means that someone else has already pushed to the remote before you,
 #   and you must pull it before pushing;
-# , send ".cache/codev/indexed" to the remote;
+# , send ".cache/codev/indexed/index" to the remote;
 # , remove the lock file;
 # , delete those remote files which are not in index file;
 # , snapshot the ".cache/codev/remote" into ".cache/codev/pristine";
 #
 # pull from remote:
-# , sync down into ".cache/codev/indexed", snapshot it to ".cache/codev/temp";
+# , download the index file from the public_html directory of the remote, into ".cache/codev/indexed";
+# , sync down the files mentioned in the index file (using LFTP);
+# , snapshot ".cache/codev/indexed" to ".cache/codev/temp";
 # , delete the index file and ".cache/codev/tmp/.cache/";
 # , rename the files in ".cache/codev/temp" based on the index file ".cache/codev/indexed/index";
 # , move ".cache/codev/temp" to ".cache/codev/remote";
@@ -34,19 +34,11 @@
 # , snapshot the working directory into ".cache/codev/remote"
 #
 # backup:
-# , copy the
-#
-# syncing is done using Rsync if it's available on the server, otherwise LFTP will be used;
 #
 # SSH:
-# , create a user with a temporary password;
-# , login, then disable multi login;
-# , reset ssh;
-# , login;
-# , make a homepage;
-# , put the fingerprint in "ssh_fingerprint.txt";
-# , change password;
-# , logout
 # create a key pair, and copy the public key to the server:
-# "https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server"
-# each time before login download the ssh key fingerprint, and append it to "~/.ssh/known_hosts";
+# https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server
+# create a user on "hashbang.sh";
+# https://github.com/hashbang/hashbang.sh/blob/master/src/hashbang.html
+# https://github.com/hashbang/hashbang.sh/blob/master/src/hashbang.sh
+# make a homepage;
