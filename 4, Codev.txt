@@ -22,9 +22,9 @@ the shown diff will be based on the working directory, pristine and remote;
 after merging:
 ; codev push
 
-Codev also automatically backs up your projects;
-"project_path/.cache/backup_path"
-; codev backup backup_path
+Codev also automatically backs up all the projects in those directories containing a ".backup_paths" file;
+to run it manually:
+; codev backup
 
 files in ".cache" directory will not be synced;
 so build directories must be put inside ".cache"; eg for Rust:
