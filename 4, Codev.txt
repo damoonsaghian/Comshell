@@ -14,8 +14,8 @@ each entry has 3 lines:
 , modification time
 , hash
 
-; codev push remote_path
-remote path will be kept in "project_path/.data/codev/remote_path";
+create a remote repository:
+; codev new
 
 ; codev pull
 the shown diff will be based on the working directory, pristine and remote;
@@ -25,6 +25,10 @@ after merging:
 Codev also automatically backs up all the projects in those directories containing a ".backup_paths" file;
 to run it manually:
 ; codev backup
+
+add or remove users that can push;
+; codev add username1 username2 ...
+; codev remove username1 username2 ...
 
 files in ".cache" directory will not be synced;
 so build directories must be put inside ".cache"; eg for Rust:
