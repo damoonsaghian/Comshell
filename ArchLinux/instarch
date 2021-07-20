@@ -245,9 +245,8 @@ printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
 
 pacman --noconfirm -S grub intel-ucode amd-ucode linux linux-firmware \
   btrfs-progs e2fsprogs dosfstools udisks2 reflector networkmanager pipewire-pulse pipewire-alsa \
-  nano man-db unzip ttf-hack noto-fonts materia-gtk-theme \
-  gnome-shell gdm gvfs libgtop gst-plugins-{base,good,bad} gst-libav gnome-terminal \
-  openssh lftp
+  openssh curl ttf-hack noto-fonts materia-gtk-theme nano man-db unzip \
+  gnome-shell gdm gvfs libgtop gst-plugins-{base,good,bad} gst-libav gnome-terminal
 
 systemctl enable fstrim.timer
 systemctl enable reflector.timer

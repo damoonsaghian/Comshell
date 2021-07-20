@@ -1,44 +1,67 @@
 #!/bin/bash
 
-# push to remote:
-# , if a file named "lock" exists at the remote, and it's younger than 20 seconds, exit;
-# , if the index file in remote is not the same as ".cache/codev/indexed/index", exit;
-#   because it means that someone else has already pushed to the remote before you,
-#   and you must pull and merge it before pushing;
-# , snapshot ".cache/codev/remote" into ".cache/codev/temp";
-# , flatten the paths of all files in ".cache/codev/temp" using their hashes for the file names;
-#   if the file's modification time is the same as the one in the index file ".cache/codev/indexed/index",
-#   take the hash from the index file, otherwise calculate the hash;
-#   and add the file to the index file;
-# , move ".cache/codev/temp" to ".cache/codev/indexed";
-# , sync up ".cache/codev/indexed" to the public_html directory of the remote (using LFTP),
-#   except the index file, and without deleting any file at the remote;
-# , create a file named "lock" in the remote;
-# , if index file in remote is not the same as the one in ".cache/codev/indexed", exit;
-#   because it means that someone else has already pushed to the remote before you,
-#   and you must pull it before pushing;
-# , send ".cache/codev/indexed/index" to the remote;
-# , remove the lock file;
-# , delete those remote files which are not in index file;
-# , snapshot the ".cache/codev/remote" into ".cache/codev/pristine";
-#
-# pull from remote:
-# , download the index file from the public_html directory of the remote, into ".cache/codev/indexed";
-# , sync down the files mentioned in the index file (using LFTP);
-# , snapshot ".cache/codev/indexed" to ".cache/codev/temp";
-# , delete the index file and ".cache/codev/tmp/.cache/";
-# , rename the files in ".cache/codev/temp" based on the index file ".cache/codev/indexed/index";
-# , move ".cache/codev/temp" to ".cache/codev/remote";
-# , show the diff based on the working directory, pristine and remote;
-# , merge the remote into the working directory;
-# , snapshot the working directory into ".cache/codev/remote"
-#
-# backup:
-#
-# SSH:
-# create a key pair, and copy the public key to the server:
-# https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server
-# create a user on "hashbang.sh";
-# https://github.com/hashbang/hashbang.sh/blob/master/src/hashbang.html
-# https://github.com/hashbang/hashbang.sh/blob/master/src/hashbang.sh
-# make a homepage;
+new () {
+  # remote_host user_name project_name
+
+  # if there is no user associated to the host in "~/.ssh/config"
+  #  ; ssh username@remote_host
+  #  project_path: "/home/user_name/public_html/project_name"
+  #  "remote_host:project_path" will be kept in "project_path/.data/codev/remote";
+  # if there is no SSH keys, create a key pair;
+  # copy the public key to the server:
+  # https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server
+  # create a user on "hashbang.sh";
+  # https://github.com/hashbang/hashbang.sh/blob/master/src/hashbang.html
+  # https://github.com/hashbang/hashbang.sh/blob/master/src/hashbang.sh
+  # make a homepage;
+}
+
+push () {
+  # if a file named "lock" exists at the remote, and it's younger than 20 seconds, exit;
+  # if the index file in remote is not the same as ".cache/codev/indexed/index", exit;
+  #   because it means that someone else has already pushed to the remote before you,
+  #   and you must pull and merge it before pushing;
+  # snapshot ".cache/codev/remote" into ".cache/codev/temp";
+  # flatten the paths of all files in ".cache/codev/temp" using their hashes for the file names;
+  #   if the file's modification time is the same as the one in the index file ".cache/codev/indexed/index",
+  #   take the hash from the index file, otherwise calculate the hash;
+  #   and add the file to the index file;
+  # move ".cache/codev/temp" to ".cache/codev/indexed";
+  # sync up ".cache/codev/indexed" to the public_html directory of the remote (using SFTP),
+  #   except the index file, and without deleting any file at the remote;
+  # create a file named "lock" in the remote;
+  # if index file in remote is not the same as the one in ".cache/codev/indexed", exit;
+  #   because it means that someone else has already pushed to the remote before you,
+  #   and you must pull it before pushing;
+  # send ".cache/codev/indexed/index" to the remote;
+  # remove the lock file;
+  # delete those remote files which are not in index file;
+  # snapshot the ".cache/codev/remote" into ".cache/codev/pristine";
+}
+
+pull () {
+  # download the index file from the public_html directory of the remote, into ".cache/codev/indexed";
+  # sync down the files mentioned in the index file (using CURL);
+  # snapshot ".cache/codev/indexed" to ".cache/codev/temp";
+  # delete the index file and ".cache/codev/tmp/.cache/";
+  # rename the files in ".cache/codev/temp" based on the index file ".cache/codev/indexed/index";
+  # move ".cache/codev/temp" to ".cache/codev/remote";
+  # show the diff based on the working directory, pristine and remote;
+  # merge the remote into the working directory;
+  # snapshot the working directory into ".cache/codev/remote"
+}
+
+backup () {}
+
+add_user () {}
+
+remove_user () {}
+
+case "$1" in
+  new) new;;
+  push) push;;
+  pull) pull;;
+  backup) backup;;
+  add) add_user;;
+  remove) remove_user;;
+esac
