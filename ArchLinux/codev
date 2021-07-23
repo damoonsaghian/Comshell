@@ -1,18 +1,28 @@
 #!/bin/bash
 
 new () {
-  # remote_host user_name project_name
+  # remote_host username project_name
+
+  # https://hackertarget.com/ssh-examples-tunnels/
+  # https://phoenixnap.com/kb/ssh-to-connect-to-remote-server-linux-or-windows
+  # https://www.geeksforgeeks.org/ssh-command-in-linux-with-examples/
+  # https://linuxize.com/post/using-the-ssh-config-file/
+  # https://www.digitalocean.com/community/tutorials/how-to-configure-custom-connection-options-for-your-ssh-client
+  # https://man.archlinux.org/listing/openssh
 
   # if there is no user associated to the host in "~/.ssh/config"
-  #  ; ssh username@remote_host
-  #  project_path: "/home/user_name/public_html/project_name"
-  #  "remote_host:project_path" will be kept in "project_path/.data/codev/remote";
+  #   ; ssh username@remote_host
+  #   project_path: "/home/user_name/public_html/project_name"
+  #   "remote_host:project_path" will be kept in "project_path/.data/codev/remote";
+  #   printf "Host $remote_host\n  User $username\n" > ~/.ssh/config
   # if there is no SSH keys, create a key pair;
   # copy the public key to the server:
   # https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server
   # create a user on "hashbang.sh";
   # https://github.com/hashbang/hashbang.sh/blob/master/src/hashbang.html
   # https://github.com/hashbang/hashbang.sh/blob/master/src/hashbang.sh
+  # https://github.com/hashbang/shell-server/blob/master/ansible/tasks/packages/main.yml
+  # https://github.com/hashbang
   # make a homepage;
 }
 
@@ -49,6 +59,25 @@ pull () {
   # show the diff based on the working directory, pristine and remote;
   # merge the remote into the working directory;
   # snapshot the working directory into ".cache/codev/remote"
+
+  # https://curl.se/
+  # https://curl.se/docs/
+  # https://curl.se/docs/manpage.html
+  # https://curl.se/docs/manual.html
+  # https://curlie.io/
+  # https://github.com/jakubroztocil/httpie
+
+  # https://www.gnu.org/software/diffutils/manual/html_mono/diff.html
+  # https://stackoverflow.com/questions/16902001/manually-merge-two-files-using-diff
+  # file tree diff
+  # https://stackoverflow.com/questions/776854/how-do-i-compare-two-source-trees-in-linux
+  # https://github.com/dandavison/delta
+  # https://github.com/dandavison/delta
+  # https://github.com/so-fancy/diff-so-fancy
+  # https://diffoscope.org/
+  # https://github.com/MightyCreak/diffuse
+  # http://meldmerge.org/
+  # https://git-scm.com/docs/git-diff
 }
 
 backup () {}
